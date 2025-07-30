@@ -1,0 +1,64 @@
+# Core Django packages
+Django>=4.2,<5.0
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+
+# Database
+psycopg2-binary
+
+# Authentication & Security
+django-allauth
+cryptography
+
+# YouTube API Integration
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# Payment Gateway
+razorpay
+
+# Email Services
+sendgrid
+django-sendgrid-v5
+
+# PDF Generation
+reportlab
+weasyprint
+
+# File Storage & Media
+Pillow
+django-storages
+boto3
+
+# API Documentation
+drf-spectacular
+
+# Development & Debugging
+django-debug-toolbar
+python-decouple
+django-extensions
+
+# Date & Time utilities
+python-dateutil
+
+# Celery for async tasks (for notifications)
+celery
+redis
+django-celery-beat
+django-celery-results
+
+# Utilities
+requests
+python-slugify
+django-model-utils
+
+# Testing
+pytest
+pytest-django
+factory-boy
+
+# Production
+gunicorn
+whitenoise
