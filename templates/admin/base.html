@@ -1,0 +1,447 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CodeLearn LMS Admin{% endblock %}</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="shortcut icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3002/3002543.png" />
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg">
+  
+  <style>
+    /* Custom LMS Admin Styles */
+    :root {
+      --primary-color: #4f46e5;
+      --secondary-color: #7c3aed;
+      --success-color: #10b981;
+      --info-color: #06b6d4;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --dark-color: #1e293b;
+      --light-color: #f8fafc;
+      --sidebar-width: 270px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+    }
+
+    /* Sidebar Styles */
+    .left-sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 1000;
+      overflow-y: auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-logo {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-logo .logo-img {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-logo .logo-img i {
+      margin-right: 10px;
+      font-size: 2rem;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-nav {
+      padding: 20px 0;
+    }
+
+    .nav-small-cap {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 15px 20px 10px;
+      margin-top: 20px;
+    }
+
+    .nav-small-cap:first-child {
+      margin-top: 0;
+    }
+
+    .sidebar-item {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-radius: 0;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .sidebar-link i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .body-wrapper {
+      margin-left: var(--sidebar-width);
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .app-header {
+      background: white;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .app-header .navbar {
+      padding: 15px 30px;
+    }
+
+    .nav-icon-hover {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .nav-icon-hover:hover {
+      background: var(--light-color);
+    }
+
+    /* Container */
+    .container-fluid {
+      padding: 30px;
+    }
+
+    /* Cards */
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      color: var(--dark-color);
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1199px) {
+      .left-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .left-sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .body-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    .sidebartoggler {
+      display: none;
+    }
+
+    @media (max-width: 1199px) {
+      .sidebartoggler {
+        display: block;
+      }
+    }
+
+    /* Utility Classes */
+    .text-primary { color: var(--primary-color) !important; }
+    .text-success { color: var(--success-color) !important; }
+    .text-info { color: var(--info-color) !important; }
+    .text-warning { color: var(--warning-color) !important; }
+    .text-danger { color: var(--danger-color) !important; }
+    
+    .bg-light-primary { background: rgba(79, 70, 229, 0.1) !important; }
+    .bg-light-success { background: rgba(16, 185, 129, 0.1) !important; }
+    .bg-light-info { background: rgba(6, 182, 212, 0.1) !important; }
+    .bg-light-warning { background: rgba(245, 158, 11, 0.1) !important; }
+    .bg-light-danger { background: rgba(239, 68, 68, 0.1) !important; }
+
+    .round-20 {
+      width: 20px;
+      height: 20px;
+    }
+
+    .round-40 {
+      width: 40px;
+      height: 40px;
+    }
+  </style>
+  
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  <div class="page-wrapper" id="main-wrapper">
+    
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar" id="sidebar">
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="/" class="logo-img">
+            <i class="fas fa-graduation-cap"></i>
+            CodeLearn LMS
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="fas fa-times text-white"></i>
+          </div>
+        </div>
+        
+        <!-- Sidebar navigation -->
+        <nav class="sidebar-nav">
+          <ul id="sidebarnav" class="list-unstyled">
+            
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">Dashboard</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:index' %}">
+                <i class="fas fa-home"></i>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            
+            <!-- Users Management -->
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">User Management</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:users_user_changelist' %}">
+                <i class="fas fa-users"></i>
+                <span class="hide-menu">Students</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:users_team_changelist' %}">
+                <i class="fas fa-users-cog"></i>
+                <span class="hide-menu">Teams</span>
+              </a>
+            </li>
+            
+            <!-- Course Management -->
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">Course Management</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:courses_course_changelist' %}">
+                <i class="fas fa-book"></i>
+                <span class="hide-menu">Courses</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:courses_category_changelist' %}">
+                <i class="fas fa-tags"></i>
+                <span class="hide-menu">Categories</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:courses_module_changelist' %}">
+                <i class="fas fa-puzzle-piece"></i>
+                <span class="hide-menu">Modules</span>
+              </a>
+            </li>
+            
+            <!-- Payment Management -->
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">Payment Management</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:payments_enrollment_changelist' %}">
+                <i class="fas fa-user-graduate"></i>
+                <span class="hide-menu">Enrollments</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:payments_payment_changelist' %}">
+                <i class="fas fa-credit-card"></i>
+                <span class="hide-menu">Payments</span>
+              </a>
+            </li>
+            
+            <!-- Content Management -->
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">Content</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:youtube_integration_youtubevideo_changelist' %}">
+                <i class="fab fa-youtube"></i>
+                <span class="hide-menu">YouTube Videos</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:notifications_notification_changelist' %}">
+                <i class="fas fa-bell"></i>
+                <span class="hide-menu">Notifications</span>
+              </a>
+            </li>
+            
+            <!-- Settings -->
+            <li class="nav-small-cap">
+              <i class="fas fa-circle nav-small-cap-icon"></i>
+              <span class="hide-menu">Settings</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/api/docs/">
+                <i class="fas fa-book-open"></i>
+                <span class="hide-menu">API Documentation</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin:password_change' %}">
+                <i class="fas fa-key"></i>
+                <span class="hide-menu">Change Password</span>
+              </a>
+            </li>
+            
+          </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
+      </div>
+    </aside>
+    <!-- Sidebar End -->
+
+    <!-- Main Wrapper -->
+    <div class="body-wrapper">
+      <!-- Header Start -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+                <i class="fas fa-bars"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
+                <i class="fas fa-bell"></i>
+                <div class="notification bg-primary rounded-circle"></div>
+              </a>
+            </li>
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <li class="nav-item dropdown">
+                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown">
+                  <img src="https://via.placeholder.com/35x35/4f46e5/white?text=A" alt="Admin" width="35" height="35" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <div class="message-body">
+                    <a href="{% url 'admin:password_change' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="fas fa-user"></i>
+                      <p class="mb-0">My Profile</p>
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="fas fa-cog"></i>
+                      <p class="mb-0">Settings</p>
+                    </a>
+                    <a href="{% url 'admin:logout' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- Header End -->
+      
+      <!-- Main Content -->
+      <div class="container-fluid">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <script>
+    // Sidebar toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarToggle = document.getElementById('headerCollapse');
+      const sidebar = document.getElementById('sidebar');
+      
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('show');
+        });
+      }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 1199 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+          sidebar.classList.remove('show');
+        }
+      });
+
+      // Active link highlighting
+      const currentPath = window.location.pathname;
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+      
+      sidebarLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

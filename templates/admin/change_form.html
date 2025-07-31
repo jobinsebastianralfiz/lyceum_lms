@@ -1,0 +1,259 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}
+    {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{% blocktrans with name=opts.verbose_name %}Change {{ name }}{% endblocktrans %}{% endif %} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .form-section h2 {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        margin: 0;
+        padding: 16px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .form-section .form-row {
+        padding: 20px 24px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .form-section .form-row:last-child {
+        border-bottom: none;
+    }
+    
+    .form-row label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .form-row .help {
+        color: #64748b;
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+    
+    .errorlist {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 0.875rem;
+        list-style: none;
+    }
+    
+    .submit-row {
+        background: #f8fafc;
+        padding: 20px 24px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .submit-row input[type="submit"], .submit-row .button {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-row input[type="submit"]:hover, .submit-row .button:hover {
+        background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%);
+        transform: translateY(-1px);
+    }
+    
+    .submit-row .deletelink {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .submit-row .deletelink:hover {
+        background: #dc2626;
+        color: white;
+    }
+    
+    .breadcrumbs {
+        background: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .breadcrumbs a {
+        color: #4f46e5;
+        text-decoration: none;
+    }
+    
+    .breadcrumbs a:hover {
+        color: #7c3aed;
+    }
+    
+    /* Inline forms styling */
+    .inline-group {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .inline-group h2 {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        margin: 0;
+        padding: 16px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .inline-group .tabular {
+        padding: 20px;
+    }
+    
+    .inline-group table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .inline-group th, .inline-group td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .inline-group th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .inline-group input, .inline-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+    }
+    
+    .add-row {
+        padding: 16px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .add-row a {
+        color: #10b981;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .add-row a:hover {
+        color: #059669;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+    &rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+      {% change_form_object_tools %}
+    {% endblock %}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+<div class="form-section">
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+    {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+    {% if errors %}
+        <div class="alert alert-danger">
+            <p class="errornote">
+            {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+            </p>
+            {{ adminform.form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {% block field_sets %}
+    {% for fieldset in adminform %}
+      {% include "admin/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+
+    {% block after_field_sets %}{% endblock %}
+
+    {% block inline_field_sets %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+        {% include inline_admin_formset.opts.template %}
+    {% endfor %}
+    {% endblock %}
+
+    {% block after_related_objects %}{% endblock %}
+
+    {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+    {% block admin_change_form_document_ready %}
+        <script id="django-admin-form-add-constants"
+                src="{% static "admin/js/change_form.js" %}"
+                {% if adminform and add %}
+                    data-model-name="{{ opts.model_name }}"
+                {% endif %}
+                async>
+        </script>
+    {% endblock %}
+
+    {# JavaScript for prepopulated fields #}
+    {% prepopulated_fields_js %}
+
+</div>
+</form>
+{% endblock %}
