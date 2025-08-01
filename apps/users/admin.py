@@ -12,24 +12,21 @@ class TeamMembershipInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    # Override the list display to show our custom fields
     list_display = ('email', 'name', 'role', 'is_active', 'date_joined')
-    list_filter = ('role', 'is_active', 'date_joined')
+    list_filter = ('role', 'is_active', 'date_joined', 'is_staff')
     search_fields = ('email', 'name', 'phone_number')
     ordering = ('-date_joined',)
     actions = [export_users_csv, activate_users, deactivate_users]
     
-    fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'name', 'phone_number', 'address')}),
-        ('Permissions', {'fields': ('role', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    # Override BaseUserAdmin fieldsets to include our custom fields
+    fieldsets = BaseUserAdmin.fieldsets + (
+        ('Custom Fields', {'fields': ('name', 'role', 'phone_number', 'address')}),
     )
     
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'name', 'role', 'password1', 'password2'),
-        }),
+    # Add fieldsets for creating new users
+    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+        ('Custom Fields', {'fields': ('name', 'role', 'phone_number', 'address')}),
     )
 
 @admin.register(Team)

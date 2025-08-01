@@ -26,7 +26,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'price_display_admin', 'total_price_display_admin', 'is_free', 'is_published', 'created_by', 'created_at')
     list_filter = ('category', 'is_free', 'is_published', 'created_at')
     search_fields = ('title', 'description')
-    readonly_fields = ('is_free_course', 'total_price', 'tax_amount', 'price_display', 'total_price_display', 'created_at', 'updated_at')
+    readonly_fields = ('is_free_course_display', 'total_price_display_formatted', 'tax_amount_display', 'price_display_formatted', 'total_price_display', 'created_at', 'updated_at')
     inlines = [ModuleInline]
     actions = [publish_courses, unpublish_courses, export_courses_csv, duplicate_course]
     
@@ -38,13 +38,47 @@ class CourseAdmin(admin.ModelAdmin):
         return obj.total_price_display
     total_price_display_admin.short_description = 'Total Price'
     
+    def is_free_course_display(self, obj):
+        """Display if course is free with icon"""
+        if obj.is_free_course:
+            return "✅ Yes (Free Course)"
+        return "❌ No (Paid Course)"
+    is_free_course_display.short_description = 'Is Free Course'
+    
+    def total_price_display_formatted(self, obj):
+        """Display total price with tax breakdown"""
+        if obj.is_free_course:
+            return "🆓 Free Course"
+        return f"💰 ₹{obj.total_price:.2f} (including {obj.tax_rate}% tax)"
+    total_price_display_formatted.short_description = 'Total Price (Inc. Tax)'
+    
+    def tax_amount_display(self, obj):
+        """Display tax amount with formatting"""
+        if obj.is_free_course:
+            return "🆓 No Tax (Free Course)"
+        return f"📊 ₹{obj.tax_amount:.2f} ({obj.tax_rate}% of ₹{obj.price})"
+    tax_amount_display.short_description = 'Tax Amount'
+    
+    def price_display_formatted(self, obj):
+        """Display base price with formatting"""
+        if obj.is_free_course:
+            return "🆓 Free Course"
+        return f"💵 ₹{obj.price} (before tax)"
+    price_display_formatted.short_description = 'Base Price (Ex. Tax)'
+    
     fieldsets = (
         ('Course Information', {
             'fields': ('title', 'description', 'category', 'created_by')
         }),
-        ('Pricing', {
-            'fields': ('is_free', 'price', 'tax_rate', 'is_free_course', 'total_price', 'tax_amount', 'price_display', 'total_price_display'),
-            'description': 'For free courses, check "Is free" or set price to 0'
+        ('Pricing Configuration', {
+            'fields': ('is_free', 'price', 'tax_rate'),
+            'description': 'Set course pricing. Check "Is free" for free courses or set price to 0.',
+            'classes': ('wide',)
+        }),
+        ('💰 Pricing Summary', {
+            'fields': ('is_free_course_display', 'price_display_formatted', 'tax_amount_display', 'total_price_display_formatted'),
+            'description': 'Calculated pricing information based on the configuration above.',
+            'classes': ('collapse', 'wide')
         }),
         ('Media', {
             'fields': ('thumbnail', 'preview_video')

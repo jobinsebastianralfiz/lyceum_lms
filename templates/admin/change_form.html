@@ -127,66 +127,135 @@
         color: #7c3aed;
     }
     
-    /* Inline forms styling */
+    /* Inline forms styling - Bootstrap approach */
     .inline-group {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-        overflow: hidden;
     }
     
-    .inline-group h2 {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    .inline-group .card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .inline-group .card-header {
+        background: #28a745;
         color: white;
-        margin: 0;
-        padding: 16px 24px;
-        font-size: 1.1rem;
+        padding: 12px 20px;
+        border-bottom: 1px solid #dee2e6;
         font-weight: 600;
     }
     
-    .inline-group .tabular {
-        padding: 20px;
-    }
-    
-    .inline-group table {
-        width: 100%;
+    .inline-group .table {
+        margin-bottom: 0;
         border-collapse: collapse;
     }
     
-    .inline-group th, .inline-group td {
+    .inline-group .table thead th {
+        background: #343a40;
+        color: white;
+        border: 1px solid #495057;
         padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #f1f5f9;
-    }
-    
-    .inline-group th {
-        background: #f8fafc;
+        text-align: center;
         font-weight: 600;
-        color: #374151;
+        font-size: 0.875rem;
     }
     
-    .inline-group input, .inline-group select {
+    .inline-group .table tbody td {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+        background: white;
+    }
+    
+    .inline-group .table tbody tr:nth-child(even) td {
+        background: #f8f9fa;
+    }
+    
+    .inline-group .table tbody tr:hover td {
+        background: #e9ecef;
+    }
+    
+    /* Form controls in tables */
+    .inline-group .form-control,
+    .inline-group .form-select,
+    .inline-group input,
+    .inline-group select,
+    .inline-group textarea {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
+        background: white;
+    }
+    
+    .inline-group .form-control:focus,
+    .inline-group .form-select:focus,
+    .inline-group input:focus,
+    .inline-group select:focus,
+    .inline-group textarea:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    /* Column width controls for payment tables */
+    .inline-group .table th:nth-child(1), .inline-group .table td:nth-child(1) { width: 8%; min-width: 80px; }
+    .inline-group .table th:nth-child(2), .inline-group .table td:nth-child(2) { width: 10%; min-width: 100px; }
+    .inline-group .table th:nth-child(3), .inline-group .table td:nth-child(3) { width: 10%; min-width: 100px; }
+    .inline-group .table th:nth-child(4), .inline-group .table td:nth-child(4) { width: 12%; min-width: 120px; }
+    .inline-group .table th:nth-child(5), .inline-group .table td:nth-child(5) { width: 12%; min-width: 120px; }
+    .inline-group .table th:nth-child(6), .inline-group .table td:nth-child(6) { width: 10%; min-width: 100px; }
+    .inline-group .table th:nth-child(7), .inline-group .table td:nth-child(7) { width: 12%; min-width: 120px; }
+    .inline-group .table th:nth-child(8), .inline-group .table td:nth-child(8) { width: 20%; max-width: 200px; }
+    .inline-group .table th:nth-child(9), .inline-group .table td:nth-child(9) { width: 6%; min-width: 60px; }
+    
+    /* Notes column specific styling */
+    .inline-group .table td:nth-child(8) textarea {
+        max-width: 200px;
+        min-height: 60px;
+        resize: vertical;
+    }
+    
+    /* Number inputs smaller width */
+    .inline-group input[type="number"] {
+        max-width: 120px;
+        text-align: right;
+    }
+    
+    /* Date inputs */
+    .inline-group input[type="date"] {
+        max-width: 150px;
+    }
+    
+    /* Select dropdowns with Bootstrap styling */
+    .inline-group select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px 16px;
+        padding-right: 32px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
     
     .add-row {
-        padding: 16px 24px;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+        padding: 16px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
     }
     
     .add-row a {
-        color: #10b981;
+        color: #28a745;
         text-decoration: none;
         font-weight: 500;
     }
     
     .add-row a:hover {
-        color: #059669;
+        color: #1e7e34;
     }
 </style>
 {% endblock %}
