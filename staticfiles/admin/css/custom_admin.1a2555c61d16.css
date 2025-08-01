@@ -1,0 +1,589 @@
+/* Modern CodeLearn LMS Admin Styling */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Enhanced Checkbox Styling */
+input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+}
+
+input[type="checkbox"]:checked {
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+input[type="checkbox"]:disabled {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+}
+
+/* Enhanced Radio Button Styling */
+input[type="radio"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    background: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+input[type="radio"]:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+}
+
+input[type="radio"]:checked {
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+input[type="radio"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Enhanced Select Dropdown Styling */
+select {
+    background: white url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    appearance: none;
+    padding-right: 40px !important;
+    cursor: pointer;
+}
+
+select:hover {
+    border-color: #4f46e5;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234f46e5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234f46e5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Multi-select styling */
+select[multiple] {
+    background: white;
+    padding-right: 16px !important;
+    min-height: 120px;
+}
+
+select[multiple] option {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px 0;
+    background: white;
+    color: #374151;
+}
+
+select[multiple] option:checked {
+    background: #4f46e5 !important;
+    color: white !important;
+}
+
+select[multiple] option:hover {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+select[multiple] option:checked:hover {
+    background: #3730a3 !important;
+    color: white !important;
+}
+
+/* Action checkbox styling in change list */
+.action-checkbox-column input[type="checkbox"] {
+    margin: 0;
+}
+
+/* Filter sidebar checkbox styling */
+#changelist-filter input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* Admin filter select styling */
+#changelist-filter select {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-size: 14px 14px;
+    background-position: right 8px center;
+    padding-right: 30px !important;
+}
+
+/* Related widget styling */
+.related-widget-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.related-widget-wrapper select,
+.related-widget-wrapper input {
+    flex: 1;
+}
+
+.related-widget-wrapper a {
+    background: #f3f4f6;
+    color: #4f46e5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.related-widget-wrapper a:hover {
+    background: #4f46e5;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* File input styling */
+input[type="file"] {
+    padding: 12px;
+    background: #f8fafc;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+input[type="file"]:hover {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+}
+
+input[type="file"]:focus {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Datetime widget styling */
+.datetime {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.datetime input {
+    flex: 1;
+}
+
+.datetime .datetimeshortcuts {
+    display: flex;
+    gap: 4px;
+}
+
+.datetime .datetimeshortcuts a {
+    background: #f3f4f6;
+    color: #4f46e5;
+    padding: 6px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.datetime .datetimeshortcuts a:hover {
+    background: #4f46e5;
+    color: white;
+}
+
+/* Calendar widget styling */
+.calendarbox, .clockbox {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th, .calendar td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #f1f5f9;
+}
+
+.calendar th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+}
+
+.calendar td a {
+    color: #4f46e5;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.calendar td a:hover {
+    background: #4f46e5;
+    color: white;
+}
+
+.calendar .today {
+    background: #dbeafe;
+    font-weight: 600;
+}
+
+/* Inline form styling */
+.inline-group {
+    margin-top: 20px;
+}
+
+.inline-group .tabular {
+    overflow-x: auto;
+}
+
+.inline-group table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+}
+
+.inline-group th,
+.inline-group td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+
+.inline-group th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.inline-group input,
+.inline-group select,
+.inline-group textarea {
+    width: 100%;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.inline-group .delete {
+    text-align: center;
+}
+
+.inline-group .delete input[type="checkbox"] {
+    margin: 0;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #334155;
+    line-height: 1.6;
+}
+
+/* Header Styling */
+#header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+#branding {
+    padding: 16px 24px;
+}
+
+#site-name {
+    margin: 0;
+}
+
+#site-name a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+#site-name a:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+#site-name i {
+    margin-right: 12px;
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+/* Navigation */
+#nav-global {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0 24px;
+}
+
+#nav-global a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 12px 16px;
+    display: inline-block;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    margin-right: 8px;
+}
+
+#nav-global a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Content Area - Full width utilization */
+#content {
+    padding: 32px 40px;
+    max-width: 100%;
+    margin: 0;
+}
+
+@media (min-width: 1600px) {
+    #content {
+        padding: 40px 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    #content {
+        padding: 20px 16px;
+    }
+}
+
+#content-main {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 100%;
+}
+
+@media (min-width: 1600px) {
+    #content-main {
+        padding: 48px;
+    }
+}
+
+@media (max-width: 768px) {
+    #content-main {
+        padding: 24px;
+    }
+}
+
+/* Module Styling */
+.module {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.module h2 {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    margin: 0;
+    padding: 16px 24px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border: none;
+}
+
+/* Forms */
+.form-row {
+    margin-bottom: 20px;
+}
+
+.form-row label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="url"], 
+input[type="number"], input[type="tel"], textarea, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, 
+input[type="url"]:focus, input[type="number"]:focus, input[type="tel"]:focus, 
+textarea:focus, select:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Buttons */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 0.875rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.button.default, .default {
+    background: #64748b;
+}
+
+.button.default:hover, .default:hover {
+    background: #475569;
+}
+
+/* Messages */
+.messagelist {
+    margin: 0 0 24px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.messagelist li {
+    background: white;
+    border-left: 4px solid #10b981;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.messagelist .error {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.messagelist .warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    background: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.breadcrumbs a {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumbs a:hover {
+    color: #7c3aed;
+}
