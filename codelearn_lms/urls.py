@@ -9,8 +9,11 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 from .admin import admin_site
 
 urlpatterns = [
-    # Custom Admin Dashboard
-    path('admin/', admin_site.urls),
+    # Custom Admin Interface
+    path('admin/', include('apps.custom_admin.urls')),
+    
+    # Django Default Admin (fallback)
+    path('django-admin/', admin_site.urls),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CodeLearn LMS Admin{% endblock %}</title>
+  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png' %}" />
+  <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #main-wrapper {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    .page-wrapper {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    .body-wrapper .container-fluid {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    .app-header {
+      margin-top: 0 !important;
+      top: 0 !important;
+    }
+    .left-sidebar {
+      top: 0 !important;
+      height: 100vh !important;
+      overflow-y: auto !important;
+    }
+    .sidebar-nav {
+      height: calc(100vh - 80px) !important;
+      overflow-y: auto !important;
+      padding-bottom: 2rem;
+    }
+    .sidebar-nav ul {
+      height: auto !important;
+      max-height: none !important;
+    }
+    /* Fix sidebar scrolling */
+    .left-sidebar > div {
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    .sidebar-nav.scroll-sidebar {
+      flex: 1 !important;
+      overflow-y: auto !important;
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img">
+            <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg' %}" alt="CodeLearn" />
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-6"></i>
+          </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <ul id="sidebarnav">
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">Home</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:dashboard' %}" aria-expanded="false">
+                <i class="ti ti-layout-dashboard"></i>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+
+            <li>
+              <span class="sidebar-divider lg"></span>
+            </li>
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">Management</span>
+            </li>
+            
+            <!-- COURSES Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">COURSES</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:categories_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-category"></i></span>
+                  <span class="hide-menu">Categories</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:courses_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-book"></i></span>
+                  <span class="hide-menu">Courses</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:modules_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-layout-grid"></i></span>
+                  <span class="hide-menu">Modules</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:student_progress_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-progress"></i></span>
+                  <span class="hide-menu">Student Progress</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:video_lessons_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-video"></i></span>
+                  <span class="hide-menu">Video Lessons</span>
+                </div>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+            
+            <!-- NOTIFICATIONS Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">NOTIFICATIONS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:email_templates_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-mail"></i></span>
+                  <span class="hide-menu">Email Templates</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:notifications_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-bell"></i></span>
+                  <span class="hide-menu">Notifications</span>
+                </div>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- PAYMENTS Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">PAYMENTS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:enrollments_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-user-check"></i></span>
+                  <span class="hide-menu">Enrollments</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:installment_plans_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-calendar-time"></i></span>
+                  <span class="hide-menu">Installment Plans</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:payments_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-currency-rupee"></i></span>
+                  <span class="hide-menu">Payments</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:tax_invoices_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-file-invoice"></i></span>
+                  <span class="hide-menu">Tax Invoices</span>
+                </div>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- USERS Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">USERS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:team_memberships_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-user-plus"></i></span>
+                  <span class="hide-menu">Team Memberships</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:teams_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-users-group"></i></span>
+                  <span class="hide-menu">Teams</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:users_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-users"></i></span>
+                  <span class="hide-menu">Users</span>
+                </div>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- YOUTUBE INTEGRATION Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">YOUTUBE INTEGRATION</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:youtube_channel_configs_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-brand-youtube"></i></span>
+                  <span class="hide-menu">YouTube Channel Configs</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:youtube_videos_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-video"></i></span>
+                  <span class="hide-menu">YouTube Videos</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <span class="sidebar-divider lg"></span>
+            </li>
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">System</span>
+            </li>
+            
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="/django-admin/" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex">
+                    <i class="ti ti-settings"></i>
+                  </span>
+                  <span class="hide-menu">Django Admin</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
+      </div>
+      <!-- End Sidebar scroll-->
+    </aside>
+    <!--  Sidebar End -->
+    
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
+                <i class="ti ti-menu-2"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="javascript:void(0)">
+                <iconify-icon icon="solar:bell-linear" class="fs-6"></iconify-icon>
+                <div class="notification bg-primary rounded-circle"></div>
+              </a>
+            </li>
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <li class="nav-item dropdown">
+                <a class="nav-link" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                  <div class="message-body">
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
+                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-mail fs-6"></i>
+                      <p class="mb-0 fs-3">My Account</p>
+                    </a>
+                    <a href="{% url 'custom_admin:logout' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!--  Header End -->
+      
+      <div class="container-fluid">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js' %}"></script>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js' %}"></script>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js' %}"></script>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js' %}"></script>
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

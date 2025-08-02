@@ -1,0 +1,152 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Modules Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Modules Management</h4>
+        <p class="card-subtitle">Manage course modules and content structure</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:module_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add New Module
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search modules or courses...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <span class="text-muted">
+          Total: {{ page_obj.paginator.count }} modules
+        </span>
+      </div>
+    </div>
+
+    <!-- Modules Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Module</th>
+            <th>Course</th>
+            <th>Order</th>
+            <th>Lessons</th>
+            <th>Created</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for module in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="text-bg-primary rounded-circle p-2 me-3">
+                  <i class="ti ti-layout-grid fs-4"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0">{{ module.title }}</h6>
+                  <small class="text-muted">{{ module.description|truncatewords:8 }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>
+                <h6 class="mb-0">{{ module.course.title }}</h6>
+                <small class="text-muted">{{ module.course.category.name }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info">{{ module.order }}</span>
+            </td>
+            <td>
+              <span class="badge bg-primary">{{ module.video_lessons.count }}</span>
+            </td>
+            <td>{{ module.created_at|date:"M d, Y" }}</td>
+            <td class="text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                  Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:module_edit' module.id %}">
+                      <i class="ti ti-edit me-2"></i>Edit
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:course_detail' module.course.id %}">
+                      <i class="ti ti-book me-2"></i>View Course
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:module_delete' module.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-5">
+              <i class="ti ti-layout-grid fs-1 text-muted mb-3"></i>
+              <h5 class="mb-2">No modules found</h5>
+              {% if search_query %}
+                <p class="mb-0">No modules match "{{ search_query }}"</p>
+              {% else %}
+                <p class="mb-0">Create your first module to organize course content</p>
+                <a href="{% url 'custom_admin:module_create' %}" class="btn btn-sm btn-primary mt-3">
+                  <i class="ti ti-plus me-1"></i>Add Module
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Modules pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+          </li>
+        {% endif %}
+        
+        <li class="page-item active">
+          <span class="page-link">{{ page_obj.number }}</span>
+        </li>
+        
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

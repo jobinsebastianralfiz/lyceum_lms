@@ -1,0 +1,206 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Users Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Users Management</h4>
+        <p class="card-subtitle">Manage all users in the system</p>
+      </div>
+      <div class="ms-auto">
+        <a href="/django-admin/users/user/add/" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add New User
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search users by name, email, or username...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} users
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="px-0">User</th>
+            <th scope="col" class="px-0">Status</th>
+            <th scope="col" class="px-0">Role</th>
+            <th scope="col" class="px-0">Enrollments</th>
+            <th scope="col" class="px-0">Joined</th>
+            <th scope="col" class="px-0 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in page_obj %}
+          <tr>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                     alt="{{ user.get_full_name|default:user.username }}" 
+                     class="rounded-circle me-3" width="40" height="40">
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ user.get_full_name|default:user.username }}</h6>
+                  <span class="text-muted fs-3">{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              {% if user.is_active %}
+                <span class="badge bg-success-subtle text-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="px-0">
+              {% if user.is_superuser %}
+                <span class="badge bg-primary">Superuser</span>
+              {% elif user.is_staff %}
+                <span class="badge bg-info">Staff</span>
+              {% else %}
+                <span class="badge bg-secondary">Student</span>
+              {% endif %}
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <span class="me-2">{{ user.enrollments.count }}</span>
+                {% if user.enrollments.count > 0 %}
+                  <i class="ti ti-book-2 text-primary fs-4"></i>
+                {% else %}
+                  <i class="ti ti-book-off text-muted fs-4"></i>
+                {% endif %}
+              </div>
+            </td>
+            <td class="px-0">
+              <span class="text-muted">{{ user.date_joined|date:"M d, Y" }}</span>
+            </td>
+            <td class="px-0 text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' user.id %}">
+                      <i class="ti ti-eye me-2"></i>View Details
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/django-admin/users/user/{{ user.id }}/change/">
+                      <i class="ti ti-edit me-2"></i>Edit User
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  {% if user.is_active %}
+                  <li>
+                    <a class="dropdown-item text-warning" href="javascript:void(0)">
+                      <i class="ti ti-user-off me-2"></i>Deactivate
+                    </a>
+                  </li>
+                  {% else %}
+                  <li>
+                    <a class="dropdown-item text-success" href="javascript:void(0)">
+                      <i class="ti ti-user-check me-2"></i>Activate
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-users fs-1 mb-3 d-block"></i>
+                {% if search_query %}
+                  <h5 class="mb-2">No users found</h5>
+                  <p class="mb-0">No users match your search criteria "{{ search_query }}"</p>
+                  <a href="{% url 'custom_admin:users_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                    Clear Search
+                  </a>
+                {% else %}
+                  <h5 class="mb-2">No users available</h5>
+                  <p class="mb-0">Get started by adding your first user</p>
+                  <a href="/django-admin/users/user/add/" class="btn btn-sm btn-primary mt-3">
+                    <i class="ti ti-plus me-1"></i>Add New User
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Users pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

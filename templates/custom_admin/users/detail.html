@@ -1,0 +1,198 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name|default:user.username }} - User Details{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- User Profile Card -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+             alt="{{ user.get_full_name|default:user.username }}" 
+             class="rounded-circle mb-3" width="100" height="100">
+        <h4 class="mb-0">{{ user.get_full_name|default:user.username }}</h4>
+        <p class="text-muted mb-3">{{ user.email }}</p>
+        
+        <div class="d-flex justify-content-center gap-2 mb-3">
+          {% if user.is_active %}
+            <span class="badge bg-success-subtle text-success">Active</span>
+          {% else %}
+            <span class="badge bg-danger-subtle text-danger">Inactive</span>
+          {% endif %}
+          
+          {% if user.is_superuser %}
+            <span class="badge bg-primary">Superuser</span>
+          {% elif user.is_staff %}
+            <span class="badge bg-info">Staff</span>
+          {% else %}
+            <span class="badge bg-secondary">Student</span>
+          {% endif %}
+        </div>
+
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="mb-0 fw-bolder">{{ enrollments.count }}</h4>
+            <span class="text-muted fs-3">Enrollments</span>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 fw-bolder">{{ user.payments.count|default:0 }}</h4>
+            <span class="text-muted fs-3">Payments</span>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 fw-bolder">
+              {% if user.team_memberships.exists %}1{% else %}0{% endif %}
+            </h4>
+            <span class="text-muted fs-3">Teams</span>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+          <a href="/django-admin/users/user/{{ user.id }}/change/" class="btn btn-primary">
+            <i class="ti ti-edit me-1"></i>Edit User
+          </a>
+          <a href="{% url 'custom_admin:users_list' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Back to Users
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Details & Enrollments -->
+  <div class="col-lg-8">
+    <!-- User Information -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">User Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Username:</td>
+                <td class="fw-medium">{{ user.username }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Email:</td>
+                <td class="fw-medium">{{ user.email }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Full Name:</td>
+                <td class="fw-medium">{{ user.get_full_name|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Date Joined:</td>
+                <td class="fw-medium">{{ user.date_joined|date:"F d, Y" }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Last Login:</td>
+                <td class="fw-medium">{{ user.last_login|date:"F d, Y H:i"|default:"Never" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Status:</td>
+                <td class="fw-medium">
+                  {% if user.is_active %}
+                    <span class="text-success">Active</span>
+                  {% else %}
+                    <span class="text-danger">Inactive</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted">Staff Status:</td>
+                <td class="fw-medium">
+                  {% if user.is_staff %}
+                    <span class="text-info">Staff Member</span>
+                  {% else %}
+                    <span class="text-muted">Regular User</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted">Superuser:</td>
+                <td class="fw-medium">
+                  {% if user.is_superuser %}
+                    <span class="text-primary">Yes</span>
+                  {% else %}
+                    <span class="text-muted">No</span>
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Enrollments -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h5 class="card-title mb-0">Course Enrollments</h5>
+          <span class="badge bg-primary-subtle text-primary">{{ enrollments.count }} Total</span>
+        </div>
+
+        {% if enrollments %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Course</th>
+                <th>Enrollment Type</th>
+                <th>Payment Status</th>
+                <th>Enrolled On</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enrollment in enrollments %}
+              <tr>
+                <td>
+                  <div>
+                    <h6 class="mb-0">{{ enrollment.course.title }}</h6>
+                    <small class="text-muted">{{ enrollment.course.description|truncatewords:10 }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ enrollment.get_enrollment_type_display }}
+                  </span>
+                </td>
+                <td>
+                  {% if enrollment.payment_status == 'completed' %}
+                    <span class="badge bg-success">Paid</span>
+                  {% elif enrollment.payment_status == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                  {% elif enrollment.payment_status == 'failed' %}
+                    <span class="badge bg-danger">Failed</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ enrollment.get_payment_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ enrollment.enrolled_on|date:"M d, Y" }}</td>
+                <td class="text-end">
+                  <a href="{% url 'custom_admin:course_detail' enrollment.course.id %}" 
+                     class="btn btn-sm btn-outline-primary">View Course</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="ti ti-book-off fs-1 text-muted mb-3"></i>
+          <h6 class="mb-2">No Course Enrollments</h6>
+          <p class="text-muted mb-0">This user hasn't enrolled in any courses yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

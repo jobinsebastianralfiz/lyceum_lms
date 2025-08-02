@@ -1,0 +1,89 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{{ title }}</h4>
+            <p class="card-subtitle">{% if is_edit %}Update category information{% else %}Create a new course category{% endif %}</p>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" 
+                   value="{% if category %}{{ category.name }}{% endif %}" required>
+            <div class="form-text">Enter a unique name for this category</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4"
+                      placeholder="Optional description for this category">{% if category %}{{ category.description }}{% endif %}</textarea>
+            <div class="form-text">Provide a brief description of what this category contains</div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>
+              {% if is_edit %}Update Category{% else %}Create Category{% endif %}
+            </button>
+            <a href="{% url 'custom_admin:categories_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Category Information</h5>
+        
+        {% if is_edit and category %}
+        <table class="table table-borderless">
+          <tr>
+            <td class="text-muted">Created:</td>
+            <td>{{ category.created_at|date:"F d, Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Updated:</td>
+            <td>{{ category.updated_at|date:"F d, Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Courses:</td>
+            <td>{{ category.courses.count }}</td>
+          </tr>
+        </table>
+        {% else %}
+        <p class="text-muted">Category information will appear here after creation.</p>
+        {% endif %}
+
+        <div class="mt-4 p-3 bg-light rounded">
+          <h6 class="mb-2">
+            <i class="ti ti-info-circle text-info me-1"></i>
+            Category Guidelines
+          </h6>
+          <ul class="list-unstyled small text-muted mb-0">
+            <li>• Use clear, descriptive names</li>
+            <li>• Categories help organize courses</li>
+            <li>• Students can filter by category</li>
+            <li>• Keep descriptions concise</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

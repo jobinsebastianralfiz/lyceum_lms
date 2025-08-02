@@ -1,0 +1,168 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Payments Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Payments Management</h4>
+        <p class="card-subtitle">Manage all payment transactions</p>
+      </div>
+    </div>
+
+    <!-- Search and Stats -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search by student name or course...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <span class="text-muted">
+          Total: {{ page_obj.paginator.count }} payments
+        </span>
+      </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Payment Method</th>
+            <th>Date</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                     alt="{{ payment.user.get_full_name }}" 
+                     class="rounded-circle me-3" width="32" height="32">
+                <div>
+                  <h6 class="mb-0">{{ payment.user.get_full_name|default:payment.user.username }}</h6>
+                  <small class="text-muted">{{ payment.user.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if payment.enrollment %}
+              <div>
+                <h6 class="mb-0">{{ payment.enrollment.course.title }}</h6>
+                <small class="text-muted">Course Payment</small>
+              </div>
+              {% else %}
+              <span class="text-muted">General Payment</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="fw-bold">₹{{ payment.amount }}</span>
+            </td>
+            <td>
+              {% if payment.status == 'completed' %}
+                <span class="badge bg-success">Completed</span>
+              {% elif payment.status == 'pending' %}
+                <span class="badge bg-warning">Pending</span>
+              {% elif payment.status == 'failed' %}
+                <span class="badge bg-danger">Failed</span>
+              {% elif payment.status == 'refunded' %}
+                <span class="badge bg-info">Refunded</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ payment.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if payment.razorpay_payment_id %}
+                <span class="badge bg-primary-subtle text-primary">Razorpay</span>
+              {% else %}
+                <span class="text-muted">Unknown</span>
+              {% endif %}
+            </td>
+            <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+            <td class="text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                  Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' payment.user.id %}">
+                      <i class="ti ti-user me-2"></i>View Student
+                    </a>
+                  </li>
+                  {% if payment.enrollment %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:course_detail' payment.enrollment.course.id %}">
+                      <i class="ti ti-book me-2"></i>View Course
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="/django-admin/payments/payment/{{ payment.id }}/change/">
+                      <i class="ti ti-edit me-2"></i>Edit Payment
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <i class="ti ti-credit-card fs-1 text-muted mb-3"></i>
+              <h5 class="mb-2">No payments found</h5>
+              {% if search_query %}
+                <p class="mb-0">No payments match "{{ search_query }}"</p>
+              {% else %}
+                <p class="mb-0">No payment transactions recorded yet</p>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Payments pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+          </li>
+        {% endif %}
+        
+        <li class="page-item active">
+          <span class="page-link">{{ page_obj.number }}</span>
+        </li>
+        
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

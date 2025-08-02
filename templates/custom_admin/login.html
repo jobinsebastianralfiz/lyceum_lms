@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - CodeLearn LMS Admin</title>
+  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png' %}" />
+  <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div
+      class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-md-8 col-lg-6 col-xxl-3">
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                  <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg' %}" alt="CodeLearn">
+                </a>
+                <p class="text-center">CodeLearn LMS Admin Panel</p>
+                
+                {% if form.errors %}
+                  <div class="alert alert-danger" role="alert">
+                    {% for field, errors in form.errors.items %}
+                      {% for error in errors %}
+                        <div>{{ error }}</div>
+                      {% endfor %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="id_username" name="username" required>
+                  </div>
+                  <div class="mb-4">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="id_password" name="password" required>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="form-check">
+                      <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked">
+                      <label class="form-check-label text-dark" for="flexCheckChecked">
+                        Remember this Device
+                      </label>
+                    </div>
+                    <a class="text-primary fw-bold" href="javascript:void(0)">Forgot Password ?</a>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
+                  <div class="d-flex align-items-center justify-content-center">
+                    <p class="fs-4 mb-0 fw-bold">CodeLearn LMS</p>
+                    <a class="text-primary fw-bold ms-2" href="javascript:void(0)">Learning Management System</a>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js' %}"></script>
+  <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- solar icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+</body>
+
+</html>

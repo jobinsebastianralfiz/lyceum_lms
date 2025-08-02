@@ -1,0 +1,217 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Course Details{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Course Overview -->
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h4 class="card-title">{{ course.title }}</h4>
+            <p class="text-muted">{{ course.description }}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="/django-admin/courses/course/{{ course.id }}/change/" class="btn btn-primary">
+              <i class="ti ti-edit me-1"></i>Edit Course
+            </a>
+          </div>
+        </div>
+
+        {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" class="img-fluid rounded mb-3" alt="{{ course.title }}">
+        {% endif %}
+
+        <div class="row text-center mb-4">
+          <div class="col-3">
+            <h4 class="mb-0 fw-bolder">{{ enrollments.count }}</h4>
+            <span class="text-muted">Students</span>
+          </div>
+          <div class="col-3">
+            <h4 class="mb-0 fw-bolder">{{ modules.count }}</h4>
+            <span class="text-muted">Modules</span>
+          </div>
+          <div class="col-3">
+            <h4 class="mb-0 fw-bolder">
+              {% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}
+            </h4>
+            <span class="text-muted">Price</span>
+          </div>
+          <div class="col-3">
+            <h4 class="mb-0 fw-bolder">
+              {% if course.is_active %}
+                <i class="ti ti-check text-success"></i>
+              {% else %}
+                <i class="ti ti-x text-danger"></i>
+              {% endif %}
+            </h4>
+            <span class="text-muted">Status</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Modules -->
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Course Modules</h5>
+        {% if modules %}
+        <div class="accordion" id="modulesAccordion">
+          {% for module in modules %}
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" 
+                      data-bs-toggle="collapse" data-bs-target="#module{{ module.id }}">
+                <div class="d-flex align-items-center w-100">
+                  <i class="ti ti-book me-2"></i>
+                  <span class="fw-medium">{{ module.title }}</span>
+                  <span class="badge bg-primary ms-auto me-3">
+                    {{ module.video_lessons.count }} lessons
+                  </span>
+                </div>
+              </button>
+            </h2>
+            <div id="module{{ module.id }}" class="accordion-collapse collapse">
+              <div class="accordion-body">
+                <p class="text-muted mb-3">{{ module.description }}</p>
+                {% if module.video_lessons.exists %}
+                <div class="list-group list-group-flush">
+                  {% for lesson in module.video_lessons.all %}
+                  <div class="list-group-item d-flex align-items-center">
+                    <i class="ti ti-play me-2"></i>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0">{{ lesson.title }}</h6>
+                      <small class="text-muted">{{ lesson.description|truncatewords:10 }}</small>
+                    </div>
+                    {% if lesson.duration %}
+                    <span class="badge bg-light text-dark">{{ lesson.duration }} min</span>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No lessons available for this module.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-book-off fs-1 text-muted mb-3"></i>
+          <h5 class="mb-2">No modules available</h5>
+          <p class="text-muted">Add modules to organize course content.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- Course Info -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Course Information</h5>
+        <table class="table table-borderless">
+          <tr>
+            <td class="text-muted">Created:</td>
+            <td>{{ course.created_at|date:"F d, Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Updated:</td>
+            <td>{{ course.updated_at|date:"F d, Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Status:</td>
+            <td>
+              {% if course.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Type:</td>
+            <td>
+              {% if course.is_free %}
+                <span class="badge bg-success">Free</span>
+              {% else %}
+                <span class="badge bg-primary">Paid</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Enrolled Students -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Enrolled Students</h5>
+          <span class="badge bg-primary">{{ enrollments.count }}</span>
+        </div>
+
+        {% if enrollments %}
+        <div class="list-group list-group-flush">
+          {% for enrollment in enrollments|slice:":10" %}
+          <div class="list-group-item d-flex align-items-center px-0">
+            <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                 alt="{{ enrollment.user.get_full_name }}" 
+                 class="rounded-circle me-3" width="32" height="32">
+            <div class="flex-grow-1">
+              <h6 class="mb-0">{{ enrollment.user.get_full_name|default:enrollment.user.username }}</h6>
+              <small class="text-muted">{{ enrollment.enrolled_on|date:"M d, Y" }}</small>
+            </div>
+            <div class="ms-auto">
+              {% if enrollment.payment_status == 'completed' %}
+                <i class="ti ti-check text-success"></i>
+              {% elif enrollment.payment_status == 'pending' %}
+                <i class="ti ti-clock text-warning"></i>
+              {% else %}
+                <i class="ti ti-x text-danger"></i>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if enrollments.count > 10 %}
+        <div class="text-center mt-3">
+          <a href="{% url 'custom_admin:enrollments_list' %}?search={{ course.title }}" 
+             class="btn btn-sm btn-outline-primary">
+            View All {{ enrollments.count }} Students
+          </a>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-users fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-0">No students enrolled yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="d-flex gap-2">
+      <a href="{% url 'custom_admin:courses_list' %}" class="btn btn-outline-secondary">
+        <i class="ti ti-arrow-left me-1"></i>Back to Courses
+      </a>
+      <a href="/django-admin/courses/course/{{ course.id }}/change/" class="btn btn-primary">
+        <i class="ti ti-edit me-1"></i>Edit Course
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

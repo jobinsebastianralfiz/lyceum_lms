@@ -1,0 +1,179 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Teams Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Teams Management</h4>
+        <p class="card-subtitle">Manage all teams and organizations</p>
+      </div>
+      <div class="ms-auto">
+        <a href="/django-admin/users/team/add/" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add New Team
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search teams by name...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <span class="text-muted">
+          Total: {{ page_obj.paginator.count }} teams
+        </span>
+      </div>
+    </div>
+
+    <!-- Teams Grid -->
+    <div class="row">
+      {% for team in page_obj %}
+      <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="d-flex align-items-center">
+                <div class="text-bg-primary rounded-circle p-2 me-3">
+                  <i class="ti ti-users-group"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{ team.name }}</h5>
+                  <small class="text-muted">{{ team.organization|default:"No organization" }}</small>
+                </div>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="/django-admin/users/team/{{ team.id }}/change/">
+                      <i class="ti ti-edit me-2"></i>Edit Team
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="javascript:void(0)">
+                      <i class="ti ti-trash me-2"></i>Delete Team
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <p class="text-muted mb-3">
+              {{ team.description|default:"No description provided"|truncatewords:15 }}
+            </p>
+
+            <div class="row text-center mb-3 border-top pt-3">
+              <div class="col-6">
+                <h4 class="mb-0 fw-bolder">{{ team.members_count }}</h4>
+                <span class="text-muted fs-3">Members</span>
+              </div>
+              <div class="col-6">
+                <h4 class="mb-0 fw-bolder">{{ team.enrollments.count|default:0 }}</h4>
+                <span class="text-muted fs-3">Enrollments</span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between">
+              <small class="text-muted">
+                <i class="ti ti-calendar me-1"></i>
+                Created {{ team.created_at|date:"M d, Y" }}
+              </small>
+              
+              {% if team.is_active %}
+                <span class="badge bg-success-subtle text-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger">Inactive</span>
+              {% endif %}
+            </div>
+
+            <!-- Team Members Preview -->
+            {% if team.team_memberships.exists %}
+            <div class="mt-3 pt-3 border-top">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <small class="text-muted fw-medium">Recent Members</small>
+                <small class="text-primary">View All</small>
+              </div>
+              <div class="d-flex -space-x-2">
+                {% for membership in team.team_memberships.all|slice:":4" %}
+                <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                     alt="{{ membership.user.get_full_name }}" 
+                     class="rounded-circle border border-2 border-white" 
+                     width="32" height="32"
+                     title="{{ membership.user.get_full_name|default:membership.user.username }}">
+                {% endfor %}
+                {% if team.members_count > 4 %}
+                <div class="rounded-circle bg-light border border-2 border-white d-flex align-items-center justify-content-center" 
+                     style="width: 32px; height: 32px;">
+                  <small class="text-muted">+{{ team.members_count|add:"-4" }}</small>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="ti ti-users-group fs-1 text-muted mb-3"></i>
+          {% if search_query %}
+            <h5 class="mb-2">No teams found</h5>
+            <p class="mb-0">No teams match your search "{{ search_query }}"</p>
+            <a href="{% url 'custom_admin:teams_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+              Clear Search
+            </a>
+          {% else %}
+            <h5 class="mb-2">No teams available</h5>
+            <p class="mb-0">Create your first team to get started</p>
+            <a href="/django-admin/users/team/add/" class="btn btn-sm btn-primary mt-3">
+              <i class="ti ti-plus me-1"></i>Create Team
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Teams pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+          </li>
+        {% endif %}
+        
+        <li class="page-item active">
+          <span class="page-link">{{ page_obj.number }}</span>
+        </li>
+        
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
