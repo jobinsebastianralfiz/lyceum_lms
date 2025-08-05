@@ -1,0 +1,325 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Enrollment - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0 text-danger">
+          <i class="ti ti-trash me-2"></i>Delete Enrollment
+        </h4>
+        <p class="card-subtitle">
+          Are you sure you want to delete this enrollment?
+        </p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:enrollments_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Enrollments
+        </a>
+      </div>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert alert-danger mb-4">
+      <h6 class="alert-heading mb-3">
+        <i class="ti ti-alert-triangle me-2"></i>Warning: This action cannot be undone!
+      </h6>
+      <ul class="mb-0">
+        <li>Student will lose access to the course content</li>
+        <li>All associated payments and progress will be preserved</li>
+        <li>Tax invoices and payment records will remain intact</li>
+        {% if enrollment.has_installment_plan %}
+        <li>Associated installment plan will also be deleted</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Enrollment Information Card -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card border-danger">
+          <div class="card-header bg-danger-subtle">
+            <h5 class="card-title mb-0 text-danger">
+              <i class="ti ti-user-check me-2"></i>Enrollment to Delete
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Student:</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2" 
+                             style="width: 32px; height: 32px;">
+                          <i class="ti ti-user text-primary"></i>
+                        </div>
+                        <div>
+                          <div class="fw-medium">{{ enrollment.user.name }}</div>
+                          <small class="text-muted">{{ enrollment.user.email }}</small>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Course:</td>
+                    <td>
+                      <div class="fw-medium">{{ enrollment.course.title }}</div>
+                      <small class="text-muted">{{ enrollment.course.category.name|default:"Uncategorized" }}</small>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Enrollment Type:</td>
+                    <td>
+                      <span class="badge bg-info-subtle text-info">{{ enrollment.get_enrollment_type_display }}</span>
+                    </td>
+                  </tr>
+                  {% if enrollment.team %}
+                  <tr>
+                    <td class="text-muted fw-medium">Team:</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="ti ti-users text-primary me-2"></i>
+                        <span class="fw-medium">{{ enrollment.team.name }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </table>
+              </div>
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Enrolled:</td>
+                    <td class="fw-medium">{{ enrollment.enrolled_on|date:"M d, Y H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Total Amount:</td>
+                    <td class="fw-medium">₹{{ enrollment.total_amount|floatformat:2 }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Tax Amount:</td>
+                    <td class="fw-medium">₹{{ enrollment.tax_amount|floatformat:2 }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Payment Status:</td>
+                    <td>
+                      {% if enrollment.payment_status == 'completed' %}
+                        <span class="badge bg-success">Completed</span>
+                      {% elif enrollment.payment_status == 'pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                      {% elif enrollment.payment_status == 'partial' %}
+                        <span class="badge bg-info">Partial</span>
+                      {% elif enrollment.payment_status == 'free' %}
+                        <span class="badge bg-secondary">Free</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ enrollment.get_payment_status_display }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Outstanding:</td>
+                    <td class="fw-medium {% if enrollment.outstanding_amount > 0 %}text-danger{% else %}text-success{% endif %}">
+                      ₹{{ enrollment.outstanding_amount|floatformat:2 }}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- Payment Summary -->
+        <div class="card border-warning mb-3">
+          <div class="card-header bg-warning-subtle">
+            <h6 class="card-title mb-0 text-warning">
+              <i class="ti ti-credit-card me-2"></i>Payment Summary
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-3">
+              <div class="row text-center">
+                <div class="col-6">
+                  <div class="border-end">
+                    <h6 class="text-success mb-0">₹{{ enrollment.paid_amount|floatformat:2 }}</h6>
+                    <small class="text-muted">Paid</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <h6 class="{% if enrollment.outstanding_amount > 0 %}text-danger{% else %}text-success{% endif %} mb-0">
+                    ₹{{ enrollment.outstanding_amount|floatformat:2 }}
+                  </h6>
+                  <small class="text-muted">Outstanding</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="small">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Payments Made:</span>
+                <span class="fw-medium">{{ enrollment.payments.count }}</span>
+              </div>
+              {% if enrollment.has_installment_plan %}
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Installment Plan:</span>
+                <span class="text-info fw-medium">Yes</span>
+              </div>
+              {% endif %}
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Tax Invoices:</span>
+                <span class="fw-medium">{{ enrollment.tax_invoices.count }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Information -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-book me-2"></i>Course Information
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-3">
+              <div class="bg-info-subtle rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" 
+                   style="width: 50px; height: 50px;">
+                <i class="ti ti-book text-info fs-4"></i>
+              </div>
+              <h6 class="mb-1">{{ enrollment.course.title|truncatechars:25 }}</h6>
+              <small class="text-muted">{{ enrollment.course.category.name|default:"Uncategorized" }}</small>
+            </div>
+            
+            <div class="small">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Course Price:</span>
+                <span>₹{{ enrollment.course.price|floatformat:2|default:"Free" }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <form method="post" class="mb-0">
+      {% csrf_token %}
+      
+      <!-- Confirmation Checkbox -->
+      <div class="mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="confirm_delete" name="confirm_delete" required>
+          <label class="form-check-label text-danger fw-medium" for="confirm_delete">
+            I understand that this action will permanently delete the enrollment for 
+            "{{ enrollment.user.name }}" in "{{ enrollment.course.title }}" and cannot be undone.
+          </label>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'custom_admin:enrollments_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <a href="{% url 'custom_admin:enrollment_edit' enrollment.id %}" class="btn btn-outline-primary">
+          <i class="ti ti-edit me-1"></i>Edit Instead
+        </a>
+        <button type="submit" class="btn btn-danger" id="delete_button" disabled>
+          <i class="ti ti-trash me-1"></i>Delete Enrollment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmCheckbox = document.getElementById('confirm_delete');
+  const deleteButton = document.getElementById('delete_button');
+  
+  confirmCheckbox.addEventListener('change', function() {
+    deleteButton.disabled = !this.checked;
+  });
+});
+</script>
+
+<style>
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.bg-danger-subtle {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.bg-warning-subtle {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.form-control, .form-select {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.form-check-input {
+  margin-top: 0.25em;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.border-end {
+  border-right: 1px solid #e0e6ed !important;
+}
+</style>
+{% endblock %}

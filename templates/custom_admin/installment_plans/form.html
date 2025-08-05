@@ -1,0 +1,465 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          {% if is_edit %}
+            <i class="ti ti-edit me-2"></i>{{ title }}
+          {% else %}
+            <i class="ti ti-plus me-2"></i>{{ title }}
+          {% endif %}
+        </h4>
+        <p class="card-subtitle">
+          {% if is_edit %}
+            Modify installment plan details and schedule
+          {% else %}
+            Create a payment installment plan for an enrollment
+          {% endif %}
+        </p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:installment_plans_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Plans
+        </a>
+      </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Errors -->
+    {% if form.errors %}
+    <div class="alert alert-danger mb-4">
+      <h6 class="alert-heading">
+        <i class="ti ti-alert-triangle me-2"></i>Please correct the errors below:
+      </h6>
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <div class="mb-1">
+            {% if field != '__all__' %}
+              <strong>{{ field }}:</strong>
+            {% endif %}
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="row">
+        <div class="col-md-8">
+          <!-- Plan Details -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="ti ti-calendar-time me-2"></i>Plan Details
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Enrollment Selection -->
+              <div class="mb-3">
+                <label for="{{ form.enrollment.id_for_label }}" class="form-label">
+                  {{ form.enrollment.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.enrollment }}
+                {% if form.enrollment.help_text %}
+                  <div class="form-text">{{ form.enrollment.help_text }}</div>
+                {% endif %}
+                {% if form.enrollment.errors %}
+                  {% for error in form.enrollment.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <!-- Total Installments -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="{{ form.total_installments.id_for_label }}" class="form-label">
+                      {{ form.total_installments.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.total_installments }}
+                    {% if form.total_installments.help_text %}
+                      <div class="form-text">{{ form.total_installments.help_text }}</div>
+                    {% endif %}
+                    {% if form.total_installments.errors %}
+                      {% for error in form.total_installments.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Frequency -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="{{ form.frequency.id_for_label }}" class="form-label">
+                      {{ form.frequency.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.frequency }}
+                    {% if form.frequency.help_text %}
+                      <div class="form-text">{{ form.frequency.help_text }}</div>
+                    {% endif %}
+                    {% if form.frequency.errors %}
+                      {% for error in form.frequency.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- Installment Amount -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="{{ form.installment_amount.id_for_label }}" class="form-label">
+                      {{ form.installment_amount.label }} <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text">₹</span>
+                      {{ form.installment_amount }}
+                    </div>
+                    {% if form.installment_amount.help_text %}
+                      <div class="form-text">{{ form.installment_amount.help_text }}</div>
+                    {% endif %}
+                    {% if form.installment_amount.errors %}
+                      {% for error in form.installment_amount.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                      {{ form.start_date.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.help_text %}
+                      <div class="form-text">{{ form.start_date.help_text }}</div>
+                    {% endif %}
+                    {% if form.start_date.errors %}
+                      {% for error in form.start_date.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Calculation Summary -->
+              <div class="alert alert-info mb-0" id="calculation-summary" style="display: none;">
+                <h6 class="alert-heading">
+                  <i class="ti ti-calculator me-2"></i>Plan Summary
+                </h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="small">
+                      <div class="d-flex justify-content-between mb-1">
+                        <span>Installments:</span>
+                        <span id="summary-installments">-</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span>Amount per installment:</span>
+                        <span id="summary-amount">-</span>
+                      </div>
+                      <div class="d-flex justify-content-between fw-medium">
+                        <span>Total plan amount:</span>
+                        <span id="summary-total">-</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="small">
+                      <div class="d-flex justify-content-between mb-1">
+                        <span>Frequency:</span>
+                        <span id="summary-frequency">-</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span>Start Date:</span>
+                        <span id="summary-start-date">-</span>
+                      </div>
+                      <div class="d-flex justify-content-between text-success fw-medium">
+                        <span>Estimated completion:</span>
+                        <span id="summary-completion">-</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <!-- Plan Summary (for editing) -->
+          {% if is_edit and plan %}
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="ti ti-info-circle me-2"></i>Current Plan
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-3">
+                <div class="bg-info-subtle rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" 
+                     style="width: 60px; height: 60px;">
+                  <i class="ti ti-calendar-time text-info fs-1"></i>
+                </div>
+                <h6 class="mb-0">{{ plan.enrollment.user.name }}</h6>
+                <small class="text-muted">{{ plan.enrollment.course.title|truncatechars:25 }}</small>
+              </div>
+              
+              <table class="table table-sm table-borderless">
+                <tr>
+                  <td class="text-muted">Installments:</td>
+                  <td class="fw-medium">{{ plan.total_installments }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Amount:</td>
+                  <td class="fw-medium">₹{{ plan.installment_amount|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Frequency:</td>
+                  <td class="fw-medium">{{ plan.get_frequency_display }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Start Date:</td>
+                  <td class="fw-medium">{{ plan.start_date|date:"M d, Y" }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Created:</td>
+                  <td class="fw-medium">{{ plan.created_at|date:"M d, Y" }}</td>
+                </tr>
+              </table>
+
+              <hr>
+              <div class="text-center">
+                <h6 class="text-muted mb-2">Progress</h6>
+                <div class="progress mb-2" style="height: 10px;">
+                  <div class="progress-bar bg-success" role="progressbar" 
+                       style="width: {% widthratio plan.completed_payments_count plan.total_installments 100 %}%"></div>
+                </div>
+                <small class="text-muted">{{ plan.completed_payments_count }} of {{ plan.total_installments }} payments</small>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Help Card -->
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="ti ti-help me-2"></i>Installment Guidelines
+              </h5>
+            </div>
+            <div class="card-body">
+              <h6>Plan Creation:</h6>
+              <ul class="list-unstyled mb-3 small">
+                <li class="mb-2">
+                  <i class="ti ti-check text-success me-2"></i>
+                  Select enrollments with pending/partial payments
+                </li>
+                <li class="mb-2">
+                  <i class="ti ti-check text-success me-2"></i>
+                  Set 2-24 installments based on course value
+                </li>
+                <li class="mb-2">
+                  <i class="ti ti-check text-success me-2"></i>
+                  Total plan amount should match enrollment
+                </li>
+              </ul>
+              
+              <h6>Frequency Options:</h6>
+              <ul class="list-unstyled mb-3 small">
+                <li class="mb-1">
+                  <span class="badge bg-primary-subtle text-primary me-2">Monthly</span>
+                  Standard monthly payments
+                </li>
+                <li class="mb-1">
+                  <span class="badge bg-info-subtle text-info me-2">Custom</span>
+                  Flexible schedule
+                </li>
+              </ul>
+              
+              <div class="alert alert-warning small mb-0">
+                <i class="ti ti-alert-triangle me-1"></i>
+                <strong>Note:</strong> Plans automatically update enrollment payment status and create payment schedules.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'custom_admin:installment_plans_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-device-floppy me-1"></i>
+          {% if is_edit %}Save Changes{% else %}Create Plan{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const installmentsField = document.getElementById('{{ form.total_installments.id_for_label }}');
+  const amountField = document.getElementById('{{ form.installment_amount.id_for_label }}');
+  const frequencyField = document.getElementById('{{ form.frequency.id_for_label }}');
+  const startDateField = document.getElementById('{{ form.start_date.id_for_label }}');
+  const summaryDiv = document.getElementById('calculation-summary');
+  
+  function updateSummary() {
+    const installments = parseInt(installmentsField.value) || 0;
+    const amount = parseFloat(amountField.value) || 0;
+    const frequency = frequencyField.options[frequencyField.selectedIndex].text || '';
+    const startDate = startDateField.value || '';
+    
+    if (installments > 0 && amount > 0) {
+      const totalAmount = installments * amount;
+      
+      // Update summary fields
+      document.getElementById('summary-installments').textContent = installments;
+      document.getElementById('summary-amount').textContent = '₹' + amount.toFixed(2);
+      document.getElementById('summary-total').textContent = '₹' + totalAmount.toFixed(2);
+      document.getElementById('summary-frequency').textContent = frequency;
+      document.getElementById('summary-start-date').textContent = startDate || 'Not set';
+      
+      // Calculate estimated completion date
+      if (startDate && frequency === 'Monthly') {
+        const start = new Date(startDate);
+        const completion = new Date(start);
+        completion.setMonth(completion.getMonth() + installments - 1);
+        document.getElementById('summary-completion').textContent = completion.toLocaleDateString('en-IN', {
+          year: 'numeric',
+          month: 'short'
+        });
+      } else {
+        document.getElementById('summary-completion').textContent = 'Variable';
+      }
+      
+      summaryDiv.style.display = 'block';
+    } else {
+      summaryDiv.style.display = 'none';
+    }
+  }
+  
+  // Add event listeners
+  installmentsField.addEventListener('input', updateSummary);
+  amountField.addEventListener('input', updateSummary);
+  frequencyField.addEventListener('change', updateSummary);
+  startDateField.addEventListener('change', updateSummary);
+  
+  // Initial update
+  updateSummary();
+});
+</script>
+
+<style>
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.form-control, .form-select {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+.form-text {
+  color: #6c757d;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-color: #e0e6ed;
+}
+
+.progress {
+  background-color: #e9ecef;
+  border-radius: 5px;
+}
+
+.progress-bar {
+  border-radius: 5px;
+}
+</style>
+{% endblock %}

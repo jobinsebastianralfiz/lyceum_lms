@@ -1,0 +1,221 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Remove Team Member - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          <i class="ti ti-user-minus me-2 text-danger"></i>Remove Team Member
+        </h4>
+        <p class="card-subtitle">Remove user from team membership</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:team_memberships_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Memberships
+        </a>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <h6 class="alert-heading">
+        <i class="ti ti-alert-triangle me-2"></i>Confirm Member Removal
+      </h6>
+      <p class="mb-0">
+        Are you sure you want to remove "{{ membership.user.name }}" from team "{{ membership.team.name }}"? 
+        This action cannot be undone, but the user can be added back to the team later.
+      </p>
+    </div>
+
+    <!-- Membership Information Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ti ti-user-check me-2"></i>Membership to be removed
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-3 text-center">
+            <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                 alt="User Avatar" class="rounded-circle mb-2" width="80" height="80">
+            <h6 class="mb-0">{{ membership.user.name }}</h6>
+            <small class="text-muted">{{ membership.user.email }}</small>
+          </div>
+          <div class="col-md-9">
+            <div class="row">
+              <div class="col-md-6">
+                <table class="table table-borderless">
+                  <tr>
+                    <td class="text-muted">Team:</td>
+                    <td class="fw-medium">{{ membership.team.name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Role:</td>
+                    <td>
+                      {% if membership.role == 'leader' %}
+                        <span class="badge bg-primary">{{ membership.get_role_display }}</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ membership.get_role_display }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Status:</td>
+                    <td>
+                      {% if membership.is_active %}
+                        <span class="badge bg-success">Active</span>
+                      {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <table class="table table-borderless">
+                  <tr>
+                    <td class="text-muted">Joined:</td>
+                    <td class="fw-medium">{{ membership.joined_at|date:"F d, Y" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Member Since:</td>
+                    <td class="fw-medium">{{ membership.joined_at|timesince }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">User Role:</td>
+                    <td class="fw-medium">{{ membership.user.get_role_display|default:"Student" }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ti ti-users me-2"></i>Team Information
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Team Name:</td>
+                <td class="fw-medium">{{ membership.team.name }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Team Leader:</td>
+                <td class="fw-medium">{{ membership.team.team_leader.name|default:"No leader assigned" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Total Members:</td>
+                <td class="fw-medium">{{ membership.team.member_count }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Max Members:</td>
+                <td class="fw-medium">{{ membership.team.max_members }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Available Spots:</td>
+                <td class="fw-medium">{{ membership.team.available_spots }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Team Status:</td>
+                <td>
+                  {% if membership.team.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Impact Warning -->
+    {% if membership.role == 'leader' %}
+    <div class="alert alert-info">
+      <h6 class="alert-heading">
+        <i class="ti ti-info-circle me-2"></i>Leadership Impact
+      </h6>
+      <p class="mb-0">
+        This user is currently a team leader. Removing them will not automatically assign a new leader.
+        You may want to promote another member to leader before removing this user.
+      </p>
+    </div>
+    {% endif %}
+
+    <!-- Confirmation Form -->
+    <form method="post" class="text-center">
+      {% csrf_token %}
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'custom_admin:team_memberships_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-warning">
+          <i class="ti ti-user-minus me-1"></i>Remove from Team
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.alert-warning {
+  border-radius: 8px;
+  border: 1px solid #ffeaa7;
+  background-color: #fff3cd;
+}
+
+.alert-info {
+  border-radius: 8px;
+  border: 1px solid #bee5eb;
+  background-color: #d1ecf1;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.table-borderless td {
+  padding: 0.5rem 0;
+  border: none;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background-color: #ffca2c;
+  border-color: #ffc720;
+  color: #212529;
+}
+</style>
+{% endblock %}

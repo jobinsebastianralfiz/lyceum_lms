@@ -1,0 +1,193 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Team - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          <i class="ti ti-trash me-2 text-danger"></i>Delete Team
+        </h4>
+        <p class="card-subtitle">Permanently remove team from the system</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:teams_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Teams
+        </a>
+      </div>
+    </div>
+
+    <div class="alert alert-danger">
+      <h6 class="alert-heading">
+        <i class="ti ti-alert-triangle me-2"></i>Warning: This action cannot be undone
+      </h6>
+      <p class="mb-0">
+        Are you sure you want to delete the team "{{ team.name }}"? 
+        This will permanently remove the team and all associated memberships.
+      </p>
+    </div>
+
+    <!-- Team Information Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ti ti-users me-2"></i>Team to be deleted
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Team Name:</td>
+                <td class="fw-medium">{{ team.name }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Description:</td>
+                <td class="fw-medium">{{ team.description|default:"No description" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Team Leader:</td>
+                <td class="fw-medium">{{ team.team_leader.name|default:"No leader assigned" }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-borderless">
+              <tr>
+                <td class="text-muted">Max Members:</td>
+                <td class="fw-medium">{{ team.max_members }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Created:</td>
+                <td class="fw-medium">{{ team.created_at|date:"F d, Y" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted">Created By:</td>
+                <td class="fw-medium">{{ team.created_by.name }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Statistics -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ti ti-chart-bar me-2"></i>Impact of deletion
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <div class="border rounded p-3">
+              <i class="ti ti-users fs-1 text-primary mb-2"></i>
+              <h6>{{ team.member_count }}</h6>
+              <small class="text-muted">Current Members</small>
+            </div>
+          </div>
+          <div class="col-md-4 text-center">
+            <div class="border rounded p-3">
+              <i class="ti ti-user-check fs-1 text-success mb-2"></i>
+              <h6>{{ team.memberships.filter.is_active=True.count|default:0 }}</h6>
+              <small class="text-muted">Active Memberships</small>
+            </div>
+          </div>
+          <div class="col-md-4 text-center">
+            <div class="border rounded p-3">
+              <i class="ti ti-calendar fs-1 text-info mb-2"></i>
+              <h6>{{ team.created_at|timesince }}</h6>
+              <small class="text-muted">Team Age</small>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <small class="text-muted">
+            <i class="ti ti-info-circle me-1"></i>
+            All team members will lose their team membership when this team is deleted.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Members (if any) -->
+    {% if team.memberships.exists %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="ti ti-user-check me-2"></i>Team Members ({{ team.member_count }})
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for membership in team.memberships.all %}
+          <div class="col-md-6 mb-2">
+            <div class="d-flex align-items-center">
+              <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                   alt="User Avatar" class="rounded-circle me-2" width="30" height="30">
+              <div>
+                <h6 class="mb-0">{{ membership.user.name }}</h6>
+                <small class="text-muted">{{ membership.get_role_display }} - {{ membership.user.email }}</small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Confirmation Form -->
+    <form method="post" class="text-center">
+      {% csrf_token %}
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'custom_admin:teams_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-danger">
+          <i class="ti ti-trash me-1"></i>Yes, Delete Team
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.alert-danger {
+  border-radius: 8px;
+  border: 1px solid #f5c6cb;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.table-borderless td {
+  padding: 0.5rem 0;
+  border: none;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+</style>
+{% endblock %}

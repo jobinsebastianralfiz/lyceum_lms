@@ -1,0 +1,84 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | CodeLearn LMS Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg' %}" 
+             alt="CodeLearn LMS" height="32" class="me-2">
+        CodeLearn LMS Admin
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+#header {
+    background: linear-gradient(135deg, #5d87ff 0%, #4570ea 100%);
+    box-shadow: 0 2px 10px rgba(93, 135, 255, 0.15);
+}
+
+#site-name a {
+    color: white;
+    text-decoration: none;
+}
+
+#site-name a:hover {
+    color: #f0f0f0;
+}
+
+.breadcrumbs {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e6ed;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, .btn {
+    background: #5d87ff;
+    border-color: #5d87ff;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, .btn:hover {
+    background: #4570ea;
+    border-color: #4570ea;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #f8f9fa;
+    color: #2a3547;
+    border-bottom: 1px solid #e0e6ed;
+}
+
+.form-row .help {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+input, textarea, select {
+    border-radius: 6px;
+    border: 1px solid #e0e6ed;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #5d87ff;
+    box-shadow: 0 0 0 2px rgba(93, 135, 255, 0.25);
+}
+
+.changeform-tabs {
+    background: white;
+    border-bottom: 1px solid #e0e6ed;
+}
+
+.changeform-tabs li.selected a {
+    color: #5d87ff;
+    border-bottom-color: #5d87ff;
+}
+</style>
+{% endblock %}

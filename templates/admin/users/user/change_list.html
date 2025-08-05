@@ -1,0 +1,307 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+{% load i18n admin_urls %}
+
+{% block title %}Users Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+            <div>
+                <h4 class="card-title mb-0">
+                    <i class="ti ti-users me-2"></i>Users Management
+                </h4>
+                <p class="card-subtitle">Manage all users in the system</p>
+            </div>
+            <div class="ms-auto">
+                <a href="{% url 'admin:users_user_add' %}" class="btn btn-primary">
+                    <i class="ti ti-plus me-1"></i>Add New User
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <form method="get" class="d-flex">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="q" 
+                               value="{{ cl.query }}" placeholder="Search users by name, email, or username...">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="ti ti-search"></i>
+                        </button>
+                        {% if cl.query %}
+                        <a href="?" class="btn btn-outline-secondary">
+                            <i class="ti ti-x"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="d-flex justify-content-end align-items-center">
+                    {% if cl.result_count %}
+                    <span class="text-muted me-2">
+                        Showing {{ cl.result_count }} user{{ cl.result_count|pluralize }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        {% if action_form and actions_on_top and cl.show_admin_actions %}
+                        <th scope="col" class="action-checkbox-column">
+                            <input type="checkbox" id="action-toggle" class="form-check-input">
+                        </th>
+                        {% endif %}
+                        
+                        {% for header in result_headers %}
+                        <th scope="col" class="px-0 {% if header.sortable %}sortable{% endif %}">
+                            {% if header.sortable %}
+                                {% if header.sort_priority > 0 %}
+                                    <a href="{{ header.url_primary }}" class="text-decoration-none">
+                                        {{ header.text|capfirst }}
+                                        {% if header.ascending %}
+                                            <i class="ti ti-chevron-up"></i>
+                                        {% else %}
+                                            <i class="ti ti-chevron-down"></i>
+                                        {% endif %}
+                                    </a>
+                                {% else %}
+                                    <a href="{{ header.url_primary }}" class="text-decoration-none">
+                                        {{ header.text|capfirst }}
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                {{ header.text|capfirst }}
+                            {% endif %}
+                        </th>
+                        {% endfor %}
+                        <th scope="col" class="px-0 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        {% if action_form and actions_on_top and cl.show_admin_actions %}
+                        <td class="action-checkbox">
+                            <input type="checkbox" name="_selected_action" value="{{ result.pk }}" class="action-select form-check-input">
+                        </td>
+                        {% endif %}
+                        
+                        {% for item in result %}
+                        <td class="px-0">
+                            {% if forloop.first %}
+                                <!-- First column (usually email) with user avatar -->
+                                <div class="d-flex align-items-center">
+                                    <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
+                                         alt="User Avatar" 
+                                         class="rounded-circle me-3" width="40" height="40">
+                                    <div>
+                                        {{ item }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ item }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        
+                        <td class="px-0 text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ti ti-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'admin:users_user_change' result.pk %}">
+                                            <i class="ti ti-edit me-2"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'admin:users_user_history' result.pk %}">
+                                            <i class="ti ti-history me-2"></i>History
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'admin:users_user_delete' result.pk %}">
+                                            <i class="ti ti-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="ti ti-users fs-1 mb-3 d-block"></i>
+                                {% if cl.query %}
+                                    <h5 class="mb-2">No users found</h5>
+                                    <p class="mb-0">No users match your search criteria "{{ cl.query }}"</p>
+                                    <a href="?" class="btn btn-sm btn-outline-primary mt-3">
+                                        Clear Search
+                                    </a>
+                                {% else %}
+                                    <h5 class="mb-2">No users available</h5>
+                                    <p class="mb-0">Get started by adding your first user</p>
+                                    <a href="{% url 'admin:users_user_add' %}" class="btn btn-sm btn-primary mt-3">
+                                        <i class="ti ti-plus me-1"></i>Add New User
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Actions Form -->
+        {% if action_form and actions_on_top and cl.show_admin_actions %}
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <label for="action-select" class="form-label mb-0 me-2">Action:</label>
+                        {{ action_form.action }}
+                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2" 
+                                name="index" value="{{ cl.full_result_count|default:0 }}">
+                            <i class="ti ti-play me-1"></i>Go
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        <span id="selected-count">0</span> of {{ cl.full_result_count|default:0 }} selected
+                    </small>
+                </div>
+            </div>
+            
+            {% for hidden in action_form.hidden_fields %}{{ hidden }}{% endfor %}
+        </form>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if cl.paginator.num_pages > 1 %}
+        <nav aria-label="Users pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if cl.result_list.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if cl.query %}q={{ cl.query }}&{% endif %}p=1">
+                            <i class="ti ti-chevrons-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if cl.query %}q={{ cl.query }}&{% endif %}p={{ cl.result_list.previous_page_number }}">
+                            <i class="ti ti-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in cl.paginator.page_range %}
+                    {% if cl.result_list.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > cl.result_list.number|add:'-3' and num < cl.result_list.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if cl.query %}q={{ cl.query }}&{% endif %}p={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if cl.result_list.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if cl.query %}q={{ cl.query }}&{% endif %}p={{ cl.result_list.next_page_number }}">
+                            <i class="ti ti-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if cl.query %}q={{ cl.query }}&{% endif %}p={{ cl.paginator.num_pages }}">
+                            <i class="ti ti-chevrons-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle select all checkbox
+    const toggleAll = document.getElementById('action-toggle');
+    const checkboxes = document.querySelectorAll('.action-select');
+    const selectedCount = document.getElementById('selected-count');
+    
+    if (toggleAll) {
+        toggleAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSelectedCount();
+        });
+    }
+    
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.action-select:checked').length;
+        if (selectedCount) selectedCount.textContent = count;
+        
+        if (toggleAll) {
+            toggleAll.indeterminate = count > 0 && count < checkboxes.length;
+            toggleAll.checked = count === checkboxes.length;
+        }
+    }
+    
+    updateSelectedCount();
+});
+</script>
+
+<style>
+.sortable a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.sortable a:hover {
+    color: #5d87ff;
+}
+
+.action-checkbox-column {
+    width: 40px;
+}
+
+.action-checkbox {
+    width: 40px;
+}
+
+.table th {
+    font-weight: 600;
+    color: #2a3547;
+    border-bottom: 2px solid #e0e6ed;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

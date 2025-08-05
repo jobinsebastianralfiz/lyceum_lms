@@ -1,0 +1,299 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}YouTube Videos - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">YouTube Videos</h4>
+        <p class="card-subtitle">Manage YouTube video content</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:youtube_video_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add Video
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search by title, video ID, or channel...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} videos
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Videos Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="px-0">Video</th>
+            <th scope="col" class="px-0">Channel</th>
+            <th scope="col" class="px-0">Duration</th>
+            <th scope="col" class="px-0">Published</th>
+            <th scope="col" class="px-0">Status</th>
+            <th scope="col" class="px-0 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for video in page_obj %}
+          <tr>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  {% if video.thumbnail_url %}
+                  <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" 
+                       class="rounded" style="width: 60px; height: 40px; object-fit: cover;">
+                  {% else %}
+                  <div class="bg-secondary-subtle rounded d-flex align-items-center justify-content-center" 
+                       style="width: 60px; height: 40px;">
+                    <i class="ti ti-video text-secondary"></i>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 fw-normal">{{ video.title|truncatechars:50 }}</h6>
+                  <div class="small text-muted">
+                    <code>{{ video.video_id }}</code>
+                    <a href="{{ video.youtube_url }}" target="_blank" class="text-decoration-none ms-2">
+                      <i class="ti ti-external-link"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2" 
+                     style="width: 30px; height: 30px;">
+                  <i class="ti ti-brand-youtube text-primary fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ video.channel_config.channel_name|truncatechars:25 }}</h6>
+                  <span class="text-muted fs-3">{{ video.channel_config.admin_user.name }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <i class="ti ti-clock text-muted me-2"></i>
+                <span>{{ video.duration }}s</span>
+              </div>
+            </td>
+            <td class="px-0">
+              <span class="text-muted">{{ video.published_at|date:"M d, Y" }}</span>
+            </td>
+            <td class="px-0">
+              {% if video.is_available %}
+                <span class="badge bg-success">Available</span>
+              {% else %}
+                <span class="badge bg-warning">Unavailable</span>
+              {% endif %}
+            </td>
+            <td class="px-0 text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{{ video.youtube_url }}" target="_blank">
+                      <i class="ti ti-external-link me-2"></i>View on YouTube
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:youtube_video_edit' video.id %}">
+                      <i class="ti ti-edit me-2"></i>Edit Video
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:youtube_video_delete' video.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete Video
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-video fs-1 mb-3 d-block"></i>
+                {% if search_query %}
+                  <h5 class="mb-2">No videos found</h5>
+                  <p class="mb-0">No YouTube videos match your search criteria "{{ search_query }}"</p>
+                  <a href="{% url 'custom_admin:youtube_videos_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                    Clear Search
+                  </a>
+                {% else %}
+                  <h5 class="mb-2">No YouTube videos</h5>
+                  <p class="mb-0">Start by adding videos from your YouTube channels</p>
+                  <a href="{% url 'custom_admin:youtube_video_create' %}" class="btn btn-sm btn-primary mt-3">
+                    <i class="ti ti-plus me-1"></i>Add Video
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="YouTube videos pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.table th {
+  font-weight: 600;
+  color: #2a3547;
+  border-bottom: 2px solid #e0e6ed;
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.form-control {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.pagination .page-link {
+  border-radius: 6px;
+  margin: 0 2px;
+  border: 1px solid #e0e6ed;
+  color: #2a3547;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.bg-secondary-subtle {
+  background-color: rgba(108, 117, 125, 0.1) !important;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+code {
+  font-size: 0.75em;
+  background-color: #f8f9fa;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #6c757d;
+}
+</style>
+{% endblock %}

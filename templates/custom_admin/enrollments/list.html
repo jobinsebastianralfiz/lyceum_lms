@@ -11,6 +11,11 @@
         <h4 class="card-title mb-0">Enrollments Management</h4>
         <p class="card-subtitle">Manage all course enrollments</p>
       </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:enrollment_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add Enrollment
+        </a>
+      </div>
     </div>
 
     <!-- Search Bar -->
@@ -27,9 +32,11 @@
         </form>
       </div>
       <div class="col-md-6 text-end">
-        <span class="text-muted">
-          Total: {{ page_obj.paginator.count }} enrollments
-        </span>
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} enrollments
+          </span>
+        </div>
       </div>
     </div>
 
@@ -38,76 +45,138 @@
       <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th>Student</th>
-            <th>Course</th>
-            <th>Type</th>
-            <th>Payment Status</th>
-            <th>Team</th>
-            <th>Enrolled Date</th>
-            <th class="text-end">Actions</th>
+            <th scope="col" class="px-0">Student</th>
+            <th scope="col" class="px-0">Course</th>
+            <th scope="col" class="px-0">Type</th>
+            <th scope="col" class="px-0">Payment</th>
+            <th scope="col" class="px-0">Amount</th>
+            <th scope="col" class="px-0">Team</th>
+            <th scope="col" class="px-0">Enrolled</th>
+            <th scope="col" class="px-0 text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for enrollment in page_obj %}
           <tr>
-            <td>
+            <td class="px-0">
               <div class="d-flex align-items-center">
-                <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
-                     alt="{{ enrollment.user.get_full_name }}" 
-                     class="rounded-circle me-3" width="32" height="32">
+                <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 40px; height: 40px;">
+                  <i class="ti ti-user text-primary"></i>
+                </div>
                 <div>
-                  <h6 class="mb-0">{{ enrollment.user.get_full_name|default:enrollment.user.username }}</h6>
-                  <small class="text-muted">{{ enrollment.user.email }}</small>
+                  <h6 class="mb-0 fw-normal">{{ enrollment.user.name|default:enrollment.user.username }}</h6>
+                  <span class="text-muted fs-3">{{ enrollment.user.email }}</span>
                 </div>
               </div>
             </td>
-            <td>
+            <td class="px-0">
               <div>
-                <h6 class="mb-0">{{ enrollment.course.title }}</h6>
-                <small class="text-muted">₹{{ enrollment.course.price|default:"Free" }}</small>
+                <h6 class="mb-0 fw-normal">{{ enrollment.course.title|truncatechars:40 }}</h6>
+                <span class="text-muted fs-3">{{ enrollment.course.category.name|default:"Uncategorized" }}</span>
               </div>
             </td>
-            <td>
+            <td class="px-0">
               <span class="badge bg-info-subtle text-info">
                 {{ enrollment.get_enrollment_type_display }}
               </span>
             </td>
-            <td>
+            <td class="px-0">
               {% if enrollment.payment_status == 'completed' %}
-                <span class="badge bg-success">Paid</span>
+                <span class="badge bg-success">Completed</span>
               {% elif enrollment.payment_status == 'pending' %}
                 <span class="badge bg-warning">Pending</span>
-              {% elif enrollment.payment_status == 'failed' %}
-                <span class="badge bg-danger">Failed</span>
+              {% elif enrollment.payment_status == 'partial' %}
+                <span class="badge bg-info">Partial</span>
+              {% elif enrollment.payment_status == 'free' %}
+                <span class="badge bg-secondary">Free</span>
               {% else %}
                 <span class="badge bg-secondary">{{ enrollment.get_payment_status_display }}</span>
               {% endif %}
             </td>
-            <td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <span class="fw-medium">₹{{ enrollment.total_amount|floatformat:2 }}</span>
+                {% if enrollment.has_installment_plan %}
+                  <i class="ti ti-calendar-time text-info ms-2" title="Has installment plan"></i>
+                {% endif %}
+              </div>
+              {% if enrollment.outstanding_amount > 0 %}
+                <small class="text-danger">Outstanding: ₹{{ enrollment.outstanding_amount|floatformat:2 }}</small>
+              {% endif %}
+            </td>
+            <td class="px-0">
               {% if enrollment.team %}
-                <span class="badge bg-primary-subtle text-primary">{{ enrollment.team.name }}</span>
+                <div class="d-flex align-items-center">
+                  <i class="ti ti-users text-primary me-2"></i>
+                  <span>{{ enrollment.team.name|truncatechars:20 }}</span>
+                </div>
               {% else %}
                 <span class="text-muted">Individual</span>
               {% endif %}
             </td>
-            <td>{{ enrollment.enrolled_on|date:"M d, Y" }}</td>
-            <td class="text-end">
-              <a href="{% url 'custom_admin:user_detail' enrollment.user.id %}" 
-                 class="btn btn-sm btn-outline-primary me-1">View Student</a>
-              <a href="{% url 'custom_admin:course_detail' enrollment.course.id %}" 
-                 class="btn btn-sm btn-outline-info">View Course</a>
+            <td class="px-0">
+              <span class="text-muted">{{ enrollment.enrolled_on|date:"M d, Y" }}</span>
+            </td>
+            <td class="px-0 text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:enrollment_edit' enrollment.id %}">
+                      <i class="ti ti-edit me-2"></i>Edit Enrollment
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' enrollment.user.id %}">
+                      <i class="ti ti-user me-2"></i>View Student
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:course_detail' enrollment.course.id %}">
+                      <i class="ti ti-book me-2"></i>View Course
+                    </a>
+                  </li>
+                  {% if enrollment.team %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:teams_list' %}?search={{ enrollment.team.name }}">
+                      <i class="ti ti-users me-2"></i>View Team
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:enrollment_delete' enrollment.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete Enrollment
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" class="text-center py-5">
-              <i class="ti ti-user-check fs-1 text-muted mb-3"></i>
-              <h5 class="mb-2">No enrollments found</h5>
-              {% if search_query %}
-                <p class="mb-0">No enrollments match "{{ search_query }}"</p>
-              {% else %}
-                <p class="mb-0">No students have enrolled in courses yet</p>
-              {% endif %}
+            <td colspan="8" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-user-check fs-1 mb-3 d-block"></i>
+                {% if search_query %}
+                  <h5 class="mb-2">No enrollments found</h5>
+                  <p class="mb-0">No enrollments match your search criteria "{{ search_query }}"</p>
+                  <a href="{% url 'custom_admin:enrollments_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                    Clear Search
+                  </a>
+                {% else %}
+                  <h5 class="mb-2">No enrollments found</h5>
+                  <p class="mb-0">No students have enrolled in courses yet</p>
+                  <a href="{% url 'custom_admin:enrollment_create' %}" class="btn btn-sm btn-primary mt-3">
+                    <i class="ti ti-plus me-1"></i>Add Enrollment
+                  </a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% endfor %}
@@ -121,17 +190,39 @@
       <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
           </li>
         {% endif %}
-        
-        <li class="page-item active">
-          <span class="page-link">{{ page_obj.number }}</span>
-        </li>
-        
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
         {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
           </li>
         {% endif %}
       </ul>
@@ -139,4 +230,81 @@
     {% endif %}
   </div>
 </div>
+
+<style>
+.table th {
+  font-weight: 600;
+  color: #2a3547;
+  border-bottom: 2px solid #e0e6ed;
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.form-control {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.pagination .page-link {
+  border-radius: 6px;
+  margin: 0 2px;
+  border: 1px solid #e0e6ed;
+  color: #2a3547;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+</style>
 {% endblock %}

@@ -12,7 +12,7 @@
         <p class="card-subtitle">Manage all users in the system</p>
       </div>
       <div class="ms-auto">
-        <a href="/django-admin/users/user/add/" class="btn btn-primary">
+        <a href="{% url 'custom_admin:user_create' %}" class="btn btn-primary">
           <i class="ti ti-plus me-1"></i>Add New User
         </a>
       </div>
@@ -109,7 +109,7 @@
                     </a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="/django-admin/users/user/{{ user.id }}/change/">
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_edit' user.id %}">
                       <i class="ti ti-edit me-2"></i>Edit User
                     </a>
                   </li>
@@ -145,7 +145,7 @@
                 {% else %}
                   <h5 class="mb-2">No users available</h5>
                   <p class="mb-0">Get started by adding your first user</p>
-                  <a href="/django-admin/users/user/add/" class="btn btn-sm btn-primary mt-3">
+                  <a href="{% url 'custom_admin:user_create' %}" class="btn btn-sm btn-primary mt-3">
                     <i class="ti ti-plus me-1"></i>Add New User
                   </a>
                 {% endif %}

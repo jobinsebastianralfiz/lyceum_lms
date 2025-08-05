@@ -1,0 +1,306 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Installment Plans - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Installment Plans</h4>
+        <p class="card-subtitle">Manage payment installment schedules</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:installment_plan_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add Installment Plan
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search by student name or course...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} plans
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installment Plans Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="px-0">Student & Course</th>
+            <th scope="col" class="px-0">Plan Details</th>
+            <th scope="col" class="px-0">Amount</th>
+            <th scope="col" class="px-0">Progress</th>
+            <th scope="col" class="px-0">Start Date</th>
+            <th scope="col" class="px-0">Status</th>
+            <th scope="col" class="px-0 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for plan in page_obj %}
+          <tr>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 40px; height: 40px;">
+                  <i class="ti ti-user text-primary"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ plan.enrollment.user.name }}</h6>
+                  <span class="text-muted fs-3">{{ plan.enrollment.course.title|truncatechars:30 }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <i class="ti ti-calendar-time text-info me-2"></i>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ plan.total_installments }} installments</h6>
+                  <span class="text-muted fs-3">{{ plan.get_frequency_display }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div>
+                <h6 class="mb-0 fw-normal">₹{{ plan.installment_amount|floatformat:2 }}</h6>
+                <span class="text-muted fs-3">per installment</span>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <div class="progress me-2" style="width: 80px; height: 8px;">
+                  <div class="progress-bar bg-success" role="progressbar" 
+                       style="width: {% widthratio plan.completed_payments_count plan.total_installments 100 %}%"></div>
+                </div>
+                <span class="small text-muted">{{ plan.completed_payments_count }}/{{ plan.total_installments }}</span>
+              </div>
+            </td>
+            <td class="px-0">
+              <span class="text-muted">{{ plan.start_date|date:"M d, Y" }}</span>
+            </td>
+            <td class="px-0">
+              {% with outstanding=plan.enrollment.outstanding_amount %}
+              {% if outstanding <= 0 %}
+                <span class="badge bg-success">Completed</span>
+              {% elif plan.enrollment.payment_status == 'partial' %}
+                <span class="badge bg-info">In Progress</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+              {% endwith %}
+            </td>
+            <td class="px-0 text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:installment_plan_edit' plan.id %}">
+                      <i class="ti ti-edit me-2"></i>Edit Plan
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:enrollment_edit' plan.enrollment.id %}">
+                      <i class="ti ti-user-check me-2"></i>View Enrollment
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:payments_list' %}?search={{ plan.enrollment.user.name }}">
+                      <i class="ti ti-credit-card me-2"></i>View Payments
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' plan.enrollment.user.id %}">
+                      <i class="ti ti-user me-2"></i>View Student
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:installment_plan_delete' plan.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete Plan
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-calendar-time fs-1 mb-3 d-block"></i>
+                {% if search_query %}
+                  <h5 class="mb-2">No installment plans found</h5>
+                  <p class="mb-0">No installment plans match your search criteria "{{ search_query }}"</p>
+                  <a href="{% url 'custom_admin:installment_plans_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                    Clear Search
+                  </a>
+                {% else %}
+                  <h5 class="mb-2">No installment plans</h5>
+                  <p class="mb-0">No payment installment plans have been created yet</p>
+                  <a href="{% url 'custom_admin:installment_plan_create' %}" class="btn btn-sm btn-primary mt-3">
+                    <i class="ti ti-plus me-1"></i>Add Installment Plan
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Installment plans pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.table th {
+  font-weight: 600;
+  color: #2a3547;
+  border-bottom: 2px solid #e0e6ed;
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.form-control {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.pagination .page-link {
+  border-radius: 6px;
+  margin: 0 2px;
+  border: 1px solid #e0e6ed;
+  color: #2a3547;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.progress {
+  background-color: #e9ecef;
+  border-radius: 4px;
+}
+
+.progress-bar {
+  border-radius: 4px;
+}
+</style>
+{% endblock %}

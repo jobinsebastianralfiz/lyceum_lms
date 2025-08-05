@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "lms",
+			"path": "../.."
+		},
+		{
+			"name": "flexy-bootstrap-lite-1.0.0",
+			"path": "../../../../Downloads/flexy-bootstrap-lite-1.0.0"
+		}
+	],
+	"settings": {}
+}

@@ -1,0 +1,271 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Video - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0 text-danger">
+          <i class="ti ti-trash me-2"></i>Delete YouTube Video
+        </h4>
+        <p class="card-subtitle">
+          Are you sure you want to delete this video from the system?
+        </p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:youtube_videos_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Videos
+        </a>
+      </div>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert alert-danger mb-4">
+      <h6 class="alert-heading mb-3">
+        <i class="ti ti-alert-triangle me-2"></i>Warning: This action cannot be undone!
+      </h6>
+      <ul class="mb-0">
+        <li>This will remove the video from the system database</li>
+        <li>The actual YouTube video will remain on YouTube</li>
+        <li>Any learning progress or references to this video will be lost</li>
+      </ul>
+    </div>
+
+    <!-- Video Information Card -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card border-danger">
+          <div class="card-header bg-danger-subtle">
+            <h5 class="card-title mb-0 text-danger">
+              <i class="ti ti-video me-2"></i>Video to Delete
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Title:</td>
+                    <td>{{ video.title }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Video ID:</td>
+                    <td><code class="text-muted">{{ video.video_id }}</code></td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Channel:</td>
+                    <td>{{ video.channel_config.channel_name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Duration:</td>
+                    <td>{{ video.duration }} seconds</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Published:</td>
+                    <td>{{ video.published_at|date:"M d, Y H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Added:</td>
+                    <td>{{ video.created_at|date:"M d, Y H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Status:</td>
+                    <td>
+                      {% if video.is_available %}
+                        <span class="badge bg-success">Available</span>
+                      {% else %}
+                        <span class="badge bg-warning">Unavailable</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">YouTube:</td>
+                    <td>
+                      <a href="{{ video.youtube_url }}" target="_blank" class="text-primary text-decoration-none small">
+                        <i class="ti ti-external-link me-1"></i>View Original
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            {% if video.description %}
+            <hr>
+            <div>
+              <h6 class="text-muted mb-2">Description:</h6>
+              <p class="small mb-0">{{ video.description|truncatewords:50 }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- Video Thumbnail -->
+        {% if video.thumbnail_url %}
+        <div class="card mb-3">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-photo me-2"></i>Video Thumbnail
+            </h6>
+          </div>
+          <div class="card-body text-center">
+            <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" 
+                 class="img-fluid rounded" style="max-height: 150px;">
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Channel Information -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-brand-youtube me-2"></i>Channel Info
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                   style="width: 40px; height: 40px;">
+                <i class="ti ti-brand-youtube text-primary"></i>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ video.channel_config.channel_name }}</h6>
+                <small class="text-muted">{{ video.channel_config.admin_user.name }}</small>
+              </div>
+            </div>
+            <div class="small">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Total Videos:</span>
+                <span>{{ video.channel_config.videos.count }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <form method="post" class="mb-0">
+      {% csrf_token %}
+      
+      <!-- Confirmation Checkbox -->
+      <div class="mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="confirm_delete" name="confirm_delete" required>
+          <label class="form-check-label text-danger fw-medium" for="confirm_delete">
+            I understand that this action cannot be undone and will permanently remove 
+            "{{ video.title }}" from the system.
+          </label>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'custom_admin:youtube_videos_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <a href="{% url 'custom_admin:youtube_video_edit' video.id %}" class="btn btn-outline-primary">
+          <i class="ti ti-edit me-1"></i>Edit Instead
+        </a>
+        <button type="submit" class="btn btn-danger" id="delete_button" disabled>
+          <i class="ti ti-trash me-1"></i>Delete Video
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmCheckbox = document.getElementById('confirm_delete');
+  const deleteButton = document.getElementById('delete_button');
+  
+  confirmCheckbox.addEventListener('change', function() {
+    deleteButton.disabled = !this.checked;
+  });
+});
+</script>
+
+<style>
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.bg-danger-subtle {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(93, 135, 255, 0.1) !important;
+}
+
+.form-control, .form-select {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.form-check-input {
+  margin-top: 0.25em;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+
+code {
+  font-size: 0.875em;
+  background-color: #f8f9fa;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+</style>
+{% endblock %}

@@ -7,11 +7,12 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.urls import reverse
 
-from apps.users.models import User, Team
+from apps.users.models import User, Team, TeamMembership
 from apps.courses.models import Course, Module, VideoLesson, Category
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
-from apps.youtube_integration.models import YouTubeVideo
+from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
 from apps.notifications.models import Notification
 
 
@@ -41,7 +42,7 @@ def dashboard_view(request):
     total_team_memberships = 0
     try:
         # Try to get team memberships through teams
-        total_team_memberships = sum(team.team_memberships.count() if hasattr(team, 'team_memberships') else 0 for team in Team.objects.all())
+        total_team_memberships = sum(team.memberships.count() if hasattr(team, 'memberships') else 0 for team in Team.objects.all())
     except:
         total_team_memberships = 0
     
@@ -246,7 +247,7 @@ def teams_list_view(request):
     """List all teams"""
     search_query = request.GET.get('search', '')
     teams = Team.objects.annotate(
-        members_count=Count('team_memberships')
+        members_count=Count('memberships')
     )
     
     if search_query:
@@ -593,28 +594,65 @@ def notification_delete_view(request, notification_id):
 @user_passes_test(is_staff_user)
 def enrollment_create_view(request):
     """Create enrollment"""
-    return render(request, 'custom_admin/enrollments/form.html', {
-        'title': 'Add Enrollment',
-        'is_edit': False
-    })
+    from .forms import CustomEnrollmentForm
+    
+    if request.method == 'POST':
+        form = CustomEnrollmentForm(request.POST)
+        if form.is_valid():
+            enrollment = form.save()
+            
+            # Check if user wants to create installment plan
+            if form.cleaned_data.get('has_installment_plan'):
+                messages.success(request, f'Enrollment for "{enrollment.user.name}" created successfully. Now create the installment plan.')
+                # Pass enrollment ID to pre-select it in the installment plan form
+                return redirect(f'{reverse("custom_admin:installment_plan_create")}?enrollment={enrollment.id}')
+            else:
+                messages.success(request, f'Enrollment for "{enrollment.user.name}" in "{enrollment.course.title}" created successfully.')
+                return redirect('custom_admin:enrollments_list')
+    else:
+        form = CustomEnrollmentForm()
+    
+    context = {
+        'form': form,
+        'title': 'Add New Enrollment',
+        'is_edit': False,
+        'enrollment': None
+    }
+    return render(request, 'custom_admin/enrollments/form.html', context)
 
 @user_passes_test(is_staff_user)
 def enrollment_edit_view(request, enrollment_id):
     """Edit enrollment"""
+    from .forms import CustomEnrollmentForm
+    
     enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    return render(request, 'custom_admin/enrollments/form.html', {
-        'enrollment': enrollment,
-        'title': 'Edit Enrollment',
-        'is_edit': True
-    })
+    
+    if request.method == 'POST':
+        form = CustomEnrollmentForm(request.POST, instance=enrollment)
+        if form.is_valid():
+            enrollment = form.save()
+            messages.success(request, f'Enrollment for "{enrollment.user.name}" in "{enrollment.course.title}" updated successfully.')
+            return redirect('custom_admin:enrollments_list')
+    else:
+        form = CustomEnrollmentForm(instance=enrollment)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Enrollment: {enrollment.user.name} - {enrollment.course.title}',
+        'is_edit': True,
+        'enrollment': enrollment
+    }
+    return render(request, 'custom_admin/enrollments/form.html', context)
 
 @user_passes_test(is_staff_user)
 def enrollment_delete_view(request, enrollment_id):
     """Delete enrollment"""
     enrollment = get_object_or_404(Enrollment, id=enrollment_id)
     if request.method == 'POST':
+        user_name = enrollment.user.name
+        course_title = enrollment.course.title
         enrollment.delete()
-        messages.success(request, f'Enrollment deleted successfully.')
+        messages.success(request, f'Enrollment for "{user_name}" in "{course_title}" deleted successfully.')
         return redirect('custom_admin:enrollments_list')
     return render(request, 'custom_admin/enrollments/delete.html', {'enrollment': enrollment})
 
@@ -622,13 +660,17 @@ def enrollment_delete_view(request, enrollment_id):
 def installment_plans_list_view(request):
     """List installment plans"""
     search_query = request.GET.get('search', '')
-    plans = InstallmentPlan.objects.select_related('enrollment', 'enrollment__user', 'enrollment__course')
+    plans = InstallmentPlan.objects.select_related('enrollment', 'enrollment__user', 'enrollment__course').prefetch_related('enrollment__payments')
     
     if search_query:
         plans = plans.filter(
             Q(enrollment__user__name__icontains=search_query) |
             Q(enrollment__course__title__icontains=search_query)
         )
+    
+    # Add completed payments count to each plan
+    for plan in plans:
+        plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
     
     paginator = Paginator(plans, 25)
     page_number = request.GET.get('page')
@@ -644,28 +686,83 @@ def installment_plans_list_view(request):
 @user_passes_test(is_staff_user)
 def installment_plan_create_view(request):
     """Create installment plan"""
-    return render(request, 'custom_admin/installment_plans/form.html', {
+    from .forms import CustomInstallmentPlanForm
+    
+    if request.method == 'POST':
+        form = CustomInstallmentPlanForm(request.POST)
+        if form.is_valid():
+            plan = form.save()
+            messages.success(request, f'Installment plan for "{plan.enrollment.user.name}" created successfully.')
+            return redirect('custom_admin:installment_plans_list')
+    else:
+        # Check if enrollment ID is passed from enrollment creation
+        enrollment_id = request.GET.get('enrollment')
+        initial_data = {}
+        
+        if enrollment_id:
+            try:
+                enrollment = Enrollment.objects.get(id=enrollment_id)
+                initial_data['enrollment'] = enrollment
+                # Set suggested values based on enrollment
+                if enrollment.total_amount:
+                    # Suggest 3 installments by default
+                    suggested_installments = 3
+                    suggested_amount = enrollment.total_amount / suggested_installments
+                    initial_data['total_installments'] = suggested_installments
+                    initial_data['installment_amount'] = suggested_amount
+            except Enrollment.DoesNotExist:
+                pass
+        
+        form = CustomInstallmentPlanForm(initial=initial_data)
+    
+    context = {
+        'form': form,
         'title': 'Add Installment Plan',
-        'is_edit': False
-    })
+        'is_edit': False,
+        'plan': None
+    }
+    return render(request, 'custom_admin/installment_plans/form.html', context)
 
 @user_passes_test(is_staff_user)
 def installment_plan_edit_view(request, plan_id):
     """Edit installment plan"""
+    from .forms import CustomInstallmentPlanForm
+    
     plan = get_object_or_404(InstallmentPlan, id=plan_id)
-    return render(request, 'custom_admin/installment_plans/form.html', {
-        'plan': plan,
-        'title': 'Edit Installment Plan',
-        'is_edit': True
-    })
+    # Add completed payments count
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+    
+    if request.method == 'POST':
+        form = CustomInstallmentPlanForm(request.POST, instance=plan)
+        if form.is_valid():
+            plan = form.save()
+            messages.success(request, f'Installment plan for "{plan.enrollment.user.name}" updated successfully.')
+            return redirect('custom_admin:installment_plans_list')
+    else:
+        form = CustomInstallmentPlanForm(instance=plan)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Plan: {plan.enrollment.user.name}',
+        'is_edit': True,
+        'plan': plan
+    }
+    return render(request, 'custom_admin/installment_plans/form.html', context)
 
 @user_passes_test(is_staff_user)
 def installment_plan_delete_view(request, plan_id):
     """Delete installment plan"""
     plan = get_object_or_404(InstallmentPlan, id=plan_id)
+    # Add completed payments count
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+    
     if request.method == 'POST':
+        user_name = plan.enrollment.user.name
+        # Update enrollment to indicate it no longer has installment plan
+        plan.enrollment.has_installment_plan = False
+        plan.enrollment.save()
         plan.delete()
-        messages.success(request, f'Installment plan deleted successfully.')
+        messages.success(request, f'Installment plan for "{user_name}" deleted successfully.')
         return redirect('custom_admin:installment_plans_list')
     return render(request, 'custom_admin/installment_plans/delete.html', {'plan': plan})
 
@@ -756,47 +853,130 @@ def tax_invoice_delete_view(request, invoice_id):
 @user_passes_test(is_staff_user)
 def team_memberships_list_view(request):
     """List team memberships"""
-    # For now redirect to teams list
-    return redirect('custom_admin:teams_list')
+    search_query = request.GET.get('search', '')
+    memberships = TeamMembership.objects.select_related('team', 'user').all()
+    
+    if search_query:
+        memberships = memberships.filter(
+            Q(user__name__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(team__name__icontains=search_query)
+        )
+    
+    paginator = Paginator(memberships, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/team_memberships/list.html', context)
 
 @user_passes_test(is_staff_user)
 def team_membership_create_view(request):
     """Create team membership"""
-    return render(request, 'custom_admin/team_memberships/form.html', {
+    from .forms import CustomTeamMembershipForm
+    
+    if request.method == 'POST':
+        form = CustomTeamMembershipForm(request.POST)
+        if form.is_valid():
+            membership = form.save()
+            messages.success(request, f'Added "{membership.user.name}" to team "{membership.team.name}" successfully.')
+            return redirect('custom_admin:team_memberships_list')
+    else:
+        form = CustomTeamMembershipForm()
+    
+    context = {
+        'form': form,
         'title': 'Add Team Membership',
-        'is_edit': False
-    })
+        'is_edit': False,
+        'membership': None
+    }
+    return render(request, 'custom_admin/team_memberships/form.html', context)
 
 @user_passes_test(is_staff_user)
 def team_membership_edit_view(request, membership_id):
     """Edit team membership"""
-    return render(request, 'custom_admin/team_memberships/form.html', {
-        'title': 'Edit Team Membership',
-        'is_edit': True
-    })
+    from .forms import CustomTeamMembershipForm
+    
+    membership = get_object_or_404(TeamMembership, id=membership_id)
+    
+    if request.method == 'POST':
+        form = CustomTeamMembershipForm(request.POST, instance=membership)
+        if form.is_valid():
+            membership = form.save()
+            messages.success(request, f'Updated membership for "{membership.user.name}" in team "{membership.team.name}".')
+            return redirect('custom_admin:team_memberships_list')
+    else:
+        form = CustomTeamMembershipForm(instance=membership)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Membership: {membership.user.name} - {membership.team.name}',
+        'is_edit': True,
+        'membership': membership
+    }
+    return render(request, 'custom_admin/team_memberships/form.html', context)
 
 @user_passes_test(is_staff_user)
 def team_membership_delete_view(request, membership_id):
     """Delete team membership"""
-    return redirect('custom_admin:team_memberships_list')
+    membership = get_object_or_404(TeamMembership, id=membership_id)
+    if request.method == 'POST':
+        user_name = membership.user.name
+        team_name = membership.team.name
+        membership.delete()
+        messages.success(request, f'Removed "{user_name}" from team "{team_name}" successfully.')
+        return redirect('custom_admin:team_memberships_list')
+    return render(request, 'custom_admin/team_memberships/delete.html', {'membership': membership})
 
 @user_passes_test(is_staff_user)
 def team_create_view(request):
     """Create team"""
-    return render(request, 'custom_admin/teams/form.html', {
-        'title': 'Add Team',
-        'is_edit': False
-    })
+    from .forms import CustomTeamForm
+    
+    if request.method == 'POST':
+        form = CustomTeamForm(request.POST)
+        if form.is_valid():
+            team = form.save()
+            messages.success(request, f'Team "{team.name}" created successfully.')
+            return redirect('custom_admin:teams_list')
+    else:
+        form = CustomTeamForm(initial={'created_by': request.user})
+    
+    context = {
+        'form': form,
+        'title': 'Add New Team',
+        'is_edit': False,
+        'team': None
+    }
+    return render(request, 'custom_admin/teams/form.html', context)
 
 @user_passes_test(is_staff_user)
 def team_edit_view(request, team_id):
     """Edit team"""
+    from .forms import CustomTeamForm
+    
     team = get_object_or_404(Team, id=team_id)
-    return render(request, 'custom_admin/teams/form.html', {
-        'team': team,
-        'title': 'Edit Team',
-        'is_edit': True
-    })
+    
+    if request.method == 'POST':
+        form = CustomTeamForm(request.POST, instance=team)
+        if form.is_valid():
+            team = form.save()
+            messages.success(request, f'Team "{team.name}" updated successfully.')
+            return redirect('custom_admin:teams_list')
+    else:
+        form = CustomTeamForm(instance=team)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Team: {team.name}',
+        'is_edit': True,
+        'team': team
+    }
+    return render(request, 'custom_admin/teams/form.html', context)
 
 @user_passes_test(is_staff_user)
 def team_delete_view(request, team_id):
@@ -811,20 +991,48 @@ def team_delete_view(request, team_id):
 @user_passes_test(is_staff_user)
 def user_create_view(request):
     """Create user"""
-    return render(request, 'custom_admin/users/form.html', {
-        'title': 'Add User',
-        'is_edit': False
-    })
+    from .forms import CustomUserCreationForm
+    
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'User "{user.name}" created successfully.')
+            return redirect('custom_admin:users_list')
+    else:
+        form = CustomUserCreationForm()
+    
+    context = {
+        'form': form,
+        'title': 'Add New User',
+        'is_edit': False,
+        'user': None
+    }
+    return render(request, 'custom_admin/users/form.html', context)
 
 @user_passes_test(is_staff_user)
 def user_edit_view(request, user_id):
     """Edit user"""
+    from .forms import CustomUserChangeForm
+    
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'custom_admin/users/form.html', {
-        'user': user,
-        'title': 'Edit User',
-        'is_edit': True
-    })
+    
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'User "{user.name}" updated successfully.')
+            return redirect('custom_admin:user_detail', user_id=user.id)
+    else:
+        form = CustomUserChangeForm(instance=user)
+    
+    context = {
+        'form': form,
+        'title': f'Edit User: {user.name}',
+        'is_edit': True,
+        'user': user
+    }
+    return render(request, 'custom_admin/users/form.html', context)
 
 @user_passes_test(is_staff_user)
 def user_delete_view(request, user_id):
@@ -844,43 +1052,95 @@ def user_delete_view(request, user_id):
 @user_passes_test(is_staff_user)
 def youtube_channel_configs_list_view(request):
     """List YouTube channel configs"""
-    # Placeholder - implement when YouTubeChannelConfig model exists
-    return render(request, 'custom_admin/youtube_channel_configs/list.html', {
-        'page_obj': None,
-        'search_query': ''
-    })
+    search_query = request.GET.get('search', '')
+    configs = YouTubeChannelConfig.objects.select_related('admin_user').all()
+    
+    if search_query:
+        configs = configs.filter(
+            Q(channel_name__icontains=search_query) |
+            Q(channel_id__icontains=search_query) |
+            Q(admin_user__name__icontains=search_query)
+        )
+    
+    paginator = Paginator(configs, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/youtube_channel_configs/list.html', context)
 
 @user_passes_test(is_staff_user)
 def youtube_channel_config_create_view(request):
     """Create YouTube channel config"""
-    return render(request, 'custom_admin/youtube_channel_configs/form.html', {
+    from .forms import CustomYouTubeChannelConfigForm
+    
+    if request.method == 'POST':
+        form = CustomYouTubeChannelConfigForm(request.POST)
+        if form.is_valid():
+            config = form.save()
+            messages.success(request, f'YouTube channel config "{config.channel_name}" created successfully.')
+            return redirect('custom_admin:youtube_channel_configs_list')
+    else:
+        form = CustomYouTubeChannelConfigForm(initial={'admin_user': request.user})
+    
+    context = {
+        'form': form,
         'title': 'Add YouTube Channel Config',
-        'is_edit': False
-    })
+        'is_edit': False,
+        'config': None
+    }
+    return render(request, 'custom_admin/youtube_channel_configs/form.html', context)
 
 @user_passes_test(is_staff_user)
 def youtube_channel_config_edit_view(request, config_id):
     """Edit YouTube channel config"""
-    return render(request, 'custom_admin/youtube_channel_configs/form.html', {
-        'title': 'Edit YouTube Channel Config',
-        'is_edit': True
-    })
+    from .forms import CustomYouTubeChannelConfigForm
+    
+    config = get_object_or_404(YouTubeChannelConfig, id=config_id)
+    
+    if request.method == 'POST':
+        form = CustomYouTubeChannelConfigForm(request.POST, instance=config)
+        if form.is_valid():
+            config = form.save()
+            messages.success(request, f'YouTube channel config "{config.channel_name}" updated successfully.')
+            return redirect('custom_admin:youtube_channel_configs_list')
+    else:
+        form = CustomYouTubeChannelConfigForm(instance=config)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Channel: {config.channel_name}',
+        'is_edit': True,
+        'config': config
+    }
+    return render(request, 'custom_admin/youtube_channel_configs/form.html', context)
 
 @user_passes_test(is_staff_user)
 def youtube_channel_config_delete_view(request, config_id):
     """Delete YouTube channel config"""
-    return redirect('custom_admin:youtube_channel_configs_list')
+    config = get_object_or_404(YouTubeChannelConfig, id=config_id)
+    if request.method == 'POST':
+        channel_name = config.channel_name
+        config.delete()
+        messages.success(request, f'YouTube channel config "{channel_name}" deleted successfully.')
+        return redirect('custom_admin:youtube_channel_configs_list')
+    return render(request, 'custom_admin/youtube_channel_configs/delete.html', {'config': config})
 
 @user_passes_test(is_staff_user)
 def youtube_videos_list_view(request):
     """List YouTube videos"""
     search_query = request.GET.get('search', '')
-    videos = YouTubeVideo.objects.all()
+    videos = YouTubeVideo.objects.select_related('channel_config').all()
     
     if search_query:
         videos = videos.filter(
             Q(title__icontains=search_query) |
-            Q(channel_title__icontains=search_query)
+            Q(channel_config__channel_name__icontains=search_query) |
+            Q(video_id__icontains=search_query)
         )
     
     paginator = Paginator(videos, 25)
@@ -897,20 +1157,48 @@ def youtube_videos_list_view(request):
 @user_passes_test(is_staff_user)
 def youtube_video_create_view(request):
     """Create YouTube video"""
-    return render(request, 'custom_admin/youtube_videos/form.html', {
+    from .forms import CustomYouTubeVideoForm
+    
+    if request.method == 'POST':
+        form = CustomYouTubeVideoForm(request.POST)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f'YouTube video "{video.title}" created successfully.')
+            return redirect('custom_admin:youtube_videos_list')
+    else:
+        form = CustomYouTubeVideoForm()
+    
+    context = {
+        'form': form,
         'title': 'Add YouTube Video',
-        'is_edit': False
-    })
+        'is_edit': False,
+        'video': None
+    }
+    return render(request, 'custom_admin/youtube_videos/form.html', context)
 
 @user_passes_test(is_staff_user)
 def youtube_video_edit_view(request, video_id):
     """Edit YouTube video"""
+    from .forms import CustomYouTubeVideoForm
+    
     video = get_object_or_404(YouTubeVideo, id=video_id)
-    return render(request, 'custom_admin/youtube_videos/form.html', {
-        'video': video,
-        'title': 'Edit YouTube Video',
-        'is_edit': True
-    })
+    
+    if request.method == 'POST':
+        form = CustomYouTubeVideoForm(request.POST, instance=video)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f'YouTube video "{video.title}" updated successfully.')
+            return redirect('custom_admin:youtube_videos_list')
+    else:
+        form = CustomYouTubeVideoForm(instance=video)
+    
+    context = {
+        'form': form,
+        'title': f'Edit Video: {video.title}',
+        'is_edit': True,
+        'video': video
+    }
+    return render(request, 'custom_admin/youtube_videos/form.html', context)
 
 @user_passes_test(is_staff_user)
 def youtube_video_delete_view(request, video_id):
