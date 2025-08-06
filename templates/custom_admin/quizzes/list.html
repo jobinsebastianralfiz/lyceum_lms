@@ -1,0 +1,193 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Quizzes Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Quizzes Management</h4>
+        <p class="card-subtitle">Manage all quizzes in the system</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:quiz_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add New Quiz
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search quizzes by title, module, or course...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} quizzes
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quizzes Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Quiz</th>
+            <th>Course</th>
+            <th>Module</th>
+            <th>Questions</th>
+            <th>Time Limit</th>
+            <th>Attempts</th>
+            <th>Required</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for quiz in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 me-3">
+                  <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="ti ti-clipboard-list text-primary"></i>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-0">{{ quiz.title }}</h6>
+                  <small class="text-muted">{{ quiz.description|truncatewords:10 }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info-subtle text-info">{{ quiz.module.course.title }}</span>
+            </td>
+            <td>
+              <span class="text-muted">{{ quiz.module.title }}</span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1">
+                <i class="ti ti-help-circle text-muted"></i>
+                <span class="fw-bold">{{ quiz.questions.count }}</span>
+                <small class="text-muted">questions</small>
+              </div>
+            </td>
+            <td>
+              {% if quiz.time_limit %}
+                <span class="fw-bold text-warning">{{ quiz.time_limit }}</span>
+                <small class="text-muted d-block">minutes</small>
+              {% else %}
+                <span class="text-muted">No limit</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="fw-bold">{{ quiz.max_attempts|default:"∞" }}</span>
+              <small class="text-muted d-block">max attempts</small>
+            </td>
+            <td>
+              {% if quiz.is_required %}
+                <span class="badge bg-danger-subtle text-danger">Required</span>
+              {% else %}
+                <span class="badge bg-secondary-subtle text-secondary">Optional</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <a href="{% url 'custom_admin:quiz_detail' quiz.id %}" 
+                   class="btn btn-outline-primary btn-sm">
+                  <i class="ti ti-eye"></i>
+                </a>
+                <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" 
+                   class="btn btn-outline-warning btn-sm">
+                  <i class="ti ti-edit"></i>
+                </a>
+                <a href="{% url 'custom_admin:quiz_delete' quiz.id %}" 
+                   class="btn btn-outline-danger btn-sm">
+                  <i class="ti ti-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <i class="ti ti-clipboard-list-off fs-1 text-muted mb-3"></i>
+              {% if search_query %}
+                <h5 class="mb-2">No quizzes found</h5>
+                <p class="mb-0">No quizzes match your search criteria "{{ search_query }}"</p>
+                <a href="{% url 'custom_admin:quizzes_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                  Clear Search
+                </a>
+              {% else %}
+                <h5 class="mb-2">No quizzes available</h5>
+                <p class="mb-0">Get started by creating your first quiz</p>
+                <a href="{% url 'custom_admin:quiz_create' %}" class="btn btn-sm btn-primary mt-3">
+                  <i class="ti ti-plus me-1"></i>Create Quiz
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Quizzes pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

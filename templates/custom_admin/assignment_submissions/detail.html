@@ -1,0 +1,248 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Grade Submission - {{ submission.assignment.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <!-- Submission Details Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-1">{{ submission.assignment.title }}</h4>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-info-subtle text-info">{{ submission.assignment.module.course.title }}</span>
+              <span class="text-muted">→</span>
+              <span class="badge bg-secondary-subtle text-secondary">{{ submission.assignment.module.title }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-success-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                <i class="ti ti-user text-success fs-6"></i>
+              </div>
+              <span class="fw-medium">{{ submission.student.name|default:submission.student.username }}</span>
+              <span class="text-muted">{{ submission.student.email }}</span>
+            </div>
+          </div>
+          <div class="ms-auto">
+            {% if submission.status == 'submitted' or submission.status == 'under_review' %}
+            <span class="badge bg-warning-subtle text-warning fs-6">Needs Grading</span>
+            {% elif submission.status == 'graded' %}
+            <span class="badge bg-success-subtle text-success fs-6">Graded</span>
+            {% elif submission.status == 'returned' %}
+            <span class="badge bg-danger-subtle text-danger fs-6">Returned for Revision</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Assignment Description -->
+        <div class="mb-4">
+          <h5 class="mb-3">Assignment Description</h5>
+          <p class="mb-3">{{ submission.assignment.description|linebreaks }}</p>
+          
+          {% if submission.assignment.requirements %}
+          <div class="bg-light p-3 rounded mb-3">
+            <h6 class="mb-2">Requirements</h6>
+            {{ submission.assignment.requirements|linebreaks }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Student Submission -->
+        <div class="mb-4">
+          <h5 class="mb-3">Student Submission</h5>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="ti ti-calendar text-muted"></i>
+                <span class="text-muted">Submitted:</span>
+                <span class="fw-medium">
+                  {% if submission.submitted_at %}
+                    {{ submission.submitted_at|date:"M d, Y H:i" }}
+                  {% else %}
+                    Not submitted
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="ti ti-clock text-muted"></i>
+                <span class="text-muted">Status:</span>
+                {% if submission.status == 'draft' %}
+                  <span class="badge bg-secondary-subtle text-secondary">Draft</span>
+                {% elif submission.status == 'submitted' %}
+                  <span class="badge bg-warning-subtle text-warning">Submitted</span>
+                {% elif submission.status == 'under_review' %}
+                  <span class="badge bg-info-subtle text-info">Under Review</span>
+                {% elif submission.status == 'graded' %}
+                  <span class="badge bg-success-subtle text-success">Graded</span>
+                {% elif submission.status == 'returned' %}
+                  <span class="badge bg-danger-subtle text-danger">Returned</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          {% if submission.github_url %}
+          <div class="bg-dark-subtle p-3 rounded mb-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ti ti-brand-github"></i>
+              <h6 class="mb-0">GitHub Repository</h6>
+            </div>
+            <a href="{{ submission.github_url }}" target="_blank" class="btn btn-outline-dark">
+              <i class="ti ti-external-link me-1"></i>{{ submission.github_url }}
+            </a>
+          </div>
+          {% endif %}
+
+          {% if submission.notes %}
+          <div class="bg-info-subtle p-3 rounded">
+            <h6 class="mb-2">Student Notes</h6>
+            <p class="mb-0">{{ submission.notes|linebreaks }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Current Grade -->
+        {% if submission.score %}
+        <div class="mb-4">
+          <h5 class="mb-3">Current Grade</h5>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="text-center p-3 {{ submission.is_passed|yesno:'bg-success-subtle,bg-danger-subtle' }} rounded">
+                <h3 class="mb-0 {{ submission.is_passed|yesno:'text-success,text-danger' }}">
+                  {{ submission.score }}/{{ submission.assignment.max_points }}
+                </h3>
+                <small class="text-muted">{{ submission.score_percentage|floatformat:1 }}%</small>
+              </div>
+            </div>
+            <div class="col-md-8">
+              {% if submission.feedback %}
+              <div class="bg-light p-3 rounded">
+                <h6 class="mb-2">Previous Feedback</h6>
+                <p class="mb-0">{{ submission.feedback|linebreaks }}</p>
+                {% if submission.graded_at %}
+                <small class="text-muted d-block mt-2">Graded on {{ submission.graded_at|date:"M d, Y H:i" }}</small>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Grading Form -->
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-4">Grade Submission</h5>
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="score" class="form-label">Score</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="score" name="score" 
+                     min="0" max="{{ submission.assignment.max_points }}" 
+                     value="{{ submission.score|default:'' }}" required>
+              <span class="input-group-text">/ {{ submission.assignment.max_points }}</span>
+            </div>
+            <div class="form-text">
+              Passing score: {{ submission.assignment.passing_score }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="feedback" class="form-label">Feedback</label>
+            <textarea class="form-control" id="feedback" name="feedback" rows="6" 
+                      placeholder="Provide detailed feedback on the student's work...">{{ submission.feedback|default:'' }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" required>
+              <option value="under_review" {% if submission.status == 'under_review' %}selected{% endif %}>Under Review</option>
+              <option value="graded" {% if submission.status == 'graded' %}selected{% endif %}>Graded (Complete)</option>
+              <option value="returned" {% if submission.status == 'returned' %}selected{% endif %}>Return for Revision</option>
+            </select>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">
+              <i class="ti ti-check me-1"></i>Save Grade
+            </button>
+            <a href="{% url 'custom_admin:assignment_submissions_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Submissions
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assignment Info -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Assignment Info</h5>
+        <div class="row text-center">
+          <div class="col-6">
+            <div class="border-end">
+              <h4 class="mb-0 text-primary">{{ submission.assignment.max_points }}</h4>
+              <small class="text-muted">Max Points</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <h4 class="mb-0 text-success">{{ submission.assignment.passing_score }}</h4>
+            <small class="text-muted">Passing Score</small>
+          </div>
+        </div>
+        
+        <hr class="my-3">
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Assignment Type:</span>
+          {% if submission.assignment.is_required %}
+            <span class="badge bg-danger-subtle text-danger">Required</span>
+          {% else %}
+            <span class="badge bg-secondary-subtle text-secondary">Optional</span>
+          {% endif %}
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Due Days:</span>
+          <span class="fw-medium">{{ submission.assignment.due_days }} days</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quick Actions</h5>
+        <div class="d-grid gap-2">
+          <a href="{% url 'custom_admin:assignment_detail' submission.assignment.id %}" 
+             class="btn btn-outline-primary">
+            <i class="ti ti-clipboard-text me-1"></i>View Assignment
+          </a>
+          {% if submission.github_url %}
+          <a href="{{ submission.github_url }}" target="_blank" 
+             class="btn btn-outline-dark">
+            <i class="ti ti-brand-github me-1"></i>Open GitHub
+          </a>
+          {% endif %}
+          <a href="{% url 'custom_admin:assignment_submissions_list' %}?assignment={{ submission.assignment.id }}" 
+             class="btn btn-outline-secondary">
+            <i class="ti ti-list me-1"></i>All Submissions
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

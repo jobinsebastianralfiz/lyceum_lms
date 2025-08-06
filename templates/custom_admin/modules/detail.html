@@ -1,0 +1,414 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ module.title }} - Module Details - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <!-- Module Details Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-1">{{ module.title }}</h4>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-info-subtle text-info">{{ module.course.title }}</span>
+              <span class="text-muted">→</span>
+              <span class="badge bg-secondary-subtle text-secondary">Module {{ module.order }}</span>
+            </div>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:module_edit' module.id %}" class="btn btn-primary">
+              <i class="ti ti-edit me-1"></i>Edit Module
+            </a>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-primary-subtle rounded">
+              <h3 class="mb-0 text-primary">{{ module.video_lessons.count }}</h3>
+              <small class="text-muted">Video Lessons</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-success-subtle rounded">
+              <h3 class="mb-0 text-success">{{ module.assignments.count }}</h3>
+              <small class="text-muted">Assignments</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-warning-subtle rounded">
+              <h3 class="mb-0 text-warning">{{ module.quizzes.count }}</h3>
+              <small class="text-muted">Quizzes</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-info-subtle rounded">
+              <h3 class="mb-0 text-info">{{ module.duration_minutes|default:"0" }}</h3>
+              <small class="text-muted">Minutes</small>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="mb-3">Module Description</h5>
+        <p class="mb-4">{{ module.description|linebreaks }}</p>
+
+        {% if module.learning_objectives %}
+        <h5 class="mb-3">Learning Objectives</h5>
+        <div class="bg-light p-3 rounded mb-4">
+          {{ module.learning_objectives|linebreaks }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-2">Module Status</h6>
+            {% if module.is_active %}
+              <span class="badge bg-success-subtle text-success fs-6">Active</span>
+            {% else %}
+              <span class="badge bg-secondary-subtle text-secondary fs-6">Inactive</span>
+            {% endif %}
+          </div>
+          <div class="col-md-6 text-end">
+            <small class="text-muted">Created: {{ module.created_at|date:"M d, Y H:i" }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Lessons Section -->
+    {% if module.video_lessons.all %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">Video Lessons</h5>
+          <a href="{% url 'custom_admin:video_lesson_create' %}?module={{ module.id }}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-plus me-1"></i>Add Video
+          </a>
+        </div>
+
+        <div class="row">
+          {% for video in module.video_lessons.all %}
+          <div class="col-md-6 mb-3">
+            <div class="card border-0 bg-light">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ video.title }}</h6>
+                    <p class="text-muted mb-0 small">{{ video.description|truncatewords:10 }}</p>
+                  </div>
+                  <div class="ms-2">
+                    <span class="badge bg-primary-subtle text-primary">#{{ video.order }}</span>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">
+                    <i class="ti ti-clock me-1"></i>{{ video.duration|default:"0" }} min
+                  </small>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:video_lesson_edit' video.id %}" 
+                       class="btn btn-outline-primary btn-sm">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:video_lesson_delete' video.id %}" 
+                       class="btn btn-outline-danger btn-sm">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Assignments Section -->
+    {% if module.assignments.all %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">Assignments</h5>
+          <a href="{% url 'custom_admin:assignment_create' %}?module={{ module.id }}" class="btn btn-outline-success btn-sm">
+            <i class="ti ti-plus me-1"></i>Add Assignment
+          </a>
+        </div>
+
+        <div class="row">
+          {% for assignment in module.assignments.all %}
+          <div class="col-12 mb-3">
+            <div class="card border-0 bg-light">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ assignment.title }}</h6>
+                    <p class="text-muted mb-0 small">{{ assignment.description|truncatewords:15 }}</p>
+                  </div>
+                  <div class="ms-2 d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary-subtle text-secondary">#{{ assignment.order }}</span>
+                    {% if assignment.is_required %}
+                      <span class="badge bg-danger-subtle text-danger">Required</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex gap-3">
+                    <small class="text-muted">
+                      <i class="ti ti-target me-1"></i>{{ assignment.max_points }} pts
+                    </small>
+                    <small class="text-muted">
+                      <i class="ti ti-calendar me-1"></i>{{ assignment.due_days }} days
+                    </small>
+                    <small class="text-muted">
+                      <i class="ti ti-clipboard-check me-1"></i>{{ assignment.submissions.count }} submissions
+                    </small>
+                  </div>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:assignment_detail' assignment.id %}" 
+                       class="btn btn-outline-primary btn-sm">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:assignment_edit' assignment.id %}" 
+                       class="btn btn-outline-warning btn-sm">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:assignment_delete' assignment.id %}" 
+                       class="btn btn-outline-danger btn-sm">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Quizzes Section -->
+    {% if module.quizzes.all %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">Quizzes</h5>
+          <a href="{% url 'custom_admin:quiz_create' %}?module={{ module.id }}" class="btn btn-outline-warning btn-sm">
+            <i class="ti ti-plus me-1"></i>Add Quiz
+          </a>
+        </div>
+
+        <div class="row">
+          {% for quiz in module.quizzes.all %}
+          <div class="col-md-6 mb-3">
+            <div class="card border-0 bg-light">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ quiz.title }}</h6>
+                    <p class="text-muted mb-0 small">{{ quiz.description|truncatewords:10 }}</p>
+                  </div>
+                  <div class="ms-2 d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary-subtle text-secondary">#{{ quiz.order }}</span>
+                    {% if quiz.is_required %}
+                      <span class="badge bg-danger-subtle text-danger">Required</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex gap-3">
+                    <small class="text-muted">
+                      <i class="ti ti-help-circle me-1"></i>{{ quiz.questions.count }} questions
+                    </small>
+                    {% if quiz.time_limit %}
+                    <small class="text-muted">
+                      <i class="ti ti-clock me-1"></i>{{ quiz.time_limit }} min
+                    </small>
+                    {% endif %}
+                    <small class="text-muted">
+                      <i class="ti ti-clipboard-data me-1"></i>{{ quiz.attempts.count }} attempts
+                    </small>
+                  </div>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:quiz_detail' quiz.id %}" 
+                       class="btn btn-outline-primary btn-sm">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" 
+                       class="btn btn-outline-warning btn-sm">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:quiz_delete' quiz.id %}" 
+                       class="btn btn-outline-danger btn-sm">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Empty States -->
+    {% if not module.video_lessons.all and not module.assignments.all and not module.quizzes.all %}
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="ti ti-folder-x fs-1 text-muted mb-3"></i>
+        <h5 class="mb-2">No Content Added Yet</h5>
+        <p class="text-muted mb-4">This module doesn't have any lessons, assignments, or quizzes yet.</p>
+        <div class="d-flex gap-2 justify-content-center">
+          <a href="{% url 'custom_admin:video_lesson_create' %}?module={{ module.id }}" class="btn btn-primary">
+            <i class="ti ti-video me-1"></i>Add Video Lesson
+          </a>
+          <a href="{% url 'custom_admin:assignment_create' %}?module={{ module.id }}" class="btn btn-success">
+            <i class="ti ti-clipboard-text me-1"></i>Add Assignment
+          </a>
+          <a href="{% url 'custom_admin:quiz_create' %}?module={{ module.id }}" class="btn btn-warning">
+            <i class="ti ti-clipboard-list me-1"></i>Add Quiz
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Module Statistics -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Module Statistics</h5>
+        <div class="row text-center">
+          <div class="col-6 mb-3">
+            <h4 class="mb-0 text-primary">{{ module.enrollments.count }}</h4>
+            <small class="text-muted">Students Enrolled</small>
+          </div>
+          <div class="col-6 mb-3">
+            <h4 class="mb-0 text-success">{{ module.completions.count }}</h4>
+            <small class="text-muted">Completions</small>
+          </div>
+          <div class="col-6">
+            <h4 class="mb-0 text-warning">{{ module.avg_progress|default:"0" }}%</h4>
+            <small class="text-muted">Avg Progress</small>
+          </div>
+          <div class="col-6">
+            <h4 class="mb-0 text-info">{{ module.avg_rating|default:"0" }}/5</h4>
+            <small class="text-muted">Avg Rating</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quick Actions</h5>
+        <div class="d-grid gap-2">
+          <a href="{% url 'custom_admin:module_progress_list' %}?module={{ module.id }}" 
+             class="btn btn-outline-primary">
+            <i class="ti ti-progress-check me-1"></i>View Student Progress
+          </a>
+          <a href="{% url 'custom_admin:module_edit' module.id %}" 
+             class="btn btn-outline-warning">
+            <i class="ti ti-edit me-1"></i>Edit Module
+          </a>
+          <a href="{% url 'custom_admin:course_detail' module.course.id %}" 
+             class="btn btn-outline-info">
+            <i class="ti ti-book me-1"></i>View Course
+          </a>
+          <a href="{% url 'custom_admin:modules_list' %}" 
+             class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Back to Modules
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module Information -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Module Information</h5>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Course:</span>
+          <span class="fw-medium">{{ module.course.title }}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Module Order:</span>
+          <span class="fw-medium">#{{ module.order }}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Duration:</span>
+          <span class="fw-medium">{{ module.duration_minutes|default:"Not set" }} minutes</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Prerequisites:</span>
+          <span class="fw-medium">{{ module.prerequisites_count|default:"None" }}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Status:</span>
+          {% if module.is_active %}
+            <span class="badge bg-success-subtle text-success">Active</span>
+          {% else %}
+            <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Overview -->
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Content Overview</h5>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Video Lessons:</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-medium">{{ module.video_lessons.count }}</span>
+            <a href="{% url 'custom_admin:video_lessons_list' %}?module={{ module.id }}" 
+               class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-eye"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Assignments:</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-medium">{{ module.assignments.count }}</span>
+            <a href="{% url 'custom_admin:assignments_list' %}?module={{ module.id }}" 
+               class="btn btn-outline-success btn-sm">
+              <i class="ti ti-eye"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Quizzes:</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-medium">{{ module.quizzes.count }}</span>
+            <a href="{% url 'custom_admin:quizzes_list' %}?module={{ module.id }}" 
+               class="btn btn-outline-warning btn-sm">
+              <i class="ti ti-eye"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

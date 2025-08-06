@@ -12,7 +12,7 @@
         <p class="card-subtitle">Manage all courses in the system</p>
       </div>
       <div class="ms-auto">
-        <a href="/django-admin/courses/course/add/" class="btn btn-primary">
+        <a href="{% url 'custom_admin:course_create' %}" class="btn btn-primary">
           <i class="ti ti-plus me-1"></i>Add New Course
         </a>
       </div>
@@ -95,7 +95,7 @@
                  class="btn btn-outline-primary btn-sm flex-grow-1">
                 <i class="ti ti-eye me-1"></i>View
               </a>
-              <a href="/django-admin/courses/course/{{ course.id }}/change/" 
+              <a href="{% url 'custom_admin:course_edit' course.id %}" 
                  class="btn btn-primary btn-sm flex-grow-1">
                 <i class="ti ti-edit me-1"></i>Edit
               </a>
@@ -123,7 +123,7 @@
           {% else %}
             <h5 class="mb-2">No courses available</h5>
             <p class="mb-0">Get started by creating your first course</p>
-            <a href="/django-admin/courses/course/add/" class="btn btn-sm btn-primary mt-3">
+            <a href="{% url 'custom_admin:course_create' %}" class="btn btn-sm btn-primary mt-3">
               <i class="ti ti-plus me-1"></i>Create Course
             </a>
           {% endif %}

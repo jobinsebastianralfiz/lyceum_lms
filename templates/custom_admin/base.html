@@ -140,6 +140,46 @@
                 </div>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:assignments_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-clipboard-text"></i></span>
+                  <span class="hide-menu">Assignments</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:assignment_submissions_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-clipboard-check"></i></span>
+                  <span class="hide-menu">Assignment Submissions</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:quizzes_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-clipboard-list"></i></span>
+                  <span class="hide-menu">Quizzes</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:quiz_attempts_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-clipboard-data"></i></span>
+                  <span class="hide-menu">Quiz Attempts</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:module_progress_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-progress-check"></i></span>
+                  <span class="hide-menu">Module Progress</span>
+                </div>
+              </a>
+            </li>
 
             <li><span class="sidebar-divider lg"></span></li>
             

@@ -1,0 +1,272 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if course %}Edit Course{% else %}Create Course{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{% if course %}Edit Course{% else %}Create New Course{% endif %}</h4>
+            <p class="card-subtitle">{% if course %}Update course details{% else %}Add a new course to the platform{% endif %}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:courses_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Courses
+            </a>
+          </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <!-- Basic Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Basic Information</h5>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="title" class="form-label">Course Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" 
+                       value="{{ course.title|default:'' }}" required 
+                       placeholder="Enter course title">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                <select class="form-select" id="category" name="category" required>
+                  <option value="">Select a category</option>
+                  {% for category in categories %}
+                    <option value="{{ category.id }}" 
+                            {% if course and course.category.id == category.id %}selected{% endif %}>
+                      {{ category.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label">Course Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="4" required
+                      placeholder="Provide a detailed description of what students will learn">{{ course.description|default:'' }}</textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="short_description" class="form-label">Short Description</label>
+            <textarea class="form-control" id="short_description" name="short_description" rows="2"
+                      placeholder="Brief summary for course cards">{{ course.short_description|default:'' }}</textarea>
+          </div>
+
+          <!-- Pricing Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Pricing Information</h5>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="is_free" name="is_free"
+                       {% if course.is_free %}checked{% endif %}>
+                <label class="form-check-label" for="is_free">
+                  <strong>Free Course</strong>
+                  <small class="text-muted d-block">Students can access this course for free</small>
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-md-6" id="pricing-fields" style="{% if course.is_free %}display: none;{% endif %}">
+              <div class="mb-3">
+                <label for="price" class="form-label">Course Price (₹)</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" class="form-control" id="price" name="price" 
+                         value="{{ course.price|default:'' }}" min="0" step="0.01"
+                         placeholder="0.00">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Media -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Course Media</h5>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="thumbnail" class="form-label">Course Thumbnail</label>
+                <input type="file" class="form-control" id="thumbnail" name="thumbnail" 
+                       accept="image/*">
+                <div class="form-text">Upload a thumbnail image for the course (recommended: 16:9 aspect ratio)</div>
+                {% if course.thumbnail %}
+                  <div class="mt-2">
+                    <small class="text-muted">Current thumbnail:</small>
+                    <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" 
+                         class="d-block mt-1 rounded" style="max-width: 150px; max-height: 100px;">
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="intro_video_url" class="form-label">Introduction Video URL</label>
+                <input type="url" class="form-control" id="intro_video_url" name="intro_video_url" 
+                       value="{{ course.intro_video_url|default:'' }}"
+                       placeholder="https://youtube.com/watch?v=...">
+                <div class="form-text">YouTube or Vimeo URL for course introduction</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Course Settings</h5>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="duration_weeks" class="form-label">Duration (Weeks)</label>
+                <input type="number" class="form-control" id="duration_weeks" name="duration_weeks" 
+                       value="{{ course.duration_weeks|default:'' }}" min="1"
+                       placeholder="8">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="skill_level" class="form-label">Skill Level</label>
+                <select class="form-select" id="skill_level" name="skill_level">
+                  <option value="beginner" {% if course.skill_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                  <option value="intermediate" {% if course.skill_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                  <option value="advanced" {% if course.skill_level == 'advanced' %}selected{% endif %}>Advanced</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="language" class="form-label">Language</label>
+                <select class="form-select" id="language" name="language">
+                  <option value="english" {% if course.language == 'english' %}selected{% endif %}>English</option>
+                  <option value="hindi" {% if course.language == 'hindi' %}selected{% endif %}>Hindi</option>
+                  <option value="both" {% if course.language == 'both' %}selected{% endif %}>Both</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prerequisites -->
+          <div class="mb-4">
+            <label for="prerequisites" class="form-label">Prerequisites</label>
+            <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
+                      placeholder="List any prerequisites or prior knowledge required">{{ course.prerequisites|default:'' }}</textarea>
+          </div>
+
+          <!-- Learning Outcomes -->
+          <div class="mb-4">
+            <label for="learning_outcomes" class="form-label">Learning Outcomes</label>
+            <textarea class="form-control" id="learning_outcomes" name="learning_outcomes" rows="4"
+                      placeholder="What will students learn? List key learning outcomes">{{ course.learning_outcomes|default:'' }}</textarea>
+          </div>
+
+          <!-- Course Status -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Status & Visibility</h5>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                       {% if course.is_active %}checked{% endif %}>
+                <label class="form-check-label" for="is_active">
+                  <strong>Active Course</strong>
+                  <small class="text-muted d-block">Course is visible to students</small>
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                       {% if course.is_featured %}checked{% endif %}>
+                <label class="form-check-label" for="is_featured">
+                  <strong>Featured Course</strong>
+                  <small class="text-muted d-block">Show in featured courses section</small>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="mb-4">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="tags" name="tags" 
+                   value="{{ course.tags|default:'' }}"
+                   placeholder="programming, python, web development (comma separated)">
+            <div class="form-text">Enter relevant tags separated by commas</div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:courses_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>{% if course %}Update Course{% else %}Create Course{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Toggle pricing fields based on free course checkbox
+document.getElementById('is_free').addEventListener('change', function() {
+  const pricingFields = document.getElementById('pricing-fields');
+  const priceInput = document.getElementById('price');
+  
+  if (this.checked) {
+    pricingFields.style.display = 'none';
+    priceInput.value = '0.00';
+    priceInput.required = false;
+  } else {
+    pricingFields.style.display = 'block';
+    priceInput.required = true;
+  }
+});
+
+// Preview thumbnail on file selection
+document.getElementById('thumbnail').addEventListener('change', function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // You could add image preview here
+      console.log('Thumbnail selected:', file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Auto-format tags
+document.getElementById('tags').addEventListener('blur', function() {
+  let tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+  this.value = tags.join(', ');
+});
+</script>
+{% endblock %}

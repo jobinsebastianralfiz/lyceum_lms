@@ -1,0 +1,181 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if assignment %}Edit Assignment{% else %}Create Assignment{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{% if assignment %}Edit Assignment{% else %}Create New Assignment{% endif %}</h4>
+            <p class="card-subtitle">{% if assignment %}Update assignment details{% else %}Add a new assignment to a module{% endif %}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:assignments_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Assignments
+            </a>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <!-- Basic Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Basic Information</h5>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="title" class="form-label">Assignment Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" 
+                       value="{{ assignment.title|default:'' }}" required 
+                       placeholder="Enter assignment title">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="order" class="form-label">Order in Module <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="order" name="order" 
+                       value="{{ assignment.order|default:'' }}" required min="1"
+                       placeholder="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="4" required
+                      placeholder="Describe what students need to accomplish in this assignment">{{ assignment.description|default:'' }}</textarea>
+          </div>
+
+          <!-- Module Selection -->
+          <div class="mb-4">
+            <label for="module" class="form-label">Module <span class="text-danger">*</span></label>
+            <select class="form-select" id="module" name="module" required>
+              <option value="">Select a module</option>
+              {% for course in courses %}
+                <optgroup label="{{ course.title }}">
+                  {% for module in course.modules.all %}
+                    <option value="{{ module.id }}" 
+                            {% if assignment and assignment.module.id == module.id %}selected{% endif %}>
+                      {{ module.title }} (Order: {{ module.order }})
+                    </option>
+                  {% endfor %}
+                </optgroup>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Requirements and Resources -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Requirements & Resources</h5>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="requirements" class="form-label">Requirements</label>
+                <textarea class="form-control" id="requirements" name="requirements" rows="6"
+                          placeholder="List specific requirements, technologies, or constraints">{{ assignment.requirements|default:'' }}</textarea>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="resources" class="form-label">Resources</label>
+                <textarea class="form-control" id="resources" name="resources" rows="6"
+                          placeholder="Provide helpful links, documentation, or additional resources">{{ assignment.resources|default:'' }}</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scoring Configuration -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Scoring Configuration</h5>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="max_points" class="form-label">Maximum Points <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="max_points" name="max_points" 
+                       value="{{ assignment.max_points|default:'100' }}" required min="1"
+                       placeholder="100">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="passing_score" class="form-label">Passing Score <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="passing_score" name="passing_score" 
+                       value="{{ assignment.passing_score|default:'70' }}" required min="1"
+                       placeholder="70">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="due_days" class="form-label">Days to Complete</label>
+                <input type="number" class="form-control" id="due_days" name="due_days" 
+                       value="{{ assignment.due_days|default:'7' }}" min="1"
+                       placeholder="7">
+                <div class="form-text">Number of days students have to complete this assignment</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment Settings -->
+          <div class="mb-4">
+            <h5 class="mb-3">Assignment Settings</h5>
+            
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="is_required" name="is_required"
+                     {% if assignment.is_required %}checked{% endif %}>
+              <label class="form-check-label" for="is_required">
+                <strong>Required Assignment</strong>
+                <small class="text-muted d-block">Students must complete this assignment to progress</small>
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:assignments_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>{% if assignment %}Update Assignment{% else %}Create Assignment{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-calculate passing score percentage
+document.getElementById('max_points').addEventListener('input', function() {
+  const maxPoints = parseInt(this.value) || 100;
+  const passingScore = document.getElementById('passing_score');
+  if (!passingScore.value) {
+    passingScore.value = Math.ceil(maxPoints * 0.7);
+  }
+});
+
+// Module selection feedback
+document.getElementById('module').addEventListener('change', function() {
+  const selectedOption = this.options[this.selectedIndex];
+  if (selectedOption.value) {
+    const moduleName = selectedOption.text;
+    // You could add AJAX here to fetch module details or update form
+  }
+});
+</script>
+{% endblock %}

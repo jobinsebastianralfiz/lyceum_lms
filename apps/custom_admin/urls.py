@@ -24,6 +24,7 @@ urlpatterns = [
     path('courses/<int:course_id>/delete/', views.course_delete_view, name='course_delete'),
     
     path('modules/', views.modules_list_view, name='modules_list'),
+    path('modules/<int:module_id>/', views.module_detail_view, name='module_detail'),
     path('modules/add/', views.module_create_view, name='module_create'),
     path('modules/<int:module_id>/edit/', views.module_edit_view, name='module_edit'),
     path('modules/<int:module_id>/delete/', views.module_delete_view, name='module_delete'),
@@ -34,6 +35,32 @@ urlpatterns = [
     path('video-lessons/add/', views.video_lesson_create_view, name='video_lesson_create'),
     path('video-lessons/<int:lesson_id>/edit/', views.video_lesson_edit_view, name='video_lesson_edit'),
     path('video-lessons/<int:lesson_id>/delete/', views.video_lesson_delete_view, name='video_lesson_delete'),
+    
+    # ASSIGNMENTS
+    path('assignments/', views.assignments_list_view, name='assignments_list'),
+    path('assignments/<int:assignment_id>/', views.assignment_detail_view, name='assignment_detail'),
+    path('assignments/add/', views.assignment_create_view, name='assignment_create'),
+    path('assignments/<int:assignment_id>/edit/', views.assignment_edit_view, name='assignment_edit'),
+    path('assignments/<int:assignment_id>/delete/', views.assignment_delete_view, name='assignment_delete'),
+    
+    # ASSIGNMENT SUBMISSIONS  
+    path('assignment-submissions/', views.assignment_submissions_list_view, name='assignment_submissions_list'),
+    path('assignment-submissions/<int:submission_id>/', views.assignment_submission_detail_view, name='assignment_submission_detail'),
+    
+    # QUIZZES
+    path('quizzes/', views.quizzes_list_view, name='quizzes_list'),
+    path('quizzes/<int:quiz_id>/', views.quiz_detail_view, name='quiz_detail'),
+    path('quizzes/add/', views.quiz_create_view, name='quiz_create'),
+    path('quizzes/<int:quiz_id>/edit/', views.quiz_edit_view, name='quiz_edit'),
+    path('quizzes/<int:quiz_id>/delete/', views.quiz_delete_view, name='quiz_delete'),
+    
+    # QUIZ ATTEMPTS
+    path('quiz-attempts/', views.quiz_attempts_list_view, name='quiz_attempts_list'),
+    path('quiz-attempts/<int:attempt_id>/', views.quiz_attempt_detail_view, name='quiz_attempt_detail'),
+    
+    # MODULE PROGRESS
+    path('module-progress/', views.module_progress_list_view, name='module_progress_list'),
+    path('module-progress/<int:progress_id>/', views.module_progress_detail_view, name='module_progress_detail'),
     
     # NOTIFICATIONS
     path('email-templates/', views.email_templates_list_view, name='email_templates_list'),

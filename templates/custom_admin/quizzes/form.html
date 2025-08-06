@@ -1,0 +1,375 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if quiz %}Edit Quiz{% else %}Create Quiz{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-10 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{% if quiz %}Edit Quiz{% else %}Create New Quiz{% endif %}</h4>
+            <p class="card-subtitle">{% if quiz %}Update quiz details and questions{% else %}Add a new quiz to a module{% endif %}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:quizzes_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Quizzes
+            </a>
+          </div>
+        </div>
+
+        <form method="post" id="quiz-form">
+          {% csrf_token %}
+          
+          <!-- Basic Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Basic Information</h5>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="title" class="form-label">Quiz Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" 
+                       value="{{ quiz.title|default:'' }}" required 
+                       placeholder="Enter quiz title">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="order" class="form-label">Order in Module <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="order" name="order" 
+                       value="{{ quiz.order|default:'' }}" required min="1"
+                       placeholder="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="4" required
+                      placeholder="Describe what this quiz covers and its purpose">{{ quiz.description|default:'' }}</textarea>
+          </div>
+
+          <!-- Module Selection -->
+          <div class="mb-4">
+            <label for="module" class="form-label">Module <span class="text-danger">*</span></label>
+            <select class="form-select" id="module" name="module" required>
+              <option value="">Select a module</option>
+              {% for course in courses %}
+                <optgroup label="{{ course.title }}">
+                  {% for module in course.modules.all %}
+                    <option value="{{ module.id }}" 
+                            {% if quiz and quiz.module.id == module.id %}selected{% endif %}>
+                      {{ module.title }} (Order: {{ module.order }})
+                    </option>
+                  {% endfor %}
+                </optgroup>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Instructions -->
+          <div class="mb-4">
+            <label for="instructions" class="form-label">Instructions for Students</label>
+            <textarea class="form-control" id="instructions" name="instructions" rows="4"
+                      placeholder="Provide specific instructions for taking this quiz">{{ quiz.instructions|default:'' }}</textarea>
+          </div>
+
+          <!-- Quiz Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Quiz Settings</h5>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="mb-3">
+                <label for="time_limit" class="form-label">Time Limit (minutes)</label>
+                <input type="number" class="form-control" id="time_limit" name="time_limit" 
+                       value="{{ quiz.time_limit|default:'' }}" min="1"
+                       placeholder="30">
+                <div class="form-text">Leave empty for no time limit</div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="mb-3">
+                <label for="max_attempts" class="form-label">Max Attempts</label>
+                <input type="number" class="form-control" id="max_attempts" name="max_attempts" 
+                       value="{{ quiz.max_attempts|default:'' }}" min="1"
+                       placeholder="3">
+                <div class="form-text">Leave empty for unlimited</div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="mb-3">
+                <label for="passing_score" class="form-label">Passing Score (%)</label>
+                <input type="number" class="form-control" id="passing_score" name="passing_score" 
+                       value="{{ quiz.passing_score|default:'70' }}" min="1" max="100"
+                       placeholder="70">
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="is_required" name="is_required"
+                         {% if quiz.is_required %}checked{% endif %}>
+                  <label class="form-check-label" for="is_required">
+                    Required Quiz
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Display Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Display Settings</h5>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="show_results_immediately" name="show_results_immediately"
+                       {% if quiz.show_results_immediately %}checked{% endif %}>
+                <label class="form-check-label" for="show_results_immediately">
+                  <strong>Show Results Immediately</strong>
+                  <small class="text-muted d-block">Students see results right after submission</small>
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="randomize_questions" name="randomize_questions"
+                       {% if quiz.randomize_questions %}checked{% endif %}>
+                <label class="form-check-label" for="randomize_questions">
+                  <strong>Randomize Question Order</strong>
+                  <small class="text-muted d-block">Questions appear in random order for each student</small>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions Section -->
+          {% if quiz %}
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Quiz Questions</h5>
+              <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
+                <i class="ti ti-plus me-1"></i>Add Question
+              </button>
+            </div>
+            
+            <div id="questions-container">
+              {% for question in quiz.questions.all %}
+              <div class="card mb-3 question-card" data-question-id="{{ question.id }}">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0">Question {{ forloop.counter }}</h6>
+                  <div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestion(this)">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="mb-3">
+                        <label class="form-label">Question Text</label>
+                        <textarea class="form-control" name="questions[{{ forloop.counter0 }}][text]" rows="3" required>{{ question.question_text }}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Points</label>
+                        <input type="number" class="form-control" name="questions[{{ forloop.counter0 }}][points]" 
+                               value="{{ question.points }}" min="1" required>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Answer Choices</label>
+                    <div class="choices-container">
+                      {% for choice in question.choices.all %}
+                      <div class="input-group mb-2">
+                        <div class="input-group-text">
+                          <input type="radio" name="questions[{{ forloop.parentloop.counter0 }}][correct]" 
+                                 value="{{ forloop.counter0 }}" {% if choice.is_correct %}checked{% endif %}>
+                        </div>
+                        <input type="text" class="form-control" 
+                               name="questions[{{ forloop.parentloop.counter0 }}][choices][{{ forloop.counter0 }}]" 
+                               value="{{ choice.choice_text }}" placeholder="Enter choice text" required>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeChoice(this)">
+                          <i class="ti ti-x"></i>
+                        </button>
+                      </div>
+                      {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addChoice(this)">
+                      <i class="ti ti-plus me-1"></i>Add Choice
+                    </button>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Explanation (Optional)</label>
+                    <textarea class="form-control" name="questions[{{ forloop.counter0 }}][explanation]" rows="2" 
+                              placeholder="Provide explanation for the correct answer">{{ question.explanation }}</textarea>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="ti ti-info-circle me-2"></i>
+            <strong>Note:</strong> After creating the quiz, you'll be able to add questions to it.
+          </div>
+          {% endif %}
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:quizzes_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>{% if quiz %}Update Quiz{% else %}Create Quiz{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let questionCount = {{ quiz.questions.count|default:0 }};
+
+function addQuestion() {
+  const container = document.getElementById('questions-container');
+  questionCount++;
+  
+  const questionHtml = `
+    <div class="card mb-3 question-card">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Question ${questionCount}</h6>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestion(this)">
+          <i class="ti ti-trash"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label class="form-label">Question Text</label>
+              <textarea class="form-control" name="questions[${questionCount-1}][text]" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label">Points</label>
+              <input type="number" class="form-control" name="questions[${questionCount-1}][points]" value="1" min="1" required>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Answer Choices</label>
+          <div class="choices-container">
+            <div class="input-group mb-2">
+              <div class="input-group-text">
+                <input type="radio" name="questions[${questionCount-1}][correct]" value="0" checked>
+              </div>
+              <input type="text" class="form-control" name="questions[${questionCount-1}][choices][0]" placeholder="Enter choice text" required>
+              <button type="button" class="btn btn-outline-danger" onclick="removeChoice(this)">
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
+            <div class="input-group mb-2">
+              <div class="input-group-text">
+                <input type="radio" name="questions[${questionCount-1}][correct]" value="1">
+              </div>
+              <input type="text" class="form-control" name="questions[${questionCount-1}][choices][1]" placeholder="Enter choice text" required>
+              <button type="button" class="btn btn-outline-danger" onclick="removeChoice(this)">
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addChoice(this)">
+            <i class="ti ti-plus me-1"></i>Add Choice
+          </button>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Explanation (Optional)</label>
+          <textarea class="form-control" name="questions[${questionCount-1}][explanation]" rows="2" placeholder="Provide explanation for the correct answer"></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  container.insertAdjacentHTML('beforeend', questionHtml);
+}
+
+function removeQuestion(button) {
+  if (confirm('Are you sure you want to remove this question?')) {
+    button.closest('.question-card').remove();
+    updateQuestionNumbers();
+  }
+}
+
+function addChoice(button) {
+  const choicesContainer = button.previousElementSibling;
+  const questionCard = button.closest('.question-card');
+  const questionIndex = Array.from(document.querySelectorAll('.question-card')).indexOf(questionCard);
+  const choiceIndex = choicesContainer.children.length;
+  
+  const choiceHtml = `
+    <div class="input-group mb-2">
+      <div class="input-group-text">
+        <input type="radio" name="questions[${questionIndex}][correct]" value="${choiceIndex}">
+      </div>
+      <input type="text" class="form-control" name="questions[${questionIndex}][choices][${choiceIndex}]" placeholder="Enter choice text" required>
+      <button type="button" class="btn btn-outline-danger" onclick="removeChoice(this)">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  `;
+  
+  choicesContainer.insertAdjacentHTML('beforeend', choiceHtml);
+}
+
+function removeChoice(button) {
+  const choicesContainer = button.closest('.choices-container');
+  if (choicesContainer.children.length > 2) {
+    button.closest('.input-group').remove();
+  } else {
+    alert('A question must have at least 2 choices.');
+  }
+}
+
+function updateQuestionNumbers() {
+  const questionCards = document.querySelectorAll('.question-card');
+  questionCards.forEach((card, index) => {
+    const header = card.querySelector('.card-header h6');
+    header.textContent = `Question ${index + 1}`;
+    
+    // Update form field names
+    const inputs = card.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+      if (input.name && input.name.includes('questions[')) {
+        input.name = input.name.replace(/questions\[\d+\]/, `questions[${index}]`);
+      }
+    });
+  });
+}
+</script>
+{% endblock %}

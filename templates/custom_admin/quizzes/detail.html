@@ -1,0 +1,319 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz.title }} - Quiz Details - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <!-- Quiz Details Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-1">{{ quiz.title }}</h4>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-info-subtle text-info">{{ quiz.module.course.title }}</span>
+              <span class="text-muted">→</span>
+              <span class="badge bg-secondary-subtle text-secondary">{{ quiz.module.title }}</span>
+            </div>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" class="btn btn-primary">
+              <i class="ti ti-edit me-1"></i>Edit Quiz
+            </a>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-primary-subtle rounded">
+              <h3 class="mb-0 text-primary">{{ quiz.questions.count }}</h3>
+              <small class="text-muted">Questions</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-warning-subtle rounded">
+              <h3 class="mb-0 text-warning">{{ quiz.time_limit|default:"∞" }}</h3>
+              <small class="text-muted">{% if quiz.time_limit %}Minutes{% else %}No Limit{% endif %}</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-success-subtle rounded">
+              <h3 class="mb-0 text-success">{{ quiz.max_attempts|default:"∞" }}</h3>
+              <small class="text-muted">Max Attempts</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-info-subtle rounded">
+              <h3 class="mb-0 text-info">#{{ quiz.order }}</h3>
+              <small class="text-muted">Order in Module</small>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="mb-3">Description</h5>
+        <p class="mb-4">{{ quiz.description|linebreaks }}</p>
+
+        {% if quiz.instructions %}
+        <h5 class="mb-3">Instructions</h5>
+        <div class="bg-light p-3 rounded mb-4">
+          {{ quiz.instructions|linebreaks }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-2">Quiz Type</h6>
+            {% if quiz.is_required %}
+              <span class="badge bg-danger-subtle text-danger fs-6">Required Quiz</span>
+            {% else %}
+              <span class="badge bg-secondary-subtle text-secondary fs-6">Optional Quiz</span>
+            {% endif %}
+          </div>
+          <div class="col-md-6 text-end">
+            <small class="text-muted">Created: {{ quiz.created_at|date:"M d, Y H:i" }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions Section -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">Quiz Questions</h5>
+          <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-plus me-1"></i>Add Question
+          </a>
+        </div>
+
+        {% if quiz.questions.all %}
+        <div class="row">
+          {% for question in quiz.questions.all %}
+          <div class="col-12 mb-3">
+            <div class="card border-left-primary">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">Question {{ forloop.counter }}</h6>
+                    <p class="mb-2">{{ question.question_text }}</p>
+                  </div>
+                  <span class="badge bg-success-subtle text-success">{{ question.points }} pts</span>
+                </div>
+                
+                <div class="row">
+                  {% for choice in question.choices.all %}
+                  <div class="col-md-6 mb-2">
+                    <div class="d-flex align-items-center gap-2 p-2 rounded {{ choice.is_correct|yesno:'bg-success-subtle,bg-light' }}">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" disabled 
+                               {% if choice.is_correct %}checked{% endif %}>
+                      </div>
+                      <span class="flex-grow-1 {{ choice.is_correct|yesno:'text-success fw-medium,' }}">
+                        {{ choice.choice_text }}
+                      </span>
+                      {% if choice.is_correct %}
+                        <i class="ti ti-check text-success"></i>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                {% if question.explanation %}
+                <div class="mt-2 p-2 bg-info-subtle rounded">
+                  <small class="text-muted">
+                    <i class="ti ti-info-circle me-1"></i>
+                    <strong>Explanation:</strong> {{ question.explanation }}
+                  </small>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="ti ti-help-circle fs-1 text-muted mb-3"></i>
+          <h5 class="mb-2">No questions added yet</h5>
+          <p class="text-muted mb-3">Start building your quiz by adding questions.</p>
+          <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i>Add First Question
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Quiz Stats -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quiz Statistics</h5>
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="mb-0 text-primary">{{ attempts.count }}</h4>
+            <small class="text-muted">Total Attempts</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-success">0</h4>
+            <small class="text-muted">Completed</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-warning">0</h4>
+            <small class="text-muted">Avg Score</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quick Actions</h5>
+        <div class="d-grid gap-2">
+          <a href="{% url 'custom_admin:quiz_attempts_list' %}?quiz={{ quiz.id }}" 
+             class="btn btn-outline-primary">
+            <i class="ti ti-clipboard-data me-1"></i>View All Attempts
+          </a>
+          <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" 
+             class="btn btn-outline-warning">
+            <i class="ti ti-edit me-1"></i>Edit Quiz
+          </a>
+          <a href="{% url 'custom_admin:quiz_delete' quiz.id %}" 
+             class="btn btn-outline-danger">
+            <i class="ti ti-trash me-1"></i>Delete Quiz
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Settings -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quiz Settings</h5>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Time Limit:</span>
+          <span class="fw-medium">
+            {% if quiz.time_limit %}{{ quiz.time_limit }} minutes{% else %}No limit{% endif %}
+          </span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Max Attempts:</span>
+          <span class="fw-medium">{{ quiz.max_attempts|default:"Unlimited" }}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Passing Score:</span>
+          <span class="fw-medium">{{ quiz.passing_score|default:"Not set" }}%</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted">Show Results:</span>
+          <span class="fw-medium">{{ quiz.show_results_immediately|yesno:"Immediately,After submission" }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Randomize Questions:</span>
+          <span class="fw-medium">{{ quiz.randomize_questions|yesno:"Yes,No" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Attempts -->
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title mb-4">Recent Attempts</h5>
+    
+    {% if attempts %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th>Time Taken</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 me-3">
+                  <div class="bg-success-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="ti ti-user text-success"></i>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-0">{{ attempt.student.name|default:attempt.student.username }}</h6>
+                  <small class="text-muted">{{ attempt.student.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if attempt.status == 'in_progress' %}
+                <span class="badge bg-warning-subtle text-warning">In Progress</span>
+              {% elif attempt.status == 'completed' %}
+                <span class="badge bg-success-subtle text-success">Completed</span>
+              {% elif attempt.status == 'timed_out' %}
+                <span class="badge bg-danger-subtle text-danger">Timed Out</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.score is not null %}
+                <span class="fw-bold">{{ attempt.score|floatformat:1 }}%</span>
+                <small class="text-muted d-block">{{ attempt.correct_answers }}/{{ quiz.questions.count }}</small>
+              {% else %}
+                <span class="text-muted">Not completed</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="text-muted">{{ attempt.started_at|date:"M d, H:i" }}</span>
+            </td>
+            <td>
+              {% if attempt.completed_at %}
+                <span class="text-muted">{{ attempt.completed_at|date:"M d, H:i" }}</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.time_taken %}
+                <span class="text-muted">{{ attempt.time_taken }} min</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'custom_admin:quiz_attempt_detail' attempt.id %}" 
+                 class="btn btn-outline-primary btn-sm">
+                <i class="ti ti-eye me-1"></i>View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <i class="ti ti-clipboard-data fs-1 text-muted mb-3"></i>
+      <h5 class="mb-2">No attempts yet</h5>
+      <p class="text-muted mb-0">Students haven't attempted this quiz yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

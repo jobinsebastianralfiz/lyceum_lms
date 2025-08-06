@@ -1,0 +1,266 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Quiz Attempts - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Quiz Attempts</h4>
+        <p class="card-subtitle">Monitor student quiz attempts and performance</p>
+      </div>
+      <div class="ms-auto">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="ti ti-filter me-1"></i>Filter by Status
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="?status=">All Attempts</a></li>
+            <li><a class="dropdown-item" href="?status=in_progress">In Progress</a></li>
+            <li><a class="dropdown-item" href="?status=completed">Completed</a></li>
+            <li><a class="dropdown-item" href="?status=timed_out">Timed Out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search by student name, quiz title, or course...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} attempts
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary-subtle border-0">
+          <div class="card-body text-center">
+            <h3 class="mb-0 text-primary">{{ stats.total }}</h3>
+            <small class="text-muted">Total Attempts</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-warning-subtle border-0">
+          <div class="card-body text-center">
+            <h3 class="mb-0 text-warning">{{ stats.in_progress }}</h3>
+            <small class="text-muted">In Progress</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-success-subtle border-0">
+          <div class="card-body text-center">
+            <h3 class="mb-0 text-success">{{ stats.completed }}</h3>
+            <small class="text-muted">Completed</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-danger-subtle border-0">
+          <div class="card-body text-center">
+            <h3 class="mb-0 text-danger">{{ stats.timed_out }}</h3>
+            <small class="text-muted">Timed Out</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attempts Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th>Quiz</th>
+            <th>Course</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th>Duration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 me-3">
+                  <div class="bg-success-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="ti ti-user text-success"></i>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-0">{{ attempt.student.name|default:attempt.student.username }}</h6>
+                  <small class="text-muted">{{ attempt.student.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>
+                <h6 class="mb-0">{{ attempt.quiz.title }}</h6>
+                <small class="text-muted">{{ attempt.quiz.module.title }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info-subtle text-info">{{ attempt.quiz.module.course.title }}</span>
+            </td>
+            <td>
+              {% if attempt.status == 'in_progress' %}
+                <span class="badge bg-warning-subtle text-warning">
+                  <i class="ti ti-clock me-1"></i>In Progress
+                </span>
+              {% elif attempt.status == 'completed' %}
+                <span class="badge bg-success-subtle text-success">
+                  <i class="ti ti-check me-1"></i>Completed
+                </span>
+              {% elif attempt.status == 'timed_out' %}
+                <span class="badge bg-danger-subtle text-danger">
+                  <i class="ti ti-clock-x me-1"></i>Timed Out
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.score is not null %}
+                <div class="d-flex align-items-center gap-1">
+                  <span class="fw-bold {{ attempt.is_passed|yesno:'text-success,text-danger' }}">
+                    {{ attempt.score|floatformat:1 }}%
+                  </span>
+                  {% if attempt.is_passed %}
+                    <i class="ti ti-check-circle text-success"></i>
+                  {% else %}
+                    <i class="ti ti-x-circle text-danger"></i>
+                  {% endif %}
+                </div>
+                <small class="text-muted">{{ attempt.correct_answers }}/{{ attempt.total_questions }} correct</small>
+              {% else %}
+                <span class="text-muted">Not completed</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="text-muted">{{ attempt.started_at|date:"M d, Y" }}</span>
+              <small class="text-muted d-block">{{ attempt.started_at|date:"H:i" }}</small>
+            </td>
+            <td>
+              {% if attempt.completed_at %}
+                <span class="text-muted">{{ attempt.completed_at|date:"M d, Y" }}</span>
+                <small class="text-muted d-block">{{ attempt.completed_at|date:"H:i" }}</small>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.time_taken %}
+                <span class="fw-bold">{{ attempt.time_taken }}</span>
+                <small class="text-muted d-block">minutes</small>
+              {% elif attempt.status == 'in_progress' %}
+                <span class="text-warning">
+                  <i class="ti ti-clock me-1"></i>Ongoing
+                </span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <a href="{% url 'custom_admin:quiz_attempt_detail' attempt.id %}" 
+                   class="btn btn-outline-primary btn-sm">
+                  <i class="ti ti-eye"></i>
+                </a>
+                {% if attempt.status == 'completed' %}
+                <a href="{% url 'custom_admin:quiz_attempt_detail' attempt.id %}" 
+                   class="btn btn-outline-info btn-sm" title="View Answers">
+                  <i class="ti ti-list-details"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center py-5">
+              <i class="ti ti-clipboard-data fs-1 text-muted mb-3"></i>
+              {% if search_query %}
+                <h5 class="mb-2">No attempts found</h5>
+                <p class="mb-0">No attempts match your search criteria "{{ search_query }}"</p>
+                <a href="{% url 'custom_admin:quiz_attempts_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                  Clear Search
+                </a>
+              {% else %}
+                <h5 class="mb-2">No quiz attempts available</h5>
+                <p class="mb-0">Students haven't attempted any quizzes yet</p>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Quiz attempts pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

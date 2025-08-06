@@ -1,0 +1,325 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if module %}Edit Module{% else %}Create Module{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{% if module %}Edit Module{% else %}Create New Module{% endif %}</h4>
+            <p class="card-subtitle">{% if module %}Update module details{% else %}Add a new module to a course{% endif %}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:modules_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Modules
+            </a>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <!-- Basic Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Basic Information</h5>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="title" class="form-label">Module Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" 
+                       value="{{ module.title|default:'' }}" required 
+                       placeholder="Enter module title">
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="order" class="form-label">Module Order <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="order" name="order" 
+                       value="{{ module.order|default:'' }}" required min="1"
+                       placeholder="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label">Module Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="4" required
+                      placeholder="Describe what students will learn in this module">{{ module.description|default:'' }}</textarea>
+          </div>
+
+          <!-- Course Selection -->
+          <div class="mb-4">
+            <label for="course" class="form-label">Course <span class="text-danger">*</span></label>
+            <select class="form-select" id="course" name="course" required>
+              <option value="">Select a course</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}" 
+                        {% if module and module.course.id == course.id %}selected{% endif %}>
+                  {{ course.title }}
+                  {% if not course.is_active %}(Inactive){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Learning Objectives -->
+          <div class="mb-4">
+            <label for="learning_objectives" class="form-label">Learning Objectives</label>
+            <textarea class="form-control" id="learning_objectives" name="learning_objectives" rows="4"
+                      placeholder="What will students learn? List key learning objectives for this module">{{ module.learning_objectives|default:'' }}</textarea>
+          </div>
+
+          <!-- Module Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Module Settings</h5>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="duration_minutes" class="form-label">Duration (Minutes)</label>
+                <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" 
+                       value="{{ module.duration_minutes|default:'' }}" min="1"
+                       placeholder="60">
+                <div class="form-text">Estimated time to complete this module</div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="difficulty_level" class="form-label">Difficulty Level</label>
+                <select class="form-select" id="difficulty_level" name="difficulty_level">
+                  <option value="beginner" {% if module.difficulty_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                  <option value="intermediate" {% if module.difficulty_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                  <option value="advanced" {% if module.difficulty_level == 'advanced' %}selected{% endif %}>Advanced</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                         {% if module.is_active %}checked{% endif %}>
+                  <label class="form-check-label" for="is_active">
+                    Active Module
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prerequisites -->
+          <div class="mb-4">
+            <h5 class="mb-3">Prerequisites</h5>
+            <div class="mb-3">
+              <label for="prerequisites" class="form-label">Prerequisite Knowledge</label>
+              <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
+                        placeholder="List any prerequisites or prior knowledge required for this module">{{ module.prerequisites|default:'' }}</textarea>
+            </div>
+            
+            {% if available_modules %}
+            <div class="mb-3">
+              <label class="form-label">Prerequisite Modules</label>
+              <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                {% for prereq_module in available_modules %}
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="prereq_{{ prereq_module.id }}" 
+                         name="prerequisite_modules" value="{{ prereq_module.id }}"
+                         {% if prereq_module in module.prerequisite_modules.all %}checked{% endif %}>
+                  <label class="form-check-label" for="prereq_{{ prereq_module.id }}">
+                    {{ prereq_module.title }} ({{ prereq_module.course.title }})
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="form-text">Select modules that must be completed before this module</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Assessment Configuration -->
+          <div class="mb-4">
+            <h5 class="mb-3">Assessment Configuration</h5>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="passing_score_percentage" class="form-label">Passing Score (%)</label>
+                  <input type="number" class="form-control" id="passing_score_percentage" name="passing_score_percentage" 
+                         value="{{ module.passing_score_percentage|default:'70' }}" min="1" max="100"
+                         placeholder="70">
+                  <div class="form-text">Minimum score to pass this module</div>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="max_attempts" class="form-label">Max Attempts</label>
+                  <input type="number" class="form-control" id="max_attempts" name="max_attempts" 
+                         value="{{ module.max_attempts|default:'' }}" min="1"
+                         placeholder="3">
+                  <div class="form-text">Leave empty for unlimited attempts</div>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">&nbsp;</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="requires_completion" name="requires_completion"
+                           {% if module.requires_completion %}checked{% endif %}>
+                    <label class="form-check-label" for="requires_completion">
+                      Completion Required
+                    </label>
+                  </div>
+                  <div class="form-text">Students must complete to progress</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Module Resources -->
+          <div class="mb-4">
+            <label for="resources" class="form-label">Additional Resources</label>
+            <textarea class="form-control" id="resources" name="resources" rows="4"
+                      placeholder="Provide links to additional resources, documentation, or materials">{{ module.resources|default:'' }}</textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="mb-4">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="tags" name="tags" 
+                   value="{{ module.tags|default:'' }}"
+                   placeholder="programming, basics, fundamentals (comma separated)">
+            <div class="form-text">Enter relevant tags separated by commas</div>
+          </div>
+
+          <!-- Module Content Preview -->
+          {% if module %}
+          <div class="mb-4">
+            <h5 class="mb-3">Current Module Content</h5>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card bg-primary-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-primary">{{ module.video_lessons.count }}</h4>
+                    <small class="text-muted">Video Lessons</small>
+                    {% if module.video_lessons.count > 0 %}
+                      <div class="mt-2">
+                        <a href="{% url 'custom_admin:video_lessons_list' %}?module={{ module.id }}" 
+                           class="btn btn-sm btn-outline-primary">View All</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-success-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-success">{{ module.assignments.count }}</h4>
+                    <small class="text-muted">Assignments</small>
+                    {% if module.assignments.count > 0 %}
+                      <div class="mt-2">
+                        <a href="{% url 'custom_admin:assignments_list' %}?module={{ module.id }}" 
+                           class="btn btn-sm btn-outline-success">View All</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-warning-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-warning">{{ module.quizzes.count }}</h4>
+                    <small class="text-muted">Quizzes</small>
+                    {% if module.quizzes.count > 0 %}
+                      <div class="mt-2">
+                        <a href="{% url 'custom_admin:quizzes_list' %}?module={{ module.id }}" 
+                           class="btn btn-sm btn-outline-warning">View All</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:modules_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            {% if module %}
+            <a href="{% url 'custom_admin:module_detail' module.id %}" class="btn btn-outline-info">
+              <i class="ti ti-eye me-1"></i>View Module
+            </a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>{% if module %}Update Module{% else %}Create Module{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-format tags
+document.getElementById('tags').addEventListener('blur', function() {
+  let tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+  this.value = tags.join(', ');
+});
+
+// Update order automatically based on selected course
+document.getElementById('course').addEventListener('change', function() {
+  const courseId = this.value;
+  if (courseId && !document.getElementById('order').value) {
+    // You could add AJAX here to get the next order number for the selected course
+    fetch(`/admin/api/courses/${courseId}/next-module-order/`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.next_order) {
+          document.getElementById('order').value = data.next_order;
+        }
+      })
+      .catch(error => console.log('Could not fetch next order:', error));
+  }
+});
+
+// Show/hide prerequisite modules based on course selection
+document.getElementById('course').addEventListener('change', function() {
+  const courseId = this.value;
+  // You could add AJAX here to filter prerequisite modules by course
+});
+
+// Duration calculator helper
+document.getElementById('duration_minutes').addEventListener('input', function() {
+  const minutes = parseInt(this.value) || 0;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  
+  let durationText = '';
+  if (hours > 0) {
+    durationText = `${hours}h ${remainingMinutes}m`;
+  } else {
+    durationText = `${minutes}m`;
+  }
+  
+  // Update a helper text element if it exists
+  const helperElement = document.getElementById('duration-helper');
+  if (helperElement) {
+    helperElement.textContent = durationText;
+  }
+});
+</script>
+{% endblock %}

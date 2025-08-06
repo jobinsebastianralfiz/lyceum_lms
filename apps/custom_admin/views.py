@@ -10,7 +10,11 @@ from django.db.models import Q
 from django.urls import reverse
 
 from apps.users.models import User, Team, TeamMembership
-from apps.courses.models import Course, Module, VideoLesson, Category
+from apps.courses.models import (
+    Course, Module, VideoLesson, Category,
+    Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
+    QuizAttempt, QuizAnswer, ModuleProgress
+)
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
 from apps.notifications.models import Notification
@@ -28,6 +32,9 @@ def dashboard_view(request):
     total_courses = Course.objects.count()
     total_modules = Module.objects.count()
     total_video_lessons = VideoLesson.objects.count()
+    total_assignments = Assignment.objects.count()
+    total_quizzes = Quiz.objects.count()
+    total_quiz_questions = QuizQuestion.objects.count()
     
     # PAYMENTS Management Statistics
     total_enrollments = Enrollment.objects.count()
@@ -80,6 +87,9 @@ def dashboard_view(request):
         'total_courses': total_courses,
         'total_modules': total_modules,
         'total_video_lessons': total_video_lessons,
+        'total_assignments': total_assignments,
+        'total_quizzes': total_quizzes,
+        'total_quiz_questions': total_quiz_questions,
         
         # PAYMENTS Management
         'total_enrollments': total_enrollments,
@@ -181,8 +191,15 @@ def courses_list_view(request):
 def course_detail_view(request, course_id):
     """View course details"""
     course = get_object_or_404(Course, id=course_id)
-    modules = Module.objects.filter(course=course).prefetch_related('video_lessons')
+    modules = Module.objects.filter(course=course).prefetch_related(
+        'video_lessons', 'assignments', 'quizzes'
+    ).order_by('order')
     enrollments = Enrollment.objects.filter(course=course).select_related('user', 'team')
+    
+    # Add assignments and quizzes count for each module
+    for module in modules:
+        module.assignments_count = module.assignments.count()
+        module.quizzes_count = module.quizzes.count()
     
     context = {
         'course': course,
@@ -403,6 +420,33 @@ def modules_list_view(request):
     }
     
     return render(request, 'custom_admin/modules/list.html', context)
+
+@user_passes_test(is_staff_user)
+def module_detail_view(request, module_id):
+    """View module details"""
+    module = get_object_or_404(Module, id=module_id)
+    
+    # Get related content counts
+    video_lessons = module.video_lessons.all()
+    assignments = module.assignments.all()
+    quizzes = module.quizzes.all()
+    
+    # Get module statistics
+    enrollments_count = module.course.enrollments.count()
+    progress_records = ModuleProgress.objects.filter(module=module)
+    completions_count = progress_records.filter(status='completed').count()
+    
+    context = {
+        'module': module,
+        'video_lessons': video_lessons,
+        'assignments': assignments,
+        'quizzes': quizzes,
+        'enrollments_count': enrollments_count,
+        'completions_count': completions_count,
+        'progress_records': progress_records,
+    }
+    
+    return render(request, 'custom_admin/modules/detail.html', context)
 
 @user_passes_test(is_staff_user)
 def module_create_view(request):
@@ -1209,3 +1253,309 @@ def youtube_video_delete_view(request, video_id):
         messages.success(request, f'YouTube video "{video.title}" deleted successfully.')
         return redirect('custom_admin:youtube_videos_list')
     return render(request, 'custom_admin/youtube_videos/delete.html', {'video': video})
+
+
+# ==============================================================================
+# ASSIGNMENTS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def assignments_list_view(request):
+    """List all assignments"""
+    search_query = request.GET.get('search', '')
+    assignments = Assignment.objects.select_related('module', 'module__course')
+    
+    if search_query:
+        assignments = assignments.filter(
+            Q(title__icontains=search_query) |
+            Q(module__title__icontains=search_query) |
+            Q(module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(assignments, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/assignments/list.html', context)
+
+@user_passes_test(is_staff_user)
+def assignment_detail_view(request, assignment_id):
+    """View assignment details"""
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    submissions = AssignmentSubmission.objects.filter(assignment=assignment).select_related('student')
+    
+    context = {
+        'assignment': assignment,
+        'submissions': submissions,
+    }
+    
+    return render(request, 'custom_admin/assignments/detail.html', context)
+
+@user_passes_test(is_staff_user)
+def assignment_create_view(request):
+    """Create assignment"""
+    return render(request, 'custom_admin/assignments/form.html', {
+        'title': 'Add Assignment',
+        'is_edit': False
+    })
+
+@user_passes_test(is_staff_user)
+def assignment_edit_view(request, assignment_id):
+    """Edit assignment"""
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    return render(request, 'custom_admin/assignments/form.html', {
+        'assignment': assignment,
+        'title': 'Edit Assignment',
+        'is_edit': True
+    })
+
+@user_passes_test(is_staff_user)
+def assignment_delete_view(request, assignment_id):
+    """Delete assignment"""
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    if request.method == 'POST':
+        assignment.delete()
+        messages.success(request, f'Assignment "{assignment.title}" deleted successfully.')
+        return redirect('custom_admin:assignments_list')
+    return render(request, 'custom_admin/assignments/delete.html', {'assignment': assignment})
+
+
+# ==============================================================================
+# ASSIGNMENT SUBMISSIONS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def assignment_submissions_list_view(request):
+    """List all assignment submissions"""
+    search_query = request.GET.get('search', '')
+    submissions = AssignmentSubmission.objects.select_related(
+        'assignment', 'student', 'assignment__module', 'assignment__module__course'
+    )
+    
+    if search_query:
+        submissions = submissions.filter(
+            Q(student__name__icontains=search_query) |
+            Q(assignment__title__icontains=search_query) |
+            Q(assignment__module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(submissions, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/assignment_submissions/list.html', context)
+
+@user_passes_test(is_staff_user)
+def assignment_submission_detail_view(request, submission_id):
+    """View and grade assignment submission"""
+    submission = get_object_or_404(AssignmentSubmission, id=submission_id)
+    
+    if request.method == 'POST':
+        score = request.POST.get('score')
+        comments = request.POST.get('grade_comments', '')
+        
+        if score:
+            try:
+                score = int(score)
+                if 0 <= score <= submission.assignment.max_points:
+                    submission.grade(score, comments, request.user)
+                    messages.success(request, f'Assignment graded successfully. Score: {score}/{submission.assignment.max_points}')
+                    return redirect('custom_admin:assignment_submission_detail', submission_id=submission.id)
+                else:
+                    messages.error(request, f'Score must be between 0 and {submission.assignment.max_points}')
+            except ValueError:
+                messages.error(request, 'Please enter a valid score.')
+        else:
+            messages.error(request, 'Score is required.')
+    
+    context = {
+        'submission': submission,
+    }
+    
+    return render(request, 'custom_admin/assignment_submissions/detail.html', context)
+
+
+# ==============================================================================
+# QUIZZES MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quizzes_list_view(request):
+    """List all quizzes"""
+    search_query = request.GET.get('search', '')
+    quizzes = Quiz.objects.select_related('module', 'module__course').annotate(
+        questions_count=Count('questions'),
+        attempts_count=Count('attempts')
+    )
+    
+    if search_query:
+        quizzes = quizzes.filter(
+            Q(title__icontains=search_query) |
+            Q(module__title__icontains=search_query) |
+            Q(module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(quizzes, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/quizzes/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_detail_view(request, quiz_id):
+    """View quiz details"""
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    questions = QuizQuestion.objects.filter(quiz=quiz).prefetch_related('choices').order_by('order')
+    attempts = QuizAttempt.objects.filter(quiz=quiz).select_related('student').order_by('-started_at')[:10]
+    
+    context = {
+        'quiz': quiz,
+        'questions': questions,
+        'recent_attempts': attempts,
+    }
+    
+    return render(request, 'custom_admin/quizzes/detail.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_create_view(request):
+    """Create quiz"""
+    return render(request, 'custom_admin/quizzes/form.html', {
+        'title': 'Add Quiz',
+        'is_edit': False
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_edit_view(request, quiz_id):
+    """Edit quiz"""
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    return render(request, 'custom_admin/quizzes/form.html', {
+        'quiz': quiz,
+        'title': 'Edit Quiz',
+        'is_edit': True
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_delete_view(request, quiz_id):
+    """Delete quiz"""
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    if request.method == 'POST':
+        quiz.delete()
+        messages.success(request, f'Quiz "{quiz.title}" deleted successfully.')
+        return redirect('custom_admin:quizzes_list')
+    return render(request, 'custom_admin/quizzes/delete.html', {'quiz': quiz})
+
+
+# ==============================================================================
+# QUIZ ATTEMPTS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quiz_attempts_list_view(request):
+    """List all quiz attempts"""
+    search_query = request.GET.get('search', '')
+    attempts = QuizAttempt.objects.select_related(
+        'quiz', 'student', 'quiz__module', 'quiz__module__course'
+    )
+    
+    if search_query:
+        attempts = attempts.filter(
+            Q(student__name__icontains=search_query) |
+            Q(quiz__title__icontains=search_query) |
+            Q(quiz__module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(attempts, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/quiz_attempts/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_attempt_detail_view(request, attempt_id):
+    """View quiz attempt details"""
+    attempt = get_object_or_404(QuizAttempt, id=attempt_id)
+    answers = QuizAnswer.objects.filter(attempt=attempt).select_related(
+        'question', 'selected_choice'
+    ).order_by('question__order')
+    
+    context = {
+        'attempt': attempt,
+        'answers': answers,
+    }
+    
+    return render(request, 'custom_admin/quiz_attempts/detail.html', context)
+
+
+# ==============================================================================
+# MODULE PROGRESS MANAGEMENT VIEWS  
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def module_progress_list_view(request):
+    """List module progress"""
+    search_query = request.GET.get('search', '')
+    progress = ModuleProgress.objects.select_related(
+        'student', 'module', 'module__course'
+    )
+    
+    if search_query:
+        progress = progress.filter(
+            Q(student__name__icontains=search_query) |
+            Q(module__title__icontains=search_query) |
+            Q(module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(progress, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'custom_admin/module_progress/list.html', context)
+
+@user_passes_test(is_staff_user)
+def module_progress_detail_view(request, progress_id):
+    """View module progress details"""
+    progress = get_object_or_404(ModuleProgress, id=progress_id)
+    
+    # Get detailed progress information
+    assignment_submissions = AssignmentSubmission.objects.filter(
+        assignment__module=progress.module,
+        student=progress.student
+    ).select_related('assignment')
+    
+    quiz_attempts = QuizAttempt.objects.filter(
+        quiz__module=progress.module,
+        student=progress.student
+    ).select_related('quiz').order_by('-started_at')
+    
+    context = {
+        'progress': progress,
+        'assignment_submissions': assignment_submissions,
+        'quiz_attempts': quiz_attempts,
+    }
+    
+    return render(request, 'custom_admin/module_progress/detail.html', context)
