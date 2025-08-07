@@ -11,6 +11,11 @@
         <h4 class="card-title mb-0">Payments Management</h4>
         <p class="card-subtitle">Manage all payment transactions</p>
       </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:payment_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add Payment
+        </a>
+      </div>
     </div>
 
     <!-- Search and Stats -->
@@ -51,15 +56,29 @@
           {% for payment in page_obj %}
           <tr>
             <td>
+              {% if payment.enrollment %}
               <div class="d-flex align-items-center">
-                <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" 
-                     alt="{{ payment.user.get_full_name }}" 
-                     class="rounded-circle me-3" width="32" height="32">
+                <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 32px; height: 32px;">
+                  <i class="ti ti-user text-primary"></i>
+                </div>
                 <div>
-                  <h6 class="mb-0">{{ payment.user.get_full_name|default:payment.user.username }}</h6>
-                  <small class="text-muted">{{ payment.user.email }}</small>
+                  <h6 class="mb-0">{{ payment.enrollment.user.name }}</h6>
+                  <small class="text-muted">{{ payment.enrollment.user.email }}</small>
                 </div>
               </div>
+              {% else %}
+              <div class="d-flex align-items-center">
+                <div class="bg-secondary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 32px; height: 32px;">
+                  <i class="ti ti-user text-secondary"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0">No Student</h6>
+                  <small class="text-muted">Manual Payment</small>
+                </div>
+              </div>
+              {% endif %}
             </td>
             <td>
               {% if payment.enrollment %}
@@ -102,11 +121,13 @@
                   Actions
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
+                  {% if payment.enrollment %}
                   <li>
-                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' payment.user.id %}">
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' payment.enrollment.user.id %}">
                       <i class="ti ti-user me-2"></i>View Student
                     </a>
                   </li>
+                  {% endif %}
                   {% if payment.enrollment %}
                   <li>
                     <a class="dropdown-item" href="{% url 'custom_admin:course_detail' payment.enrollment.course.id %}">

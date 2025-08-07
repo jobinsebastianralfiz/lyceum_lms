@@ -72,9 +72,26 @@ class Course(models.Model):
         db_table = 'courses'
 
 class Module(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
+    ]
+    
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=200)
+    description = models.TextField(default="Module description not provided.")
     order = models.PositiveIntegerField(default=1, help_text="Order of module in the course")
+    learning_objectives = models.TextField(blank=True, null=True, help_text="What students will learn")
+    duration_minutes = models.PositiveIntegerField(blank=True, null=True, help_text="Estimated completion time")
+    difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
+    is_active = models.BooleanField(default=True, help_text="Module is available to students")
+    prerequisites = models.TextField(blank=True, null=True, help_text="Required knowledge or previous modules")
+    passing_score_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=70.0)
+    max_attempts = models.PositiveIntegerField(blank=True, null=True, help_text="Maximum attempts allowed")
+    requires_completion = models.BooleanField(default=True, help_text="Must complete to progress")
+    resources = models.TextField(blank=True, null=True, help_text="Additional learning resources")
+    tags = models.CharField(max_length=500, blank=True, null=True, help_text="Comma-separated tags")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -345,6 +362,18 @@ class ModuleProgress(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - {self.module.title}"
+    
+    @property
+    def status(self):
+        """Get current progress status"""
+        if not self.is_unlocked:
+            return 'blocked'
+        elif self.is_completed:
+            return 'completed'
+        elif self.started_at:
+            return 'in_progress'
+        else:
+            return 'not_started'
     
     def check_completion(self):
         """Check if module is completed and update status"""

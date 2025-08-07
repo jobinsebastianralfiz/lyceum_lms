@@ -80,10 +80,10 @@
               </div>
               <div class="col-4">
                 <h6 class="mb-0 fw-bolder">
-                  {% if course.is_active %}
-                    <span class="text-success">Active</span>
+                  {% if course.is_published %}
+                    <span class="text-success">Published</span>
                   {% else %}
-                    <span class="text-muted">Inactive</span>
+                    <span class="text-muted">Draft</span>
                   {% endif %}
                 </h6>
                 <span class="text-muted fs-3">Status</span>

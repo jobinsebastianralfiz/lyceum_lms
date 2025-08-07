@@ -64,8 +64,13 @@
                   <i class="ti ti-user text-primary"></i>
                 </div>
                 <div>
+                  {% if plan.enrollment %}
                   <h6 class="mb-0 fw-normal">{{ plan.enrollment.user.name }}</h6>
                   <span class="text-muted fs-3">{{ plan.enrollment.course.title|truncatechars:30 }}</span>
+                  {% else %}
+                  <h6 class="mb-0 fw-normal text-muted">No Enrollment</h6>
+                  <span class="text-muted fs-3">-</span>
+                  {% endif %}
                 </div>
               </div>
             </td>
@@ -97,6 +102,7 @@
               <span class="text-muted">{{ plan.start_date|date:"M d, Y" }}</span>
             </td>
             <td class="px-0">
+              {% if plan.enrollment %}
               {% with outstanding=plan.enrollment.outstanding_amount %}
               {% if outstanding <= 0 %}
                 <span class="badge bg-success">Completed</span>
@@ -106,6 +112,9 @@
                 <span class="badge bg-warning">Pending</span>
               {% endif %}
               {% endwith %}
+              {% else %}
+                <span class="badge bg-secondary">No Enrollment</span>
+              {% endif %}
             </td>
             <td class="px-0 text-end">
               <div class="dropdown">
@@ -120,6 +129,7 @@
                     </a>
                   </li>
                   <li><hr class="dropdown-divider"></li>
+                  {% if plan.enrollment %}
                   <li>
                     <a class="dropdown-item" href="{% url 'custom_admin:enrollment_edit' plan.enrollment.id %}">
                       <i class="ti ti-user-check me-2"></i>View Enrollment
@@ -135,6 +145,7 @@
                       <i class="ti ti-user me-2"></i>View Student
                     </a>
                   </li>
+                  {% endif %}
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <a class="dropdown-item text-danger" href="{% url 'custom_admin:installment_plan_delete' plan.id %}">

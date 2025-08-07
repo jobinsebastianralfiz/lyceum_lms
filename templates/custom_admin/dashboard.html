@@ -496,8 +496,13 @@
               <i class="ti ti-currency-rupee fs-6"></i>
             </span>
             <div class="ms-3">
-              <h6 class="mb-0 fw-normal">{{ payment.user.get_full_name|default:payment.user.username }}</h6>
+              {% if payment.enrollment %}
+              <h6 class="mb-0 fw-normal">{{ payment.enrollment.user.name }}</h6>
+              <span class="text-muted fs-3">₹{{ payment.amount }} - {{ payment.enrollment.course.title|truncatechars:25 }}</span>
+              {% else %}
+              <h6 class="mb-0 fw-normal">Manual Payment</h6>
               <span class="text-muted fs-3">₹{{ payment.amount }}</span>
+              {% endif %}
             </div>
             <div class="ms-auto">
               <span class="text-muted fs-2 d-block">{{ payment.created_at|date:"M d" }}</span>

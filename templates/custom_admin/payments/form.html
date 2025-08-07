@@ -1,0 +1,264 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          {% if is_edit %}
+            <i class="ti ti-edit me-2"></i>{{ title }}
+          {% else %}
+            <i class="ti ti-plus me-2"></i>{{ title }}
+          {% endif %}
+        </h4>
+        <p class="card-subtitle">
+          {% if is_edit %}
+            Modify payment details and status
+          {% else %}
+            Add a new manual payment for an enrollment
+          {% endif %}
+        </p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:payments_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Payments
+        </a>
+      </div>
+    </div>
+
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      
+      <!-- Enrollment Selection -->
+      <div class="col-md-6">
+        <label for="enrollment" class="form-label">Enrollment *</label>
+        <select class="form-select" name="enrollment" id="enrollment" required {% if is_edit %}disabled{% endif %}>
+          <option value="">Select an enrollment</option>
+          {% for enrollment in enrollments %}
+          <option value="{{ enrollment.id }}" 
+                  {% if payment and payment.enrollment.id == enrollment.id %}selected{% endif %}>
+            {{ enrollment.user.name }} - {{ enrollment.course.title }} 
+            (Outstanding: ₹{{ enrollment.outstanding_amount }})
+          </option>
+          {% endfor %}
+        </select>
+        {% if is_edit %}
+          <input type="hidden" name="enrollment" value="{{ payment.enrollment.id }}">
+          <small class="text-muted">Enrollment cannot be changed when editing</small>
+        {% endif %}
+      </div>
+
+      <!-- Installment Number -->
+      <div class="col-md-6">
+        <label for="installment_number" class="form-label">Installment Number *</label>
+        <input type="number" class="form-control" name="installment_number" id="installment_number" 
+               value="{% if payment %}{{ payment.installment_number }}{% else %}1{% endif %}" 
+               min="1" required>
+        <small class="text-muted">Sequential payment number for this enrollment</small>
+      </div>
+
+      <!-- Amount -->
+      <div class="col-md-6">
+        <label for="amount" class="form-label">Payment Amount *</label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" class="form-control" name="amount" id="amount" 
+                 value="{% if payment %}{{ payment.amount }}{% endif %}" 
+                 step="0.01" min="0" required>
+        </div>
+      </div>
+
+      <!-- Tax Amount -->
+      <div class="col-md-6">
+        <label for="tax_amount" class="form-label">Tax Amount *</label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" class="form-control" name="tax_amount" id="tax_amount" 
+                 value="{% if payment %}{{ payment.tax_amount }}{% else %}0{% endif %}" 
+                 step="0.01" min="0" required>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="col-md-6">
+        <label for="payment_method" class="form-label">Payment Method *</label>
+        <select class="form-select" name="payment_method" id="payment_method" required>
+          <option value="">Select payment method</option>
+          <option value="razorpay" {% if payment and payment.payment_method == 'razorpay' %}selected{% endif %}>Razorpay</option>
+          <option value="cash" {% if payment and payment.payment_method == 'cash' %}selected{% endif %}>Cash</option>
+          <option value="bank_transfer" {% if payment and payment.payment_method == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+          <option value="other" {% if payment and payment.payment_method == 'other' %}selected{% endif %}>Other</option>
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div class="col-md-6">
+        <label for="status" class="form-label">Payment Status *</label>
+        <select class="form-select" name="status" id="status" required>
+          <option value="pending" {% if payment and payment.status == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="completed" {% if payment and payment.status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="overdue" {% if payment and payment.status == 'overdue' %}selected{% endif %}>Overdue</option>
+          <option value="failed" {% if payment and payment.status == 'failed' %}selected{% endif %}>Failed</option>
+        </select>
+      </div>
+
+      <!-- Transaction ID -->
+      <div class="col-md-6">
+        <label for="transaction_id" class="form-label">Transaction ID</label>
+        <input type="text" class="form-control" name="transaction_id" id="transaction_id" 
+               value="{% if payment %}{{ payment.transaction_id }}{% endif %}" 
+               placeholder="Enter transaction/reference ID">
+        <small class="text-muted">Optional: Payment gateway or bank reference</small>
+      </div>
+
+      <!-- Invoice Number -->
+      <div class="col-md-6">
+        <label for="invoice_number" class="form-label">Invoice Number</label>
+        <input type="text" class="form-control" name="invoice_number" id="invoice_number" 
+               value="{% if payment %}{{ payment.invoice_number }}{% endif %}" 
+               placeholder="Enter invoice number">
+        <small class="text-muted">Optional: Internal invoice reference</small>
+      </div>
+
+      <!-- Payment Date -->
+      <div class="col-md-6">
+        <label for="payment_date" class="form-label">Payment Date</label>
+        <input type="datetime-local" class="form-control" name="payment_date" id="payment_date" 
+               value="{% if payment.payment_date %}{{ payment.payment_date|date:'Y-m-d\TH:i' }}{% endif %}">
+        <small class="text-muted">Leave empty if payment is pending</small>
+      </div>
+
+      <!-- Due Date -->
+      <div class="col-md-6">
+        <label for="due_date" class="form-label">Due Date *</label>
+        <input type="date" class="form-control" name="due_date" id="due_date" 
+               value="{% if payment %}{{ payment.due_date|date:'Y-m-d' }}{% endif %}" 
+               required>
+      </div>
+
+      <!-- Notes -->
+      <div class="col-12">
+        <label for="notes" class="form-label">Notes</label>
+        <textarea class="form-control" name="notes" id="notes" rows="3" 
+                  placeholder="Additional notes about this payment">{% if payment %}{{ payment.notes }}{% endif %}</textarea>
+      </div>
+
+      <!-- Generate Tax Invoice Option -->
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="generate_tax_invoice" id="generate_tax_invoice" 
+                 {% if not is_edit %}checked{% endif %}>
+          <label class="form-check-label" for="generate_tax_invoice">
+            <strong>Generate Tax Invoice</strong>
+          </label>
+          <div class="form-text">
+            Automatically create a tax invoice when payment status is "completed" and has tax amount.
+            {% if is_edit %}Uncheck to prevent creating duplicate invoices.{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="col-12 pt-3">
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="ti ti-device-floppy me-2"></i>
+            {% if is_edit %}Update Payment{% else %}Create Payment{% endif %}
+          </button>
+          <a href="{% url 'custom_admin:payments_list' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-x me-2"></i>Cancel
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.form-label {
+  font-weight: 600;
+  color: #2a3547;
+  margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #e0e6ed;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-color: #e0e6ed;
+  font-weight: 500;
+}
+
+.card {
+  border-radius: 12px;
+  border: 1px solid #e0e6ed;
+}
+
+.text-muted {
+  font-size: 0.875rem;
+}
+</style>
+
+<script>
+// Auto-calculate tax amount when amount changes (assuming 18% GST)
+document.getElementById('amount').addEventListener('input', function() {
+  const amount = parseFloat(this.value) || 0;
+  const taxRate = 0.18; // 18% GST
+  const taxAmount = (amount * taxRate).toFixed(2);
+  document.getElementById('tax_amount').value = taxAmount;
+});
+
+// Set payment date to now when status is changed to completed
+document.getElementById('status').addEventListener('change', function() {
+  const paymentDateField = document.getElementById('payment_date');
+  if (this.value === 'completed' && !paymentDateField.value) {
+    const now = new Date();
+    const localDateTime = now.getFullYear() + '-' + 
+                         String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(now.getDate()).padStart(2, '0') + 'T' + 
+                         String(now.getHours()).padStart(2, '0') + ':' + 
+                         String(now.getMinutes()).padStart(2, '0');
+    paymentDateField.value = localDateTime;
+  }
+});
+</script>
+{% endblock %}

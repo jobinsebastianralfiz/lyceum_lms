@@ -1,0 +1,378 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Tax Invoices - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Tax Invoices</h4>
+        <p class="card-subtitle">Manage GST invoices and tax documentation</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:tax_invoice_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Generate Invoice
+        </a>
+      </div>
+    </div>
+
+    <!-- Search and Stats -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search" 
+                   value="{{ search_query }}" placeholder="Search by invoice number or student name...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <span class="text-muted me-2">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} invoices
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax Invoices Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="px-0">Invoice Details</th>
+            <th scope="col" class="px-0">Student & Course</th>
+            <th scope="col" class="px-0">Amount Breakdown</th>
+            <th scope="col" class="px-0">Tax Info</th>
+            <th scope="col" class="px-0">Date</th>
+            <th scope="col" class="px-0">Status</th>
+            <th scope="col" class="px-0 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for invoice in page_obj %}
+          <tr>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <div class="bg-info-subtle rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 40px; height: 40px;">
+                  <i class="ti ti-file-invoice text-info"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ invoice.invoice_number }}</h6>
+                  {% if invoice.payment %}
+                    <span class="text-muted fs-3">Payment #{{ invoice.payment.installment_number }}</span>
+                  {% else %}
+                    <span class="text-muted fs-3">Manual Invoice</span>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <i class="ti ti-user text-primary me-2"></i>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ invoice.enrollment.user.name }}</h6>
+                  <span class="text-muted fs-3">{{ invoice.enrollment.course.title|truncatechars:30 }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div>
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted fs-3">Subtotal:</span>
+                  <span class="fs-3">₹{{ invoice.subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted fs-3">Tax:</span>
+                  <span class="fs-3">₹{{ invoice.tax_amount|floatformat:2 }}</span>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-1">
+                  <span class="fw-bold fs-3">Total:</span>
+                  <span class="fw-bold fs-3">₹{{ invoice.total_amount|floatformat:2 }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <div class="d-flex align-items-center">
+                <i class="ti ti-percentage text-success me-2"></i>
+                <div>
+                  <h6 class="mb-0 fw-normal">{{ invoice.tax_rate }}%</h6>
+                  <span class="text-muted fs-3">GST Rate</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-0">
+              <span class="text-muted">{{ invoice.invoice_date|date:"M d, Y" }}</span>
+            </td>
+            <td class="px-0">
+              {% if invoice.invoice_pdf_path %}
+                <span class="badge bg-success">Generated</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td class="px-0 text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:tax_invoice_edit' invoice.id %}">
+                      <i class="ti ti-edit me-2"></i>Edit Invoice
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:enrollment_edit' invoice.enrollment.id %}">
+                      <i class="ti ti-user-check me-2"></i>View Enrollment
+                    </a>
+                  </li>
+                  {% if invoice.payment %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:payment_edit' invoice.payment.id %}">
+                      <i class="ti ti-credit-card me-2"></i>View Payment
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'custom_admin:user_detail' invoice.enrollment.user.id %}">
+                      <i class="ti ti-user me-2"></i>View Student
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  {% if invoice.invoice_pdf_path %}
+                  <li>
+                    <a class="dropdown-item" href="{{ invoice.invoice_pdf_path.url }}" target="_blank">
+                      <i class="ti ti-download me-2"></i>Download PDF
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  {% endif %}
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:tax_invoice_delete' invoice.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete Invoice
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-file-invoice fs-1 mb-3 d-block"></i>
+                {% if search_query %}
+                  <h5 class="mb-2">No tax invoices found</h5>
+                  <p class="mb-0">No tax invoices match your search criteria "{{ search_query }}"</p>
+                  <a href="{% url 'custom_admin:tax_invoices_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+                    Clear Search
+                  </a>
+                {% else %}
+                  <h5 class="mb-2">No tax invoices</h5>
+                  <p class="mb-0">No tax invoices have been generated yet</p>
+                  <a href="{% url 'custom_admin:tax_invoice_create' %}" class="btn btn-sm btn-primary mt-3">
+                    <i class="ti ti-plus me-1"></i>Generate First Invoice
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Invoice Statistics -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card bg-light">
+          <div class="card-body py-3">
+            <div class="row text-center">
+              <div class="col-md-3">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="ti ti-file-invoice text-primary me-2 fs-4"></i>
+                  <div>
+                    <h6 class="mb-0">{{ page_obj.paginator.count }}</h6>
+                    <small class="text-muted">Total Invoices</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="ti ti-check text-success me-2 fs-4"></i>
+                  <div>
+                    <h6 class="mb-0">{{ invoices_with_pdf }}</h6>
+                    <small class="text-muted">Generated PDFs</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="ti ti-currency-rupee text-info me-2 fs-4"></i>
+                  <div>
+                    <h6 class="mb-0">₹{{ total_invoice_amount|floatformat:0 }}</h6>
+                    <small class="text-muted">Total Amount</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="ti ti-percentage text-warning me-2 fs-4"></i>
+                  <div>
+                    <h6 class="mb-0">₹{{ total_tax_amount|floatformat:0 }}</h6>
+                    <small class="text-muted">Total Tax</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Tax invoices pagination" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.table th {
+  font-weight: 600;
+  color: #2a3547;
+  border-bottom: 2px solid #e0e6ed;
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+
+.form-control {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.pagination .page-link {
+  border-radius: 6px;
+  margin: 0 2px;
+  border: 1px solid #e0e6ed;
+  color: #2a3547;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 12px;
+  border: 1px solid #e0e6ed;
+}
+
+.fs-3 {
+  font-size: 0.875rem;
+}
+
+.fs-4 {
+  font-size: 1.25rem;
+}
+</style>
+{% endblock %}

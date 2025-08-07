@@ -60,12 +60,6 @@
                       placeholder="Provide a detailed description of what students will learn">{{ course.description|default:'' }}</textarea>
           </div>
 
-          <div class="mb-4">
-            <label for="short_description" class="form-label">Short Description</label>
-            <textarea class="form-control" id="short_description" name="short_description" rows="2"
-                      placeholder="Brief summary for course cards">{{ course.short_description|default:'' }}</textarea>
-          </div>
-
           <!-- Pricing Information -->
           <div class="row mb-4">
             <div class="col-12">
@@ -120,65 +114,13 @@
             
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="intro_video_url" class="form-label">Introduction Video URL</label>
-                <input type="url" class="form-control" id="intro_video_url" name="intro_video_url" 
-                       value="{{ course.intro_video_url|default:'' }}"
+                <label for="preview_video" class="form-label">Preview Video URL</label>
+                <input type="url" class="form-control" id="preview_video" name="preview_video" 
+                       value="{{ course.preview_video|default:'' }}"
                        placeholder="https://youtube.com/watch?v=...">
-                <div class="form-text">YouTube or Vimeo URL for course introduction</div>
+                <div class="form-text">YouTube or Vimeo URL for course preview</div>
               </div>
             </div>
-          </div>
-
-          <!-- Course Settings -->
-          <div class="row mb-4">
-            <div class="col-12">
-              <h5 class="mb-3">Course Settings</h5>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label for="duration_weeks" class="form-label">Duration (Weeks)</label>
-                <input type="number" class="form-control" id="duration_weeks" name="duration_weeks" 
-                       value="{{ course.duration_weeks|default:'' }}" min="1"
-                       placeholder="8">
-              </div>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label for="skill_level" class="form-label">Skill Level</label>
-                <select class="form-select" id="skill_level" name="skill_level">
-                  <option value="beginner" {% if course.skill_level == 'beginner' %}selected{% endif %}>Beginner</option>
-                  <option value="intermediate" {% if course.skill_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
-                  <option value="advanced" {% if course.skill_level == 'advanced' %}selected{% endif %}>Advanced</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label for="language" class="form-label">Language</label>
-                <select class="form-select" id="language" name="language">
-                  <option value="english" {% if course.language == 'english' %}selected{% endif %}>English</option>
-                  <option value="hindi" {% if course.language == 'hindi' %}selected{% endif %}>Hindi</option>
-                  <option value="both" {% if course.language == 'both' %}selected{% endif %}>Both</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Prerequisites -->
-          <div class="mb-4">
-            <label for="prerequisites" class="form-label">Prerequisites</label>
-            <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
-                      placeholder="List any prerequisites or prior knowledge required">{{ course.prerequisites|default:'' }}</textarea>
-          </div>
-
-          <!-- Learning Outcomes -->
-          <div class="mb-4">
-            <label for="learning_outcomes" class="form-label">Learning Outcomes</label>
-            <textarea class="form-control" id="learning_outcomes" name="learning_outcomes" rows="4"
-                      placeholder="What will students learn? List key learning outcomes">{{ course.learning_outcomes|default:'' }}</textarea>
           </div>
 
           <!-- Course Status -->
@@ -189,34 +131,14 @@
             
             <div class="col-md-6">
               <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
-                       {% if course.is_active %}checked{% endif %}>
-                <label class="form-check-label" for="is_active">
-                  <strong>Active Course</strong>
+                <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
+                       {% if course.is_published %}checked{% endif %}>
+                <label class="form-check-label" for="is_published">
+                  <strong>Published Course</strong>
                   <small class="text-muted d-block">Course is visible to students</small>
                 </label>
               </div>
             </div>
-            
-            <div class="col-md-6">
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
-                       {% if course.is_featured %}checked{% endif %}>
-                <label class="form-check-label" for="is_featured">
-                  <strong>Featured Course</strong>
-                  <small class="text-muted d-block">Show in featured courses section</small>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tags -->
-          <div class="mb-4">
-            <label for="tags" class="form-label">Tags</label>
-            <input type="text" class="form-control" id="tags" name="tags" 
-                   value="{{ course.tags|default:'' }}"
-                   placeholder="programming, python, web development (comma separated)">
-            <div class="form-text">Enter relevant tags separated by commas</div>
           </div>
 
           <!-- Submit Buttons -->

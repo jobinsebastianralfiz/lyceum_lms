@@ -368,19 +368,116 @@ def category_delete_view(request, category_id):
 @user_passes_test(is_staff_user)
 def course_create_view(request):
     """Create a new course"""
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            category_id = request.POST.get('category')
+            price = request.POST.get('price', '0.00')
+            is_free = request.POST.get('is_free') == 'on'
+            preview_video = request.POST.get('preview_video')
+            is_published = request.POST.get('is_published') == 'on'
+            
+            # Validate required fields
+            if not all([title, description, category_id]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/courses/form.html', {
+                    'title': 'Add Course',
+                    'is_edit': False,
+                    'categories': categories
+                })
+            
+            # Get category
+            category = get_object_or_404(Category, id=category_id)
+            
+            # Handle file upload
+            thumbnail = request.FILES.get('thumbnail')
+            
+            # Create course
+            course = Course.objects.create(
+                title=title,
+                description=description,
+                category=category,
+                price=float(price) if price else 0.00,
+                is_free=is_free,
+                thumbnail=thumbnail,
+                preview_video=preview_video,
+                is_published=is_published,
+                created_by=request.user
+            )
+            
+            messages.success(request, f'Course "{course.title}" created successfully.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error creating course: {str(e)}')
+    
     return render(request, 'custom_admin/courses/form.html', {
         'title': 'Add Course',
-        'is_edit': False
+        'is_edit': False,
+        'categories': categories
     })
 
 @user_passes_test(is_staff_user)
 def course_edit_view(request, course_id):
     """Edit a course"""
     course = get_object_or_404(Course, id=course_id)
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            category_id = request.POST.get('category')
+            price = request.POST.get('price', '0.00')
+            is_free = request.POST.get('is_free') == 'on'
+            preview_video = request.POST.get('preview_video')
+            is_published = request.POST.get('is_published') == 'on'
+            
+            # Validate required fields
+            if not all([title, description, category_id]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/courses/form.html', {
+                    'course': course,
+                    'title': 'Edit Course',
+                    'is_edit': True,
+                    'categories': categories
+                })
+            
+            # Get category
+            category = get_object_or_404(Category, id=category_id)
+            
+            # Update course fields
+            course.title = title
+            course.description = description
+            course.category = category
+            course.price = float(price) if price else 0.00
+            course.is_free = is_free
+            course.preview_video = preview_video
+            course.is_published = is_published
+            
+            # Handle file upload
+            thumbnail = request.FILES.get('thumbnail')
+            if thumbnail:
+                course.thumbnail = thumbnail
+            
+            course.save()
+            
+            messages.success(request, f'Course "{course.title}" updated successfully.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error updating course: {str(e)}')
+    
     return render(request, 'custom_admin/courses/form.html', {
         'course': course,
         'title': 'Edit Course',
-        'is_edit': True
+        'is_edit': True,
+        'categories': categories
     })
 
 @user_passes_test(is_staff_user)
@@ -434,7 +531,7 @@ def module_detail_view(request, module_id):
     # Get module statistics
     enrollments_count = module.course.enrollments.count()
     progress_records = ModuleProgress.objects.filter(module=module)
-    completions_count = progress_records.filter(status='completed').count()
+    completions_count = progress_records.filter(is_completed=True).count()
     
     context = {
         'module': module,
@@ -451,19 +548,133 @@ def module_detail_view(request, module_id):
 @user_passes_test(is_staff_user)
 def module_create_view(request):
     """Create a new module"""
+    courses = Course.objects.prefetch_related('modules').all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            course_id = request.POST.get('course')
+            order = request.POST.get('order')
+            learning_objectives = request.POST.get('learning_objectives')
+            duration_minutes = request.POST.get('duration_minutes')
+            difficulty_level = request.POST.get('difficulty_level', 'beginner')
+            is_active = request.POST.get('is_active') == 'on'
+            prerequisites = request.POST.get('prerequisites')
+            passing_score_percentage = request.POST.get('passing_score_percentage', 70)
+            max_attempts = request.POST.get('max_attempts')
+            requires_completion = request.POST.get('requires_completion') == 'on'
+            resources = request.POST.get('resources')
+            tags = request.POST.get('tags')
+            
+            # Validate required fields
+            if not all([title, description, course_id, order]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/modules/form.html', {
+                    'title': 'Add Module',
+                    'is_edit': False,
+                    'courses': courses
+                })
+            
+            # Get course
+            course = get_object_or_404(Course, id=course_id)
+            
+            # Create module
+            module = Module.objects.create(
+                title=title,
+                description=description,
+                course=course,
+                order=int(order),
+                learning_objectives=learning_objectives,
+                duration_minutes=int(duration_minutes) if duration_minutes else None,
+                difficulty_level=difficulty_level,
+                is_active=is_active,
+                prerequisites=prerequisites,
+                passing_score_percentage=float(passing_score_percentage),
+                max_attempts=int(max_attempts) if max_attempts else None,
+                requires_completion=requires_completion,
+                resources=resources,
+                tags=tags
+            )
+            
+            messages.success(request, f'Module "{module.title}" created successfully.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error creating module: {str(e)}')
+    
     return render(request, 'custom_admin/modules/form.html', {
         'title': 'Add Module',
-        'is_edit': False
+        'is_edit': False,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
 def module_edit_view(request, module_id):
     """Edit a module"""
     module = get_object_or_404(Module, id=module_id)
+    courses = Course.objects.prefetch_related('modules').all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            course_id = request.POST.get('course')
+            order = request.POST.get('order')
+            learning_objectives = request.POST.get('learning_objectives')
+            duration_minutes = request.POST.get('duration_minutes')
+            difficulty_level = request.POST.get('difficulty_level', 'beginner')
+            is_active = request.POST.get('is_active') == 'on'
+            prerequisites = request.POST.get('prerequisites')
+            passing_score_percentage = request.POST.get('passing_score_percentage', 70)
+            max_attempts = request.POST.get('max_attempts')
+            requires_completion = request.POST.get('requires_completion') == 'on'
+            resources = request.POST.get('resources')
+            tags = request.POST.get('tags')
+            
+            # Validate required fields
+            if not all([title, description, course_id, order]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/modules/form.html', {
+                    'module': module,
+                    'title': 'Edit Module',
+                    'is_edit': True,
+                    'courses': courses
+                })
+            
+            # Get course
+            course = get_object_or_404(Course, id=course_id)
+            
+            # Update module
+            module.title = title
+            module.description = description
+            module.course = course
+            module.order = int(order)
+            module.learning_objectives = learning_objectives
+            module.duration_minutes = int(duration_minutes) if duration_minutes else None
+            module.difficulty_level = difficulty_level
+            module.is_active = is_active
+            module.prerequisites = prerequisites
+            module.passing_score_percentage = float(passing_score_percentage)
+            module.max_attempts = int(max_attempts) if max_attempts else None
+            module.requires_completion = requires_completion
+            module.resources = resources
+            module.tags = tags
+            module.save()
+            
+            messages.success(request, f'Module "{module.title}" updated successfully.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error updating module: {str(e)}')
+    
     return render(request, 'custom_admin/modules/form.html', {
         'module': module,
         'title': 'Edit Module',
-        'is_edit': True
+        'is_edit': True,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
@@ -519,19 +730,23 @@ def video_lessons_list_view(request):
 @user_passes_test(is_staff_user)
 def video_lesson_create_view(request):
     """Create a new video lesson"""
+    courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/video_lessons/form.html', {
         'title': 'Add Video Lesson',
-        'is_edit': False
+        'is_edit': False,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
 def video_lesson_edit_view(request, lesson_id):
     """Edit a video lesson"""
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
+    courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/video_lessons/form.html', {
         'lesson': lesson,
         'title': 'Edit Video Lesson',
-        'is_edit': True
+        'is_edit': True,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
@@ -714,7 +929,10 @@ def installment_plans_list_view(request):
     
     # Add completed payments count to each plan
     for plan in plans:
-        plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+        if plan.enrollment:
+            plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+        else:
+            plan.completed_payments_count = 0
     
     paginator = Paginator(plans, 25)
     page_number = request.GET.get('page')
@@ -813,20 +1031,190 @@ def installment_plan_delete_view(request, plan_id):
 @user_passes_test(is_staff_user)
 def payment_create_view(request):
     """Create payment"""
-    return render(request, 'custom_admin/payments/form.html', {
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            enrollment_id = request.POST.get('enrollment')
+            installment_number = request.POST.get('installment_number')
+            amount = request.POST.get('amount')
+            tax_amount = request.POST.get('tax_amount')
+            payment_method = request.POST.get('payment_method')
+            status = request.POST.get('status')
+            transaction_id = request.POST.get('transaction_id')
+            invoice_number = request.POST.get('invoice_number')
+            payment_date = request.POST.get('payment_date')
+            due_date = request.POST.get('due_date')
+            notes = request.POST.get('notes')
+            
+            # Validate required fields
+            if not all([enrollment_id, installment_number, amount, tax_amount, payment_method, status, due_date]):
+                messages.error(request, 'Please fill in all required fields.')
+                return redirect('custom_admin:payment_create')
+            
+            # Get enrollment
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+            
+            # Check if payment with this installment number already exists
+            if Payment.objects.filter(enrollment=enrollment, installment_number=installment_number).exists():
+                messages.error(request, f'Payment with installment number {installment_number} already exists for this enrollment.')
+                return redirect('custom_admin:payment_create')
+            
+            # Create payment
+            payment = Payment.objects.create(
+                enrollment=enrollment,
+                installment_number=int(installment_number),
+                amount=float(amount),
+                tax_amount=float(tax_amount),
+                payment_method=payment_method,
+                status=status,
+                transaction_id=transaction_id if transaction_id else None,
+                invoice_number=invoice_number if invoice_number else None,
+                payment_date=payment_date if payment_date else None,
+                due_date=due_date,
+                notes=notes if notes else None
+            )
+            
+            # Auto-generate tax invoice if requested and payment is completed with tax amount
+            generate_tax_invoice = request.POST.get('generate_tax_invoice') == 'on'
+            if generate_tax_invoice and status == 'completed' and float(tax_amount) > 0:
+                from datetime import datetime
+                auto_invoice_number = f"INV-{enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+                
+                TaxInvoice.objects.create(
+                    enrollment=enrollment,
+                    payment=payment,
+                    invoice_number=auto_invoice_number,
+                    subtotal=float(amount),
+                    tax_rate=18.0,  # 18% GST
+                    tax_amount=float(tax_amount),
+                    total_amount=float(amount) + float(tax_amount)
+                )
+            
+            # Update enrollment payment status
+            enrollment.payment_status = 'partial' if enrollment.outstanding_amount > 0 else 'completed'
+            enrollment.save()
+            
+            success_message = f'Payment created successfully for {enrollment.user.name}.'
+            if generate_tax_invoice and status == 'completed' and float(tax_amount) > 0:
+                success_message += ' Tax invoice generated automatically.'
+            messages.success(request, success_message)
+            return redirect('custom_admin:payments_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating payment: {str(e)}')
+    
+    # Get all enrollments with outstanding amounts for dropdown
+    enrollments = Enrollment.objects.select_related('user', 'course').filter(
+        payment_status__in=['pending', 'partial']
+    ).order_by('user__name')
+    
+    context = {
         'title': 'Add Payment',
-        'is_edit': False
-    })
+        'is_edit': False,
+        'enrollments': enrollments,
+    }
+    return render(request, 'custom_admin/payments/form.html', context)
 
 @user_passes_test(is_staff_user)
 def payment_edit_view(request, payment_id):
     """Edit payment"""
     payment = get_object_or_404(Payment, id=payment_id)
-    return render(request, 'custom_admin/payments/form.html', {
+    
+    if request.method == 'POST':
+        try:
+            # Get form data (enrollment cannot be changed when editing)
+            installment_number = request.POST.get('installment_number')
+            amount = request.POST.get('amount')
+            tax_amount = request.POST.get('tax_amount')
+            payment_method = request.POST.get('payment_method')
+            status = request.POST.get('status')
+            transaction_id = request.POST.get('transaction_id')
+            invoice_number = request.POST.get('invoice_number')
+            payment_date = request.POST.get('payment_date')
+            due_date = request.POST.get('due_date')
+            notes = request.POST.get('notes')
+            
+            # Validate required fields
+            if not all([installment_number, amount, tax_amount, payment_method, status, due_date]):
+                messages.error(request, 'Please fill in all required fields.')
+                return redirect('custom_admin:payment_edit', payment_id=payment_id)
+            
+            # Check if installment number conflict (exclude current payment)
+            existing_payment = Payment.objects.filter(
+                enrollment=payment.enrollment, 
+                installment_number=installment_number
+            ).exclude(id=payment_id).first()
+            
+            if existing_payment:
+                messages.error(request, f'Payment with installment number {installment_number} already exists for this enrollment.')
+                return redirect('custom_admin:payment_edit', payment_id=payment_id)
+            
+            # Store old status to check if it changed
+            old_status = payment.status
+            
+            # Update payment
+            payment.installment_number = int(installment_number)
+            payment.amount = float(amount)
+            payment.tax_amount = float(tax_amount)
+            payment.payment_method = payment_method
+            payment.status = status
+            payment.transaction_id = transaction_id if transaction_id else None
+            payment.invoice_number = invoice_number if invoice_number else None
+            payment.payment_date = payment_date if payment_date else None
+            payment.due_date = due_date
+            payment.notes = notes if notes else None
+            payment.save()
+            
+            # Auto-generate tax invoice if requested and status changed to completed with tax amount
+            generate_tax_invoice = request.POST.get('generate_tax_invoice') == 'on'
+            should_generate_invoice = (
+                generate_tax_invoice and 
+                old_status != 'completed' and 
+                status == 'completed' and 
+                float(tax_amount) > 0
+            )
+            
+            if should_generate_invoice:
+                # Check if tax invoice already exists for this payment
+                if not TaxInvoice.objects.filter(payment=payment).exists():
+                    from datetime import datetime
+                    auto_invoice_number = f"INV-{payment.enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+                    
+                    TaxInvoice.objects.create(
+                        enrollment=payment.enrollment,
+                        payment=payment,
+                        invoice_number=auto_invoice_number,
+                        subtotal=float(amount),
+                        tax_rate=18.0,  # 18% GST
+                        tax_amount=float(tax_amount),
+                        total_amount=float(amount) + float(tax_amount)
+                    )
+            
+            # Update enrollment payment status
+            enrollment = payment.enrollment
+            enrollment.payment_status = 'partial' if enrollment.outstanding_amount > 0 else 'completed'
+            enrollment.save()
+            
+            success_message = f'Payment updated successfully for {payment.enrollment.user.name}.'
+            if should_generate_invoice:
+                success_message += ' Tax invoice generated automatically.'
+            messages.success(request, success_message)
+            return redirect('custom_admin:payments_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error updating payment: {str(e)}')
+    
+    # Get all enrollments for context (though enrollment cannot be changed)
+    enrollments = Enrollment.objects.select_related('user', 'course').order_by('user__name')
+    
+    context = {
         'payment': payment,
         'title': 'Edit Payment',
-        'is_edit': True
-    })
+        'is_edit': True,
+        'enrollments': enrollments,
+    }
+    return render(request, 'custom_admin/payments/form.html', context)
 
 @user_passes_test(is_staff_user)
 def payment_delete_view(request, payment_id):
@@ -864,10 +1252,68 @@ def tax_invoices_list_view(request):
 @user_passes_test(is_staff_user)
 def tax_invoice_create_view(request):
     """Create tax invoice"""
-    return render(request, 'custom_admin/tax_invoices/form.html', {
-        'title': 'Add Tax Invoice',
-        'is_edit': False
-    })
+    from datetime import date
+    
+    if request.method == 'POST':
+        try:
+            enrollment_id = request.POST.get('enrollment')
+            payment_id = request.POST.get('payment')
+            invoice_number = request.POST.get('invoice_number')
+            invoice_date = request.POST.get('invoice_date')
+            subtotal = request.POST.get('subtotal')
+            tax_rate = request.POST.get('tax_rate')
+            tax_amount = request.POST.get('tax_amount')
+            total_amount = request.POST.get('total_amount')
+            
+            # Validate required fields
+            if not all([enrollment_id, invoice_number, invoice_date, subtotal, tax_rate, tax_amount, total_amount]):
+                messages.error(request, 'Please fill in all required fields.')
+                return redirect('custom_admin:tax_invoice_create')
+            
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+            payment = get_object_or_404(Payment, id=payment_id) if payment_id else None
+            
+            # Check if invoice number already exists
+            if TaxInvoice.objects.filter(invoice_number=invoice_number).exists():
+                messages.error(request, f'Invoice number {invoice_number} already exists.')
+                return redirect('custom_admin:tax_invoice_create')
+            
+            # Create tax invoice
+            TaxInvoice.objects.create(
+                enrollment=enrollment,
+                payment=payment,
+                invoice_number=invoice_number,
+                invoice_date=invoice_date,
+                subtotal=float(subtotal),
+                tax_rate=float(tax_rate),
+                tax_amount=float(tax_amount),
+                total_amount=float(total_amount)
+            )
+            
+            messages.success(request, f'Tax invoice {invoice_number} created successfully.')
+            return redirect('custom_admin:tax_invoices_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating tax invoice: {str(e)}')
+    
+    # Get context data
+    enrollments = Enrollment.objects.select_related('user', 'course').order_by('user__name')
+    payments = Payment.objects.select_related('enrollment__user').filter(status='completed').order_by('-payment_date')
+    
+    # Generate suggested invoice number
+    from datetime import datetime
+    suggested_number = f"{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    
+    context = {
+        'title': 'Generate Tax Invoice',
+        'is_edit': False,
+        'enrollments': enrollments,
+        'payments': payments,
+        'suggested_invoice_number': suggested_number,
+        'today': date.today().strftime('%Y-%m-%d')
+    }
+    
+    return render(request, 'custom_admin/tax_invoices/form.html', context)
 
 @user_passes_test(is_staff_user)
 def tax_invoice_edit_view(request, invoice_id):
@@ -1299,19 +1745,23 @@ def assignment_detail_view(request, assignment_id):
 @user_passes_test(is_staff_user)
 def assignment_create_view(request):
     """Create assignment"""
+    courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/assignments/form.html', {
         'title': 'Add Assignment',
-        'is_edit': False
+        'is_edit': False,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
 def assignment_edit_view(request, assignment_id):
     """Edit assignment"""
     assignment = get_object_or_404(Assignment, id=assignment_id)
+    courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/assignments/form.html', {
         'assignment': assignment,
         'title': 'Edit Assignment',
-        'is_edit': True
+        'is_edit': True,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
@@ -1434,19 +1884,117 @@ def quiz_detail_view(request, quiz_id):
 @user_passes_test(is_staff_user)
 def quiz_create_view(request):
     """Create quiz"""
+    courses = Course.objects.prefetch_related('modules').all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            module_id = request.POST.get('module')
+            time_limit = request.POST.get('time_limit')
+            max_attempts = request.POST.get('max_attempts')
+            passing_score = request.POST.get('passing_score', 70)
+            is_required = request.POST.get('is_required') == 'on'
+            show_results_immediately = request.POST.get('show_results_immediately') == 'on'
+            randomize_questions = request.POST.get('randomize_questions') == 'on'
+            order = request.POST.get('order', 1)
+            
+            # Validate required fields
+            if not all([title, description, module_id]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/quizzes/form.html', {
+                    'title': 'Add Quiz',
+                    'is_edit': False,
+                    'courses': courses
+                })
+            
+            # Get module
+            module = get_object_or_404(Module, id=module_id)
+            
+            # Create quiz
+            quiz = Quiz.objects.create(
+                title=title,
+                description=description,
+                module=module,
+                time_limit=int(time_limit) if time_limit else 30,
+                max_attempts=int(max_attempts) if max_attempts else 3,
+                passing_score=int(passing_score),
+                is_required=is_required,
+                show_results_immediately=show_results_immediately,
+                randomize_questions=randomize_questions,
+                order=int(order)
+            )
+            
+            messages.success(request, f'Quiz "{quiz.title}" created successfully.')
+            return redirect('custom_admin:quiz_detail', quiz_id=quiz.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error creating quiz: {str(e)}')
+    
     return render(request, 'custom_admin/quizzes/form.html', {
         'title': 'Add Quiz',
-        'is_edit': False
+        'is_edit': False,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)
 def quiz_edit_view(request, quiz_id):
     """Edit quiz"""
     quiz = get_object_or_404(Quiz, id=quiz_id)
+    courses = Course.objects.prefetch_related('modules').all()
+    
+    if request.method == 'POST':
+        try:
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            module_id = request.POST.get('module')
+            time_limit = request.POST.get('time_limit')
+            max_attempts = request.POST.get('max_attempts')
+            passing_score = request.POST.get('passing_score', 70)
+            is_required = request.POST.get('is_required') == 'on'
+            show_results_immediately = request.POST.get('show_results_immediately') == 'on'
+            randomize_questions = request.POST.get('randomize_questions') == 'on'
+            order = request.POST.get('order', 1)
+            
+            # Validate required fields
+            if not all([title, description, module_id]):
+                messages.error(request, 'Please fill in all required fields.')
+                return render(request, 'custom_admin/quizzes/form.html', {
+                    'quiz': quiz,
+                    'title': 'Edit Quiz',
+                    'is_edit': True,
+                    'courses': courses
+                })
+            
+            # Get module
+            module = get_object_or_404(Module, id=module_id)
+            
+            # Update quiz fields
+            quiz.title = title
+            quiz.description = description
+            quiz.module = module
+            quiz.time_limit = int(time_limit) if time_limit else 30
+            quiz.max_attempts = int(max_attempts) if max_attempts else 3
+            quiz.passing_score = int(passing_score)
+            quiz.is_required = is_required
+            quiz.show_results_immediately = show_results_immediately
+            quiz.randomize_questions = randomize_questions
+            quiz.order = int(order)
+            quiz.save()
+            
+            messages.success(request, f'Quiz "{quiz.title}" updated successfully.')
+            return redirect('custom_admin:quiz_detail', quiz_id=quiz.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error updating quiz: {str(e)}')
+    
     return render(request, 'custom_admin/quizzes/form.html', {
         'quiz': quiz,
         'title': 'Edit Quiz',
-        'is_edit': True
+        'is_edit': True,
+        'courses': courses
     })
 
 @user_passes_test(is_staff_user)

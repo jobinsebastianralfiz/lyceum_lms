@@ -6375,3 +6375,1592 @@ INFO 2025-08-06 10:22:30,196 basehttp 17510 6204616704 "GET /admin/quizzes/ HTTP
 INFO 2025-08-06 10:22:31,284 basehttp 17510 6204616704 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
 INFO 2025-08-06 10:22:31,781 basehttp 17510 6204616704 "GET /admin/module-progress/ HTTP/1.1" 200 23491
 INFO 2025-08-06 10:22:35,127 basehttp 17510 6204616704 "GET /admin/ HTTP/1.1" 200 33127
+INFO 2025-08-06 10:55:15,964 autoreload 24103 8499945216 Watching for file changes with StatReloader
+WARNING 2025-08-06 10:55:16,964 log 24103 6155595776 Not Found: /
+WARNING 2025-08-06 10:55:16,964 basehttp 24103 6155595776 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-06 10:55:17,023 log 24103 6206074880 Not Found: /favicon.ico
+WARNING 2025-08-06 10:55:17,024 log 24103 6172422144 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-06 10:55:17,024 log 24103 6189248512 Not Found: /apple-touch-icon.png
+WARNING 2025-08-06 10:55:17,024 basehttp 24103 6206074880 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-06 10:55:17,025 basehttp 24103 6172422144 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-06 10:55:17,025 basehttp 24103 6189248512 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+INFO 2025-08-06 10:55:20,776 basehttp 24103 6155595776 "GET /admin/users/ HTTP/1.1" 302 0
+WARNING 2025-08-06 10:55:20,785 log 24103 6155595776 Not Found: /accounts/login/
+WARNING 2025-08-06 10:55:20,785 basehttp 24103 6155595776 "GET /accounts/login/?next=/admin/users/ HTTP/1.1" 404 3457
+INFO 2025-08-06 10:55:28,467 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-06 10:55:28,479 log 24103 6155595776 Not Found: /accounts/login/
+WARNING 2025-08-06 10:55:28,479 basehttp 24103 6155595776 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-06 10:55:34,197 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-06 10:55:34,207 log 24103 6155595776 Not Found: /accounts/login/
+WARNING 2025-08-06 10:55:34,208 basehttp 24103 6155595776 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-06 10:55:35,858 basehttp 24103 6155595776 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3495
+INFO 2025-08-06 10:55:36,287 basehttp 24103 6155595776 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 10:55:51,419 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 200 3495
+WARNING 2025-08-06 10:56:09,341 log 24103 6155595776 Not Found: /
+WARNING 2025-08-06 10:56:09,342 basehttp 24103 6155595776 "GET / HTTP/1.1" 404 3375
+INFO 2025-08-06 10:56:10,398 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-06 10:56:10,404 log 24103 6155595776 Not Found: /accounts/login/
+WARNING 2025-08-06 10:56:10,405 basehttp 24103 6155595776 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-06 10:56:14,322 basehttp 24103 6155595776 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 11:01:05,970 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 11:01:19,915 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 11:02:58,548 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 11:03:06,723 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-06 11:03:14,598 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-06 11:03:14,617 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 200 33127
+WARNING 2025-08-06 11:44:01,574 log 24103 6155595776 Not Found: /dashboard/
+WARNING 2025-08-06 11:44:01,575 basehttp 24103 6155595776 "GET /dashboard/ HTTP/1.1" 404 3423
+WARNING 2025-08-06 11:44:01,612 log 24103 6172422144 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-06 11:44:01,613 log 24103 6189248512 Not Found: /apple-touch-icon.png
+WARNING 2025-08-06 11:44:01,613 log 24103 6206074880 Not Found: /favicon.ico
+WARNING 2025-08-06 11:44:01,614 basehttp 24103 6189248512 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-06 11:44:01,614 basehttp 24103 6172422144 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-06 11:44:01,614 basehttp 24103 6206074880 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-06 11:44:02,449 log 24103 6155595776 Not Found: /
+WARNING 2025-08-06 11:44:02,449 basehttp 24103 6155595776 "GET / HTTP/1.1" 404 3375
+INFO 2025-08-06 11:44:02,767 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 200 33127
+INFO 2025-08-06 11:44:03,602 basehttp 24103 6155595776 "GET /api/docs/ HTTP/1.1" 200 4650
+INFO 2025-08-06 11:44:03,770 basehttp 24103 6155595776 "GET /api/schema/ HTTP/1.1" 200 131720
+WARNING 2025-08-06 11:44:40,977 log 24103 6155595776 Forbidden (CSRF token from POST incorrect.): /admin/login/
+WARNING 2025-08-06 11:44:40,978 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 403 2518
+WARNING 2025-08-06 11:44:48,684 log 24103 6155595776 Forbidden (CSRF token from POST incorrect.): /admin/login/
+WARNING 2025-08-06 11:44:48,685 basehttp 24103 6155595776 "POST /admin/login/ HTTP/1.1" 403 2518
+INFO 2025-08-06 11:44:52,200 basehttp 24103 6155595776 "GET /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-06 11:44:52,220 basehttp 24103 6155595776 "GET /admin/ HTTP/1.1" 200 33127
+INFO 2025-08-06 11:44:56,673 basehttp 24103 6155595776 "GET /admin/users/ HTTP/1.1" 200 40950
+INFO 2025-08-06 14:25:25,798 basehttp 24103 6155595776 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:25:27,644 basehttp 24103 6155595776 "GET /admin/courses/add/ HTTP/1.1" 200 27568
+INFO 2025-08-06 14:25:30,243 basehttp 24103 6155595776 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:25:31,462 basehttp 24103 6155595776 "GET /admin/modules/add/ HTTP/1.1" 200 27154
+INFO 2025-08-06 14:25:33,911 basehttp 24103 6155595776 "GET /admin/student-progress/ HTTP/1.1" 302 0
+INFO 2025-08-06 14:25:33,927 basehttp 24103 6155595776 "GET /admin/enrollments/ HTTP/1.1" 200 21035
+INFO 2025-08-06 14:25:35,615 basehttp 24103 6155595776 "GET /admin/enrollments/add/ HTTP/1.1" 200 32162
+ERROR 2025-08-06 14:25:37,870 log 24103 6155595776 Internal Server Error: /admin/video-lessons/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 517, in video_lessons_list_view
+    return render(request, 'custom_admin/video_lessons/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/video_lessons/list.html
+ERROR 2025-08-06 14:25:37,873 basehttp 24103 6155595776 "GET /admin/video-lessons/ HTTP/1.1" 500 95234
+INFO 2025-08-06 14:37:58,561 basehttp 24103 6172422144 "GET /admin/video-lessons/ HTTP/1.1" 200 24587
+INFO 2025-08-06 14:38:03,521 basehttp 24103 6172422144 "GET /admin/assignments/ HTTP/1.1" 200 19580
+INFO 2025-08-06 14:38:04,870 basehttp 24103 6172422144 "GET /admin/assignments/add/ HTTP/1.1" 200 24052
+INFO 2025-08-06 14:38:07,352 basehttp 24103 6172422144 "GET /admin/assignment-submissions/ HTTP/1.1" 200 21225
+INFO 2025-08-06 14:38:08,787 basehttp 24103 6172422144 "GET /admin/quizzes/ HTTP/1.1" 200 19563
+INFO 2025-08-06 14:38:10,324 basehttp 24103 6172422144 "GET /admin/quizzes/add/ HTTP/1.1" 200 28977
+INFO 2025-08-06 14:38:15,404 basehttp 24103 6172422144 "GET /admin/quizzes/ HTTP/1.1" 200 19563
+INFO 2025-08-06 14:41:07,090 basehttp 24103 6172422144 "GET /admin/quizzes/add/ HTTP/1.1" 200 28977
+INFO 2025-08-06 14:41:16,655 basehttp 24103 6172422144 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:41:20,124 basehttp 24103 6172422144 "GET /admin/quizzes/ HTTP/1.1" 200 19563
+INFO 2025-08-06 14:41:21,251 basehttp 24103 6172422144 "GET /admin/quizzes/add/ HTTP/1.1" 200 28977
+INFO 2025-08-06 14:41:35,051 basehttp 24103 6172422144 "GET /admin/modules/ HTTP/1.1" 200 22426
+ERROR 2025-08-06 14:41:37,948 log 24103 6172422144 Internal Server Error: /admin/modules/1/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 437, in module_detail_view
+    completions_count = progress_records.filter(status='completed').count()
+                        ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1546, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1577, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<6 lines>...
+        summarize=summarize,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1427, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1237, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1725, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'status' into field. Choices are: assignments_completed, completed_at, completion_percentage, created_at, id, is_completed, is_unlocked, module, module_id, quizzes_passed, started_at, student, student_id, updated_at, videos_completed
+ERROR 2025-08-06 14:41:37,950 basehttp 24103 6172422144 "GET /admin/modules/1/ HTTP/1.1" 500 118287
+INFO 2025-08-06 14:42:15,260 autoreload 24103 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:42:15,679 autoreload 44775 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:42:59,125 autoreload 44775 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-06 14:42:59,391 autoreload 45184 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:43:58,360 basehttp 45184 6192263168 "GET /admin/modules/1/ HTTP/1.1" 200 27552
+INFO 2025-08-06 14:44:08,415 basehttp 45184 6192263168 "GET /admin/modules/1/edit/ HTTP/1.1" 200 28810
+INFO 2025-08-06 14:44:12,884 basehttp 45184 6192263168 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:44:16,999 basehttp 45184 6192263168 "GET /admin/modules/1/ HTTP/1.1" 200 27552
+INFO 2025-08-06 14:44:24,512 basehttp 45184 6192263168 "GET /admin/modules/1/edit/ HTTP/1.1" 200 28810
+INFO 2025-08-06 14:45:01,229 basehttp 45184 6192263168 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:45:07,309 basehttp 45184 6192263168 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:45:09,578 basehttp 45184 6192263168 "GET /admin/modules/1/ HTTP/1.1" 200 27552
+INFO 2025-08-06 14:45:11,087 basehttp 45184 6192263168 "GET /admin/modules/1/edit/ HTTP/1.1" 200 28810
+INFO 2025-08-06 14:45:41,730 autoreload 45184 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:45:42,173 autoreload 45665 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:45:47,559 autoreload 45665 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:45:47,856 autoreload 45733 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:08,567 autoreload 45733 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:09,007 autoreload 45927 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:14,338 autoreload 45927 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:14,594 autoreload 45971 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:28,161 autoreload 45971 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:28,419 autoreload 46105 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:31,594 basehttp 46105 6133198848 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 14:46:32,896 basehttp 46105 6133198848 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:46:34,767 autoreload 46105 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:34,988 autoreload 46160 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:48,516 autoreload 46160 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:48,772 autoreload 46302 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:46:54,079 autoreload 46302 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:46:54,350 autoreload 46342 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:47:22,871 basehttp 46342 6126874624 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:47:24,945 basehttp 46342 6126874624 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:47:27,088 basehttp 46342 6126874624 "GET /admin/modules/1/ HTTP/1.1" 200 27552
+INFO 2025-08-06 14:47:28,631 basehttp 46342 6126874624 "GET /admin/modules/1/edit/ HTTP/1.1" 200 29680
+INFO 2025-08-06 14:47:49,433 basehttp 46342 6126874624 "POST /admin/modules/1/edit/ HTTP/1.1" 200 29680
+INFO 2025-08-06 14:48:19,167 basehttp 46342 6126874624 "GET /admin/modules/ HTTP/1.1" 200 22426
+INFO 2025-08-06 14:48:22,188 basehttp 46342 6126874624 "GET /admin/modules/1/ HTTP/1.1" 200 27552
+INFO 2025-08-06 14:48:24,292 autoreload 46342 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:48:24,692 autoreload 46708 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:48:28,673 basehttp 46708 6126612480 "GET /admin/modules/1/edit/ HTTP/1.1" 200 29680
+INFO 2025-08-06 14:48:35,204 autoreload 46708 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:48:35,471 autoreload 46775 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:49:02,430 autoreload 46775 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-06 14:49:02,655 autoreload 46952 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:49:19,276 autoreload 46952 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-06 14:49:19,690 autoreload 47123 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:50:35,676 basehttp 47123 6128545792 "GET /admin/modules/1/edit/ HTTP/1.1" 200 29737
+INFO 2025-08-06 14:50:47,823 basehttp 47123 6128545792 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:50:50,725 basehttp 47123 6128545792 "GET /admin/courses/1/edit/ HTTP/1.1" 200 27630
+INFO 2025-08-06 14:51:00,902 basehttp 47123 6128545792 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:51:10,667 basehttp 47123 6128545792 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 14:51:11,838 basehttp 47123 6128545792 "GET /admin/categories/add/ HTTP/1.1" 200 19753
+INFO 2025-08-06 14:51:14,235 basehttp 47123 6128545792 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:51:48,169 basehttp 47123 6128545792 "GET /admin/courses/1/edit/ HTTP/1.1" 200 27630
+INFO 2025-08-06 14:52:26,710 autoreload 47123 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:52:27,209 autoreload 47782 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:52:33,572 autoreload 47782 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:52:33,808 autoreload 47833 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:53:07,991 basehttp 47833 6196948992 "GET /admin/courses/1/edit/ HTTP/1.1" 200 28253
+INFO 2025-08-06 14:53:25,380 basehttp 47833 6196948992 "POST /admin/courses/1/edit/ HTTP/1.1" 200 28253
+INFO 2025-08-06 14:53:31,554 basehttp 47833 6196948992 "POST /admin/courses/1/edit/ HTTP/1.1" 200 28253
+INFO 2025-08-06 14:54:02,613 autoreload 47833 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:54:03,071 autoreload 48259 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:54:12,535 autoreload 48259 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 14:54:12,785 autoreload 48324 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 14:55:59,518 basehttp 48324 6156464128 "POST /admin/courses/1/edit/ HTTP/1.1" 302 0
+INFO 2025-08-06 14:56:00,758 basehttp 48324 6156464128 "GET /admin/courses/1/ HTTP/1.1" 200 20957
+INFO 2025-08-06 14:56:05,353 basehttp 48324 6156464128 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:56:06,764 basehttp 48324 6156464128 "GET /admin/courses/1/edit/ HTTP/1.1" 200 24752
+INFO 2025-08-06 14:56:33,172 basehttp 48324 6156464128 "POST /admin/courses/1/edit/ HTTP/1.1" 302 0
+INFO 2025-08-06 14:56:33,187 basehttp 48324 6156464128 "GET /admin/courses/1/ HTTP/1.1" 200 20957
+INFO 2025-08-06 14:56:36,267 basehttp 48324 6156464128 "GET /django-admin/courses/course/1/change/ HTTP/1.1" 200 31976
+INFO 2025-08-06 14:56:36,269 basehttp 48324 6156464128 "GET /static/admin/img/icon-no.svg HTTP/1.1" 304 0
+INFO 2025-08-06 14:56:36,276 basehttp 48324 6156464128 "GET /django-admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-08-06 14:56:36,297 basehttp 48324 6156464128 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+INFO 2025-08-06 14:56:43,179 basehttp 48324 6156464128 "GET /django-admin/courses/course/1/change/ HTTP/1.1" 200 31681
+INFO 2025-08-06 14:56:43,185 basehttp 48324 6156464128 "GET /django-admin/jsi18n/ HTTP/1.1" 200 3343
+INFO 2025-08-06 14:56:51,435 basehttp 48324 6156464128 "GET /admin/courses/ HTTP/1.1" 200 29682
+INFO 2025-08-06 14:56:53,472 basehttp 48324 6156464128 "GET /admin/courses/1/ HTTP/1.1" 200 20957
+INFO 2025-08-06 14:58:30,455 basehttp 48324 6173290496 "GET /admin/courses/1/ HTTP/1.1" 200 20925
+INFO 2025-08-06 14:58:32,469 basehttp 48324 6173290496 "GET /admin/courses/1/edit/ HTTP/1.1" 200 24759
+INFO 2025-08-06 14:58:41,226 basehttp 48324 6173290496 "POST /admin/courses/1/edit/ HTTP/1.1" 302 0
+INFO 2025-08-06 14:58:41,236 basehttp 48324 6173290496 "GET /admin/courses/1/ HTTP/1.1" 200 20925
+INFO 2025-08-06 15:00:09,107 basehttp 48324 6173290496 "GET /admin/courses/1/ HTTP/1.1" 200 20932
+INFO 2025-08-06 15:00:11,474 basehttp 48324 6173290496 "GET /admin/courses/1/edit/ HTTP/1.1" 200 24759
+INFO 2025-08-06 15:00:16,036 basehttp 48324 6173290496 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 15:00:17,410 basehttp 48324 6173290496 "GET /admin/courses/ HTTP/1.1" 200 29691
+INFO 2025-08-06 15:00:18,709 basehttp 48324 6173290496 "GET /admin/courses/1/edit/ HTTP/1.1" 200 24759
+INFO 2025-08-06 15:00:21,132 basehttp 48324 6173290496 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-06 15:00:26,405 basehttp 48324 6173290496 "GET /admin/modules/1/ HTTP/1.1" 200 27572
+INFO 2025-08-06 15:00:35,122 basehttp 48324 6173290496 "GET /admin/modules/1/edit/ HTTP/1.1" 200 29737
+INFO 2025-08-06 15:01:10,019 basehttp 48324 6173290496 "POST /admin/modules/1/edit/ HTTP/1.1" 302 0
+INFO 2025-08-06 15:01:10,034 basehttp 48324 6173290496 "GET /admin/modules/1/ HTTP/1.1" 200 27572
+INFO 2025-08-06 15:01:21,482 basehttp 48324 6173290496 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-06 15:01:23,357 basehttp 48324 6173290496 "GET /admin/student-progress/ HTTP/1.1" 302 0
+INFO 2025-08-06 15:01:23,374 basehttp 48324 6173290496 "GET /admin/enrollments/ HTTP/1.1" 200 21035
+INFO 2025-08-06 15:01:25,820 basehttp 48324 6173290496 "GET /admin/video-lessons/ HTTP/1.1" 200 24587
+INFO 2025-08-06 15:01:29,001 basehttp 48324 6173290496 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-06 15:01:31,127 basehttp 48324 6173290496 "GET /admin/modules/add/ HTTP/1.1" 200 28016
+INFO 2025-08-06 15:01:33,559 basehttp 48324 6173290496 "GET /admin/ HTTP/1.1" 200 33127
+INFO 2025-08-06 15:01:35,724 basehttp 48324 6173290496 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 15:01:38,109 basehttp 48324 6173290496 "GET /admin/courses/ HTTP/1.1" 200 29691
+INFO 2025-08-06 15:01:48,112 basehttp 48324 6173290496 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-06 15:01:50,372 basehttp 48324 6173290496 "GET /admin/quizzes/ HTTP/1.1" 200 19563
+INFO 2025-08-06 15:01:51,652 basehttp 48324 6173290496 "GET /admin/quizzes/add/ HTTP/1.1" 200 29751
+INFO 2025-08-06 15:02:41,780 basehttp 48324 6156464128 "POST /admin/quizzes/add/ HTTP/1.1" 200 29751
+INFO 2025-08-06 15:03:28,077 autoreload 48324 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 15:03:28,558 autoreload 51105 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 15:03:38,005 autoreload 51105 8499945216 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-06 15:03:38,451 autoreload 51169 8499945216 Watching for file changes with StatReloader
+INFO 2025-08-06 15:09:52,067 basehttp 51169 6197587968 "POST /admin/quizzes/add/ HTTP/1.1" 302 0
+INFO 2025-08-06 15:09:52,098 basehttp 51169 6197587968 "GET /admin/quizzes/1/ HTTP/1.1" 200 23556
+INFO 2025-08-06 15:09:56,344 basehttp 51169 6197587968 "GET /admin/quizzes/1/edit/ HTTP/1.1" 200 29719
+INFO 2025-08-06 15:10:09,173 basehttp 51169 6197587968 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 15:10:10,086 basehttp 51169 6197587968 "GET /admin/courses/ HTTP/1.1" 200 29691
+INFO 2025-08-06 15:10:11,584 basehttp 51169 6197587968 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-06 15:10:12,751 basehttp 51169 6197587968 "GET /admin/student-progress/ HTTP/1.1" 302 0
+INFO 2025-08-06 15:10:12,763 basehttp 51169 6197587968 "GET /admin/enrollments/ HTTP/1.1" 200 21035
+INFO 2025-08-06 15:10:13,896 basehttp 51169 6197587968 "GET /admin/video-lessons/ HTTP/1.1" 200 24587
+INFO 2025-08-06 15:10:15,726 basehttp 51169 6197587968 "GET /admin/assignments/ HTTP/1.1" 200 19580
+INFO 2025-08-06 15:10:16,403 basehttp 51169 6197587968 "GET /admin/assignment-submissions/ HTTP/1.1" 200 21225
+INFO 2025-08-06 15:10:17,342 basehttp 51169 6197587968 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-06 15:10:17,931 basehttp 51169 6197587968 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-06 15:10:18,803 basehttp 51169 6197587968 "GET /admin/module-progress/ HTTP/1.1" 200 23491
+ERROR 2025-08-06 15:10:24,226 log 51169 6197587968 Internal Server Error: /admin/email-templates/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 771, in email_templates_list_view
+    return render(request, 'custom_admin/email_templates/list.html', {
+        'page_obj': None,
+        'search_query': ''
+    })
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/email_templates/list.html
+ERROR 2025-08-06 15:10:24,227 basehttp 51169 6197587968 "GET /admin/email-templates/ HTTP/1.1" 500 94223
+ERROR 2025-08-06 15:10:28,065 log 51169 6197587968 Internal Server Error: /admin/notifications/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 818, in notifications_list_view
+    return render(request, 'custom_admin/notifications/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/notifications/list.html
+ERROR 2025-08-06 15:10:28,066 basehttp 51169 6197587968 "GET /admin/notifications/ HTTP/1.1" 500 95426
+INFO 2025-08-06 15:10:33,750 basehttp 51169 6197587968 "GET /admin/enrollments/ HTTP/1.1" 200 21035
+INFO 2025-08-06 15:10:35,663 basehttp 51169 6197587968 "GET /admin/enrollments/add/ HTTP/1.1" 200 31671
+INFO 2025-08-06 15:10:40,611 basehttp 51169 6197587968 "GET /admin/enrollments/add/ HTTP/1.1" 200 30825
+INFO 2025-08-06 15:11:10,532 basehttp 51169 6214414336 "POST /admin/enrollments/add/ HTTP/1.1" 302 0
+INFO 2025-08-06 15:11:10,548 basehttp 51169 6214414336 "GET /admin/installment-plans/add/?enrollment=1 HTTP/1.1" 200 30016
+ERROR 2025-08-06 15:11:14,777 log 51169 6214414336 Internal Server Error: /admin/email-templates/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 771, in email_templates_list_view
+    return render(request, 'custom_admin/email_templates/list.html', {
+        'page_obj': None,
+        'search_query': ''
+    })
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/email_templates/list.html
+ERROR 2025-08-06 15:11:14,778 basehttp 51169 6214414336 "GET /admin/email-templates/ HTTP/1.1" 500 93891
+INFO 2025-08-06 15:11:17,761 basehttp 51169 6214414336 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+INFO 2025-08-06 15:11:34,076 basehttp 51169 6214414336 "GET /admin/installment-plans/ HTTP/1.1" 200 21138
+INFO 2025-08-06 15:11:35,918 basehttp 51169 6214414336 "GET /admin/installment-plans/add/ HTTP/1.1" 200 29655
+INFO 2025-08-06 15:11:40,767 basehttp 51169 6214414336 "GET /admin/installment-plans/ HTTP/1.1" 200 21138
+INFO 2025-08-06 15:19:19,669 basehttp 51169 6197587968 "GET /admin/installment-plans/ HTTP/1.1" 200 21138
+ERROR 2025-08-06 15:32:40,157 log 51169 6197587968 Internal Server Error: /admin/installment-plans/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 932, in installment_plans_list_view
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'payments'
+ERROR 2025-08-06 15:32:40,158 basehttp 51169 6197587968 "GET /admin/installment-plans/ HTTP/1.1" 500 77803
+INFO 2025-08-06 15:32:44,711 basehttp 51169 6197587968 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-06 15:32:51,434 basehttp 51169 6197587968 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+ERROR 2025-08-06 15:32:58,951 log 51169 6197587968 Internal Server Error: /admin/installment-plans/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 932, in installment_plans_list_view
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'payments'
+ERROR 2025-08-06 15:32:58,951 basehttp 51169 6197587968 "GET /admin/installment-plans/ HTTP/1.1" 500 77800
+INFO 2025-08-06 15:33:04,591 basehttp 51169 6197587968 "GET /admin/ HTTP/1.1" 200 33743
+INFO 2025-08-06 15:33:09,646 basehttp 51169 6197587968 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+INFO 2025-08-06 15:33:15,317 basehttp 51169 6197587968 "GET /admin/enrollments/1/edit/ HTTP/1.1" 200 33049
+INFO 2025-08-06 15:33:41,371 basehttp 51169 6197587968 "GET /admin/teams/ HTTP/1.1" 200 22306
+INFO 2025-08-06 15:33:57,592 basehttp 51169 6197587968 "GET /admin/teams/1/edit/ HTTP/1.1" 200 25116
+INFO 2025-08-06 15:53:36,906 basehttp 51169 6197587968 "GET /admin/ HTTP/1.1" 200 33743
+ERROR 2025-08-06 15:54:35,105 log 51169 6197587968 Internal Server Error: /admin/installment-plans/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 932, in installment_plans_list_view
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'payments'
+ERROR 2025-08-06 15:54:35,106 basehttp 51169 6197587968 "GET /admin/installment-plans/ HTTP/1.1" 500 77788
+INFO 2025-08-07 09:18:59,090 autoreload 1277 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 09:19:01,317 log 1277 6161756160 Not Found: /
+WARNING 2025-08-07 09:19:01,317 basehttp 1277 6161756160 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-07 09:19:01,393 log 1277 6178582528 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 09:19:01,394 log 1277 6195408896 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 09:19:01,394 log 1277 6161756160 Not Found: /favicon.ico
+WARNING 2025-08-07 09:19:01,394 log 1277 6212235264 Not Found: /favicon.ico
+WARNING 2025-08-07 09:19:01,395 basehttp 1277 6195408896 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-07 09:19:01,395 basehttp 1277 6178582528 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 09:19:01,395 basehttp 1277 6161756160 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 09:19:01,395 basehttp 1277 6212235264 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 09:19:04,152 log 1277 6161756160 Not Found: /
+WARNING 2025-08-07 09:19:04,152 basehttp 1277 6161756160 "GET / HTTP/1.1" 404 3375
+INFO 2025-08-07 09:19:04,710 basehttp 1277 6161756160 "GET /admin/ HTTP/1.1" 200 33743
+INFO 2025-08-07 09:19:04,720 basehttp 1277 6161756160 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,722 basehttp 1277 6229061632 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,722 basehttp 1277 6161756160 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,724 basehttp 1277 6245888000 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,725 basehttp 1277 6262714368 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,725 basehttp 1277 6279540736 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,725 basehttp 1277 6229061632 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,725 basehttp 1277 6296367104 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,734 basehttp 1277 6229061632 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,734 basehttp 1277 6161756160 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,761 basehttp 1277 6161756160 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.svg HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:04,845 basehttp 1277 6161756160 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 304 0
+INFO 2025-08-07 09:19:07,276 basehttp 1277 6161756160 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-07 09:19:07,296 basehttp 1277 6161756160 "GET /admin/ HTTP/1.1" 200 33743
+INFO 2025-08-07 09:19:11,749 basehttp 1277 6161756160 "GET /admin/assignment-submissions/ HTTP/1.1" 200 21225
+INFO 2025-08-07 09:19:13,200 basehttp 1277 6161756160 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-07 09:19:13,728 basehttp 1277 6161756160 "GET /admin/module-progress/ HTTP/1.1" 200 23491
+ERROR 2025-08-07 09:19:17,006 log 1277 6161756160 Internal Server Error: /admin/tax-invoices/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 1077, in tax_invoices_list_view
+    return render(request, 'custom_admin/tax_invoices/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/tax_invoices/list.html
+ERROR 2025-08-07 09:19:17,007 basehttp 1277 6161756160 "GET /admin/tax-invoices/ HTTP/1.1" 500 94482
+INFO 2025-08-07 09:19:19,591 basehttp 1277 6161756160 "GET /admin/payments/ HTTP/1.1" 200 19096
+ERROR 2025-08-07 09:19:26,177 log 1277 6161756160 Internal Server Error: /admin/installment-plans/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 932, in installment_plans_list_view
+    plan.completed_payments_count = plan.enrollment.payments.filter(status='completed').count()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'payments'
+ERROR 2025-08-07 09:19:26,178 basehttp 1277 6161756160 "GET /admin/installment-plans/ HTTP/1.1" 500 77252
+INFO 2025-08-07 09:25:34,195 autoreload 1277 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:25:34,458 autoreload 2982 8528633600 Watching for file changes with StatReloader
+ERROR 2025-08-07 09:26:37,455 log 2982 6133706752 Internal Server Error: /admin/installment-plans/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 946, in installment_plans_list_view
+    return render(request, 'custom_admin/installment_plans/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'enrollment_edit' with arguments '('',)' not found. 1 pattern(s) tried: ['admin/enrollments/(?P<enrollment_id>[0-9]+)/edit/\\Z']
+ERROR 2025-08-07 09:26:37,457 basehttp 2982 6133706752 "GET /admin/installment-plans/ HTTP/1.1" 500 186765
+INFO 2025-08-07 09:27:31,532 basehttp 2982 6133706752 "GET /admin/installment-plans/ HTTP/1.1" 200 38129
+INFO 2025-08-07 09:27:42,684 basehttp 2982 6133706752 "GET /admin/installment-plans/add/ HTTP/1.1" 200 29655
+INFO 2025-08-07 09:27:47,355 basehttp 2982 6133706752 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:29:37,308 basehttp 2982 6133706752 "GET /admin/payments/ HTTP/1.1" 200 19096
+ERROR 2025-08-07 09:29:41,015 log 2982 6133706752 Internal Server Error: /admin/tax-invoices/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 1080, in tax_invoices_list_view
+    return render(request, 'custom_admin/tax_invoices/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/tax_invoices/list.html
+ERROR 2025-08-07 09:29:41,016 basehttp 2982 6133706752 "GET /admin/tax-invoices/ HTTP/1.1" 500 94475
+INFO 2025-08-07 09:29:43,618 basehttp 2982 6133706752 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:30:44,588 basehttp 2982 6150533120 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:31:51,489 autoreload 2982 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:31:51,712 autoreload 4451 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:32:01,567 basehttp 4451 6163673088 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:32:02,607 basehttp 4451 6163673088 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:32:03,587 basehttp 4451 6163673088 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:32:09,390 autoreload 4451 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:32:09,619 autoreload 4560 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:32:26,233 autoreload 4560 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:32:26,494 autoreload 4619 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:32:32,791 autoreload 4619 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:32:33,031 autoreload 4663 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:32:41,050 basehttp 4663 6199570432 "GET /admin/payments/ HTTP/1.1" 200 19096
+INFO 2025-08-07 09:32:55,693 basehttp 4663 6199570432 "GET /admin/payments/ HTTP/1.1" 200 19267
+INFO 2025-08-07 09:32:56,683 basehttp 4663 6199570432 "GET /admin/payments/add/ HTTP/1.1" 200 24845
+INFO 2025-08-07 09:33:28,556 basehttp 4663 6199570432 "GET /admin/payments/ HTTP/1.1" 200 19267
+INFO 2025-08-07 09:38:33,255 autoreload 4663 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/payments/views.py changed, reloading.
+INFO 2025-08-07 09:38:33,491 autoreload 5644 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:40:02,858 autoreload 5644 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/payments/views.py changed, reloading.
+INFO 2025-08-07 09:40:03,090 autoreload 5904 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:40:31,041 autoreload 5904 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/payments/views.py changed, reloading.
+INFO 2025-08-07 09:40:31,271 autoreload 5956 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:40:41,661 autoreload 5956 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/payments/urls.py changed, reloading.
+INFO 2025-08-07 09:40:42,123 autoreload 6174 8528633600 Watching for file changes with StatReloader
+ERROR 2025-08-07 09:45:18,926 log 6174 6195245056 Internal Server Error: /admin/tax-invoices/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 1200, in tax_invoices_list_view
+    return render(request, 'custom_admin/tax_invoices/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/tax_invoices/list.html
+ERROR 2025-08-07 09:45:18,927 basehttp 6174 6195245056 "GET /admin/tax-invoices/ HTTP/1.1" 500 94475
+INFO 2025-08-07 09:46:55,440 basehttp 6174 6212071424 "GET /admin/tax-invoices/ HTTP/1.1" 200 23003
+ERROR 2025-08-07 09:46:57,106 log 6174 6212071424 Internal Server Error: /admin/tax-invoices/add/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 1205, in tax_invoice_create_view
+    return render(request, 'custom_admin/tax_invoices/form.html', {
+        'title': 'Add Tax Invoice',
+        'is_edit': False
+    })
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/tax_invoices/form.html
+ERROR 2025-08-07 09:46:57,107 basehttp 6174 6212071424 "GET /admin/tax-invoices/add/ HTTP/1.1" 500 93217
+INFO 2025-08-07 09:49:04,703 autoreload 6174 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:49:05,174 autoreload 7538 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:49:20,805 autoreload 7538 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:49:21,056 autoreload 7643 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:50:39,212 autoreload 7643 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 09:50:39,673 autoreload 8152 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 09:51:02,477 basehttp 8152 6158954496 "GET /admin/tax-invoices/add/ HTTP/1.1" 200 25174
+INFO 2025-08-07 09:51:09,503 basehttp 8152 6158954496 "GET /admin/installment-plans/ HTTP/1.1" 200 37997
+INFO 2025-08-07 09:51:14,718 basehttp 8152 6158954496 "GET /admin/payments/ HTTP/1.1" 200 19267
+INFO 2025-08-07 09:51:15,943 basehttp 8152 6158954496 "GET /admin/payments/add/ HTTP/1.1" 200 24845
+INFO 2025-08-07 09:52:27,826 basehttp 8152 6158954496 "POST /admin/payments/add/ HTTP/1.1" 302 0
+ERROR 2025-08-07 09:52:27,863 log 8152 6158954496 Internal Server Error: /admin/payments/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 259, in payments_list_view
+    return render(request, 'custom_admin/payments/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 09:52:27,865 basehttp 8152 6158954496 "GET /admin/payments/ HTTP/1.1" 500 194750
+ERROR 2025-08-07 09:56:59,739 log 8152 6158954496 Internal Server Error: /admin/payments/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 259, in payments_list_view
+    return render(request, 'custom_admin/payments/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'user_detail' with arguments '('',)' not found. 1 pattern(s) tried: ['admin/users/(?P<user_id>[0-9]+)/\\Z']
+ERROR 2025-08-07 09:56:59,742 basehttp 8152 6158954496 "GET /admin/payments/ HTTP/1.1" 500 183064
+ERROR 2025-08-07 09:57:01,198 log 8152 6158954496 Internal Server Error: /admin/payments/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 259, in payments_list_view
+    return render(request, 'custom_admin/payments/list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 471, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 828, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'user_detail' with arguments '('',)' not found. 1 pattern(s) tried: ['admin/users/(?P<user_id>[0-9]+)/\\Z']
+ERROR 2025-08-07 09:57:01,199 basehttp 8152 6158954496 "GET /admin/payments/ HTTP/1.1" 500 183064
+WARNING 2025-08-07 09:58:44,244 log 8152 6158954496 Not Found: /
+WARNING 2025-08-07 09:58:44,244 basehttp 8152 6158954496 "GET / HTTP/1.1" 404 3375
+ERROR 2025-08-07 09:58:44,775 log 8152 6158954496 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 09:58:44,776 basehttp 8152 6158954496 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 09:58:45,225 basehttp 8152 6158954496 "GET /api/docs/ HTTP/1.1" 200 4650
+INFO 2025-08-07 09:58:45,381 basehttp 8152 6158954496 "GET /api/schema/ HTTP/1.1" 200 148382
+INFO 2025-08-07 09:58:46,237 basehttp 8152 6158954496 "GET /api/docs/ HTTP/1.1" 200 4650
+INFO 2025-08-07 09:58:46,290 basehttp 8152 6158954496 "GET /api/schema/ HTTP/1.1" 200 148382
+WARNING 2025-08-07 09:58:50,701 log 8152 12901707776 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 09:58:50,702 log 8152 12918534144 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 09:58:50,703 log 8152 12935360512 Not Found: /favicon.ico
+WARNING 2025-08-07 09:58:50,704 basehttp 8152 12901707776 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 09:58:50,704 basehttp 8152 12918534144 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-07 09:58:50,704 basehttp 8152 12935360512 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 09:58:53,380 log 8152 12901707776 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 09:58:53,381 basehttp 8152 12901707776 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 09:58:53,382 log 8152 12918534144 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 09:58:53,383 log 8152 12935360512 Not Found: /favicon.ico
+WARNING 2025-08-07 09:58:53,383 basehttp 8152 12935360512 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 09:58:53,384 basehttp 8152 12918534144 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+INFO 2025-08-07 09:59:09,230 basehttp 8152 12952186880 code 400, message Bad request version ("¨âyÙ\x8f\x95\x9f¸\x7füNº/{Ê®\x00v\x13\x02\x13\x03\x13\x01À/À+À0À,\x00\x9eÀ'\x00gÀ(\x00k\x00£\x00\x9fÌ©Ì¨ÌªÀ¯À\xadÀ£À\x9fÀ]ÀaÀWÀS\x00¢À®À¬À¢À\x9eÀ\\À`ÀVÀRÀ$\x00jÀ#\x00@À")
+ERROR 2025-08-07 09:59:09,231 basehttp 8152 12952186880 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-08-07 10:06:35,388 autoreload 8152 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 10:06:35,997 autoreload 12481 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 10:06:45,269 log 12481 6208663552 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 10:06:45,269 log 12481 6225489920 Not Found: /favicon.ico
+WARNING 2025-08-07 10:06:45,269 log 12481 6191837184 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 10:06:45,269 basehttp 12481 6208663552 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-07 10:06:45,269 basehttp 12481 6225489920 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 10:06:45,269 basehttp 12481 6191837184 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+INFO 2025-08-07 10:06:49,425 basehttp 12481 6242316288 "GET /api/docs/ HTTP/1.1" 200 4650
+INFO 2025-08-07 10:06:49,554 basehttp 12481 6242316288 "GET /api/schema/ HTTP/1.1" 200 148382
+WARNING 2025-08-07 10:06:53,116 log 12481 6242316288 Not Found: /
+WARNING 2025-08-07 10:06:53,116 basehttp 12481 6242316288 "GET / HTTP/1.1" 404 3375
+ERROR 2025-08-07 10:06:54,712 log 12481 6242316288 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:06:54,715 basehttp 12481 6242316288 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 10:06:58,492 basehttp 12481 6242316288 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+ERROR 2025-08-07 10:06:58,535 log 12481 6242316288 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:06:58,538 basehttp 12481 6242316288 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 10:07:04,057 basehttp 12481 6242316288 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+ERROR 2025-08-07 10:07:04,093 log 12481 6242316288 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:07:04,095 basehttp 12481 6242316288 "GET /admin/ HTTP/1.1" 500 228967
+ERROR 2025-08-07 10:07:08,263 log 12481 6242316288 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:07:08,265 basehttp 12481 6242316288 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 10:07:22,700 autoreload 12481 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 10:07:23,113 autoreload 12616 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 10:07:35,588 autoreload 12616 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 10:07:36,050 autoreload 12694 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 10:07:43,411 autoreload 12694 8528633600 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-07 10:07:43,742 autoreload 12762 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 10:08:06,754 log 12762 6134067200 Not Found: /
+WARNING 2025-08-07 10:08:06,754 basehttp 12762 6134067200 "GET / HTTP/1.1" 404 3375
+ERROR 2025-08-07 10:08:09,914 log 12762 6134067200 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:08:09,916 basehttp 12762 6134067200 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 10:08:14,089 basehttp 12762 6134067200 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+ERROR 2025-08-07 10:08:14,138 log 12762 6134067200 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 880, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+TypeError: 'Payment' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 890, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Payment' object has no attribute 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 896, in _resolve_lookup
+    current = current[int(bit)]
+                      ~~~^^^^^
+ValueError: invalid literal for int() with base 10: 'user'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 122, in dashboard_view
+    return render(request, 'custom_admin/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 238, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 1064, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 736, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 847, in resolve
+    value = self._resolve_lookup(context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 903, in _resolve_lookup
+    raise VariableDoesNotExist(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )  # missing attribute
+    ^
+django.template.base.VariableDoesNotExist: Failed lookup for key [user] in <Payment: Payment 1 - Student 1>
+ERROR 2025-08-07 10:08:14,140 basehttp 12762 6134067200 "GET /admin/ HTTP/1.1" 500 228967
+INFO 2025-08-07 10:09:13,641 basehttp 12762 6134067200 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-07 10:09:27,631 basehttp 12762 6134067200 "GET /admin/users/ HTTP/1.1" 200 40950
+WARNING 2025-08-07 10:09:44,751 log 12762 6150893568 Unauthorized: /api/users/auth/login/
+WARNING 2025-08-07 10:09:44,751 basehttp 12762 6150893568 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+WARNING 2025-08-07 10:11:46,755 log 12762 6134067200 Unauthorized: /api/users/auth/login/
+WARNING 2025-08-07 10:11:46,756 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+WARNING 2025-08-07 10:13:00,289 log 12762 6134067200 Unauthorized: /api/users/auth/login/
+WARNING 2025-08-07 10:13:00,289 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+INFO 2025-08-07 10:17:52,148 basehttp 12762 6134067200 "POST /api/users/auth/register/ HTTP/1.1" 201 117
+INFO 2025-08-07 10:17:55,315 basehttp 12762 6134067200 "GET /admin/users/ HTTP/1.1" 200 43374
+INFO 2025-08-07 10:18:09,894 basehttp 12762 6150893568 "POST /api/users/auth/login/ HTTP/1.1" 200 571
+INFO 2025-08-07 10:20:32,814 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 200 571
+INFO 2025-08-07 10:22:59,914 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 200 571
+INFO 2025-08-07 10:23:26,048 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 200 571
+WARNING 2025-08-07 10:25:41,705 log 12762 6134067200 Unauthorized: /api/users/auth/login/
+WARNING 2025-08-07 10:25:41,706 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+INFO 2025-08-07 10:25:52,319 basehttp 12762 6134067200 "POST /api/users/auth/login/ HTTP/1.1" 200 571
+INFO 2025-08-07 11:04:41,702 basehttp 12762 6134067200 "GET /admin/users/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:04:41,711 log 12762 6134067200 Not Found: /accounts/login/
+WARNING 2025-08-07 11:04:41,712 basehttp 12762 6134067200 "GET /accounts/login/?next=/admin/users/ HTTP/1.1" 404 3457
+WARNING 2025-08-07 11:04:44,885 log 12762 6134067200 Not Found: /accounts/login/
+WARNING 2025-08-07 11:04:44,885 basehttp 12762 6134067200 "GET /accounts/login/?next=/admin/users/ HTTP/1.1" 404 3457
+WARNING 2025-08-07 11:04:49,698 log 12762 6134067200 Not Found: /accounts/login/
+WARNING 2025-08-07 11:04:49,698 basehttp 12762 6134067200 "GET /accounts/login/ HTTP/1.1" 404 3438
+INFO 2025-08-07 11:05:00,708 autoreload 20652 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 11:05:02,534 log 20652 6129053696 Not Found: /
+WARNING 2025-08-07 11:05:02,534 basehttp 20652 6129053696 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-07 11:05:02,569 log 20652 6145880064 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 11:05:02,570 log 20652 6179532800 Not Found: /favicon.ico
+WARNING 2025-08-07 11:05:02,570 basehttp 20652 6145880064 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 11:05:02,570 basehttp 20652 6179532800 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 11:05:02,571 log 20652 6162706432 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 11:05:02,571 basehttp 20652 6162706432 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+INFO 2025-08-07 11:05:05,892 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:05:05,902 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:05,902 basehttp 20652 6129053696 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+WARNING 2025-08-07 11:05:11,847 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:11,848 basehttp 20652 6129053696 "GET /accounts/login/ HTTP/1.1" 404 3438
+INFO 2025-08-07 11:05:19,452 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:05:19,464 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:19,464 basehttp 20652 6129053696 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+WARNING 2025-08-07 11:05:19,736 log 20652 6129053696 Not Found: /
+WARNING 2025-08-07 11:05:19,737 basehttp 20652 6129053696 "GET / HTTP/1.1" 404 3375
+INFO 2025-08-07 11:05:20,857 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:05:20,868 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:20,868 basehttp 20652 6129053696 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-07 11:05:32,154 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:05:32,168 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:32,168 basehttp 20652 6129053696 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-07 11:05:33,571 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-07 11:05:33,584 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:33,585 basehttp 20652 6129053696 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+WARNING 2025-08-07 11:05:40,120 log 20652 6129053696 Not Found: /accounts/login/
+WARNING 2025-08-07 11:05:40,121 basehttp 20652 6129053696 "GET /accounts/login/ HTTP/1.1" 404 3438
+WARNING 2025-08-07 11:05:47,268 log 20652 6129053696 Not Found: /login/
+WARNING 2025-08-07 11:05:47,269 basehttp 20652 6129053696 "GET //login/ HTTP/1.1" 404 3411
+INFO 2025-08-07 11:06:24,265 basehttp 20652 6129053696 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-07 11:06:42,678 basehttp 20652 6129053696 "POST /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-07 11:06:42,691 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 200 34170

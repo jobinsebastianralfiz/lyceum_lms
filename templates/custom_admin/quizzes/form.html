@@ -49,9 +49,9 @@
           </div>
 
           <div class="mb-4">
-            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+            <label for="description" class="form-label">Quiz Instructions <span class="text-danger">*</span></label>
             <textarea class="form-control" id="description" name="description" rows="4" required
-                      placeholder="Describe what this quiz covers and its purpose">{{ quiz.description|default:'' }}</textarea>
+                      placeholder="Provide specific instructions for taking this quiz and what it covers">{{ quiz.description|default:'' }}</textarea>
           </div>
 
           <!-- Module Selection -->
@@ -72,12 +72,6 @@
             </select>
           </div>
 
-          <!-- Instructions -->
-          <div class="mb-4">
-            <label for="instructions" class="form-label">Instructions for Students</label>
-            <textarea class="form-control" id="instructions" name="instructions" rows="4"
-                      placeholder="Provide specific instructions for taking this quiz">{{ quiz.instructions|default:'' }}</textarea>
-          </div>
 
           <!-- Quiz Settings -->
           <div class="row mb-4">
