@@ -7964,3 +7964,124 @@ WARNING 2025-08-07 11:05:47,269 basehttp 20652 6129053696 "GET //login/ HTTP/1.1
 INFO 2025-08-07 11:06:24,265 basehttp 20652 6129053696 "GET /admin/login/ HTTP/1.1" 200 3495
 INFO 2025-08-07 11:06:42,678 basehttp 20652 6129053696 "POST /admin/login/ HTTP/1.1" 302 0
 INFO 2025-08-07 11:06:42,691 basehttp 20652 6129053696 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-07 13:32:49,960 autoreload 34687 8528633600 Watching for file changes with StatReloader
+INFO 2025-08-07 13:35:48,847 autoreload 35127 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 13:37:03,165 log 35127 6128644096 Method Not Allowed: /api/users/auth/login/
+WARNING 2025-08-07 13:37:03,166 basehttp 35127 6128644096 "HEAD /api/users/auth/login/ HTTP/1.1" 405 0
+ERROR 2025-08-07 13:37:10,701 log 35127 6128644096 Invalid HTTP_HOST header: '192.168.1.46:8000'. You may need to add '192.168.1.46' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.1.46:8000'. You may need to add '192.168.1.46' to ALLOWED_HOSTS.
+WARNING 2025-08-07 13:37:10,702 basehttp 35127 6128644096 "HEAD /api/users/auth/login/ HTTP/1.1" 400 0
+ERROR 2025-08-07 13:37:40,596 log 35127 6128644096 Invalid HTTP_HOST header: '192.168.1.46:8000'. You may need to add '192.168.1.46' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '192.168.1.46:8000'. You may need to add '192.168.1.46' to ALLOWED_HOSTS.
+WARNING 2025-08-07 13:37:40,597 basehttp 35127 6128644096 "POST /api/users/auth/login/ HTTP/1.1" 400 73407
+INFO 2025-08-07 13:50:27,781 autoreload 38244 8528633600 Watching for file changes with StatReloader
+WARNING 2025-08-07 13:50:29,402 log 38244 6128513024 Not Found: /
+WARNING 2025-08-07 13:50:29,403 basehttp 38244 6128513024 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-07 13:50:29,465 log 38244 6145339392 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 13:50:29,465 log 38244 6178992128 Not Found: /favicon.ico
+WARNING 2025-08-07 13:50:29,466 log 38244 6162165760 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 13:50:29,466 basehttp 38244 6178992128 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 13:50:29,466 basehttp 38244 6145339392 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 13:50:29,466 basehttp 38244 6162165760 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-07 13:50:32,723 log 38244 6195818496 Method Not Allowed: /api/users/auth/login/
+WARNING 2025-08-07 13:50:32,723 basehttp 38244 6195818496 "GET /api/users/auth/login/ HTTP/1.1" 405 40
+WARNING 2025-08-07 13:50:32,798 log 38244 6195818496 Not Found: /favicon.ico
+WARNING 2025-08-07 13:50:32,798 basehttp 38244 6195818496 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-07 13:50:32,844 log 38244 6212644864 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-07 13:50:32,845 basehttp 38244 6212644864 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-07 13:50:32,912 log 38244 6212644864 Not Found: /apple-touch-icon.png
+WARNING 2025-08-07 13:50:32,912 basehttp 38244 6212644864 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+INFO 2025-08-07 13:50:40,774 basehttp 38244 6128513024 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-07 13:50:44,679 basehttp 38244 6128513024 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-07 13:50:44,700 basehttp 38244 6128513024 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-07 13:50:45,185 basehttp 38244 6128513024 "GET /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-07 13:50:45,203 basehttp 38244 6128513024 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-07 14:28:55,444 basehttp 38244 6128513024 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-07 14:28:56,249 basehttp 38244 6128513024 "GET /admin/courses/ HTTP/1.1" 200 41257
+INFO 2025-08-07 14:28:57,102 basehttp 38244 6128513024 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-07 14:28:57,798 basehttp 38244 6128513024 "GET /admin/student-progress/ HTTP/1.1" 302 0
+INFO 2025-08-07 14:28:57,823 basehttp 38244 6128513024 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+INFO 2025-08-08 16:05:22,820 autoreload 7707 8684986112 Watching for file changes with StatReloader
+WARNING 2025-08-08 16:05:24,369 log 7707 6131773440 Not Found: /
+WARNING 2025-08-08 16:05:24,369 basehttp 7707 6131773440 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-08 16:05:24,421 log 7707 6165426176 Not Found: /apple-touch-icon.png
+WARNING 2025-08-08 16:05:24,422 log 7707 6148599808 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-08 16:05:24,422 basehttp 7707 6165426176 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-08 16:05:24,422 log 7707 6182252544 Not Found: /favicon.ico
+WARNING 2025-08-08 16:05:24,423 basehttp 7707 6148599808 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-08 16:05:24,423 basehttp 7707 6182252544 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-08 16:05:27,561 log 7707 6131773440 Not Found: /
+WARNING 2025-08-08 16:05:27,562 basehttp 7707 6131773440 "GET / HTTP/1.1" 404 3375
+INFO 2025-08-08 16:05:27,857 basehttp 7707 6131773440 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-08 16:05:27,867 log 7707 6131773440 Not Found: /accounts/login/
+WARNING 2025-08-08 16:05:27,868 basehttp 7707 6131773440 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-08 16:05:32,987 basehttp 7707 6131773440 "GET /admin/ HTTP/1.1" 302 0
+WARNING 2025-08-08 16:05:33,000 log 7707 6131773440 Not Found: /accounts/login/
+WARNING 2025-08-08 16:05:33,001 basehttp 7707 6131773440 "GET /accounts/login/?next=/admin/ HTTP/1.1" 404 3451
+INFO 2025-08-08 16:05:35,760 basehttp 7707 6131773440 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-08 16:05:35,775 basehttp 7707 6131773440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:35,777 basehttp 7707 6232731648 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:35,777 basehttp 7707 6199078912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:35,777 basehttp 7707 6215905280 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:35,783 basehttp 7707 6131773440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:35,784 basehttp 7707 6199078912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,072 basehttp 7707 6232731648 "POST /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-08 16:05:50,088 basehttp 7707 6215905280 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-08 16:05:50,114 basehttp 7707 6131773440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,115 basehttp 7707 6232731648 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,115 basehttp 7707 6199078912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,115 basehttp 7707 6215905280 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,130 basehttp 7707 6131773440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.svg HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:50,210 basehttp 7707 6232731648 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 304 0
+INFO 2025-08-08 16:05:58,814 basehttp 7707 6215905280 "GET /admin/categories/ HTTP/1.1" 200 24947
+INFO 2025-08-08 16:05:59,769 basehttp 7707 6232731648 "GET /admin/courses/ HTTP/1.1" 200 41257
+INFO 2025-08-08 16:06:00,490 basehttp 7707 6215905280 "GET /admin/modules/ HTTP/1.1" 200 22452
+INFO 2025-08-08 16:06:00,992 basehttp 7707 6232731648 "GET /admin/student-progress/ HTTP/1.1" 302 0
+INFO 2025-08-08 16:06:01,012 basehttp 7707 6199078912 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+INFO 2025-08-08 16:06:01,361 basehttp 7707 6131773440 "GET /admin/video-lessons/ HTTP/1.1" 200 24587
+INFO 2025-08-08 16:06:01,764 basehttp 7707 6199078912 "GET /admin/assignments/ HTTP/1.1" 200 19580
+INFO 2025-08-08 16:06:02,214 basehttp 7707 6131773440 "GET /admin/assignment-submissions/ HTTP/1.1" 200 21225
+INFO 2025-08-08 16:06:03,009 basehttp 7707 6199078912 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-08 16:06:03,407 basehttp 7707 6131773440 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-08 16:06:04,191 basehttp 7707 6199078912 "GET /admin/module-progress/ HTTP/1.1" 200 23491
+ERROR 2025-08-08 16:06:04,734 log 7707 6131773440 Internal Server Error: /admin/email-templates/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 771, in email_templates_list_view
+    return render(request, 'custom_admin/email_templates/list.html', {
+        'page_obj': None,
+        'search_query': ''
+    })
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: custom_admin/email_templates/list.html
+ERROR 2025-08-08 16:06:04,736 basehttp 7707 6131773440 "GET /admin/email-templates/ HTTP/1.1" 500 93456
+INFO 2025-08-08 16:06:10,721 basehttp 7707 6199078912 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-08 16:14:32,279 basehttp 7707 6148599808 "GET /admin/ HTTP/1.1" 200 34170
