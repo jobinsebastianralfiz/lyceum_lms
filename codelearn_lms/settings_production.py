@@ -11,24 +11,24 @@ DEBUG = False
 
 # SECURITY WARNING: define the correct hosts in production!
 ALLOWED_HOSTS = [
-    'uptrail.ralfiz.com',
-    'www.uptrail.ralfiz.com',
-    'api.uptrail.ralfiz.com',
+    'uptrail.info',
+    'www.uptrail.info',
     # Add IP address if needed
     # '192.168.1.100',
 ]
 
-# Database - Use PostgreSQL in production
+# Database - Use MySQL in production
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'codelearn_lms_prod'),
-        'USER': os.environ.get('DB_USER', 'codelearn_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'ralffmqq_uptrail'),
+        'USER': os.environ.get('DB_USER', 'ralffmqq_uptrail_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', '~583hkWOKxOu'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
-            'sslmode': 'prefer',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
         },
     }
 }
@@ -63,9 +63,8 @@ X_FRAME_OPTIONS = 'DENY'
 # CSRF Settings
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    'https://uptrail.ralfiz.com',
-    'https://www.uptrail.ralfiz.com',
-    'https://api.uptrail.ralfiz.com',
+    'https://uptrail.info',
+    'https://www.uptrail.info',
 ]
 
 # Session Security
@@ -75,12 +74,12 @@ SESSION_COOKIE_AGE = 3600  # 1 hour
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Static files (CSS, JavaScript, Images)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
+STATIC_ROOT = '/home/ralffmqq/public_html/static/'
+STATIC_URL = 'https://uptrail.info/static/'
 
 # Media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = '/home/ralffmqq/public_html/codelearnmedia/'
+MEDIA_URL = 'https://uptrail.info/codelearnmedia/'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -89,16 +88,15 @@ EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@uptrail.ralfiz.com')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@uptrail.info')
 
 # CORS Configuration for Production
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "https://uptrail.ralfiz.com",
-    "https://www.uptrail.ralfiz.com",
-    "https://api.uptrail.ralfiz.com",
+    "https://uptrail.info",
+    "https://www.uptrail.info",
     # Add your mobile app domains if needed
-    # "https://app.uptrail.ralfiz.com",
+    # "https://app.uptrail.info",
 ]
 
 # Additional CORS settings
@@ -136,68 +134,29 @@ REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = [
 if 'rest_framework.renderers.BrowsableAPIRenderer' in REST_FRAMEWORK.get('DEFAULT_RENDERER_CLASSES', []):
     REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].remove('rest_framework.renderers.BrowsableAPIRenderer')
 
-# Logging Configuration
+# Override the LOGGING from base settings to prevent file handler error
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-            'maxBytes': 1024*1024*50,  # 50 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django_error.log'),
-            'maxBytes': 1024*1024*50,  # 50 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+        'null': {
+            'class': 'logging.NullHandler',
         },
     },
     'root': {
-        'handlers': ['file', 'console'],
-        'level': 'INFO',
+        'handlers': ['null'],
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
+            'handlers': ['null'],
             'propagate': False,
         },
-        'django.request': {
-            'handlers': ['error_file'],
-            'level': 'ERROR',
+        'codelearn_lms': {
+            'handlers': ['null'],
             'propagate': False,
         },
-        'apps': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
+    }
 }
-
-# Ensure logs directory exists
-os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
 # File Upload Settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
@@ -223,23 +182,17 @@ YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY', '')
 CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
 CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
 
-# Sentry Error Tracking (Optional)
+# Sentry Error Tracking (Optional - disabled for now)
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
-if SENTRY_DSN:
-    import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
-    from sentry_sdk.integrations.logging import LoggingIntegration
-
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[
-            DjangoIntegration(),
-            LoggingIntegration(level=logging.INFO, event_level=logging.ERROR),
-        ],
-        traces_sample_rate=0.1,
-        send_default_pii=True,
-        environment='production',
-    )
+# if SENTRY_DSN:
+#     import sentry_sdk
+#     from sentry_sdk.integrations.django import DjangoIntegration
+#     sentry_sdk.init(
+#         dsn=SENTRY_DSN,
+#         integrations=[DjangoIntegration()],
+#         traces_sample_rate=0.1,
+#         environment='production',
+#     )
 
 # Rate Limiting (if using django-ratelimit)
 RATELIMIT_ENABLE = True
@@ -250,4 +203,4 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 # Disable admin docs in production
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'django.contrib.admindocs']
 
-print(f"🏭 Production settings loaded for uptrail.ralfiz.com")
+print(f"🏭 Production settings loaded for uptrail.info")

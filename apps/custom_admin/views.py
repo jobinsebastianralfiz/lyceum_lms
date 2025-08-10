@@ -126,7 +126,7 @@ def dashboard_view(request):
 def users_list_view(request):
     """List all users"""
     search_query = request.GET.get('search', '')
-    users = User.objects.all()
+    users = User.objects.all().order_by('username')
     
     if search_query:
         users = users.filter(
@@ -167,7 +167,7 @@ def courses_list_view(request):
     search_query = request.GET.get('search', '')
     courses = Course.objects.annotate(
         enrollments_count=Count('enrollments')
-    )
+    ).order_by('title')
     
     if search_query:
         courses = courses.filter(
@@ -214,7 +214,7 @@ def course_detail_view(request, course_id):
 def enrollments_list_view(request):
     """List all enrollments"""
     search_query = request.GET.get('search', '')
-    enrollments = Enrollment.objects.select_related('user', 'course', 'team')
+    enrollments = Enrollment.objects.select_related('user', 'course', 'team').order_by('-created_at')
     
     if search_query:
         enrollments = enrollments.filter(
@@ -239,7 +239,7 @@ def enrollments_list_view(request):
 def payments_list_view(request):
     """List all payments"""
     search_query = request.GET.get('search', '')
-    payments = Payment.objects.select_related('enrollment__user', 'enrollment__course')
+    payments = Payment.objects.select_related('enrollment__user', 'enrollment__course').order_by('-created_at')
     
     if search_query:
         payments = payments.filter(
@@ -265,7 +265,7 @@ def teams_list_view(request):
     search_query = request.GET.get('search', '')
     teams = Team.objects.annotate(
         members_count=Count('memberships')
-    )
+    ).order_by('name')
     
     if search_query:
         teams = teams.filter(name__icontains=search_query)
@@ -316,7 +316,7 @@ def logout_view(request):
 def categories_list_view(request):
     """List all categories"""
     search_query = request.GET.get('search', '')
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('name')
     
     if search_query:
         categories = categories.filter(name__icontains=search_query)
@@ -335,6 +335,34 @@ def categories_list_view(request):
 @user_passes_test(is_staff_user)
 def category_create_view(request):
     """Create a new category"""
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            description = request.POST.get('description', '')
+            
+            if not name:
+                messages.error(request, 'Category name is required.')
+                return render(request, 'custom_admin/categories/form.html', {
+                    'title': 'Add Category',
+                    'is_edit': False
+                })
+            
+            # Create the category
+            category = Category.objects.create(
+                name=name,
+                description=description
+            )
+            
+            messages.success(request, f'Category "{category.name}" created successfully.')
+            return redirect('custom_admin:categories_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating category: {str(e)}')
+            return render(request, 'custom_admin/categories/form.html', {
+                'title': 'Add Category',
+                'is_edit': False
+            })
+    
     return render(request, 'custom_admin/categories/form.html', {
         'title': 'Add Category',
         'is_edit': False
@@ -344,6 +372,36 @@ def category_create_view(request):
 def category_edit_view(request, category_id):
     """Edit a category"""
     category = get_object_or_404(Category, id=category_id)
+    
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            description = request.POST.get('description', '')
+            
+            if not name:
+                messages.error(request, 'Category name is required.')
+                return render(request, 'custom_admin/categories/form.html', {
+                    'category': category,
+                    'title': 'Edit Category',
+                    'is_edit': True
+                })
+            
+            # Update the category
+            category.name = name
+            category.description = description
+            category.save()
+            
+            messages.success(request, f'Category "{category.name}" updated successfully.')
+            return redirect('custom_admin:categories_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error updating category: {str(e)}')
+            return render(request, 'custom_admin/categories/form.html', {
+                'category': category,
+                'title': 'Edit Category',
+                'is_edit': True
+            })
+    
     return render(request, 'custom_admin/categories/form.html', {
         'category': category,
         'title': 'Edit Category',
@@ -499,7 +557,7 @@ def course_delete_view(request, course_id):
 def modules_list_view(request):
     """List all modules"""
     search_query = request.GET.get('search', '')
-    modules = Module.objects.select_related('course')
+    modules = Module.objects.select_related('course').order_by('title')
     
     if search_query:
         modules = modules.filter(
@@ -707,7 +765,7 @@ def student_progress_list_view(request):
 def video_lessons_list_view(request):
     """List all video lessons"""
     search_query = request.GET.get('search', '')
-    lessons = VideoLesson.objects.select_related('module', 'module__course')
+    lessons = VideoLesson.objects.select_related('module', 'module__course').order_by('title')
     
     if search_query:
         lessons = lessons.filter(
@@ -798,7 +856,7 @@ def email_template_delete_view(request, template_id):
 def notifications_list_view(request):
     """List notifications"""
     search_query = request.GET.get('search', '')
-    notifications = Notification.objects.select_related('user')
+    notifications = Notification.objects.select_related('user').order_by('-created_at')
     
     if search_query:
         notifications = notifications.filter(
@@ -919,7 +977,7 @@ def enrollment_delete_view(request, enrollment_id):
 def installment_plans_list_view(request):
     """List installment plans"""
     search_query = request.GET.get('search', '')
-    plans = InstallmentPlan.objects.select_related('enrollment', 'enrollment__user', 'enrollment__course').prefetch_related('enrollment__payments')
+    plans = InstallmentPlan.objects.select_related('enrollment', 'enrollment__user', 'enrollment__course').prefetch_related('enrollment__payments').order_by('-created_at')
     
     if search_query:
         plans = plans.filter(
@@ -1230,7 +1288,7 @@ def payment_delete_view(request, payment_id):
 def tax_invoices_list_view(request):
     """List tax invoices"""
     search_query = request.GET.get('search', '')
-    invoices = TaxInvoice.objects.select_related('enrollment', 'enrollment__user', 'payment')
+    invoices = TaxInvoice.objects.select_related('enrollment', 'enrollment__user', 'payment').order_by('-created_at')
     
     if search_query:
         invoices = invoices.filter(
@@ -1344,7 +1402,7 @@ def tax_invoice_delete_view(request, invoice_id):
 def team_memberships_list_view(request):
     """List team memberships"""
     search_query = request.GET.get('search', '')
-    memberships = TeamMembership.objects.select_related('team', 'user').all()
+    memberships = TeamMembership.objects.select_related('team', 'user').all().order_by('team__name', 'user__name')
     
     if search_query:
         memberships = memberships.filter(
@@ -1543,7 +1601,7 @@ def user_delete_view(request, user_id):
 def youtube_channel_configs_list_view(request):
     """List YouTube channel configs"""
     search_query = request.GET.get('search', '')
-    configs = YouTubeChannelConfig.objects.select_related('admin_user').all()
+    configs = YouTubeChannelConfig.objects.select_related('admin_user').all().order_by('channel_name')
     
     if search_query:
         configs = configs.filter(
@@ -1624,7 +1682,7 @@ def youtube_channel_config_delete_view(request, config_id):
 def youtube_videos_list_view(request):
     """List YouTube videos"""
     search_query = request.GET.get('search', '')
-    videos = YouTubeVideo.objects.select_related('channel_config').all()
+    videos = YouTubeVideo.objects.select_related('channel_config').all().order_by('title')
     
     if search_query:
         videos = videos.filter(
@@ -1709,7 +1767,7 @@ def youtube_video_delete_view(request, video_id):
 def assignments_list_view(request):
     """List all assignments"""
     search_query = request.GET.get('search', '')
-    assignments = Assignment.objects.select_related('module', 'module__course')
+    assignments = Assignment.objects.select_related('module', 'module__course').order_by('title')
     
     if search_query:
         assignments = assignments.filter(
@@ -1785,7 +1843,7 @@ def assignment_submissions_list_view(request):
     search_query = request.GET.get('search', '')
     submissions = AssignmentSubmission.objects.select_related(
         'assignment', 'student', 'assignment__module', 'assignment__module__course'
-    )
+    ).order_by('-submitted_at')
     
     if search_query:
         submissions = submissions.filter(
@@ -1846,7 +1904,7 @@ def quizzes_list_view(request):
     quizzes = Quiz.objects.select_related('module', 'module__course').annotate(
         questions_count=Count('questions'),
         attempts_count=Count('attempts')
-    )
+    ).order_by('title')
     
     if search_query:
         quizzes = quizzes.filter(
@@ -2018,7 +2076,7 @@ def quiz_attempts_list_view(request):
     search_query = request.GET.get('search', '')
     attempts = QuizAttempt.objects.select_related(
         'quiz', 'student', 'quiz__module', 'quiz__module__course'
-    )
+    ).order_by('-started_at')
     
     if search_query:
         attempts = attempts.filter(
@@ -2064,7 +2122,7 @@ def module_progress_list_view(request):
     search_query = request.GET.get('search', '')
     progress = ModuleProgress.objects.select_related(
         'student', 'module', 'module__course'
-    )
+    ).order_by('-updated_at')
     
     if search_query:
         progress = progress.filter(

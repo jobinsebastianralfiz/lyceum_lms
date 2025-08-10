@@ -127,13 +127,19 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if not DEBUG:
+    # Production paths to match .htaccess configuration
+    STATIC_URL = '/codelearnstatic/'
+    STATIC_ROOT = '/home/ralffmqq/public_html/codelearnstatic/'
+    MEDIA_URL = '/codelearnmedia/'
+    MEDIA_ROOT = '/home/ralffmqq/public_html/codelearnmedia/'
+else:
+    # Development paths
+    STATIC_URL = '/static/'
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    STATICFILES_DIRS = [BASE_DIR / 'static']
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

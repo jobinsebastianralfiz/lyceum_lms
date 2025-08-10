@@ -1,0 +1,114 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+# PassengerAppRoot "/home/ralffmqq/web_app"
+# PassengerBaseURI "/"
+# PassengerPython "/home/ralffmqq/virtualenv/web_app/3.8/bin/python"
+# # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# # DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+# <IfModule Litespeed>
+# </IfModule>
+# # DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
+
+# Rewrite Rules for Static and Media Files
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # uptrail.info static files - serve directly from filesystem
+    RewriteCond %{HTTP_HOST} ^(www\.)?uptrail\.info$ [NC]
+    RewriteRule ^codelearnstatic/(.*)$ /home/ralffmqq/public_html/codelearnstatic/$1 [L]
+
+    # uptrail.info media files - let Django handle these
+    # (removed rewrite rule to let Django serve media files)
+
+    # Set environment variable for uptrail.info domain
+    RewriteCond %{HTTP_HOST} ^(www\.)?uptrail\.info$ [NC]
+    RewriteRule ^(.*)$ - [E=UPTRAIL:1]
+
+    # runwithajith.com media files - HIGHEST PRIORITY
+    RewriteCond %{HTTP_HOST} ^(www\.)?runwithajith\.com$ [NC]
+    RewriteRule ^media/(.*)$ /home/ralffmqq/public_html/runwithajith_pro/media/$1 [L]
+
+    # runwithajith.com static files
+    RewriteCond %{HTTP_HOST} ^(www\.)?runwithajith\.com$ [NC]
+    RewriteRule ^static/(.*)$ /home/ralffmqq/public_html/runwithajith_pro/staticfiles/$1 [L]
+
+    # ExamEase app static and media files - examease.ralfiz.com
+    RewriteCond %{HTTP_HOST} ^(www\.)?examease\.ralfiz\.com$ [NC]
+    RewriteRule ^media/(.*)$ examease/media/$1 [L]
+
+    RewriteCond %{HTTP_HOST} ^(www\.)?examease\.ralfiz\.com$ [NC]
+    RewriteRule ^static/(.*)$ examease/staticfiles/$1 [L]
+
+    # ISP Management app static and media files
+    RewriteRule ^ispmanagement/static/(.*)$ /home/ralffmqq/public_html/ispmanagement/staticfiles/$1 [L]
+    RewriteRule ^ispmanagement/media/(.*)$ /home/ralffmqq/public_html/ispmanagement/media/$1 [L]
+
+    # Ajith portfolio subdirectory app static and media files
+    RewriteRule ^runwithajith/static/(.*)$ /home/ralffmqq/public_html/runwithajith/staticfiles/$1 [L]
+    RewriteRule ^runwithajith/media/(.*)$ /home/ralffmqq/public_html/runwithajith/media/$1 [L]
+
+    # Camelot app static files
+    RewriteRule ^camelotappstatic/(.*)$ /home/ralffmqq/public_html/camelotappstatic/$1 [L]
+    RewriteRule ^media/camelotapp/(.*)$ /home/ralffmqq/public_html/camelotappstatic/media/$1 [L]
+
+    # Mathmate pro static files  
+    RewriteRule ^mathmateprostatic/(.*)$ /home/ralffmqq/public_html/mathmatepro/mathmateprostatic/$1 [L]
+    RewriteRule ^mathmatepromedia/(.*)$ /home/ralffmqq/public_html/mathmatepro/media/$1 [L]
+    RewriteRule ^imagapistatic/(.*)$ /home/ralffmqq/public_html/imageapistatic/$1 [L]
+    RewriteRule ^media/ServiceImages/(.*)$ /home/ralffmqq/public_html/imageapistatic/images/$1 [L]
+
+    # Ralfiz app static and media files (DEFAULT/FALLBACK)
+    RewriteRule ^static/(.*)$ /home/ralffmqq/public_html/staticfiles/$1 [L]
+    RewriteRule ^images/(.*)$ /home/ralffmqq/public_html/static/images/$1 [L]
+</IfModule>
+
+# MIME Types for Images
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+    AddType image/webp .webp
+    AddType image/svg+xml .svg
+</IfModule>
+
+# Cache Headers for Media Files
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+</IfModule>
+
+# Directory Security for Media Files
+<IfModule mod_authz_core.c>
+    # Allow access to media files
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx)$">
+        Require all granted
+    </FilesMatch>
+
+    # Block execution of scripts in media directory
+    <FilesMatch "\.(php|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Conditional Passenger Configuration based on domain
+<If "%{ENV:UPTRAIL} == '1'">
+    PassengerAppRoot "/home/ralffmqq/uptrail"
+    PassengerBaseURI "/"
+    PassengerPython "/home/ralffmqq/virtualenv/uptrail/3.9/bin/python"
+</If>
+
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+<If "%{ENV:UPTRAIL} != '1'">
+    PassengerAppRoot "/home/ralffmqq/ralfiz_website"
+    PassengerBaseURI "/"
+    PassengerPython "/home/ralffmqq/virtualenv/ralfiz_website/3.8/bin/python"
+</If>
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

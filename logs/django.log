@@ -8085,3 +8085,59 @@ django.template.exceptions.TemplateDoesNotExist: custom_admin/email_templates/li
 ERROR 2025-08-08 16:06:04,736 basehttp 7707 6131773440 "GET /admin/email-templates/ HTTP/1.1" 500 93456
 INFO 2025-08-08 16:06:10,721 basehttp 7707 6199078912 "GET /admin/ HTTP/1.1" 200 34170
 INFO 2025-08-08 16:14:32,279 basehttp 7707 6148599808 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-09 13:57:03,007 autoreload 13625 8584781568 Watching for file changes with StatReloader
+WARNING 2025-08-09 13:57:05,411 log 13625 6161166336 Not Found: /
+WARNING 2025-08-09 13:57:05,412 basehttp 13625 6161166336 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-09 13:57:05,472 log 13625 6177992704 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-09 13:57:05,472 basehttp 13625 6177992704 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-09 13:57:05,478 log 13625 6228471808 Not Found: /favicon.ico
+WARNING 2025-08-09 13:57:05,478 log 13625 6211645440 Not Found: /apple-touch-icon.png
+WARNING 2025-08-09 13:57:05,479 basehttp 13625 6228471808 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-09 13:57:05,479 log 13625 6194819072 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-09 13:57:05,479 basehttp 13625 6194819072 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-09 13:57:05,480 basehttp 13625 6211645440 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-09 13:57:05,537 log 13625 6177992704 Not Found: /apple-touch-icon.png
+WARNING 2025-08-09 13:57:05,537 basehttp 13625 6177992704 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-09 13:57:06,553 log 13625 6262124544 Not Found: /
+WARNING 2025-08-09 13:57:06,553 basehttp 13625 6262124544 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-09 13:57:06,592 log 13625 6312603648 Not Found: /favicon.ico
+WARNING 2025-08-09 13:57:06,593 log 13625 6278950912 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-09 13:57:06,595 log 13625 6295777280 Not Found: /apple-touch-icon.png
+WARNING 2025-08-09 13:57:06,595 basehttp 13625 6312603648 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-09 13:57:06,595 basehttp 13625 6278950912 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-09 13:57:06,595 basehttp 13625 6295777280 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+INFO 2025-08-09 13:57:08,598 basehttp 13625 6161166336 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-09 13:57:08,605 basehttp 13625 6161166336 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,608 basehttp 13625 6161166336 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,609 basehttp 13625 6295777280 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,609 basehttp 13625 6161166336 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,609 basehttp 13625 6262124544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,609 basehttp 13625 6245298176 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,610 basehttp 13625 6278950912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,610 basehttp 13625 6312603648 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,620 basehttp 13625 6295777280 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,620 basehttp 13625 6262124544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,670 basehttp 13625 6161166336 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.svg HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:08,737 basehttp 13625 6245298176 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 304 0
+INFO 2025-08-09 13:57:12,180 basehttp 13625 6295777280 "GET /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-09 13:57:12,205 basehttp 13625 6262124544 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-09 15:56:12,158 basehttp 13625 6161166336 "GET /admin/ HTTP/1.1" 200 34170
+WARNING 2025-08-09 15:56:13,628 log 13625 6161166336 Not Found: /dashboard/
+WARNING 2025-08-09 15:56:13,628 basehttp 13625 6161166336 "GET /dashboard/ HTTP/1.1" 404 3423
+WARNING 2025-08-09 15:56:13,894 log 13625 13069578240 Not Found: /favicon.ico
+WARNING 2025-08-09 15:56:13,895 log 13625 13035925504 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-09 15:56:13,896 log 13625 13052751872 Not Found: /apple-touch-icon.png
+WARNING 2025-08-09 15:56:13,897 basehttp 13625 13069578240 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-09 15:56:13,897 basehttp 13625 13035925504 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+WARNING 2025-08-09 15:56:13,897 basehttp 13625 13052751872 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-09 15:56:15,005 log 13625 6161166336 Not Found: /
+WARNING 2025-08-09 15:56:15,005 basehttp 13625 6161166336 "GET / HTTP/1.1" 404 3375
+WARNING 2025-08-09 15:56:15,071 log 13625 13035925504 Not Found: /apple-touch-icon.png
+WARNING 2025-08-09 15:56:15,072 log 13625 13069578240 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-09 15:56:15,073 log 13625 13052751872 Not Found: /favicon.ico
+WARNING 2025-08-09 15:56:15,073 basehttp 13625 13035925504 "GET /apple-touch-icon.png HTTP/1.1" 404 3453
+WARNING 2025-08-09 15:56:15,073 basehttp 13625 13052751872 "GET /favicon.ico HTTP/1.1" 404 3426
+WARNING 2025-08-09 15:56:15,073 basehttp 13625 13069578240 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 3489
+INFO 2025-08-09 15:56:15,226 basehttp 13625 6161166336 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-09 15:56:16,347 basehttp 13625 6161166336 "GET /api/docs/ HTTP/1.1" 200 4650
+INFO 2025-08-09 15:56:17,324 basehttp 13625 6161166336 "GET /api/schema/ HTTP/1.1" 200 148382

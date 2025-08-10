@@ -129,13 +129,16 @@ class CourseListSerializer(serializers.ModelSerializer):
     is_enrolled = serializers.SerializerMethodField()
     module_count = serializers.SerializerMethodField()
     total_lessons = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    preview_video_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'category_name', 'price', 'tax_rate',
             'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
-            'preview_video', 'is_enrolled', 'module_count', 'total_lessons', 'created_at'
+            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_enrolled', 
+            'module_count', 'total_lessons', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
@@ -158,6 +161,21 @@ class CourseListSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.IntegerField) 
     def get_total_lessons(self, obj):
         return VideoLesson.objects.filter(module__course=obj).count()
+    
+    @extend_schema_field(serializers.CharField)
+    def get_thumbnail_url(self, obj):
+        """Get full URL for thumbnail image"""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+    
+    @extend_schema_field(serializers.CharField)
+    def get_preview_video_url(self, obj):
+        """Get preview video URL"""
+        return obj.preview_video if obj.preview_video else None
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     """
@@ -170,14 +188,16 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     total_price_display = serializers.CharField(read_only=True)
     is_enrolled = serializers.SerializerMethodField()
     enrollment_info = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    preview_video_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'category', 'price', 'tax_rate',
             'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
-            'preview_video', 'is_published', 'created_by_name', 'modules',
-            'is_enrolled', 'enrollment_info', 'created_at'
+            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_published', 
+            'created_by_name', 'modules', 'is_enrolled', 'enrollment_info', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
@@ -215,6 +235,21 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'total_amount': enrollment.total_amount,
             'outstanding_amount': enrollment.outstanding_amount
         }
+    
+    @extend_schema_field(serializers.CharField)
+    def get_thumbnail_url(self, obj):
+        """Get full URL for thumbnail image"""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+    
+    @extend_schema_field(serializers.CharField)
+    def get_preview_video_url(self, obj):
+        """Get preview video URL"""
+        return obj.preview_video if obj.preview_video else None
 
 class StudentProgressSerializer(serializers.ModelSerializer):
     """

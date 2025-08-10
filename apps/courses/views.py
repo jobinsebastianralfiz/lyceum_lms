@@ -72,6 +72,10 @@ class CategoryListView(generics.ListAPIView):
                         "price": "4999.00",
                         "price_display": "₹4999",
                         "total_price_display": "₹5899",
+                        "thumbnail": "/media/course_thumbnails/python_course.jpg",
+                        "thumbnail_url": "https://yoursite.com/media/course_thumbnails/python_course.jpg",
+                        "preview_video": "https://www.youtube.com/watch?v=abc123",
+                        "preview_video_url": "https://www.youtube.com/watch?v=abc123",
                         "is_free_course": False,
                         "is_enrolled": False,
                         "module_count": 5,
@@ -119,6 +123,10 @@ class CourseListView(generics.ListAPIView):
                     },
                     "price_display": "₹4999",
                     "total_price_display": "₹5899",
+                    "thumbnail": "/media/course_thumbnails/python_course.jpg",
+                    "thumbnail_url": "https://yoursite.com/media/course_thumbnails/python_course.jpg",
+                    "preview_video": "https://www.youtube.com/watch?v=abc123",
+                    "preview_video_url": "https://www.youtube.com/watch?v=abc123",
                     "is_enrolled": False,
                     "modules": [
                         {

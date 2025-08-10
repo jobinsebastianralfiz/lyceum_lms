@@ -1,5 +1,6 @@
 """
-URL configuration for CodeLearn LMS project.
+URL configuration for CodeLearn LMS project - Production Version
+Upload this as urls.py to your production server
 """
 from django.contrib import admin
 from django.urls import path, include
@@ -28,17 +29,8 @@ urlpatterns = [
     path('api/youtube/', include('apps.youtube_integration.urls')),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-else:
-    # In production, serve media files through Django since web server config isn't working
-    from django.views.static import serve
-    from django.urls import re_path
-    
-    urlpatterns += [
-        re_path(r'^codelearnmedia/(?P<path>.*)$', serve, {
-            'document_root': settings.MEDIA_ROOT,
-        }),
-    ]
+# In production, Apache serves static files via .htaccess
+# But we still need to ensure Django doesn't interfere
+# Remove the DEBUG check so static URLs are always properly handled
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
