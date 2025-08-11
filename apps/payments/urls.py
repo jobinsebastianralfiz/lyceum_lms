@@ -11,4 +11,5 @@ urlpatterns = [
     # Student enrollment and payment history
     path('my-enrollments/', views.UserEnrollmentsView.as_view(), name='my-enrollments'),
     path('enrollments/<int:enrollment_id>/payments/', views.EnrollmentPaymentHistoryView.as_view(), name='enrollment-payment-history'),
+    path('enrollments/<int:enrollment_id>/installment-plan/', views.EnrollmentInstallmentPlanView.as_view(), name='enrollment-installment-plan'),
 ]

@@ -121,4 +121,8 @@ urlpatterns = [
     path('youtube-videos/add/', views.youtube_video_create_view, name='youtube_video_create'),
     path('youtube-videos/<int:video_id>/edit/', views.youtube_video_edit_view, name='youtube_video_edit'),
     path('youtube-videos/<int:video_id>/delete/', views.youtube_video_delete_view, name='youtube_video_delete'),
+    
+    # AJAX ENDPOINTS
+    path('get-course-info/<int:course_id>/', views.get_course_info, name='get_course_info'),
+    path('get-enrollment-info/<int:enrollment_id>/', views.get_enrollment_info, name='get_enrollment_info'),
 ]

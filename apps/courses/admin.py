@@ -39,8 +39,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'price_display_admin', 'total_price_display_admin', 'is_free', 'is_published', 'created_by', 'created_at')
-    list_filter = ('category', 'is_free', 'is_published', 'created_at')
+    list_display = ('title', 'category', 'price_display_admin', 'total_price_display_admin', 'is_free', 'is_published', 'allow_public_enrollment', 'created_by', 'created_at')
+    list_filter = ('category', 'is_free', 'is_published', 'allow_public_enrollment', 'created_at')
     search_fields = ('title', 'description')
     readonly_fields = ('is_free_course_display', 'total_price_display_formatted', 'tax_amount_display', 'price_display_formatted', 'total_price_display', 'created_at', 'updated_at')
     inlines = [ModuleInline]
@@ -99,8 +99,9 @@ class CourseAdmin(admin.ModelAdmin):
         ('Media', {
             'fields': ('thumbnail', 'preview_video')
         }),
-        ('Status', {
-            'fields': ('is_published',)
+        ('Publication & Enrollment Settings', {
+            'fields': ('is_published', 'allow_public_enrollment'),
+            'description': 'Control course visibility and enrollment access. Uncheck "Allow public enrollment" for admin-only enrollment courses.'
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -120,7 +121,7 @@ class VideoLessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'youtube_video_id', 'duration', 'is_preview', 'order')
     list_filter = ('module__course', 'is_preview', 'created_at')
     search_fields = ('title', 'youtube_video_id', 'module__title')
-    readonly_fields = ('youtube_url', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
 
 @admin.register(StudentProgress)
 class StudentProgressAdmin(admin.ModelAdmin):
@@ -142,7 +143,6 @@ class QuizQuestionInline(admin.StackedInline):
     model = QuizQuestion
     extra = 1
     fields = ('question_text', 'question_type', 'points', 'explanation', 'order')
-    inlines = [QuizChoiceInline]
     ordering = ('order',)
 
 

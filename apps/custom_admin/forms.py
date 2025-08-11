@@ -550,7 +550,7 @@ class CustomEnrollmentForm(forms.ModelForm):
         widget=forms.Select(attrs={
             'class': 'form-select'
         }),
-        help_text='Course to enroll the student in'
+        help_text='Course to enroll the student in (includes both public and admin-only courses)'
     )
     
     enrollment_type = forms.ChoiceField(
@@ -576,12 +576,13 @@ class CustomEnrollmentForm(forms.ModelForm):
         max_digits=10,
         decimal_places=2,
         min_value=0,
+        required=False,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'step': '0.01',
-            'placeholder': 'Enter total amount'
+            'placeholder': 'Enter total amount (auto-filled for free courses)'
         }),
-        help_text='Total enrollment amount including tax'
+        help_text='Total enrollment amount including tax (auto-populated based on course)'
     )
     
     tax_amount = forms.DecimalField(
@@ -589,12 +590,13 @@ class CustomEnrollmentForm(forms.ModelForm):
         decimal_places=2,
         min_value=0,
         initial=0,
+        required=False,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'step': '0.01',
-            'placeholder': 'Enter tax amount'
+            'placeholder': 'Enter tax amount (auto-filled for free courses)'
         }),
-        help_text='Tax amount for this enrollment'
+        help_text='Tax amount for this enrollment (auto-populated based on course)'
     )
     
     payment_status = forms.ChoiceField(
@@ -630,12 +632,22 @@ class CustomEnrollmentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set course price as default total_amount if creating new enrollment
+        # Set course pricing as default values if creating new enrollment
         if not self.instance.pk and 'course' in self.data:
             try:
                 course = Course.objects.get(pk=self.data['course'])
-                if course.price:
-                    self.fields['total_amount'].initial = course.price
+                if course.is_free_course:
+                    # Free course - set to 0 and hide fields
+                    self.fields['total_amount'].initial = 0
+                    self.fields['tax_amount'].initial = 0
+                    self.fields['payment_status'].initial = 'free'
+                    self.fields['total_amount'].widget.attrs['readonly'] = True
+                    self.fields['tax_amount'].widget.attrs['readonly'] = True
+                else:
+                    # Paid course - set to course prices
+                    self.fields['total_amount'].initial = course.total_price
+                    self.fields['tax_amount'].initial = course.tax_amount
+                    self.fields['payment_status'].initial = 'pending'
             except (Course.DoesNotExist, ValueError):
                 pass
 
@@ -645,6 +657,9 @@ class CustomEnrollmentForm(forms.ModelForm):
         course = cleaned_data.get('course')
         enrollment_type = cleaned_data.get('enrollment_type')
         team = cleaned_data.get('team')
+        total_amount = cleaned_data.get('total_amount')
+        tax_amount = cleaned_data.get('tax_amount')
+        payment_status = cleaned_data.get('payment_status')
         
         if user and course:
             # Check if user is already enrolled in this course
@@ -655,6 +670,18 @@ class CustomEnrollmentForm(forms.ModelForm):
             
             if existing_enrollment.exists():
                 raise ValidationError('This user is already enrolled in this course.')
+            
+            # Auto-populate pricing based on course for free courses
+            if course.is_free_course:
+                cleaned_data['total_amount'] = 0
+                cleaned_data['tax_amount'] = 0
+                cleaned_data['payment_status'] = 'free'
+            elif total_amount is None or tax_amount is None:
+                # Auto-populate for paid courses if not provided
+                cleaned_data['total_amount'] = course.total_price
+                cleaned_data['tax_amount'] = course.tax_amount
+                if not payment_status:
+                    cleaned_data['payment_status'] = 'pending'
         
         # Validate team enrollment
         if enrollment_type == 'team':
@@ -665,9 +692,9 @@ class CustomEnrollmentForm(forms.ModelForm):
             cleaned_data['team'] = None
         
         # Validate tax amount doesn't exceed total amount
-        total_amount = cleaned_data.get('total_amount', 0)
-        tax_amount = cleaned_data.get('tax_amount', 0)
-        if tax_amount > total_amount:
+        final_total = cleaned_data.get('total_amount', 0) or 0
+        final_tax = cleaned_data.get('tax_amount', 0) or 0
+        if final_tax > final_total:
             raise ValidationError('Tax amount cannot exceed total amount.')
         
         return cleaned_data
@@ -690,8 +717,8 @@ class CustomInstallmentPlanForm(forms.ModelForm):
     
     enrollment = forms.ModelChoiceField(
         queryset=Enrollment.objects.select_related('user', 'course').filter(
-            has_installment_plan=False,
-            payment_status__in=['pending', 'partial']
+            payment_status__in=['pending', 'partial'],
+            installment_plan_details__isnull=True
         ),
         widget=forms.Select(attrs={
             'class': 'form-select'
@@ -755,6 +782,8 @@ class CustomInstallmentPlanForm(forms.ModelForm):
             self.fields['start_date'].initial = date.today()
 
     def clean(self):
+        from decimal import Decimal
+        
         cleaned_data = super().clean()
         enrollment = cleaned_data.get('enrollment')
         total_installments = cleaned_data.get('total_installments')
@@ -765,14 +794,18 @@ class CustomInstallmentPlanForm(forms.ModelForm):
             total_plan_amount = total_installments * installment_amount
             
             # Check if total plan amount matches or is reasonable compared to enrollment amount
-            enrollment_total = enrollment.total_amount or 0
+            enrollment_total = enrollment.total_amount or Decimal('0')
             
-            if total_plan_amount > enrollment_total * 1.1:  # Allow 10% margin for flexibility
+            # Convert to Decimal for proper calculation
+            margin_high = enrollment_total * Decimal('1.1')  # Allow 10% margin for flexibility
+            margin_low = enrollment_total * Decimal('0.5')   # Must be at least 50% of enrollment
+            
+            if total_plan_amount > margin_high:
                 raise ValidationError(
                     f'Total installment amount (₹{total_plan_amount:.2f}) exceeds enrollment amount (₹{enrollment_total:.2f}) by more than 10%.'
                 )
             
-            if total_plan_amount < enrollment_total * 0.5:  # Must be at least 50% of enrollment
+            if total_plan_amount < margin_low:
                 raise ValidationError(
                     f'Total installment amount (₹{total_plan_amount:.2f}) is too low compared to enrollment amount (₹{enrollment_total:.2f}).'
                 )

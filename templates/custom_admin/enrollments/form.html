@@ -160,10 +160,10 @@
             <div class="card-body">
               <div class="row">
                 <!-- Total Amount -->
-                <div class="col-md-6">
+                <div class="col-md-6" id="total-amount-field">
                   <div class="mb-3">
                     <label for="{{ form.total_amount.id_for_label }}" class="form-label">
-                      {{ form.total_amount.label }} <span class="text-danger">*</span>
+                      {{ form.total_amount.label }} {% if form.total_amount.field.required %}<span class="text-danger">*</span>{% endif %}
                     </label>
                     <div class="input-group">
                       <span class="input-group-text">₹</span>
@@ -181,10 +181,10 @@
                 </div>
 
                 <!-- Tax Amount -->
-                <div class="col-md-6">
+                <div class="col-md-6" id="tax-amount-field">
                   <div class="mb-3">
                     <label for="{{ form.tax_amount.id_for_label }}" class="form-label">
-                      {{ form.tax_amount.label }} <span class="text-danger">*</span>
+                      {{ form.tax_amount.label }} {% if form.tax_amount.field.required %}<span class="text-danger">*</span>{% endif %}
                     </label>
                     <div class="input-group">
                       <span class="input-group-text">₹</span>
@@ -372,6 +372,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const enrollmentTypeField = document.getElementById('{{ form.enrollment_type.id_for_label }}');
   const teamField = document.getElementById('{{ form.team.id_for_label }}');
   const teamRow = teamField.closest('.mb-3');
+  const courseField = document.getElementById('{{ form.course.id_for_label }}');
+  const totalAmountField = document.getElementById('{{ form.total_amount.id_for_label }}');
+  const taxAmountField = document.getElementById('{{ form.tax_amount.id_for_label }}');
+  const paymentStatusField = document.getElementById('{{ form.payment_status.id_for_label }}');
+  const hasInstallmentField = document.getElementById('{{ form.has_installment_plan.id_for_label }}');
+  const totalAmountDiv = document.getElementById('total-amount-field');
+  const taxAmountDiv = document.getElementById('tax-amount-field');
   
   function toggleTeamField() {
     if (enrollmentTypeField.value === 'team') {
@@ -384,23 +391,86 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Initial toggle
+  function handleCourseSelection() {
+    const courseId = courseField.value;
+    if (courseId) {
+      // Fetch course pricing information
+      fetch(`/admin/get-course-info/${courseId}/`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.is_free) {
+            // Free course - set values to 0 and add visual indicator
+            totalAmountField.value = '0.00';
+            taxAmountField.value = '0.00';
+            paymentStatusField.value = 'free';
+            
+            // Make fields readonly
+            totalAmountField.readOnly = true;
+            taxAmountField.readOnly = true;
+            
+            // Hide installment plan option for free courses
+            hasInstallmentField.checked = false;
+            hasInstallmentField.disabled = true;
+            
+            // Add free course indicator
+            if (!document.getElementById('free-course-indicator')) {
+              const indicator = document.createElement('div');
+              indicator.id = 'free-course-indicator';
+              indicator.className = 'alert alert-success mt-2';
+              indicator.innerHTML = '<i class="ti ti-check-circle me-2"></i><strong>Free Course:</strong> Payment fields automatically set to ₹0';
+              totalAmountDiv.appendChild(indicator);
+            }
+          } else {
+            // Paid course - set course pricing and make fields editable
+            totalAmountField.value = data.total_price || '0.00';
+            taxAmountField.value = data.tax_amount || '0.00';
+            paymentStatusField.value = 'pending';
+            
+            // Make fields editable
+            totalAmountField.readOnly = false;
+            taxAmountField.readOnly = false;
+            hasInstallmentField.disabled = false;
+            
+            // Remove free course indicator
+            const indicator = document.getElementById('free-course-indicator');
+            if (indicator) {
+              indicator.remove();
+            }
+          }
+        })
+        .catch(error => {
+          console.log('Error fetching course info:', error);
+        });
+    } else {
+      // No course selected - reset fields
+      totalAmountField.readOnly = false;
+      taxAmountField.readOnly = false;
+      hasInstallmentField.disabled = false;
+      const indicator = document.getElementById('free-course-indicator');
+      if (indicator) {
+        indicator.remove();
+      }
+    }
+  }
+  
+  // Initial toggles
   toggleTeamField();
+  handleCourseSelection();
   
-  // Toggle on change
+  // Event listeners
   enrollmentTypeField.addEventListener('change', toggleTeamField);
+  courseField.addEventListener('change', handleCourseSelection);
 
-  // Auto-calculate tax (example: 18% GST)
-  const totalAmountField = document.getElementById('{{ form.total_amount.id_for_label }}');
-  const taxAmountField = document.getElementById('{{ form.tax_amount.id_for_label }}');
-  
+  // Auto-calculate tax (example: 18% GST) - only for editable fields
   totalAmountField.addEventListener('input', function() {
-    const totalAmount = parseFloat(this.value) || 0;
-    const taxRate = 0.18; // 18% GST
-    const suggestedTax = (totalAmount * taxRate / (1 + taxRate)).toFixed(2);
-    
-    if (taxAmountField.value === '' || taxAmountField.value === '0.00') {
-      taxAmountField.value = suggestedTax;
+    if (!totalAmountField.readOnly) {
+      const totalAmount = parseFloat(this.value) || 0;
+      const taxRate = 0.18; // 18% GST
+      const suggestedTax = (totalAmount * taxRate / (1 + taxRate)).toFixed(2);
+      
+      if (taxAmountField.value === '' || taxAmountField.value === '0.00') {
+        taxAmountField.value = suggestedTax;
+      }
     }
   });
 });

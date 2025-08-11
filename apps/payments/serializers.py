@@ -66,20 +66,70 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     """
     course_title = serializers.CharField(source='course.title', read_only=True)
     course_price = serializers.DecimalField(source='course.price', max_digits=10, decimal_places=2, read_only=True)
+    course_total_price = serializers.DecimalField(source='course.total_price', max_digits=10, decimal_places=2, read_only=True)
     user_name = serializers.CharField(source='user.name', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
     payments = PaymentSerializer(many=True, read_only=True)
+    installment_plan = serializers.SerializerMethodField()
     paid_amount = serializers.ReadOnlyField()
     outstanding_amount = serializers.ReadOnlyField()
+    payment_progress = serializers.SerializerMethodField()
     
     class Meta:
         model = Enrollment
         fields = [
-            'id', 'user', 'user_name', 'course', 'course_title', 'course_price',
-            'team', 'enrollment_type', 'enrolled_on', 'total_amount', 'tax_amount',
-            'payment_status', 'has_installment_plan', 'active', 'paid_amount',
-            'outstanding_amount', 'payments', 'created_at', 'updated_at'
+            'id', 'user', 'user_name', 'user_email', 'course', 'course_title', 
+            'course_price', 'course_total_price', 'team', 'enrollment_type', 
+            'enrolled_on', 'total_amount', 'tax_amount', 'payment_status', 
+            'has_installment_plan', 'installment_plan', 'active', 'paid_amount',
+            'outstanding_amount', 'payment_progress', 'payments', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'enrolled_on', 'created_at', 'updated_at']
+    
+    def get_installment_plan(self, obj):
+        """Get installment plan details if exists"""
+        try:
+            plan = obj.installment_plan_details
+            if plan:
+                return {
+                    'id': plan.id,
+                    'total_installments': plan.total_installments,
+                    'installment_amount': plan.installment_amount,
+                    'frequency': plan.frequency,
+                    'start_date': plan.start_date,
+                    'remaining_installments': plan.total_installments - obj.payments.filter(status='completed').count(),
+                    'next_due_date': self.get_next_due_date(obj, plan)
+                }
+        except:
+            pass
+        return None
+    
+    def get_next_due_date(self, enrollment, plan):
+        """Calculate next payment due date"""
+        from datetime import datetime, timedelta
+        
+        completed_payments = enrollment.payments.filter(status='completed').count()
+        if completed_payments >= plan.total_installments:
+            return None
+        
+        # Calculate next due date based on frequency (simplified to avoid extra dependencies)
+        if plan.frequency == 'monthly':
+            # Add months by adding 30 days per month (approximation)
+            days_to_add = completed_payments * 30
+            next_date = plan.start_date + timedelta(days=days_to_add)
+        else:
+            # For custom frequency, assume monthly
+            days_to_add = completed_payments * 30
+            next_date = plan.start_date + timedelta(days=days_to_add)
+        
+        return next_date
+    
+    def get_payment_progress(self, obj):
+        """Get payment progress percentage"""
+        if obj.total_amount and obj.total_amount > 0:
+            progress = (obj.paid_amount / obj.total_amount) * 100
+            return round(float(progress), 2)
+        return 100.0 if obj.payment_status == 'free' else 0.0
 
 
 class InstallmentPlanSerializer(serializers.ModelSerializer):
@@ -126,7 +176,7 @@ class CoursePreviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Course
-        fields = ['id', 'title', 'base_price', 'tax_rate', 'tax_amount', 'total_amount', 'is_free']
+        fields = ['id', 'title', 'base_price', 'tax_rate', 'tax_amount', 'total_amount', 'is_free', 'allow_public_enrollment']
     
     def get_tax_rate(self, obj):
         """Return tax rate as percentage"""

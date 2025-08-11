@@ -24,6 +24,7 @@ class Course(models.Model):
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
     preview_video = models.URLField(blank=True, null=True, help_text="YouTube video URL for preview")
     is_published = models.BooleanField(default=False)
+    allow_public_enrollment = models.BooleanField(default=True, help_text="Allow students to enroll via app/API. If False, only admin can enroll students.")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_courses')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -70,6 +71,7 @@ class Course(models.Model):
     
     class Meta:
         db_table = 'courses'
+        ordering = ['-created_at']
 
 class Module(models.Model):
     DIFFICULTY_CHOICES = [

@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.http import JsonResponse
+from django.urls import path
 from .models import Enrollment, InstallmentPlan, Payment, TaxInvoice
 
 class PaymentInline(admin.TabularInline):
@@ -20,6 +22,26 @@ class EnrollmentAdmin(admin.ModelAdmin):
     search_fields = ('user__name', 'user__email', 'course__title', 'team__name')
     readonly_fields = ('paid_amount', 'outstanding_amount', 'enrolled_on', 'created_at', 'updated_at')
     inlines = [InstallmentPlanInline, PaymentInline]
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj and obj.course and obj.course.is_free_course:
+            # Make payment fields optional for free courses
+            form.base_fields['total_amount'].required = False
+            form.base_fields['tax_amount'].required = False
+        return form
+    
+    def save_model(self, request, obj, form, change):
+        # Auto-populate payment details based on course
+        if obj.course:
+            if obj.course.is_free_course:
+                obj.total_amount = 0
+                obj.tax_amount = 0
+                obj.payment_status = 'free'
+            elif not obj.total_amount or obj.total_amount == 0:
+                obj.total_amount = obj.course.total_price
+                obj.tax_amount = obj.course.tax_amount
+        super().save_model(request, obj, form, change)
     
     def enrollment_display_admin(self, obj):
         if obj.enrollment_type == 'team' and obj.team:
@@ -42,10 +64,12 @@ class EnrollmentAdmin(admin.ModelAdmin):
             'fields': ('user', 'course', 'team', 'enrollment_type', 'enrolled_on')
         }),
         ('Payment Information', {
-            'fields': ('total_amount', 'tax_amount', 'payment_status', 'paid_amount', 'outstanding_amount')
+            'fields': ('total_amount', 'tax_amount', 'payment_status', 'paid_amount', 'outstanding_amount'),
+            'description': 'Payment fields are auto-populated based on course pricing. For free courses, these will be set to 0.'
         }),
         ('Installment Plan', {
-            'fields': ('has_installment_plan',)
+            'fields': ('has_installment_plan',),
+            'description': 'Check this to create an installment plan after saving the enrollment'
         }),
         ('Status', {
             'fields': ('active',)
@@ -55,6 +79,32 @@ class EnrollmentAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
+    
+    class Media:
+        js = ('admin/js/enrollment_admin.js',)
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('get-course-pricing/', self.get_course_pricing, name='get_course_pricing'),
+        ]
+        return custom_urls + urls
+    
+    def get_course_pricing(self, request):
+        from apps.courses.models import Course
+        course_id = request.GET.get('course_id')
+        if course_id:
+            try:
+                course = Course.objects.get(id=course_id)
+                return JsonResponse({
+                    'is_free': course.is_free_course,
+                    'total_price': float(course.total_price),
+                    'tax_amount': float(course.tax_amount),
+                    'base_price': float(course.price or 0)
+                })
+            except Course.DoesNotExist:
+                pass
+        return JsonResponse({'error': 'Course not found'}, status=404)
 
 @admin.register(InstallmentPlan)
 class InstallmentPlanAdmin(admin.ModelAdmin):
@@ -69,9 +119,20 @@ class InstallmentPlanAdmin(admin.ModelAdmin):
         return "No enrollment linked"
     enrollment_display.short_description = 'Enrollment'
     
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "enrollment":
+            # Only show enrollments that are paid and don't have installment plans yet
+            kwargs["queryset"] = Enrollment.objects.filter(
+                payment_status__in=['pending', 'partial'],
+                has_installment_plan=True,
+                installment_plan_details__isnull=True
+            ).select_related('user', 'course')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
     fieldsets = (
         ('Enrollment', {
-            'fields': ('enrollment',)
+            'fields': ('enrollment',),
+            'description': 'Select an enrollment that has installment plan enabled but no plan created yet.'
         }),
         ('Plan Details', {
             'fields': ('total_installments', 'installment_amount', 'frequency', 'start_date')

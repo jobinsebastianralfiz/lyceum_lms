@@ -55,11 +55,19 @@
             {% endif %}
             
             <div class="position-absolute top-0 end-0 m-2">
-              {% if course.is_free %}
-                <span class="badge bg-success">Free</span>
-              {% else %}
-                <span class="badge bg-primary">₹{{ course.price }}</span>
-              {% endif %}
+              <div class="d-flex flex-column gap-1">
+                {% if course.is_free %}
+                  <span class="badge bg-success">Free</span>
+                {% else %}
+                  <span class="badge bg-primary">₹{{ course.price }}</span>
+                {% endif %}
+                
+                {% if not course.allow_public_enrollment %}
+                  <span class="badge bg-warning text-dark" title="Admin-only enrollment">
+                    <i class="ti ti-lock fs-4"></i> Admin Only
+                  </span>
+                {% endif %}
+              </div>
             </div>
           </div>
           

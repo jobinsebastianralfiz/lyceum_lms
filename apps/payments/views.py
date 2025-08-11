@@ -9,8 +9,8 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from apps.courses.models import Course
-from .models import Enrollment, Payment, TaxInvoice
-from .serializers import CourseEnrollmentSerializer, PaymentSerializer, CoursePreviewSerializer
+from .models import Enrollment, Payment, TaxInvoice, InstallmentPlan
+from .serializers import CourseEnrollmentSerializer, PaymentSerializer, CoursePreviewSerializer, EnrollmentSerializer, InstallmentPlanSerializer
 
 
 class CourseEnrollmentView(APIView):
@@ -54,6 +54,12 @@ class CourseEnrollmentView(APIView):
         try:
             # Get course
             course = Course.objects.get(id=course_id)
+            
+            # Check if course allows public enrollment
+            if not course.allow_public_enrollment:
+                return Response({
+                    "error": "This course is not available for public enrollment. Contact admin for access."
+                }, status=status.HTTP_403_FORBIDDEN)
             
             # Check if user already enrolled
             existing_enrollment = Enrollment.objects.filter(
@@ -137,21 +143,21 @@ class CourseEnrollmentView(APIView):
 
 class UserEnrollmentsView(generics.ListAPIView):
     """
-    Get all enrollments for the authenticated user
+    Get all enrollments for the authenticated user with payment and installment details
     """
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = PaymentSerializer
+    serializer_class = EnrollmentSerializer
     
     def get_queryset(self):
         return Enrollment.objects.filter(
             user=self.request.user,
             active=True
-        ).select_related('course').prefetch_related('payments')
+        ).select_related('course', 'user').prefetch_related('payments', 'installment_plan_details')
     
     @extend_schema(
         summary="Get User's Course Enrollments",
-        description="Retrieve all active course enrollments for the authenticated user",
-        responses={200: PaymentSerializer(many=True)}
+        description="Retrieve all active course enrollments with payment and installment plan details",
+        responses={200: EnrollmentSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -205,6 +211,75 @@ class EnrollmentPaymentHistoryView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+class EnrollmentInstallmentPlanView(APIView):
+    """
+    Get detailed installment plan information for a specific enrollment
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @extend_schema(
+        summary="Get Enrollment Installment Plan Details",
+        description="Get detailed installment plan information for a specific enrollment (admin-created enrollments only)",
+        parameters=[
+            OpenApiParameter(
+                name='enrollment_id',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description='Enrollment ID'
+            )
+        ],
+        responses={
+            200: InstallmentPlanSerializer,
+            404: {"type": "object", "properties": {"error": {"type": "string"}}}
+        }
+    )
+    def get(self, request, enrollment_id):
+        try:
+            # Verify enrollment belongs to user
+            enrollment = Enrollment.objects.get(
+                id=enrollment_id,
+                user=request.user,
+                active=True
+            )
+            
+            # Check if enrollment has installment plan
+            if not enrollment.has_installment_plan:
+                return Response({
+                    "error": "This enrollment does not have an installment plan"
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            try:
+                installment_plan = InstallmentPlan.objects.get(enrollment=enrollment)
+                serializer = InstallmentPlanSerializer(installment_plan)
+                
+                # Get additional payment information
+                payments = Payment.objects.filter(enrollment=enrollment).order_by('installment_number')
+                payment_serializer = PaymentSerializer(payments, many=True)
+                
+                return Response({
+                    "installment_plan": serializer.data,
+                    "payments": payment_serializer.data,
+                    "enrollment_summary": {
+                        "id": enrollment.id,
+                        "course_title": enrollment.course.title,
+                        "total_amount": enrollment.total_amount,
+                        "paid_amount": enrollment.paid_amount,
+                        "outstanding_amount": enrollment.outstanding_amount,
+                        "payment_status": enrollment.payment_status
+                    }
+                }, status=status.HTTP_200_OK)
+                
+            except InstallmentPlan.DoesNotExist:
+                return Response({
+                    "error": "Installment plan not found for this enrollment"
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+        except Enrollment.DoesNotExist:
+            return Response({
+                "error": "Enrollment not found or does not belong to you"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
 class CoursePricingPreviewView(APIView):
     """
     Get course pricing breakdown before purchase
@@ -240,7 +315,8 @@ class CoursePricingPreviewView(APIView):
             return Response({
                 "course_pricing": serializer.data,
                 "is_enrolled": is_enrolled,
-                "can_purchase": not is_enrolled
+                "can_purchase": not is_enrolled and course.allow_public_enrollment,
+                "allow_public_enrollment": course.allow_public_enrollment
             }, status=status.HTTP_200_OK)
             
         except Course.DoesNotExist:

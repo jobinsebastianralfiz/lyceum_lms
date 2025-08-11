@@ -139,6 +139,17 @@
                 </label>
               </div>
             </div>
+            
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="allow_public_enrollment" name="allow_public_enrollment"
+                       {% if course.allow_public_enrollment|default:True %}checked{% endif %}>
+                <label class="form-check-label" for="allow_public_enrollment">
+                  <strong>Allow Public Enrollment</strong>
+                  <small class="text-muted d-block">Students can enroll via app/API. Uncheck for admin-only enrollment</small>
+                </label>
+              </div>
+            </div>
           </div>
 
           <!-- Submit Buttons -->

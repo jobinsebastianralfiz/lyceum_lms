@@ -33,11 +33,14 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 else:
-    # In production, serve media files through Django since web server config isn't working
+    # In production, serve static and media files through Django since web server config isn't working
     from django.views.static import serve
     from django.urls import re_path
     
     urlpatterns += [
+        re_path(r'^codelearnstatic/(?P<path>.*)$', serve, {
+            'document_root': settings.STATIC_ROOT,
+        }),
         re_path(r'^codelearnmedia/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
         }),

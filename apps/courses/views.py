@@ -79,7 +79,8 @@ class CategoryListView(generics.ListAPIView):
                         "is_free_course": False,
                         "is_enrolled": False,
                         "module_count": 5,
-                        "total_lessons": 25
+                        "total_lessons": 25,
+                        "allow_public_enrollment": True
                     }
                 ]
             )
@@ -99,7 +100,7 @@ class CourseListView(generics.ListAPIView):
     search_fields = ['title', 'description']
     
     def get_queryset(self):
-        return Course.objects.filter(is_published=True).select_related('category')
+        return Course.objects.filter(is_published=True, allow_public_enrollment=True).select_related('category')
 
 @extend_schema_view(
     get=extend_schema(
@@ -128,6 +129,7 @@ class CourseListView(generics.ListAPIView):
                     "preview_video": "https://www.youtube.com/watch?v=abc123",
                     "preview_video_url": "https://www.youtube.com/watch?v=abc123",
                     "is_enrolled": False,
+                    "allow_public_enrollment": True,
                     "modules": [
                         {
                             "id": 1,
@@ -147,7 +149,7 @@ class CourseDetailView(generics.RetrieveAPIView):
     """
     Get detailed information about a specific course.
     """
-    queryset = Course.objects.filter(is_published=True).select_related('category').prefetch_related('modules__video_lessons')
+    queryset = Course.objects.filter(is_published=True, allow_public_enrollment=True).select_related('category').prefetch_related('modules__video_lessons')
     serializer_class = CourseDetailSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -298,7 +300,8 @@ def search_courses(request):
         Q(title__icontains=query) | 
         Q(description__icontains=query) |
         Q(category__name__icontains=query),
-        is_published=True
+        is_published=True,
+        allow_public_enrollment=True
     ).select_related('category').distinct()
     
     serializer = CourseListSerializer(courses, many=True, context={'request': request})

@@ -21,13 +21,25 @@ class Enrollment(models.Model):
     team = models.ForeignKey('users.Team', on_delete=models.CASCADE, related_name='enrollments', null=True, blank=True, help_text="Team for team enrollments")
     enrollment_type = models.CharField(max_length=15, choices=ENROLLMENT_TYPE_CHOICES, default='individual')
     enrolled_on = models.DateTimeField(auto_now_add=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total amount including tax")
-    tax_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, help_text="Total amount including tax")
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True)
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='pending')
     has_installment_plan = models.BooleanField(default=False, help_text="Whether this enrollment has an installment plan")
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        # Auto-set payment details for free courses
+        if self.course and self.course.is_free_course:
+            self.total_amount = 0
+            self.tax_amount = 0
+            self.payment_status = 'free'
+        elif self.course and not self.total_amount:
+            # Auto-populate pricing for paid courses if not set
+            self.total_amount = self.course.total_price
+            self.tax_amount = self.course.tax_amount
+        super().save(*args, **kwargs)
     
     def __str__(self):
         if self.enrollment_type == 'team' and self.team:
@@ -77,7 +89,7 @@ class InstallmentPlan(models.Model):
         ('custom', 'Custom'),
     ]
     
-    enrollment = models.OneToOneField('Enrollment', on_delete=models.CASCADE, related_name='installment_plan_details', null=True, blank=True)
+    enrollment = models.OneToOneField(Enrollment, on_delete=models.CASCADE, related_name='installment_plan_details', null=True, blank=True)
     total_installments = models.PositiveIntegerField()
     installment_amount = models.DecimalField(max_digits=10, decimal_places=2)
     frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default='monthly')

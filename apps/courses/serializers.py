@@ -19,7 +19,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     @extend_schema_field(serializers.IntegerField)
     def get_course_count(self, obj):
-        return obj.courses.filter(is_published=True).count()
+        return obj.courses.filter(is_published=True, allow_public_enrollment=True).count()
 
 class VideoLessonSerializer(serializers.ModelSerializer):
     """
@@ -138,7 +138,7 @@ class CourseListSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'category_name', 'price', 'tax_rate',
             'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
             'thumbnail_url', 'preview_video', 'preview_video_url', 'is_enrolled', 
-            'module_count', 'total_lessons', 'created_at'
+            'module_count', 'total_lessons', 'allow_public_enrollment', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
@@ -196,8 +196,9 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'category', 'price', 'tax_rate',
             'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
-            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_published', 
-            'created_by_name', 'modules', 'is_enrolled', 'enrollment_info', 'created_at'
+            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_published',
+            'allow_public_enrollment', 'created_by_name', 'modules', 'is_enrolled', 
+            'enrollment_info', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)

@@ -327,11 +327,70 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const enrollmentField = document.getElementById('{{ form.enrollment.id_for_label }}');
   const installmentsField = document.getElementById('{{ form.total_installments.id_for_label }}');
   const amountField = document.getElementById('{{ form.installment_amount.id_for_label }}');
   const frequencyField = document.getElementById('{{ form.frequency.id_for_label }}');
   const startDateField = document.getElementById('{{ form.start_date.id_for_label }}');
   const summaryDiv = document.getElementById('calculation-summary');
+  
+  let selectedEnrollmentAmount = 0;
+  
+  function handleEnrollmentSelection() {
+    const enrollmentId = enrollmentField.value;
+    if (enrollmentId) {
+      // Fetch enrollment info to get total amount
+      fetch(`/admin/get-enrollment-info/${enrollmentId}/`)
+        .then(response => response.json())
+        .then(data => {
+          selectedEnrollmentAmount = data.total_amount || 0;
+          
+          // Auto-calculate installment amount based on current installments
+          calculateInstallmentAmount();
+          
+          // Show enrollment info
+          if (data.total_amount > 0) {
+            const infoDiv = document.createElement('div');
+            infoDiv.id = 'enrollment-info';
+            infoDiv.className = 'alert alert-info mt-2';
+            infoDiv.innerHTML = `
+              <i class="ti ti-info-circle me-2"></i>
+              <strong>Enrollment:</strong> ${data.user_name} - ${data.course_title}<br>
+              <strong>Total Amount:</strong> ₹${data.total_amount.toFixed(2)} | 
+              <strong>Outstanding:</strong> ₹${data.outstanding_amount.toFixed(2)}
+            `;
+            
+            // Remove existing info if any
+            const existingInfo = document.getElementById('enrollment-info');
+            if (existingInfo) {
+              existingInfo.remove();
+            }
+            
+            enrollmentField.parentElement.appendChild(infoDiv);
+          }
+        })
+        .catch(error => {
+          console.log('Error fetching enrollment info:', error);
+        });
+    } else {
+      selectedEnrollmentAmount = 0;
+      const existingInfo = document.getElementById('enrollment-info');
+      if (existingInfo) {
+        existingInfo.remove();
+      }
+    }
+  }
+  
+  function calculateInstallmentAmount() {
+    const installments = parseInt(installmentsField.value) || 0;
+    if (selectedEnrollmentAmount > 0 && installments > 0) {
+      const suggestedAmount = (selectedEnrollmentAmount / installments).toFixed(2);
+      if (!amountField.value || parseFloat(amountField.value) === 0) {
+        amountField.value = suggestedAmount;
+        updateSummary();
+      }
+    }
+  }
   
   function updateSummary() {
     const installments = parseInt(installmentsField.value) || 0;
@@ -348,6 +407,30 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('summary-total').textContent = '₹' + totalAmount.toFixed(2);
       document.getElementById('summary-frequency').textContent = frequency;
       document.getElementById('summary-start-date').textContent = startDate || 'Not set';
+      
+      // Show warning if total doesn't match enrollment amount
+      if (selectedEnrollmentAmount > 0) {
+        const difference = Math.abs(totalAmount - selectedEnrollmentAmount);
+        const percentDiff = (difference / selectedEnrollmentAmount) * 100;
+        
+        if (percentDiff > 10) {
+          const warningDiv = document.getElementById('amount-warning') || document.createElement('div');
+          warningDiv.id = 'amount-warning';
+          warningDiv.className = 'alert alert-warning mt-2';
+          warningDiv.innerHTML = `
+            <i class="ti ti-alert-triangle me-2"></i>
+            <strong>Warning:</strong> Plan total (₹${totalAmount.toFixed(2)}) differs from enrollment amount (₹${selectedEnrollmentAmount.toFixed(2)}) by ₹${difference.toFixed(2)}
+          `;
+          if (!document.getElementById('amount-warning')) {
+            summaryDiv.appendChild(warningDiv);
+          }
+        } else {
+          const warningDiv = document.getElementById('amount-warning');
+          if (warningDiv) {
+            warningDiv.remove();
+          }
+        }
+      }
       
       // Calculate estimated completion date
       if (startDate && frequency === 'Monthly') {
@@ -369,12 +452,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Add event listeners
-  installmentsField.addEventListener('input', updateSummary);
+  enrollmentField.addEventListener('change', handleEnrollmentSelection);
+  installmentsField.addEventListener('input', function() {
+    calculateInstallmentAmount();
+    updateSummary();
+  });
   amountField.addEventListener('input', updateSummary);
   frequencyField.addEventListener('change', updateSummary);
   startDateField.addEventListener('change', updateSummary);
   
-  // Initial update
+  // Initial setup
+  handleEnrollmentSelection();
   updateSummary();
 });
 </script>

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.urls import reverse
+from django.http import JsonResponse
 
 from apps.users.models import User, Team, TeamMembership
 from apps.courses.models import (
@@ -438,6 +439,7 @@ def course_create_view(request):
             is_free = request.POST.get('is_free') == 'on'
             preview_video = request.POST.get('preview_video')
             is_published = request.POST.get('is_published') == 'on'
+            allow_public_enrollment = request.POST.get('allow_public_enrollment') == 'on'
             
             # Validate required fields
             if not all([title, description, category_id]):
@@ -464,6 +466,7 @@ def course_create_view(request):
                 thumbnail=thumbnail,
                 preview_video=preview_video,
                 is_published=is_published,
+                allow_public_enrollment=allow_public_enrollment,
                 created_by=request.user
             )
             
@@ -495,6 +498,7 @@ def course_edit_view(request, course_id):
             is_free = request.POST.get('is_free') == 'on'
             preview_video = request.POST.get('preview_video')
             is_published = request.POST.get('is_published') == 'on'
+            allow_public_enrollment = request.POST.get('allow_public_enrollment') == 'on'
             
             # Validate required fields
             if not all([title, description, category_id]):
@@ -517,6 +521,7 @@ def course_edit_view(request, course_id):
             course.is_free = is_free
             course.preview_video = preview_video
             course.is_published = is_published
+            course.allow_public_enrollment = allow_public_enrollment
             
             # Handle file upload
             thumbnail = request.FILES.get('thumbnail')
@@ -2165,3 +2170,43 @@ def module_progress_detail_view(request, progress_id):
     }
     
     return render(request, 'custom_admin/module_progress/detail.html', context)
+
+
+# ==============================================================================
+# AJAX ENDPOINTS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def get_course_info(request, course_id):
+    """AJAX endpoint to get course pricing information"""
+    try:
+        course = get_object_or_404(Course, id=course_id)
+        return JsonResponse({
+            'is_free': course.is_free_course,
+            'base_price': float(course.price or 0),
+            'total_price': float(course.total_price),
+            'tax_amount': float(course.tax_amount),
+            'course_title': course.title
+        })
+    except Course.DoesNotExist:
+        return JsonResponse({'error': 'Course not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@user_passes_test(is_staff_user)
+def get_enrollment_info(request, enrollment_id):
+    """AJAX endpoint to get enrollment information for installment plans"""
+    try:
+        enrollment = get_object_or_404(Enrollment.objects.select_related('user', 'course'), id=enrollment_id)
+        return JsonResponse({
+            'user_name': enrollment.user.name,
+            'course_title': enrollment.course.title,
+            'total_amount': float(enrollment.total_amount),
+            'outstanding_amount': float(enrollment.outstanding_amount),
+            'payment_status': enrollment.payment_status,
+            'enrollment_type': enrollment.enrollment_type
+        })
+    except Enrollment.DoesNotExist:
+        return JsonResponse({'error': 'Enrollment not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

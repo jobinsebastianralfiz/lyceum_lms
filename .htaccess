@@ -12,9 +12,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # uptrail.info static files - serve directly from filesystem
+    # HIGHEST PRIORITY: uptrail.info static files - serve directly from filesystem  
+    # Skip Django for static files
     RewriteCond %{HTTP_HOST} ^(www\.)?uptrail\.info$ [NC]
-    RewriteRule ^codelearnstatic/(.*)$ /home/ralffmqq/public_html/codelearnstatic/$1 [L]
+    RewriteCond %{REQUEST_URI} ^/codelearnstatic/ [NC]
+    RewriteRule ^codelearnstatic/(.*)$ /home/ralffmqq/public_html/codelearnstatic/$1 [L,QSA]
 
     # uptrail.info media files - let Django handle these
     # (removed rewrite rule to let Django serve media files)
@@ -83,7 +85,7 @@
 # Directory Security for Media Files
 <IfModule mod_authz_core.c>
     # Allow access to media files
-    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx)$">
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|css|js|woff|woff2|ttf|eot|ico)$">
         Require all granted
     </FilesMatch>
 
