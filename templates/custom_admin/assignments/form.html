@@ -23,6 +23,12 @@
         <form method="post">
           {% csrf_token %}
           
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+          
           <!-- Basic Information -->
           <div class="row mb-4">
             <div class="col-12">
@@ -31,45 +37,40 @@
             
             <div class="col-md-8">
               <div class="mb-3">
-                <label for="title" class="form-label">Assignment Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" name="title" 
-                       value="{{ assignment.title|default:'' }}" required 
-                       placeholder="Enter assignment title">
+                <label for="{{ form.title.id_for_label }}" class="form-label">Assignment Title <span class="text-danger">*</span></label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                  <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="order" class="form-label">Order in Module <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="order" name="order" 
-                       value="{{ assignment.order|default:'' }}" required min="1"
-                       placeholder="1">
+                <label for="{{ form.order.id_for_label }}" class="form-label">Order in Module <span class="text-danger">*</span></label>
+                {{ form.order }}
+                {% if form.order.errors %}
+                  <div class="text-danger small">{{ form.order.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-            <textarea class="form-control" id="description" name="description" rows="4" required
-                      placeholder="Describe what students need to accomplish in this assignment">{{ assignment.description|default:'' }}</textarea>
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description <span class="text-danger">*</span></label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="text-danger small">{{ form.description.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Module Selection -->
           <div class="mb-4">
-            <label for="module" class="form-label">Module <span class="text-danger">*</span></label>
-            <select class="form-select" id="module" name="module" required>
-              <option value="">Select a module</option>
-              {% for course in courses %}
-                <optgroup label="{{ course.title }}">
-                  {% for module in course.modules.all %}
-                    <option value="{{ module.id }}" 
-                            {% if assignment and assignment.module.id == module.id %}selected{% endif %}>
-                      {{ module.title }} (Order: {{ module.order }})
-                    </option>
-                  {% endfor %}
-                </optgroup>
-              {% endfor %}
-            </select>
+            <label for="{{ form.module.id_for_label }}" class="form-label">Module <span class="text-danger">*</span></label>
+            {{ form.module }}
+            {% if form.module.errors %}
+              <div class="text-danger small">{{ form.module.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Requirements and Resources -->
@@ -80,17 +81,21 @@
             
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="requirements" class="form-label">Requirements</label>
-                <textarea class="form-control" id="requirements" name="requirements" rows="6"
-                          placeholder="List specific requirements, technologies, or constraints">{{ assignment.requirements|default:'' }}</textarea>
+                <label for="{{ form.requirements.id_for_label }}" class="form-label">Requirements</label>
+                {{ form.requirements }}
+                {% if form.requirements.errors %}
+                  <div class="text-danger small">{{ form.requirements.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="resources" class="form-label">Resources</label>
-                <textarea class="form-control" id="resources" name="resources" rows="6"
-                          placeholder="Provide helpful links, documentation, or additional resources">{{ assignment.resources|default:'' }}</textarea>
+                <label for="{{ form.resources.id_for_label }}" class="form-label">Resources</label>
+                {{ form.resources }}
+                {% if form.resources.errors %}
+                  <div class="text-danger small">{{ form.resources.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -103,29 +108,32 @@
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="max_points" class="form-label">Maximum Points <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="max_points" name="max_points" 
-                       value="{{ assignment.max_points|default:'100' }}" required min="1"
-                       placeholder="100">
+                <label for="{{ form.max_points.id_for_label }}" class="form-label">Maximum Points <span class="text-danger">*</span></label>
+                {{ form.max_points }}
+                {% if form.max_points.errors %}
+                  <div class="text-danger small">{{ form.max_points.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="passing_score" class="form-label">Passing Score <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="passing_score" name="passing_score" 
-                       value="{{ assignment.passing_score|default:'70' }}" required min="1"
-                       placeholder="70">
+                <label for="{{ form.passing_score.id_for_label }}" class="form-label">Passing Score <span class="text-danger">*</span></label>
+                {{ form.passing_score }}
+                {% if form.passing_score.errors %}
+                  <div class="text-danger small">{{ form.passing_score.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="due_days" class="form-label">Days to Complete</label>
-                <input type="number" class="form-control" id="due_days" name="due_days" 
-                       value="{{ assignment.due_days|default:'7' }}" min="1"
-                       placeholder="7">
-                <div class="form-text">Number of days students have to complete this assignment</div>
+                <label for="{{ form.due_days.id_for_label }}" class="form-label">Days to Complete</label>
+                {{ form.due_days }}
+                <div class="form-text">{{ form.due_days.help_text }}</div>
+                {% if form.due_days.errors %}
+                  <div class="text-danger small">{{ form.due_days.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -135,12 +143,14 @@
             <h5 class="mb-3">Assignment Settings</h5>
             
             <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" id="is_required" name="is_required"
-                     {% if assignment.is_required %}checked{% endif %}>
-              <label class="form-check-label" for="is_required">
+              {{ form.is_required }}
+              <label class="form-check-label" for="{{ form.is_required.id_for_label }}">
                 <strong>Required Assignment</strong>
-                <small class="text-muted d-block">Students must complete this assignment to progress</small>
+                <small class="text-muted d-block">{{ form.is_required.help_text }}</small>
               </label>
+              {% if form.is_required.errors %}
+                <div class="text-danger small">{{ form.is_required.errors.0 }}</div>
+              {% endif %}
             </div>
           </div>
 
@@ -160,21 +170,30 @@
 </div>
 
 <script>
-// Auto-calculate passing score percentage
-document.getElementById('max_points').addEventListener('input', function() {
-  const maxPoints = parseInt(this.value) || 100;
-  const passingScore = document.getElementById('passing_score');
-  if (!passingScore.value) {
-    passingScore.value = Math.ceil(maxPoints * 0.7);
+document.addEventListener('DOMContentLoaded', function() {
+  // Auto-calculate passing score percentage
+  const maxPointsField = document.getElementById('{{ form.max_points.id_for_label }}');
+  const passingScoreField = document.getElementById('{{ form.passing_score.id_for_label }}');
+  
+  if (maxPointsField && passingScoreField) {
+    maxPointsField.addEventListener('input', function() {
+      const maxPoints = parseInt(this.value) || 100;
+      if (!passingScoreField.value || passingScoreField.value == 0) {
+        passingScoreField.value = Math.ceil(maxPoints * 0.7);
+      }
+    });
   }
-});
 
-// Module selection feedback
-document.getElementById('module').addEventListener('change', function() {
-  const selectedOption = this.options[this.selectedIndex];
-  if (selectedOption.value) {
-    const moduleName = selectedOption.text;
-    // You could add AJAX here to fetch module details or update form
+  // Module selection feedback
+  const moduleField = document.getElementById('{{ form.module.id_for_label }}');
+  if (moduleField) {
+    moduleField.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      if (selectedOption.value) {
+        const moduleName = selectedOption.text;
+        // Could add AJAX here to fetch module details or auto-set order
+      }
+    });
   }
 });
 </script>

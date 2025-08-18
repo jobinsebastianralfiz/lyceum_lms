@@ -1,0 +1,156 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ question.question_text|truncatechars:50 }} - Quiz Question - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <!-- Question Details Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-1">Question Details</h4>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-info-subtle text-info">{{ question.quiz.module.course.title }}</span>
+              <span class="text-muted">→</span>
+              <span class="badge bg-secondary-subtle text-secondary">{{ question.quiz.title }}</span>
+            </div>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:quiz_question_edit' question.id %}" class="btn btn-primary">
+              <i class="ti ti-edit me-1"></i>Edit Question
+            </a>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-primary-subtle rounded">
+              <h3 class="mb-0 text-primary">{{ question.choices.count }}</h3>
+              <small class="text-muted">Choices</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-success-subtle rounded">
+              <h3 class="mb-0 text-success">{{ question.points }}</h3>
+              <small class="text-muted">Points</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-warning-subtle rounded">
+              <h3 class="mb-0 text-warning">{{ question.get_question_type_display }}</h3>
+              <small class="text-muted">Type</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center p-3 bg-info-subtle rounded">
+              <h3 class="mb-0 text-info">#{{ question.order }}</h3>
+              <small class="text-muted">Order</small>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="mb-3">Question Text</h5>
+        <div class="bg-light p-3 rounded mb-4">
+          <p class="mb-0">{{ question.question_text|linebreaks }}</p>
+        </div>
+
+        {% if question.explanation %}
+        <h5 class="mb-3">Explanation</h5>
+        <div class="bg-info-subtle p-3 rounded mb-4">
+          <p class="mb-0">{{ question.explanation|linebreaks }}</p>
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col-md-6">
+            <small class="text-muted">Created: {{ question.created_at|date:"M d, Y H:i" }}</small>
+          </div>
+          <div class="col-md-6 text-end">
+            <small class="text-muted">Updated: {{ question.updated_at|date:"M d, Y H:i" }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Choices Section -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">Answer Choices</h5>
+          <a href="{% url 'custom_admin:quiz_choice_create' %}?question={{ question.id }}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-plus me-1"></i>Add Choice
+          </a>
+        </div>
+
+        {% if choices %}
+        <div class="row">
+          {% for choice in choices %}
+          <div class="col-md-6 mb-3">
+            <div class="card {{ choice.is_correct|yesno:'border-success,border-light' }}">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" disabled {% if choice.is_correct %}checked{% endif %}>
+                      </div>
+                      <span class="fw-medium">Choice {{ choice.order }}</span>
+                      {% if choice.is_correct %}
+                        <span class="badge bg-success ms-2">Correct Answer</span>
+                      {% endif %}
+                    </div>
+                    <p class="mb-0 {{ choice.is_correct|yesno:'text-success fw-medium,' }}">{{ choice.choice_text }}</p>
+                  </div>
+                  <div class="btn-group btn-group-sm ms-2">
+                    <a href="{% url 'custom_admin:quiz_choice_edit' choice.id %}" class="btn btn-outline-warning btn-sm" title="Edit Choice">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <a href="{% url 'custom_admin:quiz_choice_delete' choice.id %}" class="btn btn-outline-danger btn-sm" title="Delete Choice">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="ti ti-list fs-1 text-muted mb-3"></i>
+          <h5 class="mb-2">No choices added yet</h5>
+          <p class="text-muted mb-3">Add answer choices for this question.</p>
+          <a href="{% url 'custom_admin:quiz_choice_create' %}?question={{ question.id }}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i>Add First Choice
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Quick Actions</h5>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'custom_admin:quiz_detail' question.quiz.id %}" class="btn btn-outline-primary">
+            <i class="ti ti-arrow-left me-1"></i>Back to Quiz
+          </a>
+          <a href="{% url 'custom_admin:quiz_question_edit' question.id %}" class="btn btn-outline-warning">
+            <i class="ti ti-edit me-1"></i>Edit Question
+          </a>
+          <a href="{% url 'custom_admin:quiz_choice_create' %}?question={{ question.id }}" class="btn btn-outline-success">
+            <i class="ti ti-plus me-1"></i>Add Choice
+          </a>
+          <a href="{% url 'custom_admin:quiz_question_delete' question.id %}" class="btn btn-outline-danger">
+            <i class="ti ti-trash me-1"></i>Delete Question
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

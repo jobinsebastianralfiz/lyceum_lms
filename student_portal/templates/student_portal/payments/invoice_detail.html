@@ -1,0 +1,153 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Student Portal - UpTrail{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="card-title mb-1">Tax Invoice</h4>
+            <p class="mb-0 text-muted">Invoice #{{ invoice.invoice_number }}</p>
+          </div>
+          <div>
+            <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-secondary btn-sm me-2">
+              <i class="ti ti-arrow-left"></i> Back to Invoices
+            </a>
+            {% if invoice.invoice_pdf_path %}
+              <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn btn-success btn-sm">
+                <i class="ti ti-download"></i> Download PDF
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Invoice Header -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">Invoice Details</h6>
+                <ul class="list-unstyled mb-0">
+                  <li><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</li>
+                  <li><strong>Invoice Date:</strong> {{ invoice.invoice_date|date:"M d, Y" }}</li>
+                  <li><strong>Generated:</strong> {{ invoice.created_at|date:"M d, Y H:i" }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">Student Information</h6>
+                <ul class="list-unstyled mb-0">
+                  <li><strong>Name:</strong> {{ invoice.enrollment.user.name }}</li>
+                  <li><strong>Email:</strong> {{ invoice.enrollment.user.email }}</li>
+                  {% if invoice.enrollment.user.phone_number %}
+                    <li><strong>Phone:</strong> {{ invoice.enrollment.user.phone_number }}</li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Information -->
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">Course Details</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <h5>{{ invoice.enrollment.course.title }}</h5>
+                <p class="text-muted mb-1">{{ invoice.enrollment.course.description|truncatewords:20 }}</p>
+                <p class="mb-0">
+                  <span class="badge bg-info">{{ invoice.enrollment.course.category.name }}</span>
+                  <span class="badge bg-secondary">{{ invoice.enrollment.get_enrollment_type_display }}</span>
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <p class="mb-1"><strong>Enrollment Date:</strong></p>
+                <p class="h6">{{ invoice.enrollment.enrolled_on|date:"M d, Y" }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Information -->
+        {% if invoice.payment %}
+          <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0">Payment Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <ul class="list-unstyled">
+                    <li><strong>Installment Number:</strong> {{ invoice.payment.installment_number }}</li>
+                    <li><strong>Payment Date:</strong> {{ invoice.payment.payment_date|date:"M d, Y H:i" }}</li>
+                    <li><strong>Payment Method:</strong> {{ invoice.payment.get_payment_method_display }}</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <ul class="list-unstyled">
+                    <li><strong>Transaction ID:</strong> 
+                      {% if invoice.payment.transaction_id %}
+                        <code>{{ invoice.payment.transaction_id }}</code>
+                      {% else %}
+                        <span class="text-muted">Not available</span>
+                      {% endif %}
+                    </li>
+                    <li><strong>Status:</strong> 
+                      <span class="badge bg-success">{{ invoice.payment.get_status_display }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Invoice Amount Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0">Amount Breakdown</h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <td class="text-end"><strong>Subtotal:</strong></td>
+                    <td class="text-end" style="width: 150px;">₹{{ invoice.subtotal|floatformat:2 }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-end"><strong>Tax ({{ invoice.tax_rate }}%):</strong></td>
+                    <td class="text-end">₹{{ invoice.tax_amount|floatformat:2 }}</td>
+                  </tr>
+                  <tr class="border-top">
+                    <td class="text-end"><strong>Total Amount:</strong></td>
+                    <td class="text-end"><h5 class="text-primary">₹{{ invoice.total_amount|floatformat:2 }}</h5></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="mt-4 p-3 bg-light rounded">
+          <small class="text-muted">
+            <strong>Note:</strong> This is a computer-generated invoice. For any queries regarding this invoice, 
+            please contact support with the invoice number {{ invoice.invoice_number }}.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

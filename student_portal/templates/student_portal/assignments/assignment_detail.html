@@ -1,0 +1,281 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ assignment.title }} - CodeLearn Student Portal{% endblock %}
+
+{% block content %}
+<!-- Assignment Header -->
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-1 fw-semibold">{{ assignment.title }}</h5>
+            <small class="text-muted">{{ course.title }} → {{ module.title }}</small>
+          </div>
+          <div>
+            {% if submission %}
+              {% if submission.status == 'draft' %}
+                <span class="badge bg-warning">Draft</span>
+              {% elif submission.status == 'submitted' %}
+                <span class="badge bg-primary">Submitted</span>
+              {% elif submission.status == 'under_review' %}
+                <span class="badge bg-info">Under Review</span>
+              {% elif submission.status == 'graded' %}
+                {% if submission.is_passed %}
+                  <span class="badge bg-success">Passed</span>
+                {% else %}
+                  <span class="badge bg-danger">Failed</span>
+                {% endif %}
+              {% elif submission.status == 'returned' %}
+                <span class="badge bg-warning">Returned</span>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-secondary">Not Submitted</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Assignment Description -->
+        <div class="mb-4">
+          <h6 class="fw-semibold mb-2">Description</h6>
+          <p class="text-muted">{{ assignment.description|linebreaks }}</p>
+        </div>
+        
+        <!-- Requirements -->
+        {% if assignment.requirements %}
+        <div class="mb-4">
+          <h6 class="fw-semibold mb-2">Requirements</h6>
+          <div class="bg-light p-3 rounded">
+            {{ assignment.requirements|linebreaks }}
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Resources -->
+        {% if assignment.resources %}
+        <div class="mb-4">
+          <h6 class="fw-semibold mb-2">Additional Resources</h6>
+          <div class="bg-light-info p-3 rounded">
+            {{ assignment.resources|linebreaks }}
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Submission Form -->
+        {% if not submission or submission.status == 'draft' or submission.status == 'returned' %}
+        <div class="card border-primary">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">
+              <i class="ti ti-upload me-2"></i>
+              {% if submission %}Update Submission{% else %}Submit Assignment{% endif %}
+            </h6>
+          </div>
+          <div class="card-body">
+            <form id="assignmentSubmissionForm">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="github_url" class="form-label fw-semibold">GitHub Repository URL *</label>
+                <input type="url" class="form-control" id="github_url" name="github_url" 
+                       value="{% if submission %}{{ submission.github_url }}{% endif %}" 
+                       placeholder="https://github.com/username/repository" required>
+                <div class="form-text">Please provide the URL to your GitHub repository containing the assignment solution.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="submission_notes" class="form-label fw-semibold">Submission Notes</label>
+                <textarea class="form-control" id="submission_notes" name="submission_notes" 
+                          rows="4" placeholder="Add any notes about your submission (optional)">{% if submission %}{{ submission.submission_notes }}{% endif %}</textarea>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="ti ti-send me-2"></i>Submit Assignment
+                </button>
+                <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-light-secondary text-secondary">
+                  <i class="ti ti-arrow-left me-2"></i>Back to Course
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Existing Submission Display -->
+        {% if submission and submission.status != 'draft' %}
+        <div class="card border-success">
+          <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+              <i class="ti ti-check me-2"></i>Your Submission
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>GitHub URL:</strong><br>
+                <a href="{{ submission.github_url }}" target="_blank" class="text-primary">
+                  {{ submission.github_url }}
+                  <i class="ti ti-external-link ms-1"></i>
+                </a>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Submitted At:</strong><br>
+                {{ submission.submitted_at|date:"M d, Y g:i A" }}
+              </div>
+            </div>
+            
+            {% if submission.submission_notes %}
+            <div class="mb-3">
+              <strong>Your Notes:</strong><br>
+              <p class="text-muted mb-0">{{ submission.submission_notes|linebreaks }}</p>
+            </div>
+            {% endif %}
+            
+            {% if submission.status == 'graded' %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <strong>Score:</strong><br>
+                <span class="badge bg-{% if submission.is_passed %}success{% else %}danger{% endif %} fs-6">
+                  {{ submission.score }}/{{ assignment.max_points }} ({{ submission.score_percentage|floatformat:1 }}%)
+                </span>
+              </div>
+              <div class="col-md-6 mb-3">
+                <strong>Graded At:</strong><br>
+                {{ submission.graded_at|date:"M d, Y g:i A" }}
+              </div>
+            </div>
+            
+            {% if submission.grade_comments %}
+            <div class="mb-3">
+              <strong>Instructor Feedback:</strong>
+              <div class="bg-light p-3 rounded mt-2">
+                {{ submission.grade_comments|linebreaks }}
+              </div>
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Assignment Sidebar -->
+  <div class="col-lg-4">
+    <!-- Assignment Info -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0 fw-semibold">Assignment Details</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <small class="text-muted d-block">Maximum Points</small>
+          <strong class="text-primary">{{ assignment.max_points }} points</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Passing Score</small>
+          <strong>{{ assignment.passing_score }} points ({{ assignment.passing_score|mul:100|div:assignment.max_points|floatformat:0 }}%)</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Due Date</small>
+          <strong>{{ assignment.due_days }} days from module start</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Required</small>
+          {% if assignment.is_required %}
+            <span class="badge bg-warning">Required for completion</span>
+          {% else %}
+            <span class="badge bg-info">Optional</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0 fw-semibold">Navigation</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-light-primary text-primary">
+            <i class="ti ti-arrow-left me-2"></i>Back to Course
+          </a>
+          <a href="{% url 'student_portal:my_courses' %}" class="btn btn-light-secondary text-secondary">
+            <i class="ti ti-book me-2"></i>My Courses
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('assignmentSubmissionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ti ti-loader-2 me-2"></i>Submitting...';
+            
+            fetch('{% url "student_portal:submit_assignment" assignment.id %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        <i class="ti ti-check me-2"></i>Assignment submitted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    form.parentNode.insertBefore(alertDiv, form);
+                    
+                    // Reload page after a short delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="ti ti-x me-2"></i>${error.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                form.parentNode.insertBefore(alertDiv, form);
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

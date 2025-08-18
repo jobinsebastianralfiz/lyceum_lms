@@ -1,0 +1,95 @@
+{% extends "student_portal/base.html" %}
+{% load static %}
+
+{% block title %}Student Login - UpTrail{% endblock %}
+
+{% block auth_content %}
+<div class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+  <div class="d-flex align-items-center justify-content-center w-100">
+    <div class="row justify-content-center w-100">
+      <div class="col-md-8 col-lg-6 col-xxl-3">
+        <div class="card mb-0">
+          <div class="card-body">
+            <a href="{% url 'student_portal:dashboard' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+              <img src="{% static 'images/logo/logo.svg' %}" alt="UpTrail" style="height: 60px;">
+            </a>
+            <p class="text-center">Student Portal - Welcome Back</p>
+            
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+            
+            <form method="post">
+              {% csrf_token %}
+              {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+              {% endif %}
+              
+              <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" required 
+                       placeholder="Enter your email address" value="{{ request.POST.email|default:'' }}">
+              </div>
+              
+              <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required 
+                       placeholder="Enter your password">
+              </div>
+              
+              <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
+              
+              <div class="d-flex align-items-center justify-content-center">
+                <p class="fs-4 mb-0 fw-bold">Need help accessing your account?</p>
+                <a class="text-primary fw-bold ms-2" href="mailto:support@uptrail.com">Contact Support</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Ensure CSRF protection is working
+  document.addEventListener('DOMContentLoaded', function() {
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    
+    // Check CSRF protection on form submission
+    const form = document.querySelector('form[method="post"]');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const csrfCookie = getCookie('csrftoken');
+        const csrfInput = this.querySelector('[name=csrfmiddlewaretoken]');
+        
+        if (!csrfCookie || !csrfInput || !csrfInput.value) {
+          e.preventDefault();
+          alert('Security error. Please reload the page and try again.');
+          location.reload();
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -9,6 +9,12 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 from .admin import admin_site
 
 urlpatterns = [
+    # Landing Pages
+    path('', include('landing.urls')),
+    
+    # Student Portal
+    path('student/', include('student_portal.urls')),
+    
     # Custom Admin Interface
     path('admin/', include('apps.custom_admin.urls')),
     

@@ -1,0 +1,231 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-10 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h4 class="card-title mb-0">{{ title }}</h4>
+          <a href="{% if question %}{% url 'custom_admin:quiz_question_detail' question.id %}{% else %}{% url 'custom_admin:quiz_questions_list' %}{% endif %}" 
+             class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Back
+          </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
+
+          <!-- Question Basic Info -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="ti ti-help-circle me-2"></i>Question Details</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.quiz.id_for_label }}" class="form-label">{{ form.quiz.label }}</label>
+                  {{ form.quiz }}
+                  {% if form.quiz.help_text %}
+                  <div class="form-text">{{ form.quiz.help_text }}</div>
+                  {% endif %}
+                  {% if form.quiz.errors %}
+                  <div class="text-danger">{{ form.quiz.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-3 mb-3">
+                  <label for="{{ form.question_type.id_for_label }}" class="form-label">{{ form.question_type.label }}</label>
+                  {{ form.question_type }}
+                  {% if form.question_type.help_text %}
+                  <div class="form-text">{{ form.question_type.help_text }}</div>
+                  {% endif %}
+                  {% if form.question_type.errors %}
+                  <div class="text-danger">{{ form.question_type.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-3 mb-3">
+                  <label for="{{ form.points.id_for_label }}" class="form-label">{{ form.points.label }}</label>
+                  {{ form.points }}
+                  {% if form.points.help_text %}
+                  <div class="form-text">{{ form.points.help_text }}</div>
+                  {% endif %}
+                  {% if form.points.errors %}
+                  <div class="text-danger">{{ form.points.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.question_text.id_for_label }}" class="form-label">{{ form.question_text.label }} <span class="text-danger">*</span></label>
+                {{ form.question_text }}
+                {% if form.question_text.help_text %}
+                <div class="form-text">{{ form.question_text.help_text }}</div>
+                {% endif %}
+                {% if form.question_text.errors %}
+                <div class="text-danger">{{ form.question_text.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.explanation.id_for_label }}" class="form-label">{{ form.explanation.label }}</label>
+                  {{ form.explanation }}
+                  {% if form.explanation.help_text %}
+                  <div class="form-text">{{ form.explanation.help_text }}</div>
+                  {% endif %}
+                  {% if form.explanation.errors %}
+                  <div class="text-danger">{{ form.explanation.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.order.id_for_label }}" class="form-label">{{ form.order.label }}</label>
+                  {{ form.order }}
+                  {% if form.order.help_text %}
+                  <div class="form-text">{{ form.order.help_text }}</div>
+                  {% endif %}
+                  {% if form.order.errors %}
+                  <div class="text-danger">{{ form.order.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answer Choices Section -->
+          <div class="card mb-4" id="choices-section">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="ti ti-list me-2"></i>Answer Choices</h5>
+              <small class="text-muted">Add at least 2 answer choices for multiple choice questions</small>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <!-- Choice 1 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_1.id_for_label }}" class="form-label">Choice 1 <span class="text-danger">*</span></label>
+                  {{ form.choice_1 }}
+                  {% if form.choice_1.errors %}
+                  <div class="text-danger">{{ form.choice_1.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Choice 2 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_2.id_for_label }}" class="form-label">Choice 2 <span class="text-danger">*</span></label>
+                  {{ form.choice_2 }}
+                  {% if form.choice_2.errors %}
+                  <div class="text-danger">{{ form.choice_2.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Choice 3 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_3.id_for_label }}" class="form-label">Choice 3</label>
+                  {{ form.choice_3 }}
+                  {% if form.choice_3.errors %}
+                  <div class="text-danger">{{ form.choice_3.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Choice 4 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_4.id_for_label }}" class="form-label">Choice 4</label>
+                  {{ form.choice_4 }}
+                  {% if form.choice_4.errors %}
+                  <div class="text-danger">{{ form.choice_4.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Choice 5 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_5.id_for_label }}" class="form-label">Choice 5 <small class="text-muted">(optional)</small></label>
+                  {{ form.choice_5 }}
+                  {% if form.choice_5.errors %}
+                  <div class="text-danger">{{ form.choice_5.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Choice 6 -->
+                <div class="col-md-6 mb-3">
+                  <label for="{{ form.choice_6.id_for_label }}" class="form-label">Choice 6 <small class="text-muted">(optional)</small></label>
+                  {{ form.choice_6 }}
+                  {% if form.choice_6.errors %}
+                  <div class="text-danger">{{ form.choice_6.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Correct Answer Selection -->
+              <div class="mt-4 p-3 bg-success-subtle rounded">
+                <h6 class="mb-3"><i class="ti ti-check-box me-2"></i>Select Correct Answer</h6>
+                <div class="row">
+                  {% for radio in form.correct_choice %}
+                  <div class="col-md-2 mb-2">
+                    <div class="form-check">
+                      {{ radio.tag }}
+                      <label class="form-check-label" for="{{ radio.id_for_label }}">
+                        {{ radio.choice_label }}
+                      </label>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% if form.correct_choice.help_text %}
+                <div class="form-text mt-2">{{ form.correct_choice.help_text }}</div>
+                {% endif %}
+                {% if form.correct_choice.errors %}
+                <div class="text-danger mt-2">{{ form.correct_choice.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% if question %}{% url 'custom_admin:quiz_question_detail' question.id %}{% else %}{% url 'custom_admin:quiz_questions_list' %}{% endif %}" 
+               class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>
+              {% if is_edit %}Update Question{% else %}Create Question{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Show/hide choices section based on question type
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeField = document.getElementById('{{ form.question_type.id_for_label }}');
+    const choicesSection = document.getElementById('choices-section');
+    
+    function toggleChoicesSection() {
+        if (questionTypeField.value === 'multiple_choice') {
+            choicesSection.style.display = 'block';
+        } else {
+            choicesSection.style.display = 'none';
+        }
+    }
+    
+    // Initial check
+    toggleChoicesSection();
+    
+    // Listen for changes
+    questionTypeField.addEventListener('change', toggleChoicesSection);
+});
+</script>
+{% endblock %}

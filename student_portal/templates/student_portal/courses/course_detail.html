@@ -1,0 +1,334 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ course.title }} - CodeLearn Student Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-circle {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-circle svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring {
+        fill: none;
+        stroke: #e9ecef;
+        stroke-width: 3;
+    }
+    
+    .progress-ring-fill {
+        fill: none;
+        stroke: #28a745;
+        stroke-width: 3;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Course Header -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="h3 mb-2">{{ course.title }}</h1>
+                <p class="text-muted mb-3">{{ course.description }}</p>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-primary">{{ course.category.name }}</span>
+                    <span class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>
+                        Enrolled: {{ enrollment.enrolled_on|date:"M d, Y" }}
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-layer-group me-1"></i>
+                        {{ modules.count }} Module{{ modules.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="progress-circle d-inline-block me-3">
+                    <svg viewBox="0 0 36 36">
+                        <path class="progress-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <path class="progress-ring-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    </svg>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <span class="fw-bold">0%</span>
+                    </div>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Overall Progress</small>
+                    <strong class="text-success">Keep Learning!</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Modules -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Course Content</h5>
+            </div>
+            <div class="card-body p-0">
+                {% for module in modules %}
+                <div class="border-bottom {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="p-4">
+                        <!-- Module Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                {% if module.progress.is_unlocked %}
+                                    {% if module.progress.is_completed %}
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="ti ti-check"></i>
+                                    </div>
+                                    {% else %}
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="ti ti-play"></i>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="ti ti-lock"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ module.title }}</h6>
+                                    <small class="text-muted">{{ module.description|truncatechars:100 }}</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                {% if module.progress.is_completed %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif module.progress.is_unlocked %}
+                                <span class="badge bg-primary">{{ module.progress.completion_percentage|floatformat:0 }}% Complete</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Locked</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Module Progress -->
+                        {% if module.progress.is_unlocked %}
+                        <div class="mb-3">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ module.progress.completion_percentage }}%"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Module Content -->
+                        {% if module.progress.is_unlocked %}
+                        <div class="accordion" id="module{{ module.id }}Accordion">
+                            <!-- Video Lessons -->
+                            {% if module.video_lessons.exists %}
+                            <div class="accordion-item border-0">
+                                <h2 class="accordion-header" id="lessons{{ module.id }}">
+                                    <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#lessonsCollapse{{ module.id }}">
+                                        <i class="ti ti-play me-2"></i>
+                                        {{ module.video_lessons.count }} Video Lesson{{ module.video_lessons.count|pluralize }}
+                                    </button>
+                                </h2>
+                                <div id="lessonsCollapse{{ module.id }}" class="accordion-collapse collapse" data-bs-parent="#module{{ module.id }}Accordion">
+                                    <div class="accordion-body">
+                                        {% for lesson in module.video_lessons.all %}
+                                        <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ti ti-play text-primary me-2"></i>
+                                                <div>
+                                                    <span class="fw-medium">{{ lesson.title }}</span>
+                                                    {% if lesson.duration %}
+                                                    <small class="text-muted d-block">{{ lesson.duration|floatformat:0 }} seconds</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'student_portal:lesson_viewer' lesson.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="ti ti-play me-1"></i>Watch
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Assignments -->
+                            {% if module.assignments.exists %}
+                            <div class="accordion-item border-0">
+                                <h2 class="accordion-header" id="assignments{{ module.id }}">
+                                    <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#assignmentsCollapse{{ module.id }}">
+                                        <i class="ti ti-file-text me-2"></i>
+                                        {{ module.assignments.count }} Assignment{{ module.assignments.count|pluralize }}
+                                    </button>
+                                </h2>
+                                <div id="assignmentsCollapse{{ module.id }}" class="accordion-collapse collapse" data-bs-parent="#module{{ module.id }}Accordion">
+                                    <div class="accordion-body">
+                                        {% for assignment in module.assignments.all %}
+                                        <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ti ti-file-text text-warning me-2"></i>
+                                                <div>
+                                                    <span class="fw-medium">{{ assignment.title }}</span>
+                                                    <small class="text-muted d-block">{{ assignment.max_points }} points • {{ assignment.due_days }} days to complete</small>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'student_portal:assignment_detail' assignment.id %}" class="btn btn-sm btn-warning">
+                                                    <i class="ti ti-edit me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Quizzes -->
+                            {% if module.quizzes.exists %}
+                            <div class="accordion-item border-0">
+                                <h2 class="accordion-header" id="quizzes{{ module.id }}">
+                                    <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#quizzesCollapse{{ module.id }}">
+                                        <i class="ti ti-help me-2"></i>
+                                        {{ module.quizzes.count }} Quiz{{ module.quizzes.count|pluralize }}
+                                    </button>
+                                </h2>
+                                <div id="quizzesCollapse{{ module.id }}" class="accordion-collapse collapse" data-bs-parent="#module{{ module.id }}Accordion">
+                                    <div class="accordion-body">
+                                        {% for quiz in module.quizzes.all %}
+                                        <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ti ti-help text-info me-2"></i>
+                                                <div>
+                                                    <span class="fw-medium">{{ quiz.title }}</span>
+                                                    <small class="text-muted d-block">{{ quiz.total_points }} points • {{ quiz.time_limit }} minutes • {{ quiz.max_attempts }} attempts</small>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'student_portal:quiz_detail' quiz.id %}" class="btn btn-sm btn-info">
+                                                    <i class="ti ti-play me-1"></i>Take Quiz
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- No Content Message -->
+                            {% if not module.video_lessons.exists and not module.assignments.exists and not module.quizzes.exists %}
+                            <div class="text-center py-3">
+                                <small class="text-muted">No content available in this module</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No modules available</h5>
+                    <p class="text-muted">This course doesn't have any modules yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Course Sidebar -->
+    <div class="col-lg-4">
+        <!-- Course Info -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Course Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block">Instructor</small>
+                    <strong>{{ course.created_by.name }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Category</small>
+                    <strong>{{ course.category.name }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Price</small>
+                    <strong>{{ course.price_display }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Total Modules</small>
+                    <strong>{{ modules.count }}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Enrollment Status</small>
+                    {% if enrollment.payment_status == 'completed' or course.is_free %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Payment Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'student_portal:my_courses' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to My Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calculate and update overall progress using completion percentages
+    let moduleProgresses = [
+        {% for module in modules %}
+        {{ module.progress.completion_percentage|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    let totalModules = {{ modules.count }};
+    let totalProgress = moduleProgresses.reduce((sum, progress) => sum + progress, 0);
+    let overallProgress = totalModules > 0 ? Math.round(totalProgress / totalModules) : 0;
+    
+    // Update progress circle
+    const progressRingFill = document.querySelector('.progress-ring-fill');
+    const progressText = document.querySelector('.progress-circle span');
+    
+    if (progressRingFill) {
+        progressRingFill.setAttribute('stroke-dasharray', overallProgress + ', 100');
+    }
+    if (progressText) {
+        progressText.textContent = overallProgress + '%';
+    }
+    
+    console.log('Course detail loaded:', '{{ course.title }}');
+});
+</script>
+{% endblock %}

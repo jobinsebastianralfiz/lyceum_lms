@@ -19,6 +19,8 @@ from apps.courses.models import (
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
 from apps.notifications.models import Notification
+from .forms import CustomVideoLessonForm, CustomAssignmentForm, CustomQuizQuestionForm, CustomQuizChoiceForm, CustomQuizQuestionWithChoicesForm
+from .quiz_reset_views import quiz_attempt_reset_view, quiz_attempt_delete_view
 
 
 def is_staff_user(user):
@@ -793,8 +795,18 @@ def video_lessons_list_view(request):
 @user_passes_test(is_staff_user)
 def video_lesson_create_view(request):
     """Create a new video lesson"""
+    if request.method == 'POST':
+        form = CustomVideoLessonForm(request.POST, request.FILES)
+        if form.is_valid():
+            video_lesson = form.save()
+            messages.success(request, f'Video lesson "{video_lesson.title}" created successfully.')
+            return redirect('custom_admin:video_lessons_list')
+    else:
+        form = CustomVideoLessonForm()
+    
     courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/video_lessons/form.html', {
+        'form': form,
         'title': 'Add Video Lesson',
         'is_edit': False,
         'courses': courses
@@ -804,8 +816,19 @@ def video_lesson_create_view(request):
 def video_lesson_edit_view(request, lesson_id):
     """Edit a video lesson"""
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
+    
+    if request.method == 'POST':
+        form = CustomVideoLessonForm(request.POST, request.FILES, instance=lesson)
+        if form.is_valid():
+            video_lesson = form.save()
+            messages.success(request, f'Video lesson "{video_lesson.title}" updated successfully.')
+            return redirect('custom_admin:video_lessons_list')
+    else:
+        form = CustomVideoLessonForm(instance=lesson)
+    
     courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/video_lessons/form.html', {
+        'form': form,
         'lesson': lesson,
         'title': 'Edit Video Lesson',
         'is_edit': True,
@@ -1808,8 +1831,18 @@ def assignment_detail_view(request, assignment_id):
 @user_passes_test(is_staff_user)
 def assignment_create_view(request):
     """Create assignment"""
+    if request.method == 'POST':
+        form = CustomAssignmentForm(request.POST)
+        if form.is_valid():
+            assignment = form.save()
+            messages.success(request, f'Assignment "{assignment.title}" created successfully.')
+            return redirect('custom_admin:assignments_list')
+    else:
+        form = CustomAssignmentForm()
+    
     courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/assignments/form.html', {
+        'form': form,
         'title': 'Add Assignment',
         'is_edit': False,
         'courses': courses
@@ -1819,8 +1852,19 @@ def assignment_create_view(request):
 def assignment_edit_view(request, assignment_id):
     """Edit assignment"""
     assignment = get_object_or_404(Assignment, id=assignment_id)
+    
+    if request.method == 'POST':
+        form = CustomAssignmentForm(request.POST, instance=assignment)
+        if form.is_valid():
+            assignment = form.save()
+            messages.success(request, f'Assignment "{assignment.title}" updated successfully.')
+            return redirect('custom_admin:assignments_list')
+    else:
+        form = CustomAssignmentForm(instance=assignment)
+    
     courses = Course.objects.prefetch_related('modules').all()
     return render(request, 'custom_admin/assignments/form.html', {
+        'form': form,
         'assignment': assignment,
         'title': 'Edit Assignment',
         'is_edit': True,
@@ -2193,6 +2237,222 @@ def get_course_info(request, course_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+# ==============================================================================
+# QUIZ QUESTIONS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quiz_questions_list_view(request):
+    """List all quiz questions"""
+    search_query = request.GET.get('search', '')
+    quiz_id = request.GET.get('quiz')
+    
+    questions = QuizQuestion.objects.select_related('quiz', 'quiz__module', 'quiz__module__course').prefetch_related('choices').order_by('quiz__title', 'order')
+    
+    if quiz_id:
+        questions = questions.filter(quiz_id=quiz_id)
+    
+    if search_query:
+        questions = questions.filter(
+            Q(question_text__icontains=search_query) |
+            Q(quiz__title__icontains=search_query) |
+            Q(quiz__module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(questions, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all quizzes for filter dropdown
+    quizzes = Quiz.objects.select_related('module', 'module__course').order_by('module__course__title', 'title')
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'quiz_id': quiz_id,
+        'quizzes': quizzes,
+    }
+    
+    return render(request, 'custom_admin/quiz_questions/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_question_detail_view(request, question_id):
+    """View quiz question details"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    choices = QuizChoice.objects.filter(question=question).order_by('order')
+    
+    context = {
+        'question': question,
+        'choices': choices,
+    }
+    
+    return render(request, 'custom_admin/quiz_questions/detail.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_question_create_view(request):
+    """Create quiz question with choices"""
+    quiz_id = request.GET.get('quiz')
+    
+    if request.method == 'POST':
+        form = CustomQuizQuestionWithChoicesForm(request.POST)
+        if form.is_valid():
+            question = form.save()
+            messages.success(request, f'Quiz question created successfully with answer choices.')
+            return redirect('custom_admin:quiz_question_detail', question_id=question.id)
+    else:
+        initial_data = {}
+        if quiz_id:
+            try:
+                quiz = Quiz.objects.get(id=quiz_id)
+                initial_data['quiz'] = quiz
+                # Set next order number
+                last_question = QuizQuestion.objects.filter(quiz=quiz).order_by('-order').first()
+                initial_data['order'] = (last_question.order + 1) if last_question else 1
+            except Quiz.DoesNotExist:
+                pass
+        
+        form = CustomQuizQuestionWithChoicesForm(initial=initial_data)
+    
+    return render(request, 'custom_admin/quiz_questions/form_with_choices.html', {
+        'form': form,
+        'title': 'Add Quiz Question',
+        'is_edit': False,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_question_edit_view(request, question_id):
+    """Edit quiz question"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    
+    if request.method == 'POST':
+        form = CustomQuizQuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            question = form.save()
+            messages.success(request, f'Quiz question updated successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=question.id)
+    else:
+        form = CustomQuizQuestionForm(instance=question)
+    
+    return render(request, 'custom_admin/quiz_questions/form.html', {
+        'form': form,
+        'question': question,
+        'title': 'Edit Quiz Question',
+        'is_edit': True,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_question_delete_view(request, question_id):
+    """Delete quiz question"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, f'Quiz question deleted successfully.')
+        return redirect('custom_admin:quiz_questions_list')
+    return render(request, 'custom_admin/quiz_questions/delete.html', {'question': question})
+
+
+# ==============================================================================
+# QUIZ CHOICES MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quiz_choices_list_view(request):
+    """List all quiz choices"""
+    search_query = request.GET.get('search', '')
+    question_id = request.GET.get('question')
+    
+    choices = QuizChoice.objects.select_related('question', 'question__quiz').order_by('question__quiz__title', 'question__order', 'order')
+    
+    if question_id:
+        choices = choices.filter(question_id=question_id)
+    
+    if search_query:
+        choices = choices.filter(
+            Q(choice_text__icontains=search_query) |
+            Q(question__question_text__icontains=search_query) |
+            Q(question__quiz__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(choices, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all questions for filter dropdown
+    questions = QuizQuestion.objects.select_related('quiz').order_by('quiz__title', 'order')
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'question_id': question_id,
+        'questions': questions,
+    }
+    
+    return render(request, 'custom_admin/quiz_choices/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_choice_create_view(request):
+    """Create quiz choice"""
+    question_id = request.GET.get('question')
+    
+    if request.method == 'POST':
+        form = CustomQuizChoiceForm(request.POST)
+        if form.is_valid():
+            choice = form.save()
+            messages.success(request, f'Quiz choice created successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=choice.question.id)
+    else:
+        initial_data = {}
+        if question_id:
+            try:
+                question = QuizQuestion.objects.get(id=question_id)
+                initial_data['question'] = question
+                # Set next order number
+                last_choice = QuizChoice.objects.filter(question=question).order_by('-order').first()
+                initial_data['order'] = (last_choice.order + 1) if last_choice else 1
+            except QuizQuestion.DoesNotExist:
+                pass
+        
+        form = CustomQuizChoiceForm(initial=initial_data)
+    
+    return render(request, 'custom_admin/quiz_choices/form.html', {
+        'form': form,
+        'title': 'Add Quiz Choice',
+        'is_edit': False,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_choice_edit_view(request, choice_id):
+    """Edit quiz choice"""
+    choice = get_object_or_404(QuizChoice, id=choice_id)
+    
+    if request.method == 'POST':
+        form = CustomQuizChoiceForm(request.POST, instance=choice)
+        if form.is_valid():
+            choice = form.save()
+            messages.success(request, f'Quiz choice updated successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=choice.question.id)
+    else:
+        form = CustomQuizChoiceForm(instance=choice)
+    
+    return render(request, 'custom_admin/quiz_choices/form.html', {
+        'form': form,
+        'choice': choice,
+        'title': 'Edit Quiz Choice',
+        'is_edit': True,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_choice_delete_view(request, choice_id):
+    """Delete quiz choice"""
+    choice = get_object_or_404(QuizChoice, id=choice_id)
+    question_id = choice.question.id
+    if request.method == 'POST':
+        choice.delete()
+        messages.success(request, f'Quiz choice deleted successfully.')
+        return redirect('custom_admin:quiz_question_detail', question_id=question_id)
+    return render(request, 'custom_admin/quiz_choices/delete.html', {'choice': choice})
+
 @user_passes_test(is_staff_user)
 def get_enrollment_info(request, enrollment_id):
     """AJAX endpoint to get enrollment information for installment plans"""
@@ -2210,3 +2470,219 @@ def get_enrollment_info(request, enrollment_id):
         return JsonResponse({'error': 'Enrollment not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# ==============================================================================
+# QUIZ QUESTIONS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quiz_questions_list_view(request):
+    """List all quiz questions"""
+    search_query = request.GET.get('search', '')
+    quiz_id = request.GET.get('quiz')
+    
+    questions = QuizQuestion.objects.select_related('quiz', 'quiz__module', 'quiz__module__course').prefetch_related('choices').order_by('quiz__title', 'order')
+    
+    if quiz_id:
+        questions = questions.filter(quiz_id=quiz_id)
+    
+    if search_query:
+        questions = questions.filter(
+            Q(question_text__icontains=search_query) |
+            Q(quiz__title__icontains=search_query) |
+            Q(quiz__module__course__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(questions, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all quizzes for filter dropdown
+    quizzes = Quiz.objects.select_related('module', 'module__course').order_by('module__course__title', 'title')
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'quiz_id': quiz_id,
+        'quizzes': quizzes,
+    }
+    
+    return render(request, 'custom_admin/quiz_questions/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_question_detail_view(request, question_id):
+    """View quiz question details"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    choices = QuizChoice.objects.filter(question=question).order_by('order')
+    
+    context = {
+        'question': question,
+        'choices': choices,
+    }
+    
+    return render(request, 'custom_admin/quiz_questions/detail.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_question_create_view(request):
+    """Create quiz question with choices"""
+    quiz_id = request.GET.get('quiz')
+    
+    if request.method == 'POST':
+        form = CustomQuizQuestionWithChoicesForm(request.POST)
+        if form.is_valid():
+            question = form.save()
+            messages.success(request, f'Quiz question created successfully with answer choices.')
+            return redirect('custom_admin:quiz_question_detail', question_id=question.id)
+    else:
+        initial_data = {}
+        if quiz_id:
+            try:
+                quiz = Quiz.objects.get(id=quiz_id)
+                initial_data['quiz'] = quiz
+                # Set next order number
+                last_question = QuizQuestion.objects.filter(quiz=quiz).order_by('-order').first()
+                initial_data['order'] = (last_question.order + 1) if last_question else 1
+            except Quiz.DoesNotExist:
+                pass
+        
+        form = CustomQuizQuestionWithChoicesForm(initial=initial_data)
+    
+    return render(request, 'custom_admin/quiz_questions/form_with_choices.html', {
+        'form': form,
+        'title': 'Add Quiz Question',
+        'is_edit': False,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_question_edit_view(request, question_id):
+    """Edit quiz question"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    
+    if request.method == 'POST':
+        form = CustomQuizQuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            question = form.save()
+            messages.success(request, f'Quiz question updated successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=question.id)
+    else:
+        form = CustomQuizQuestionForm(instance=question)
+    
+    return render(request, 'custom_admin/quiz_questions/form.html', {
+        'form': form,
+        'question': question,
+        'title': 'Edit Quiz Question',
+        'is_edit': True,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_question_delete_view(request, question_id):
+    """Delete quiz question"""
+    question = get_object_or_404(QuizQuestion, id=question_id)
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, f'Quiz question deleted successfully.')
+        return redirect('custom_admin:quiz_questions_list')
+    return render(request, 'custom_admin/quiz_questions/delete.html', {'question': question})
+
+
+# ==============================================================================
+# QUIZ CHOICES MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def quiz_choices_list_view(request):
+    """List all quiz choices"""
+    search_query = request.GET.get('search', '')
+    question_id = request.GET.get('question')
+    
+    choices = QuizChoice.objects.select_related('question', 'question__quiz').order_by('question__quiz__title', 'question__order', 'order')
+    
+    if question_id:
+        choices = choices.filter(question_id=question_id)
+    
+    if search_query:
+        choices = choices.filter(
+            Q(choice_text__icontains=search_query) |
+            Q(question__question_text__icontains=search_query) |
+            Q(question__quiz__title__icontains=search_query)
+        )
+    
+    paginator = Paginator(choices, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all questions for filter dropdown
+    questions = QuizQuestion.objects.select_related('quiz').order_by('quiz__title', 'order')
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'question_id': question_id,
+        'questions': questions,
+    }
+    
+    return render(request, 'custom_admin/quiz_choices/list.html', context)
+
+@user_passes_test(is_staff_user)
+def quiz_choice_create_view(request):
+    """Create quiz choice"""
+    question_id = request.GET.get('question')
+    
+    if request.method == 'POST':
+        form = CustomQuizChoiceForm(request.POST)
+        if form.is_valid():
+            choice = form.save()
+            messages.success(request, f'Quiz choice created successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=choice.question.id)
+    else:
+        initial_data = {}
+        if question_id:
+            try:
+                question = QuizQuestion.objects.get(id=question_id)
+                initial_data['question'] = question
+                # Set next order number
+                last_choice = QuizChoice.objects.filter(question=question).order_by('-order').first()
+                initial_data['order'] = (last_choice.order + 1) if last_choice else 1
+            except QuizQuestion.DoesNotExist:
+                pass
+        
+        form = CustomQuizChoiceForm(initial=initial_data)
+    
+    return render(request, 'custom_admin/quiz_choices/form.html', {
+        'form': form,
+        'title': 'Add Quiz Choice',
+        'is_edit': False,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_choice_edit_view(request, choice_id):
+    """Edit quiz choice"""
+    choice = get_object_or_404(QuizChoice, id=choice_id)
+    
+    if request.method == 'POST':
+        form = CustomQuizChoiceForm(request.POST, instance=choice)
+        if form.is_valid():
+            choice = form.save()
+            messages.success(request, f'Quiz choice updated successfully.')
+            return redirect('custom_admin:quiz_question_detail', question_id=choice.question.id)
+    else:
+        form = CustomQuizChoiceForm(instance=choice)
+    
+    return render(request, 'custom_admin/quiz_choices/form.html', {
+        'form': form,
+        'choice': choice,
+        'title': 'Edit Quiz Choice',
+        'is_edit': True,
+    })
+
+@user_passes_test(is_staff_user)
+def quiz_choice_delete_view(request, choice_id):
+    """Delete quiz choice"""
+    choice = get_object_or_404(QuizChoice, id=choice_id)
+    question_id = choice.question.id
+    if request.method == 'POST':
+        choice.delete()
+        messages.success(request, f'Quiz choice deleted successfully.')
+        return redirect('custom_admin:quiz_question_detail', question_id=question_id)
+    return render(request, 'custom_admin/quiz_choices/delete.html', {'choice': choice})

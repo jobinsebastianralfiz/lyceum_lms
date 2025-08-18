@@ -1,0 +1,435 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ quiz.title }} - CodeLearn Student Portal{% endblock %}
+
+{% block content %}
+<!-- Quiz Header -->
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-1 fw-semibold">{{ quiz.title }}</h5>
+            <small class="text-muted">{{ course.title }} → {{ module.title }}</small>
+          </div>
+          <div>
+            {% if current_attempt %}
+              <span class="badge bg-warning">In Progress</span>
+            {% elif attempts %}
+              <span class="badge bg-info">{{ attempts.count }}/{{ quiz.max_attempts }} Attempts Used</span>
+            {% else %}
+              <span class="badge bg-secondary">Not Attempted</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Quiz Description -->
+        <div class="mb-4">
+          <h6 class="fw-semibold mb-2">Description</h6>
+          <p class="text-muted">{{ quiz.description|linebreaks }}</p>
+        </div>
+        
+        <!-- Quiz Instructions -->
+        <div class="row mb-4">
+          <div class="col-md-3 mb-2">
+            <div class="bg-light p-3 rounded text-center">
+              <i class="ti ti-clock text-primary fs-4 d-block mb-1"></i>
+              <strong>{{ quiz.time_limit }}</strong><br>
+              <small class="text-muted">Minutes</small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <div class="bg-light p-3 rounded text-center">
+              <i class="ti ti-help text-info fs-4 d-block mb-1"></i>
+              <strong>{{ quiz.total_questions }}</strong><br>
+              <small class="text-muted">Questions</small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <div class="bg-light p-3 rounded text-center">
+              <i class="ti ti-target text-success fs-4 d-block mb-1"></i>
+              <strong>{{ quiz.total_points }}</strong><br>
+              <small class="text-muted">Total Points</small>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <div class="bg-light p-3 rounded text-center">
+              <i class="ti ti-refresh text-warning fs-4 d-block mb-1"></i>
+              <strong>{{ quiz.max_attempts }}</strong><br>
+              <small class="text-muted">Max Attempts</small>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Start Quiz or Continue -->
+        {% if current_attempt %}
+          <!-- Continue Current Attempt -->
+          <div class="alert alert-warning">
+            <i class="ti ti-clock me-2"></i>
+            You have an ongoing attempt started on {{ current_attempt.started_at|date:"M d, Y g:i A" }}. 
+            Continue below to complete your quiz.
+          </div>
+          
+          <!-- Quiz Form -->
+          <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+              <h6 class="mb-0">
+                <i class="ti ti-help me-2"></i>Quiz Questions
+                <span class="float-end" id="timer"></span>
+              </h6>
+            </div>
+            <div class="card-body">
+              <form id="quizForm">
+                {% csrf_token %}
+                {% for question in questions %}
+                <div class="mb-4 p-3 border rounded">
+                  <h6 class="fw-semibold mb-3">
+                    Question {{ forloop.counter }} ({{ question.points }} points)
+                  </h6>
+                  <p class="mb-3">{{ question.question_text|linebreaks }}</p>
+                  
+                  {% if question.question_type == 'multiple_choice' or question.question_type == 'true_false' %}
+                    {% for choice in question.choices.all %}
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="radio" 
+                             name="question_{{ question.id }}" 
+                             value="{{ choice.id }}" 
+                             id="choice_{{ choice.id }}">
+                      <label class="form-check-label" for="choice_{{ choice.id }}">
+                        {{ choice.choice_text }}
+                      </label>
+                    </div>
+                    {% endfor %}
+                  {% elif question.question_type == 'short_answer' %}
+                    <textarea class="form-control" name="question_{{ question.id }}_text" 
+                              rows="3" placeholder="Enter your answer here..."></textarea>
+                  {% endif %}
+                </div>
+                {% endfor %}
+                
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success">
+                    <i class="ti ti-send me-2"></i>Submit Quiz
+                  </button>
+                  <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-light-secondary text-secondary">
+                    <i class="ti ti-arrow-left me-2"></i>Back to Course
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+        {% elif can_attempt %}
+          <!-- Start New Attempt -->
+          <div class="card border-success">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0">
+                <i class="ti ti-play me-2"></i>Ready to Start Quiz?
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info">
+                <h6 class="alert-heading">Important Instructions:</h6>
+                <ul class="mb-0">
+                  <li>You have <strong>{{ quiz.time_limit }} minutes</strong> to complete this quiz</li>
+                  <li>You can attempt this quiz <strong>{{ quiz.max_attempts }} times</strong></li>
+                  <li>You need <strong>{{ quiz.passing_score }}%</strong> to pass</li>
+                  <li>Once started, the timer cannot be paused</li>
+                  {% if quiz.randomize_questions %}
+                  <li>Questions will be presented in random order</li>
+                  {% endif %}
+                </ul>
+              </div>
+              
+              <!-- CSRF token for starting quiz -->
+              {% csrf_token %}
+              
+              <button type="button" class="btn btn-success btn-lg" id="startQuizBtn">
+                <i class="ti ti-play me-2"></i>Start Quiz
+              </button>
+            </div>
+          </div>
+        {% else %}
+          <!-- No More Attempts -->
+          <div class="alert alert-warning">
+            <i class="ti ti-x me-2"></i>
+            You have used all {{ quiz.max_attempts }} attempts for this quiz.
+            <br><small class="text-muted">
+              Debug: Attempts used: {{ attempts.count }}/{{ quiz.max_attempts }} | Can attempt: {{ can_attempt }}
+            </small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quiz Sidebar -->
+  <div class="col-lg-4">
+    <!-- Quiz Info -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0 fw-semibold">Quiz Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <small class="text-muted d-block">Passing Score</small>
+          <strong class="text-success">{{ quiz.passing_score }}%</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Time Limit</small>
+          <strong>{{ quiz.time_limit }} minutes</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Attempts Used</small>
+          <strong>{{ attempts.count }}/{{ quiz.max_attempts }}</strong>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">Required</small>
+          {% if quiz.is_required %}
+            <span class="badge bg-warning">Required for completion</span>
+          {% else %}
+            <span class="badge bg-info">Optional</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Previous Attempts -->
+    {% if attempts %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0 fw-semibold">Previous Attempts</h5>
+      </div>
+      <div class="card-body">
+        {% for attempt in attempts %}
+        <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+          <div>
+            <strong>Attempt {{ attempt.attempt_number }}</strong><br>
+            <small class="text-muted">{{ attempt.completed_at|date:"M d, Y g:i A" }}</small>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-{% if attempt.is_passed %}success{% else %}danger{% endif %}">
+              {{ attempt.score_percentage|floatformat:1 }}%
+            </span><br>
+            <small class="text-muted">{{ attempt.score }}/{{ attempt.total_points }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Navigation -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0 fw-semibold">Navigation</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-light-primary text-primary">
+            <i class="ti ti-arrow-left me-2"></i>Back to Course
+          </a>
+          <a href="{% url 'student_portal:my_courses' %}" class="btn btn-light-secondary text-secondary">
+            <i class="ti ti-book me-2"></i>My Courses
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentAttemptId = {% if current_attempt %}{{ current_attempt.id }}{% else %}null{% endif %};
+    let timeLimit = {{ quiz.time_limit }} * 60; // Convert to seconds
+    let startTime = {% if current_attempt %}"{{ current_attempt.started_at|date:'c' }}"{% else %}null{% endif %};
+    let timerInterval;
+    
+    // Start Quiz Button
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    if (startQuizBtn) {
+        startQuizBtn.addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<i class="ti ti-loader-2 me-2"></i>Starting Quiz...';
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfToken) {
+                alert('CSRF token not found. Please reload the page.');
+                this.disabled = false;
+                this.innerHTML = '<i class="ti ti-play me-2"></i>Start Quiz';
+                return;
+            }
+            
+            fetch('{% url "student_portal:start_quiz_attempt" quiz.id %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken.value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentAttemptId = data.attempt_id;
+                    startTime = data.started_at;
+                    // Reload page to show quiz form
+                    window.location.reload();
+                } else {
+                    throw new Error(data.error || 'Failed to start quiz');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error starting quiz: ' + error.message);
+                this.disabled = false;
+                this.innerHTML = '<i class="ti ti-play me-2"></i>Start Quiz';
+            });
+        });
+    }
+    
+    // Timer functionality - only run if there's an active attempt
+    if (currentAttemptId && startTime && timeLimit > 0) {
+        const startDate = new Date(startTime);
+        
+        // Debug information
+        console.log('Timer Debug Info:');
+        console.log('Current Attempt ID:', currentAttemptId);
+        console.log('Start Time String:', startTime);
+        console.log('Start Date Object:', startDate);
+        console.log('Time Limit (seconds):', timeLimit);
+        console.log('Is Start Date Valid?', !isNaN(startDate.getTime()));
+        
+        // Only proceed if we have a valid start date
+        if (isNaN(startDate.getTime())) {
+            console.error('Invalid start date, timer will not start');
+            return;
+        }
+        
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = Math.floor((now - startDate) / 1000);
+            const remaining = Math.max(0, timeLimit - elapsed);
+            
+            // Debug timer values
+            console.log('Timer Update - Now:', now, 'Elapsed:', elapsed, 'Remaining:', remaining);
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 300) { // 5 minutes warning
+                    timerElement.className = 'text-warning';
+                }
+                if (remaining <= 60) { // 1 minute warning
+                    timerElement.className = 'text-danger';
+                }
+            }
+            
+            // Only auto-submit if time is actually up AND we have a valid timer
+            if (remaining <= 0 && elapsed > 10) { // Added 10 second buffer to prevent immediate submission
+                console.log('Timer expired, auto-submitting quiz');
+                clearInterval(timerInterval);
+                alert('Time is up! Submitting your quiz automatically.');
+                const quizForm = document.getElementById('quizForm');
+                if (quizForm) {
+                    quizForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        }
+        
+        // Initial timer update
+        updateTimer();
+        
+        // Only start interval if timer is working properly
+        const testElapsed = Math.floor((new Date() - startDate) / 1000);
+        if (testElapsed >= 0 && testElapsed < timeLimit) {
+            timerInterval = setInterval(updateTimer, 1000);
+            console.log('Timer started successfully');
+        } else {
+            console.error('Timer validation failed - elapsed:', testElapsed, 'timeLimit:', timeLimit);
+        }
+    } else {
+        console.log('Timer not started - Missing required data:', {
+            currentAttemptId: currentAttemptId,
+            startTime: startTime,
+            timeLimit: timeLimit
+        });
+    }
+    
+    // Quiz Form Submission
+    const quizForm = document.getElementById('quizForm');
+    if (quizForm) {
+        quizForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ti ti-loader-2 me-2"></i>Submitting...';
+            
+            // Get CSRF token for submission
+            const csrfTokenSubmit = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfTokenSubmit) {
+                alert('CSRF token not found. Please reload the page.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+            
+            fetch(`{% url 'student_portal:submit_quiz_answers' 0 %}`.replace('0', currentAttemptId), {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfTokenSubmit.value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    clearInterval(timerInterval);
+                    
+                    // Show results
+                    const resultsHtml = `
+                        <div class="alert alert-${data.passed ? 'success' : 'warning'}">
+                            <h5 class="alert-heading">Quiz Completed!</h5>
+                            <p><strong>Score:</strong> ${data.score}/${data.total_points} (${data.percentage.toFixed(1)}%)</p>
+                            <p><strong>Result:</strong> ${data.passed ? 'Passed' : 'Failed'}</p>
+                            <p><strong>Completed at:</strong> ${new Date(data.completed_at).toLocaleString()}</p>
+                        </div>
+                    `;
+                    
+                    this.outerHTML = resultsHtml;
+                    
+                    // Reload page after a delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting quiz: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

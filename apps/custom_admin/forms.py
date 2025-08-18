@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from apps.users.models import User, Team, TeamMembership
 from apps.youtube_integration.models import YouTubeChannelConfig, YouTubeVideo
 from apps.payments.models import Enrollment, InstallmentPlan, Payment
-from apps.courses.models import Course
+from apps.courses.models import Course, Module, VideoLesson, Assignment, Quiz, QuizQuestion, QuizChoice
 
 class CustomUserCreationForm(UserCreationForm):
     """Custom form for creating new users"""
@@ -845,3 +845,318 @@ class CustomInstallmentPlanForm(forms.ModelForm):
             instance.enrollment.save()
         
         return instance
+
+
+class CustomVideoLessonForm(forms.ModelForm):
+    """Custom form for creating and editing video lessons"""
+
+    class Meta:
+        model = VideoLesson
+        fields = ('module', 'title', 'youtube_video_id', 'youtube_url', 'thumbnail_url', 
+                  'duration', 'description', 'resource_file', 'order', 'is_preview')
+        widgets = {
+            'module': forms.Select(attrs={'class': 'form-select'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter video lesson title'}),
+            'youtube_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=...'}),
+            'youtube_video_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter YouTube video ID'}),
+            'thumbnail_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Thumbnail URL (auto-generated if empty)'}),
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Duration in seconds'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe what students will learn'}),
+            'resource_file': forms.FileInput(attrs={'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+            'is_preview': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make module queryset more organized
+        self.fields['module'].queryset = Module.objects.select_related('course').all().order_by('course__title', 'order')
+        
+        # Set help texts
+        self.fields['youtube_url'].help_text = 'Full YouTube URL (optional if video ID provided)'
+        self.fields['youtube_video_id'].help_text = 'YouTube video ID (optional if URL provided)'
+        self.fields['thumbnail_url'].help_text = 'Auto-generated from YouTube if not provided'
+        self.fields['duration'].help_text = 'Video duration in seconds'
+        self.fields['order'].help_text = 'Order of lesson in the module'
+        self.fields['is_preview'].help_text = 'Available as free preview for non-enrolled students'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        youtube_url = cleaned_data.get('youtube_url', '').strip()
+        youtube_video_id = cleaned_data.get('youtube_video_id', '').strip()
+        
+        # At least one of YouTube URL or video ID must be provided
+        if not youtube_url and not youtube_video_id:
+            raise ValidationError('Either YouTube URL or YouTube video ID must be provided.')
+        
+        # Extract video ID from URL if URL is provided but ID is not
+        if youtube_url and not youtube_video_id:
+            video_id = self.extract_youtube_id(youtube_url)
+            if video_id:
+                cleaned_data['youtube_video_id'] = video_id
+            else:
+                raise ValidationError(f'Could not extract video ID from URL: {youtube_url}')
+        
+        # Generate thumbnail URL if not provided and video ID exists
+        final_video_id = cleaned_data.get('youtube_video_id')
+        if final_video_id and not cleaned_data.get('thumbnail_url'):
+            cleaned_data['thumbnail_url'] = f'https://img.youtube.com/vi/{final_video_id}/maxresdefault.jpg'
+        
+        return cleaned_data
+
+    def extract_youtube_id(self, url):
+        """Extract YouTube video ID from various YouTube URL formats"""
+        import re
+        url = url.strip()
+        patterns = [
+            r'(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})',
+            r'(?:https?://)?(?:www\.)?youtu\.be/([a-zA-Z0-9_-]{11})',
+            r'(?:https?://)?(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})',
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, url)
+            if match and len(match.group(1)) == 11:
+                return match.group(1)
+        return None
+
+
+class CustomAssignmentForm(forms.ModelForm):
+    """Custom form for creating and editing assignments"""
+
+    class Meta:
+        model = Assignment
+        fields = ('module', 'title', 'description', 'requirements', 'resources', 
+                  'max_points', 'passing_score', 'due_days', 'is_required', 'order')
+        widgets = {
+            'module': forms.Select(attrs={'class': 'form-select'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter assignment title'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe what students need to accomplish'}),
+            'requirements': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'List specific requirements, technologies, or constraints'}),
+            'resources': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Provide helpful links, documentation, or additional resources'}),
+            'max_points': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '100'}),
+            'passing_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '70'}),
+            'due_days': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '7'}),
+            'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make module queryset more organized
+        self.fields['module'].queryset = Module.objects.select_related('course').all().order_by('course__title', 'order')
+        
+        # Set help texts
+        self.fields['module'].help_text = 'Select the module this assignment belongs to'
+        self.fields['title'].help_text = 'Title of the assignment'
+        self.fields['description'].help_text = 'Assignment instructions and requirements'
+        self.fields['requirements'].help_text = 'Specific requirements (e.g., "Create a Python script that...")'
+        self.fields['resources'].help_text = 'Additional resources or links'
+        self.fields['max_points'].help_text = 'Maximum points for this assignment'
+        self.fields['passing_score'].help_text = 'Minimum score to pass'
+        self.fields['due_days'].help_text = 'Days from module start to complete assignment'
+        self.fields['is_required'].help_text = 'Required to proceed to next module'
+        self.fields['order'].help_text = 'Order within the module'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        max_points = cleaned_data.get('max_points')
+        passing_score = cleaned_data.get('passing_score')
+        
+        # Validate that passing score doesn't exceed max points
+        if max_points and passing_score and passing_score > max_points:
+            raise ValidationError('Passing score cannot exceed maximum points.')
+        
+        return cleaned_data
+
+    def clean_order(self):
+        order = self.cleaned_data.get('order')
+        module = self.cleaned_data.get('module')
+        
+        if order and module:
+            # Check if another assignment in the same module already has this order
+            existing_assignment = Assignment.objects.filter(
+                module=module,
+                order=order
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            if existing_assignment.exists():
+                raise ValidationError(f'An assignment with order {order} already exists in this module.')
+        
+        return order
+
+
+class CustomQuizQuestionForm(forms.ModelForm):
+    """Custom form for creating and editing quiz questions"""
+
+    class Meta:
+        model = QuizQuestion
+        fields = ('quiz', 'question_text', 'question_type', 'points', 'explanation', 'order')
+        widgets = {
+            'quiz': forms.Select(attrs={'class': 'form-select'}),
+            'question_text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter the question text'}),
+            'question_type': forms.Select(attrs={'class': 'form-select'}),
+            'points': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+            'explanation': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Explanation shown after answering (optional)'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set help texts
+        self.fields['quiz'].help_text = 'Select the quiz this question belongs to'
+        self.fields['question_text'].help_text = 'The question text that students will see'
+        self.fields['question_type'].help_text = 'Type of question'
+        self.fields['points'].help_text = 'Points awarded for correct answer'
+        self.fields['explanation'].help_text = 'Optional explanation shown after answering'
+        self.fields['order'].help_text = 'Order of question in the quiz'
+
+    def clean_order(self):
+        order = self.cleaned_data.get('order')
+        quiz = self.cleaned_data.get('quiz')
+        
+        if order and quiz:
+            # Check if another question in the same quiz already has this order
+            existing_question = QuizQuestion.objects.filter(
+                quiz=quiz,
+                order=order
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            if existing_question.exists():
+                raise ValidationError(f'A question with order {order} already exists in this quiz.')
+        
+        return order
+
+
+class CustomQuizChoiceForm(forms.ModelForm):
+    """Custom form for creating and editing quiz choices"""
+
+    class Meta:
+        model = QuizChoice
+        fields = ('question', 'choice_text', 'is_correct', 'order')
+        widgets = {
+            'question': forms.Select(attrs={'class': 'form-select'}),
+            'choice_text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the choice text'}),
+            'is_correct': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set help texts
+        self.fields['question'].help_text = 'Select the question this choice belongs to'
+        self.fields['choice_text'].help_text = 'The choice text that students will see'
+        self.fields['is_correct'].help_text = 'Mark this as the correct answer'
+        self.fields['order'].help_text = 'Order of choice in the question'
+
+    def clean_order(self):
+        order = self.cleaned_data.get('order')
+        question = self.cleaned_data.get('question')
+        
+        if order and question:
+            # Check if another choice in the same question already has this order
+            existing_choice = QuizChoice.objects.filter(
+                question=question,
+                order=order
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            if existing_choice.exists():
+                raise ValidationError(f'A choice with order {order} already exists in this question.')
+        
+        return order
+
+
+class CustomQuizQuestionWithChoicesForm(forms.ModelForm):
+    """Enhanced form for creating quiz questions with choices in one step"""
+    
+    # Choice fields (up to 6 choices)
+    choice_1 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 1'}))
+    choice_2 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 2'}))
+    choice_3 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 3'}))
+    choice_4 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 4'}))
+    choice_5 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 5 (optional)'}))
+    choice_6 = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice 6 (optional)'}))
+    
+    # Correct answer selection
+    correct_choice = forms.ChoiceField(
+        choices=[
+            ('1', 'Choice 1'),
+            ('2', 'Choice 2'), 
+            ('3', 'Choice 3'),
+            ('4', 'Choice 4'),
+            ('5', 'Choice 5'),
+            ('6', 'Choice 6'),
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        help_text='Select which choice is the correct answer'
+    )
+
+    class Meta:
+        model = QuizQuestion
+        fields = ('quiz', 'question_text', 'question_type', 'points', 'explanation', 'order')
+        widgets = {
+            'quiz': forms.Select(attrs={'class': 'form-select'}),
+            'question_text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter the question text'}),
+            'question_type': forms.Select(attrs={'class': 'form-select'}),
+            'points': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+            'explanation': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Explanation shown after answering (optional)'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set help texts
+        self.fields['quiz'].help_text = 'Select the quiz this question belongs to'
+        self.fields['question_text'].help_text = 'The question text that students will see'
+        self.fields['question_type'].help_text = 'Type of question'
+        self.fields['points'].help_text = 'Points awarded for correct answer'
+        self.fields['explanation'].help_text = 'Optional explanation shown after answering'
+        self.fields['order'].help_text = 'Order of question in the quiz'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        question_type = cleaned_data.get('question_type')
+        
+        # For multiple choice questions, ensure we have at least 2 choices
+        if question_type == 'multiple_choice':
+            choices = []
+            for i in range(1, 7):
+                choice_text = cleaned_data.get(f'choice_{i}', '').strip()
+                if choice_text:
+                    choices.append(choice_text)
+            
+            if len(choices) < 2:
+                raise ValidationError('Multiple choice questions must have at least 2 answer choices.')
+            
+            correct_choice = cleaned_data.get('correct_choice')
+            if correct_choice and int(correct_choice) > len(choices):
+                raise ValidationError('The selected correct answer choice does not exist.')
+        
+        return cleaned_data
+
+    def save(self, commit=True):
+        question = super().save(commit=commit)
+        
+        if commit and self.cleaned_data.get('question_type') == 'multiple_choice':
+            # Delete existing choices if editing
+            if question.pk:
+                question.choices.all().delete()
+            
+            # Create new choices
+            choices = []
+            for i in range(1, 7):
+                choice_text = self.cleaned_data.get(f'choice_{i}', '').strip()
+                if choice_text:
+                    choices.append(choice_text)
+            
+            correct_choice_num = int(self.cleaned_data.get('correct_choice', '1'))
+            
+            for i, choice_text in enumerate(choices, 1):
+                QuizChoice.objects.create(
+                    question=question,
+                    choice_text=choice_text,
+                    is_correct=(i == correct_choice_num),
+                    order=i
+                )
+        
+        return question

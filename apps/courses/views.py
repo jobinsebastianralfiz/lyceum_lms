@@ -149,9 +149,37 @@ class CourseDetailView(generics.RetrieveAPIView):
     """
     Get detailed information about a specific course.
     """
-    queryset = Course.objects.filter(is_published=True, allow_public_enrollment=True).select_related('category').prefetch_related('modules__video_lessons')
     serializer_class = CourseDetailSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # If user is authenticated, include both public courses and private courses they're enrolled in
+        if user.is_authenticated:
+            from apps.payments.models import Enrollment
+            enrolled_course_ids = Enrollment.objects.filter(
+                user=user,
+                active=True
+            ).values_list('course_id', flat=True)
+            
+            # Include public courses OR private courses the user is enrolled in
+            queryset = Course.objects.filter(
+                is_published=True
+            ).filter(
+                Q(allow_public_enrollment=True) | 
+                Q(id__in=enrolled_course_ids, allow_public_enrollment=False)
+            )
+        else:
+            # For anonymous users, only show public courses
+            queryset = Course.objects.filter(is_published=True, allow_public_enrollment=True)
+        
+        return queryset.select_related('category', 'created_by').prefetch_related(
+            'modules__video_lessons',
+            'modules__assignments', 
+            'modules__quizzes',
+            'modules__student_progress'
+        )
 
 @extend_schema_view(
     get=extend_schema(

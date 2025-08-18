@@ -1,0 +1,339 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        background: #000;
+        border-radius: 15px 15px 0 0;
+        overflow: hidden;
+    }
+    
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    .progress-circle {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-circle svg {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring {
+        fill: none;
+        stroke: #e9ecef;
+        stroke-width: 3;
+    }
+    
+    .progress-ring-fill {
+        fill: none;
+        stroke: #28a745;
+        stroke-width: 3;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Video Player -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-body p-0">
+                <!-- Video Container -->
+                <div class="video-container mb-3">
+                    {% if lesson.youtube_video_id %}
+                    <iframe 
+                        id="youtube-player"
+                        src="https://www.youtube.com/embed/{{ lesson.youtube_video_id }}?enablejsapi=1&origin={{ request.get_host }}"
+                        frameborder="0" 
+                        allow="autoplay; encrypted-media" 
+                        allowfullscreen>
+                    </iframe>
+                    {% elif lesson.youtube_url %}
+                    <iframe 
+                        id="youtube-player"
+                        src="{{ lesson.youtube_url }}" 
+                        frameborder="0" 
+                        allow="autoplay; encrypted-media" 
+                        allowfullscreen>
+                    </iframe>
+                    {% else %}
+                    <div class="bg-dark d-flex align-items-center justify-content-center text-white" style="height: 400px;">
+                        <div class="text-center">
+                            <i class="fas fa-video fa-4x mb-3"></i>
+                            <h5>Video not available</h5>
+                            <p>This lesson doesn't have a video yet.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Lesson Info -->
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="h4 mb-2">{{ lesson.title }}</h2>
+                            <div class="d-flex align-items-center gap-3 text-muted">
+                                <span>
+                                    <i class="fas fa-book me-1"></i>
+                                    {{ module.title }}
+                                </span>
+                                {% if lesson.duration %}
+                                <span>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ lesson.duration|floatformat:0 }} seconds
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="progress-circle">
+                                <svg viewBox="0 0 36 36" style="width: 60px; height: 60px;">
+                                    <path class="progress-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="progress-ring-fill" stroke-dasharray="{{ progress.completed_percentage }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <span class="fw-bold small">{{ progress.completed_percentage|floatformat:0 }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if lesson.description %}
+                    <div class="mb-4">
+                        <h6>Description</h6>
+                        <p class="text-muted">{{ lesson.description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Progress Actions -->
+                    <div class="d-flex gap-2 mb-3">
+                        {% if not progress.completed %}
+                        <button id="mark-complete" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Mark as Complete
+                        </button>
+                        {% else %}
+                        <button class="btn btn-success" disabled>
+                            <i class="fas fa-check me-2"></i>Completed
+                        </button>
+                        {% endif %}
+                        
+                        {% if lesson.resource_file %}
+                        <a href="{{ lesson.resource_file.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-download me-2"></i>Download Resources
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="d-flex justify-content-between">
+                        {% if prev_lesson %}
+                        <a href="{% url 'student_portal:lesson_viewer' prev_lesson.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-chevron-left me-2"></i>Previous Lesson
+                        </a>
+                        {% else %}
+                        <div></div>
+                        {% endif %}
+                        
+                        {% if next_lesson %}
+                        <a href="{% url 'student_portal:lesson_viewer' next_lesson.id %}" class="btn btn-primary">
+                            Next Lesson<i class="fas fa-chevron-right ms-2"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-outline-primary">
+                            Back to Course<i class="fas fa-book ms-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Lesson Progress -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Lesson Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Completion</span>
+                        <span id="progress-percentage">{{ progress.completed_percentage|floatformat:0 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: {{ progress.completed_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="small text-muted">
+                    {% if progress.last_watched_at %}
+                    Last watched: {{ progress.last_watched_at|timesince }} ago
+                    {% else %}
+                    Not started yet
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Module Overview -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">{{ module.title }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">{{ module.description|truncatechars:150 }}</p>
+                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">Module Progress</span>
+                    <span class="small">{{ module_progress.completion_percentage|default:0|floatformat:0 }}%</span>
+                </div>
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ module_progress.completion_percentage|default:0 }}%"></div>
+                </div>
+                
+                <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-book me-2"></i>Back to Course
+                </a>
+            </div>
+        </div>
+        
+        <!-- Other Lessons in Module -->
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Other Lessons</h5>
+            </div>
+            <div class="card-body p-0">
+                {% for other_lesson in module.video_lessons.all %}
+                <div class="p-3 {% if other_lesson.id == lesson.id %}bg-light{% endif %} {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            {% if other_lesson.id == lesson.id %}
+                            <span class="fw-bold text-primary">{{ other_lesson.title }}</span>
+                            <small class="d-block text-muted">Currently watching</small>
+                            {% else %}
+                            <a href="{% url 'student_portal:lesson_viewer' other_lesson.id %}" class="text-decoration-none">
+                                {{ other_lesson.title }}
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            {% if other_lesson.id == lesson.id %}
+                            <i class="fas fa-play text-primary"></i>
+                            {% else %}
+                            <i class="fas fa-play-circle text-muted"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let lessonId = {{ lesson.id }};
+    let currentProgress = {{ progress.completed_percentage }};
+    let isCompleted = {% if progress.completed %}true{% else %}false{% endif %};
+    
+    // Mark as complete functionality
+    $('#mark-complete').click(function() {
+        updateProgress(100, true);
+    });
+    
+    function updateProgress(percentage, completed = false) {
+        $.post('{% url "student_portal:update_lesson_progress" lesson.id %}', {
+            'completed_percentage': percentage,
+            'completed': completed,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(data) {
+            if (data.success) {
+                // Update UI
+                $('#progress-percentage').text(Math.round(data.completed_percentage) + '%');
+                $('#progress-bar').css('width', data.completed_percentage + '%');
+                $('.progress-ring-fill').attr('stroke-dasharray', data.completed_percentage + ', 100');
+                $('.progress-circle span').text(Math.round(data.completed_percentage) + '%');
+                
+                if (data.completed) {
+                    $('#mark-complete').prop('disabled', true).html('<i class="fas fa-check me-2"></i>Completed');
+                    isCompleted = true;
+                }
+                
+                currentProgress = data.completed_percentage;
+            }
+        })
+        .fail(function() {
+            alert('Failed to update progress. Please try again.');
+        });
+    }
+    
+    // YouTube API integration for automatic progress tracking
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+    var player;
+    window.onYouTubeIframeAPIReady = function() {
+        {% if lesson.youtube_video_id %}
+        player = new YT.Player('youtube-player', {
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
+        });
+        {% endif %}
+    }
+    
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            // Start tracking progress
+            setInterval(function() {
+                if (player && player.getCurrentTime && player.getDuration) {
+                    let currentTime = player.getCurrentTime();
+                    let duration = player.getDuration();
+                    
+                    if (duration > 0) {
+                        let percentage = (currentTime / duration) * 100;
+                        
+                        // Only update if progress increased significantly (every 5%)
+                        if (percentage > currentProgress + 5) {
+                            updateProgress(percentage);
+                        }
+                        
+                        // Auto-complete when 90% watched
+                        if (percentage >= 90 && !isCompleted) {
+                            updateProgress(100, true);
+                        }
+                    }
+                }
+            }, 5000); // Check every 5 seconds
+        }
+    }
+    
+    console.log('Lesson viewer loaded:', '{{ lesson.title }}');
+});
+</script>
+{% endblock %}

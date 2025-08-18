@@ -8141,3 +8141,415 @@ WARNING 2025-08-09 15:56:15,073 basehttp 13625 13069578240 "GET /apple-touch-ico
 INFO 2025-08-09 15:56:15,226 basehttp 13625 6161166336 "GET /admin/ HTTP/1.1" 200 34170
 INFO 2025-08-09 15:56:16,347 basehttp 13625 6161166336 "GET /api/docs/ HTTP/1.1" 200 4650
 INFO 2025-08-09 15:56:17,324 basehttp 13625 6161166336 "GET /api/schema/ HTTP/1.1" 200 148382
+INFO 2025-08-15 09:27:10,216 autoreload 5696 8454201088 Watching for file changes with StatReloader
+INFO 2025-08-15 09:27:15,253 basehttp 5696 6159855616 "GET / HTTP/1.1" 200 10025
+INFO 2025-08-15 09:27:15,292 basehttp 5696 6159855616 "GET /static/landing/css/style.css HTTP/1.1" 200 12536
+INFO 2025-08-15 09:27:15,292 basehttp 5696 6176681984 "GET /static/landing/js/script.js HTTP/1.1" 200 8509
+WARNING 2025-08-15 09:27:16,338 log 5696 6159855616 Not Found: /favicon.ico
+WARNING 2025-08-15 09:27:16,339 basehttp 5696 6159855616 "GET /favicon.ico HTTP/1.1" 404 3942
+INFO 2025-08-15 10:34:50,619 autoreload 11355 8454201088 Watching for file changes with StatReloader
+INFO 2025-08-15 13:11:11,433 basehttp 11355 6201962496 "GET / HTTP/1.1" 200 9963
+INFO 2025-08-15 13:11:11,470 basehttp 11355 6201962496 "GET /static/landing/css/style.css HTTP/1.1" 200 13837
+INFO 2025-08-15 13:11:11,470 basehttp 11355 6218788864 "GET /static/landing/images/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-15 13:11:11,470 basehttp 11355 6235615232 "GET /static/landing/js/script.js HTTP/1.1" 200 8473
+INFO 2025-08-15 13:11:11,472 basehttp 11355 6235615232 "GET /static/landing/images/appicon.png HTTP/1.1" 200 9495
+INFO 2025-08-15 13:11:11,474 basehttp 11355 6218788864 "GET /static/landing/images/simulator.png HTTP/1.1" 200 1259634
+INFO 2025-08-17 09:52:23,940 autoreload 5444 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:52:27,137 basehttp 5444 6191755264 "GET / HTTP/1.1" 200 9953
+INFO 2025-08-17 09:52:27,166 basehttp 5444 6208581632 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-17 09:52:27,166 basehttp 5444 6225408000 "GET /static/landing/images/appicon.png HTTP/1.1" 304 0
+INFO 2025-08-17 09:52:27,166 basehttp 5444 6242234368 "GET /static/landing/js/script.js HTTP/1.1" 304 0
+INFO 2025-08-17 09:52:27,166 basehttp 5444 6259060736 "GET /static/landing/images/simulator.png HTTP/1.1" 304 0
+INFO 2025-08-17 09:52:27,166 basehttp 5444 6191755264 "GET /static/landing/css/style.css HTTP/1.1" 200 19986
+INFO 2025-08-17 09:55:30,759 basehttp 5444 6191755264 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 09:55:31,975 basehttp 5444 6191755264 "GET /student/login/ HTTP/1.1" 200 7470
+WARNING 2025-08-17 09:55:51,615 log 5444 6191755264 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:55:51,617 basehttp 5444 6191755264 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 09:55:51,645 log 5444 6208581632 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-17 09:55:51,645 basehttp 5444 6208581632 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 4113
+WARNING 2025-08-17 09:55:51,705 log 5444 6208581632 Not Found: /apple-touch-icon.png
+WARNING 2025-08-17 09:55:51,706 basehttp 5444 6208581632 "GET /apple-touch-icon.png HTTP/1.1" 404 4077
+INFO 2025-08-17 09:56:25,235 autoreload 5444 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:56:25,478 autoreload 6558 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:56:33,875 autoreload 6558 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:56:34,089 autoreload 6597 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:56:50,682 autoreload 6597 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 09:56:50,910 autoreload 6728 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:56:56,188 autoreload 6728 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:56:56,419 autoreload 6776 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:57:00,681 autoreload 6776 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:57:00,911 autoreload 6824 8444092160 Watching for file changes with StatReloader
+WARNING 2025-08-17 09:57:39,606 log 6824 6125662208 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:57:39,607 basehttp 6824 6125662208 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 09:57:46,639 log 6824 6125662208 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:57:46,640 basehttp 6824 6125662208 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 09:58:04,717 autoreload 7213 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:58:06,086 basehttp 7213 6198145024 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 09:58:07,602 basehttp 7213 6198145024 "GET /student/login/ HTTP/1.1" 200 8656
+WARNING 2025-08-17 09:58:25,629 log 7213 6198145024 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:58:25,630 basehttp 7213 6198145024 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 09:58:45,201 autoreload 7213 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:58:45,612 autoreload 7452 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 09:58:55,031 autoreload 7452 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 09:58:55,278 autoreload 7504 8444092160 Watching for file changes with StatReloader
+WARNING 2025-08-17 09:59:41,584 log 7504 6194802688 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:59:41,585 basehttp 7504 6194802688 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 09:59:46,703 log 7504 6194802688 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 09:59:46,704 basehttp 7504 6194802688 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:00:44,637 autoreload 7504 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:00:44,856 autoreload 7679 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:00:50,141 autoreload 7679 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:00:50,365 autoreload 7715 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:01:16,266 basehttp 7715 6218182656 "GET /student/login/ HTTP/1.1" 200 8656
+WARNING 2025-08-17 10:01:16,311 log 7715 6201356288 Not Found: /favicon.ico
+WARNING 2025-08-17 10:01:16,311 basehttp 7715 6201356288 "GET /favicon.ico HTTP/1.1" 404 4050
+INFO 2025-08-17 10:01:28,679 basehttp 7715 6218182656 "POST /student/login/ HTTP/1.1" 200 9071
+INFO 2025-08-17 10:01:47,202 basehttp 7715 6218182656 "POST /student/login/ HTTP/1.1" 200 9071
+INFO 2025-08-17 10:02:30,284 basehttp 7715 6201356288 "POST /student/login/ HTTP/1.1" 200 9071
+INFO 2025-08-17 10:04:43,727 basehttp 7715 6201356288 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:04:43,738 basehttp 7715 6201356288 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:04:43,743 basehttp 7715 6201356288 "GET /student/login/?next=/student/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:04:56,933 basehttp 7715 6201356288 "GET /student/login/?next=/student/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:05:21,641 basehttp 7715 6218182656 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:05:21,648 basehttp 7715 6218182656 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:05:21,653 basehttp 7715 6218182656 "GET /student/login/?next=/student/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:05:49,289 autoreload 7715 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:05:49,535 autoreload 8438 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:06:31,429 basehttp 8438 6131609600 "POST /student/login/?next=/student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:06:31,436 basehttp 8438 6131609600 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:06:31,443 basehttp 8438 6131609600 "GET /student/login/?next=/student/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:07:24,483 autoreload 8438 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:07:24,722 autoreload 8700 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:07:31,028 autoreload 8700 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:07:31,266 autoreload 8737 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:09:33,386 basehttp 8737 6204338176 "POST /student/login/?next=/student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:09:33,394 basehttp 8737 6204338176 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:09:33,400 basehttp 8737 6204338176 "GET /student/login/?next=/student/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:10:08,975 autoreload 8737 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:10:09,195 autoreload 8939 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:10:26,868 basehttp 8939 6192197632 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:10:26,874 basehttp 8939 6209024000 "GET /student/login/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:10:43,698 basehttp 8939 6192197632 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:10:43,702 basehttp 8939 6209024000 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:10:43,704 basehttp 8939 6192197632 "GET /student/login/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:10:48,273 basehttp 8939 6209024000 "GET /student/login/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:10:48,485 basehttp 8939 6192197632 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:10:48,491 basehttp 8939 6209024000 "GET /student/login/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:11:05,052 autoreload 8939 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:05,302 autoreload 9149 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:19,828 autoreload 9149 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:20,074 autoreload 9226 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:24,331 autoreload 9226 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:24,551 autoreload 9276 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:28,812 autoreload 9276 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:29,095 autoreload 9312 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:40,618 autoreload 9312 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:40,879 autoreload 9392 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:46,177 autoreload 9392 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:46,399 autoreload 9425 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:51,684 autoreload 9425 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:51,923 autoreload 9471 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:11:56,175 autoreload 9471 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:11:56,394 autoreload 9500 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:12:00,654 autoreload 9500 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:12:00,885 autoreload 9529 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:12:07,207 autoreload 9529 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:12:07,447 autoreload 9577 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:12:23,833 basehttp 9577 6129004544 "GET /student/login/ HTTP/1.1" 200 8656
+WARNING 2025-08-17 10:12:38,215 log 9577 6129004544 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:12:38,216 basehttp 9577 6129004544 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:12:54,003 autoreload 9577 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:12:54,233 autoreload 9715 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:13:14,863 autoreload 9715 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 10:13:15,103 autoreload 9832 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:14:09,795 basehttp 9832 6137737216 "GET /student/simple-login/ HTTP/1.1" 200 818
+INFO 2025-08-17 10:14:30,824 basehttp 9832 6154563584 "POST /student/simple-login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:14:30,827 basehttp 9832 6137737216 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:14:30,830 basehttp 9832 6154563584 "GET /student/login/ HTTP/1.1" 200 8656
+INFO 2025-08-17 10:15:03,517 autoreload 9832 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/simple_login.py changed, reloading.
+INFO 2025-08-17 10:15:03,767 autoreload 10000 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:15:12,108 autoreload 10000 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:15:12,341 autoreload 10065 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:10,886 autoreload 10065 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 10:17:11,322 autoreload 10391 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:27,086 autoreload 10578 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:41,387 autoreload 10391 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:17:41,678 autoreload 10741 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:47,010 autoreload 10741 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:17:47,259 autoreload 10785 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:50,702 autoreload 10837 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:17:56,465 autoreload 10942 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:18:26,442 autoreload 10785 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:18:26,444 autoreload 10942 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:18:26,689 autoreload 11124 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:18:26,690 autoreload 11125 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:18:36,078 autoreload 11125 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:18:36,082 autoreload 11124 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:18:36,324 autoreload 11197 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:18:36,326 autoreload 11196 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:19:27,126 basehttp 11196 6123417600 "GET /student/login/ HTTP/1.1" 200 8694
+INFO 2025-08-17 10:19:35,071 autoreload 11197 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 10:19:35,081 autoreload 11196 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 10:19:35,487 autoreload 11590 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:19:35,487 autoreload 11589 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:32:44,171 autoreload 11590 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:32:44,172 autoreload 11589 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:32:44,557 autoreload 11929 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:32:44,558 autoreload 11928 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:32:50,843 autoreload 11928 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:32:50,850 autoreload 11929 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:32:51,118 autoreload 11998 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:32:51,128 autoreload 11999 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:33:08,554 basehttp 11998 6162280448 "GET /student/login/ HTTP/1.1" 200 7686
+INFO 2025-08-17 10:33:08,817 basehttp 11998 6162280448 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:33:08,833 basehttp 11998 6162280448 "GET /student/ HTTP/1.1" 200 9583
+WARNING 2025-08-17 10:34:21,570 log 11999 6325039104 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:34:21,571 basehttp 11999 6325039104 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:34:39,453 autoreload 11999 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:34:39,856 autoreload 12538 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:34:47,261 autoreload 12538 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:34:47,498 autoreload 12581 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:34:51,737 autoreload 12581 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:34:51,986 autoreload 12629 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:35:07,070 autoreload 12774 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:35:15,283 basehttp 12774 6169358336 "GET /student/login/ HTTP/1.1" 200 7686
+WARNING 2025-08-17 10:35:16,454 log 12629 6164049920 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:35:16,455 basehttp 12629 6164049920 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 10:35:24,195 log 12629 6164049920 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:35:24,195 basehttp 12629 6164049920 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:35:30,268 basehttp 12774 6169358336 "GET /student/login/ HTTP/1.1" 200 7686
+INFO 2025-08-17 10:35:30,448 basehttp 12774 6169358336 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:35:30,465 basehttp 12774 6169358336 "GET /student/ HTTP/1.1" 200 9583
+INFO 2025-08-17 10:35:43,639 autoreload 13137 8444092160 Watching for file changes with StatReloader
+WARNING 2025-08-17 10:35:49,358 log 13137 6121811968 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:35:49,359 basehttp 13137 6121811968 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 10:42:20,707 log 13137 6121811968 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:42:20,708 basehttp 13137 6121811968 "POST /student/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 10:42:28,762 log 13137 6121811968 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:42:28,763 basehttp 13137 6121811968 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:42:42,670 basehttp 13137 6138638336 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 10:42:44,171 basehttp 13137 6138638336 "GET /student/login/ HTTP/1.1" 200 7686
+WARNING 2025-08-17 10:42:59,593 log 13137 6138638336 Forbidden (CSRF cookie not set.): /student/login/
+WARNING 2025-08-17 10:42:59,593 basehttp 13137 6138638336 "POST /student/login/ HTTP/1.1" 403 2870
+INFO 2025-08-17 10:43:28,263 autoreload 13137 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:43:28,481 autoreload 13527 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:43:53,267 autoreload 13527 8444092160 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-17 10:43:53,516 autoreload 13642 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:44:01,400 basehttp 13642 6156644352 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 10:44:03,461 basehttp 13642 6240776192 "GET /static/landing/images/appicon.png HTTP/1.1" 200 9495
+WARNING 2025-08-17 10:44:03,470 log 13642 6173470720 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-17 10:44:03,471 log 13642 6207123456 Not Found: /favicon.ico
+WARNING 2025-08-17 10:44:03,471 basehttp 13642 6207123456 "GET /favicon.ico HTTP/1.1" 404 4050
+WARNING 2025-08-17 10:44:03,472 basehttp 13642 6173470720 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 4113
+WARNING 2025-08-17 10:44:03,472 log 13642 6190297088 Not Found: /apple-touch-icon.png
+WARNING 2025-08-17 10:44:03,473 basehttp 13642 6190297088 "GET /apple-touch-icon.png HTTP/1.1" 404 4077
+INFO 2025-08-17 10:44:03,473 basehttp 13642 6223949824 "GET /static/landing/images/simulator.png HTTP/1.1" 200 1259634
+INFO 2025-08-17 10:44:03,983 autoreload 13642 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:44:04,212 autoreload 13697 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:44:08,376 autoreload 13763 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:44:10,934 basehttp 13697 6193000448 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 10:44:10,956 basehttp 13697 6260305920 "GET /static/landing/js/script.js HTTP/1.1" 200 8473
+INFO 2025-08-17 10:44:10,957 basehttp 13697 6243479552 "GET /static/landing/images/appicon.png HTTP/1.1" 200 9495
+INFO 2025-08-17 10:44:10,957 basehttp 13697 6209826816 "GET /static/landing/images/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-17 10:44:10,958 basehttp 13697 6193000448 "GET /static/landing/css/style.css HTTP/1.1" 200 23405
+INFO 2025-08-17 10:44:10,959 basehttp 13697 6226653184 "GET /static/landing/images/simulator.png HTTP/1.1" 200 1259634
+WARNING 2025-08-17 10:44:11,519 log 13697 6226653184 Not Found: /favicon.ico
+WARNING 2025-08-17 10:44:11,519 basehttp 13697 6226653184 "GET /favicon.ico HTTP/1.1" 404 4050
+INFO 2025-08-17 10:44:12,944 basehttp 13697 6226653184 "GET /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:44:12,953 basehttp 13697 6226653184 "GET /student/login/?csrf_setup=1 HTTP/1.1" 200 10512
+INFO 2025-08-17 10:44:16,705 basehttp 13763 6193065984 "GET /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:44:25,644 basehttp 13763 6193065984 "GET /student/login/?csrf_setup=1 HTTP/1.1" 200 10512
+INFO 2025-08-17 10:44:31,268 basehttp 13763 6193065984 "GET /student/login/?csrf_setup=1 HTTP/1.1" 200 10512
+INFO 2025-08-17 10:44:35,678 basehttp 13697 6226653184 "POST /student/login/?csrf_setup=1 HTTP/1.1" 302 0
+INFO 2025-08-17 10:44:35,687 basehttp 13697 6226653184 "GET /student/ HTTP/1.1" 200 9583
+INFO 2025-08-17 10:44:35,711 basehttp 13697 6226653184 "GET /static/student_portal/css/style.css HTTP/1.1" 200 9329
+INFO 2025-08-17 10:44:38,161 basehttp 13697 6226653184 "GET /student/my-courses/ HTTP/1.1" 200 6779
+INFO 2025-08-17 10:44:39,799 basehttp 13697 6226653184 "GET /student/browse/ HTTP/1.1" 200 28464
+INFO 2025-08-17 10:44:47,946 basehttp 13697 6226653184 "GET /student/profile/ HTTP/1.1" 200 13271
+INFO 2025-08-17 10:44:51,032 basehttp 13697 6226653184 "GET /student/my-courses/ HTTP/1.1" 200 6779
+INFO 2025-08-17 10:44:53,092 basehttp 13697 6226653184 "GET /student/ HTTP/1.1" 200 9142
+INFO 2025-08-17 10:45:36,132 autoreload 13697 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:45:36,139 autoreload 13763 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:45:36,520 autoreload 14269 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:45:36,520 autoreload 14268 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:45:58,207 autoreload 14269 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:45:58,208 autoreload 14268 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:45:58,513 autoreload 14410 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:45:58,513 autoreload 14411 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:46:03,764 autoreload 14411 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:46:03,765 autoreload 14410 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:46:04,035 autoreload 14462 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:46:04,035 autoreload 14461 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:46:07,148 basehttp 14462 6191820800 "GET /student/my-courses/ HTTP/1.1" 200 6779
+INFO 2025-08-17 10:46:09,146 basehttp 14462 6191820800 "GET /student/ HTTP/1.1" 200 9142
+INFO 2025-08-17 10:46:34,599 basehttp 14462 6191820800 "GET /student/logout/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:46:34,604 basehttp 14462 6191820800 "GET /student/login/ HTTP/1.1" 200 9621
+INFO 2025-08-17 10:46:55,936 basehttp 14462 6191820800 "POST /student/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 10:46:55,942 basehttp 14462 6191820800 "GET /student/ HTTP/1.1" 200 9583
+INFO 2025-08-17 10:52:25,768 autoreload 15671 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:52:52,683 autoreload 15671 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:52:52,898 autoreload 15779 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:52:53,186 autoreload 14462 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:52:53,432 autoreload 15780 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:52:55,535 autoreload 15780 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:52:55,761 autoreload 15788 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:52:56,012 autoreload 15779 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 10:52:56,224 autoreload 15789 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 10:53:08,917 basehttp 15788 6162132992 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 10:53:08,935 basehttp 15788 6229438464 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 200 2542
+INFO 2025-08-17 10:53:08,935 basehttp 15788 6178959360 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 200 1890
+INFO 2025-08-17 10:53:08,935 basehttp 15788 6246264832 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 200 1263
+INFO 2025-08-17 10:53:08,937 basehttp 15788 6195785728 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-17 10:53:08,938 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-17 10:53:08,940 basehttp 15788 6162132992 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-17 10:53:08,943 basehttp 15788 6162132992 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 200 3890
+INFO 2025-08-17 10:53:08,944 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-17 10:53:09,066 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 200 552144
+INFO 2025-08-17 10:53:09,158 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+INFO 2025-08-17 10:53:11,405 basehttp 15788 6212612096 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 10:53:12,937 basehttp 15788 6212612096 "GET /student/browse/ HTTP/1.1" 200 30062
+INFO 2025-08-17 10:53:19,549 basehttp 15788 6212612096 "GET /student/profile/ HTTP/1.1" 200 14869
+INFO 2025-08-17 10:53:21,015 basehttp 15788 6212612096 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 10:53:31,727 basehttp 15788 6212612096 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 10:53:34,603 basehttp 15788 6212612096 "GET /student/browse/ HTTP/1.1" 200 30062
+INFO 2025-08-17 10:53:59,263 basehttp 15788 6212612096 "GET /student/browse/ HTTP/1.1" 200 30062
+INFO 2025-08-17 10:54:01,004 basehttp 15788 6212612096 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 10:54:03,341 basehttp 15788 6212612096 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 10:54:07,078 basehttp 15788 6212612096 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 10:54:08,627 basehttp 15788 6212612096 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 10:54:09,654 basehttp 15788 6212612096 "GET /student/browse/ HTTP/1.1" 200 30062
+INFO 2025-08-17 10:54:16,036 basehttp 15788 6212612096 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 11:11:32,955 basehttp 15788 6162132992 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 11:11:33,656 basehttp 15788 6162132992 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 11:11:35,169 basehttp 15788 6162132992 "GET /student/my-courses/ HTTP/1.1" 200 8377
+INFO 2025-08-17 11:11:36,631 basehttp 15788 6162132992 "GET /student/ HTTP/1.1" 200 10806
+INFO 2025-08-17 11:11:59,276 basehttp 15788 6195785728 "GET / HTTP/1.1" 200 11559
+INFO 2025-08-17 11:12:04,917 basehttp 15788 6195785728 "GET /admin/login HTTP/1.1" 301 0
+INFO 2025-08-17 11:12:04,925 basehttp 15788 6195785728 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-17 11:12:04,957 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 200 1890
+INFO 2025-08-17 11:12:04,957 basehttp 15788 6229438464 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-17 11:12:04,957 basehttp 15788 6195785728 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-17 11:12:04,957 basehttp 15788 6246264832 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-17 11:12:04,961 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 200 3890
+INFO 2025-08-17 11:12:04,962 basehttp 15788 6229438464 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-17 11:12:05,520 basehttp 15788 6195785728 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+WARNING 2025-08-17 11:12:20,517 log 15788 6246264832 Forbidden (CSRF cookie not set.): /admin/login/
+WARNING 2025-08-17 11:12:20,518 basehttp 15788 6246264832 "POST /admin/login/ HTTP/1.1" 403 2870
+WARNING 2025-08-17 11:12:25,330 log 15788 6279917568 Not Found: /apple-touch-icon.png
+WARNING 2025-08-17 11:12:25,331 log 15788 6263091200 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-17 11:12:25,332 log 15788 6296743936 Not Found: /favicon.ico
+WARNING 2025-08-17 11:12:25,332 basehttp 15788 6263091200 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 4113
+WARNING 2025-08-17 11:12:25,332 basehttp 15788 6279917568 "GET /apple-touch-icon.png HTTP/1.1" 404 4077
+WARNING 2025-08-17 11:12:25,333 basehttp 15788 6296743936 "GET /favicon.ico HTTP/1.1" 404 4050
+INFO 2025-08-17 11:12:36,091 basehttp 15788 6195785728 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-17 11:12:36,102 basehttp 15788 6195785728 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-17 11:12:36,113 basehttp 15788 6195785728 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 200 1890
+INFO 2025-08-17 11:12:36,116 basehttp 15788 13170143232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 200 3890
+INFO 2025-08-17 11:12:36,116 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-17 11:12:36,117 basehttp 15788 6229438464 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-17 11:12:36,117 basehttp 15788 13186969600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-17 11:12:36,593 basehttp 15788 13186969600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+INFO 2025-08-17 11:13:02,295 basehttp 15788 13186969600 "POST /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-17 11:13:02,305 basehttp 15788 13186969600 "GET /admin/ HTTP/1.1" 200 34170
+INFO 2025-08-17 11:13:02,335 basehttp 15788 6229438464 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 200 2542
+INFO 2025-08-17 11:13:02,335 basehttp 15788 6212612096 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 200 1263
+INFO 2025-08-17 11:13:02,336 basehttp 15788 13186969600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 200 8191
+INFO 2025-08-17 11:13:02,337 basehttp 15788 13170143232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 200 171895
+INFO 2025-08-17 11:13:02,340 basehttp 15788 13170143232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 200 552144
+INFO 2025-08-17 11:13:09,669 basehttp 15788 13170143232 "GET /admin/users/ HTTP/1.1" 200 48263
+INFO 2025-08-17 11:13:19,118 basehttp 15788 13170143232 "GET /admin/enrollments/ HTTP/1.1" 200 24068
+INFO 2025-08-17 11:13:25,390 basehttp 15788 13170143232 "GET /admin/enrollments/add/ HTTP/1.1" 200 34462
+INFO 2025-08-17 11:13:34,333 basehttp 15788 13170143232 "GET /admin/get-course-info/9/ HTTP/1.1" 200 139
+INFO 2025-08-17 11:13:42,164 basehttp 15788 13170143232 "GET /admin/get-course-info/7/ HTTP/1.1" 200 142
+INFO 2025-08-17 11:13:45,764 basehttp 15788 13170143232 "GET /admin/get-course-info/3/ HTTP/1.1" 200 112
+INFO 2025-08-17 11:13:50,702 basehttp 15788 13170143232 "POST /admin/enrollments/add/ HTTP/1.1" 302 0
+INFO 2025-08-17 11:13:50,718 basehttp 15788 13170143232 "GET /admin/enrollments/ HTTP/1.1" 200 27102
+INFO 2025-08-17 11:13:56,968 basehttp 15788 6162132992 "GET /student/ HTTP/1.1" 200 11738
+INFO 2025-08-17 11:14:00,084 basehttp 15788 6162132992 "GET /student/my-courses/ HTTP/1.1" 200 10460
+ERROR 2025-08-17 11:14:01,923 log 15788 6162132992 Internal Server Error: /student/course/3/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/student_portal/views.py", line 208, in course_detail
+    'enrollment': enrollment,
+                  ^^^^^^^^^^
+NameError: name 'enrollment' is not defined. Did you mean: 'Enrollment'?
+ERROR 2025-08-17 11:14:01,925 basehttp 15788 6162132992 "GET /student/course/3/ HTTP/1.1" 500 73031
+INFO 2025-08-17 11:14:34,404 autoreload 15788 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 11:14:34,907 autoreload 16708 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 11:14:40,065 autoreload 16766 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 11:15:16,919 basehttp 16708 6157840384 "GET /student/course/3/ HTTP/1.1" 200 11770
+INFO 2025-08-17 11:15:26,023 basehttp 16708 6157840384 "GET /student/ HTTP/1.1" 200 11738
+INFO 2025-08-17 11:48:56,004 basehttp 16708 6157840384 "GET /admin/enrollments/ HTTP/1.1" 200 27102
+INFO 2025-08-17 13:34:52,914 autoreload 18905 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:44:08,980 basehttp 16708 6157840384 "GET /student/ HTTP/1.1" 200 11738
+INFO 2025-08-17 13:44:10,198 basehttp 16708 6157840384 "GET /student/my-courses/ HTTP/1.1" 200 10460
+INFO 2025-08-17 13:44:12,974 basehttp 16708 6157840384 "GET /student/course/3/ HTTP/1.1" 200 11770
+INFO 2025-08-17 13:44:14,821 basehttp 16708 6157840384 "GET /student/ HTTP/1.1" 200 11738
+INFO 2025-08-17 13:44:59,065 autoreload 16708 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 13:44:59,382 autoreload 19969 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:45:37,616 autoreload 19969 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 13:45:37,823 autoreload 20033 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:45:45,153 autoreload 20033 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 13:45:45,361 autoreload 20086 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:45:59,919 autoreload 20086 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 13:46:00,129 autoreload 20190 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:48:46,996 basehttp 20190 6131937280 "GET /student/ HTTP/1.1" 200 11738
+INFO 2025-08-17 13:48:48,485 basehttp 20190 6131937280 "GET /student/my-courses/ HTTP/1.1" 200 10460
+INFO 2025-08-17 13:48:50,063 basehttp 20190 6131937280 "GET /student/course/3/ HTTP/1.1" 200 11770
+WARNING 2025-08-17 13:48:56,352 log 20716 6106689536 Not Found: /student-portal/
+WARNING 2025-08-17 13:48:56,352 basehttp 20716 6106689536 "GET /student-portal/ HTTP/1.1" 404 4934
+INFO 2025-08-17 13:49:04,973 basehttp 20716 6106689536 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 13:56:51,730 autoreload 20190 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 13:56:52,142 autoreload 21640 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 13:58:02,342 basehttp 22123 6117961728 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-17 14:14:52,550 basehttp 21640 6192295936 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:14:54,370 basehttp 21640 6192295936 "GET /admin/quizzes/1/ HTTP/1.1" 200 23754
+INFO 2025-08-17 14:14:56,299 basehttp 21640 6192295936 "GET /admin/quizzes/1/reset-attempts/ HTTP/1.1" 200 21130
+INFO 2025-08-17 14:15:03,743 basehttp 21640 6192295936 "POST /admin/quizzes/1/reset-attempts/ HTTP/1.1" 302 0
+INFO 2025-08-17 14:15:03,753 basehttp 21640 6192295936 "GET /admin/quizzes/1/ HTTP/1.1" 200 23754
+INFO 2025-08-17 14:15:43,486 basehttp 21640 6192295936 "GET /admin/quizzes/1/reset-attempts/ HTTP/1.1" 200 21130
+INFO 2025-08-17 14:16:01,827 basehttp 21640 6192295936 "POST /admin/quizzes/1/reset-attempts/ HTTP/1.1" 302 0
+INFO 2025-08-17 14:16:01,838 basehttp 21640 6192295936 "GET /admin/quizzes/1/ HTTP/1.1" 200 23754
+INFO 2025-08-17 14:16:06,046 basehttp 21640 6192295936 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:17:20,838 autoreload 21640 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 14:17:21,243 autoreload 24180 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:18:38,161 basehttp 24180 6204977152 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:18:39,626 basehttp 24180 6204977152 "GET /admin/quizzes/1/ HTTP/1.1" 200 23754
+INFO 2025-08-17 14:21:15,608 basehttp 24180 6204977152 "GET /admin/users/ HTTP/1.1" 200 48263
+INFO 2025-08-17 14:21:22,253 basehttp 24180 6204977152 "GET /admin/users/12/ HTTP/1.1" 200 21612
+INFO 2025-08-17 14:23:15,038 basehttp 24180 6204977152 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-17 14:23:17,176 basehttp 24180 6204977152 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:23:21,203 basehttp 24180 6204977152 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-17 14:23:22,267 basehttp 24180 6204977152 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:23:23,324 basehttp 24180 6204977152 "GET /admin/quiz-attempts/ HTTP/1.1" 200 21129
+INFO 2025-08-17 14:23:24,442 basehttp 24180 6204977152 "GET /admin/quizzes/ HTTP/1.1" 200 21305
+INFO 2025-08-17 14:23:33,064 basehttp 24180 6204977152 "GET /admin/quizzes/1/ HTTP/1.1" 200 23754
+INFO 2025-08-17 14:33:43,295 autoreload 24180 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 14:33:43,710 autoreload 25127 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:33:52,108 autoreload 25127 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 14:33:52,336 autoreload 25179 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:34:00,726 autoreload 25179 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 14:34:00,944 autoreload 25281 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:34:11,399 autoreload 25281 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 14:34:11,637 autoreload 25362 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:42:12,494 basehttp 25362 6136180736 "GET /student/my-courses/ HTTP/1.1" 200 10068
+INFO 2025-08-17 14:42:59,620 basehttp 25362 6136180736 "GET /student/ HTTP/1.1" 200 11315
+INFO 2025-08-17 14:43:03,863 basehttp 25362 6136180736 "GET /student/ HTTP/1.1" 200 11315
+INFO 2025-08-17 14:47:19,679 autoreload 25362 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 14:47:19,909 autoreload 27053 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 14:47:24,155 autoreload 27053 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-17 14:47:24,393 autoreload 27097 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 15:02:51,144 basehttp 27097 6138097664 "GET /student/ HTTP/1.1" 200 12592
+INFO 2025-08-17 15:20:35,041 autoreload 27097 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 15:20:35,506 autoreload 29185 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 15:23:25,734 autoreload 29185 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 15:23:26,133 autoreload 29480 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 15:23:33,537 autoreload 29480 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 15:23:33,752 autoreload 29545 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 15:25:00,357 autoreload 29545 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 15:25:00,592 autoreload 29779 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-17 15:32:32,291 autoreload 29779 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-17 15:32:32,693 autoreload 31007 8444092160 Watching for file changes with StatReloader

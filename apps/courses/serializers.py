@@ -182,7 +182,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     Serializer for detailed course view
     """
     category = CategorySerializer(read_only=True)
-    modules = ModuleSerializer(many=True, read_only=True)
+    modules = serializers.SerializerMethodField()
     created_by_name = serializers.CharField(source='created_by.name', read_only=True)
     price_display = serializers.CharField(read_only=True)
     total_price_display = serializers.CharField(read_only=True)
@@ -251,6 +251,12 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     def get_preview_video_url(self, obj):
         """Get preview video URL"""
         return obj.preview_video if obj.preview_video else None
+    
+    @extend_schema_field(serializers.ListField)
+    def get_modules(self, obj):
+        """Get modules ordered by their order field"""
+        modules = obj.modules.filter(is_active=True).order_by('order')
+        return ModuleSerializer(modules, many=True, context=self.context).data
 
 class StudentProgressSerializer(serializers.ModelSerializer):
     """

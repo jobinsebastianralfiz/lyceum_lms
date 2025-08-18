@@ -83,7 +83,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h5 class="card-title mb-0">Quiz Questions</h5>
-          <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" class="btn btn-outline-primary btn-sm">
+          <a href="{% url 'custom_admin:quiz_question_create' %}?quiz={{ quiz.id }}" class="btn btn-outline-primary btn-sm">
             <i class="ti ti-plus me-1"></i>Add Question
           </a>
         </div>
@@ -99,7 +99,20 @@
                     <h6 class="mb-1">Question {{ forloop.counter }}</h6>
                     <p class="mb-2">{{ question.question_text }}</p>
                   </div>
-                  <span class="badge bg-success-subtle text-success">{{ question.points }} pts</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success">{{ question.points }} pts</span>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'custom_admin:quiz_question_detail' question.id %}" class="btn btn-outline-primary btn-sm" title="View Details">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                      <a href="{% url 'custom_admin:quiz_question_edit' question.id %}" class="btn btn-outline-warning btn-sm" title="Edit Question">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                      <a href="{% url 'custom_admin:quiz_question_delete' question.id %}" class="btn btn-outline-danger btn-sm" title="Delete Question">
+                        <i class="ti ti-trash"></i>
+                      </a>
+                    </div>
+                  </div>
                 </div>
                 
                 <div class="row">
@@ -139,7 +152,7 @@
           <i class="ti ti-help-circle fs-1 text-muted mb-3"></i>
           <h5 class="mb-2">No questions added yet</h5>
           <p class="text-muted mb-3">Start building your quiz by adding questions.</p>
-          <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" class="btn btn-primary">
+          <a href="{% url 'custom_admin:quiz_question_create' %}?quiz={{ quiz.id }}" class="btn btn-primary">
             <i class="ti ti-plus me-1"></i>Add First Question
           </a>
         </div>
@@ -182,6 +195,10 @@
           <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" 
              class="btn btn-outline-warning">
             <i class="ti ti-edit me-1"></i>Edit Quiz
+          </a>
+          <a href="{% url 'custom_admin:quiz_attempt_reset' quiz.id %}" 
+             class="btn btn-outline-warning">
+            <i class="ti ti-refresh me-1"></i>Reset Attempts
           </a>
           <a href="{% url 'custom_admin:quiz_delete' quiz.id %}" 
              class="btn btn-outline-danger">

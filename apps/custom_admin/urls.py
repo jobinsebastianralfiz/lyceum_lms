@@ -54,9 +54,24 @@ urlpatterns = [
     path('quizzes/<int:quiz_id>/edit/', views.quiz_edit_view, name='quiz_edit'),
     path('quizzes/<int:quiz_id>/delete/', views.quiz_delete_view, name='quiz_delete'),
     
+    # QUIZ QUESTIONS
+    path('quiz-questions/', views.quiz_questions_list_view, name='quiz_questions_list'),
+    path('quiz-questions/<int:question_id>/', views.quiz_question_detail_view, name='quiz_question_detail'),
+    path('quiz-questions/add/', views.quiz_question_create_view, name='quiz_question_create'),
+    path('quiz-questions/<int:question_id>/edit/', views.quiz_question_edit_view, name='quiz_question_edit'),
+    path('quiz-questions/<int:question_id>/delete/', views.quiz_question_delete_view, name='quiz_question_delete'),
+    
+    # QUIZ CHOICES
+    path('quiz-choices/', views.quiz_choices_list_view, name='quiz_choices_list'),
+    path('quiz-choices/add/', views.quiz_choice_create_view, name='quiz_choice_create'),
+    path('quiz-choices/<int:choice_id>/edit/', views.quiz_choice_edit_view, name='quiz_choice_edit'),
+    path('quiz-choices/<int:choice_id>/delete/', views.quiz_choice_delete_view, name='quiz_choice_delete'),
+    
     # QUIZ ATTEMPTS
     path('quiz-attempts/', views.quiz_attempts_list_view, name='quiz_attempts_list'),
     path('quiz-attempts/<int:attempt_id>/', views.quiz_attempt_detail_view, name='quiz_attempt_detail'),
+    path('quiz-attempts/<int:attempt_id>/delete/', views.quiz_attempt_delete_view, name='quiz_attempt_delete'),
+    path('quizzes/<int:quiz_id>/reset-attempts/', views.quiz_attempt_reset_view, name='quiz_attempt_reset'),
     
     # MODULE PROGRESS
     path('module-progress/', views.module_progress_list_view, name='module_progress_list'),

@@ -20,8 +20,14 @@
           </div>
         </div>
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
           
           <!-- Basic Information -->
           <div class="row mb-4">
@@ -31,45 +37,40 @@
             
             <div class="col-md-8">
               <div class="mb-3">
-                <label for="title" class="form-label">Video Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" name="title" 
-                       value="{{ video.title|default:'' }}" required 
-                       placeholder="Enter video lesson title">
+                <label for="{{ form.title.id_for_label }}" class="form-label">Video Title <span class="text-danger">*</span></label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                  <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="order" class="form-label">Order in Module <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="order" name="order" 
-                       value="{{ video.order|default:'' }}" required min="1"
-                       placeholder="1">
+                <label for="{{ form.order.id_for_label }}" class="form-label">Order in Module <span class="text-danger">*</span></label>
+                {{ form.order }}
+                {% if form.order.errors %}
+                  <div class="text-danger small">{{ form.order.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-            <textarea class="form-control" id="description" name="description" rows="4" required
-                      placeholder="Describe what students will learn in this video">{{ video.description|default:'' }}</textarea>
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="text-danger small">{{ form.description.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Module Selection -->
           <div class="mb-4">
-            <label for="module" class="form-label">Module <span class="text-danger">*</span></label>
-            <select class="form-select" id="module" name="module" required>
-              <option value="">Select a module</option>
-              {% for course in courses %}
-                <optgroup label="{{ course.title }}">
-                  {% for module in course.modules.all %}
-                    <option value="{{ module.id }}" 
-                            {% if video and video.module.id == module.id %}selected{% endif %}>
-                      {{ module.title }} (Order: {{ module.order }})
-                    </option>
-                  {% endfor %}
-                </optgroup>
-              {% endfor %}
-            </select>
+            <label for="{{ form.module.id_for_label }}" class="form-label">Module <span class="text-danger">*</span></label>
+            {{ form.module }}
+            {% if form.module.errors %}
+              <div class="text-danger small">{{ form.module.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Video Content -->
@@ -80,27 +81,53 @@
             
             <div class="col-md-8">
               <div class="mb-3">
-                <label for="video_url" class="form-label">Video URL <span class="text-danger">*</span></label>
-                <input type="url" class="form-control" id="video_url" name="video_url" 
-                       value="{{ video.video_url|default:'' }}" required
-                       placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
-                <div class="form-text">YouTube, Vimeo, or direct video URL</div>
+                <label for="{{ form.youtube_url.id_for_label }}" class="form-label">YouTube URL</label>
+                {{ form.youtube_url }}
+                <div class="form-text">{{ form.youtube_url.help_text }}</div>
+                {% if form.youtube_url.errors %}
+                  <div class="text-danger small">{{ form.youtube_url.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
             
             <div class="col-md-4">
               <div class="mb-3">
-                <label for="duration" class="form-label">Duration (minutes)</label>
-                <input type="number" class="form-control" id="duration" name="duration" 
-                       value="{{ video.duration|default:'' }}" min="1" step="0.1"
-                       placeholder="15">
-                <div class="form-text">Video duration in minutes</div>
+                <label for="{{ form.youtube_video_id.id_for_label }}" class="form-label">YouTube Video ID</label>
+                {{ form.youtube_video_id }}
+                <div class="form-text">{{ form.youtube_video_id.help_text }}</div>
+                {% if form.youtube_video_id.errors %}
+                  <div class="text-danger small">{{ form.youtube_video_id.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mb-4">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="{{ form.thumbnail_url.id_for_label }}" class="form-label">Thumbnail URL</label>
+                {{ form.thumbnail_url }}
+                <div class="form-text">{{ form.thumbnail_url.help_text }}</div>
+                {% if form.thumbnail_url.errors %}
+                  <div class="text-danger small">{{ form.thumbnail_url.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="{{ form.duration.id_for_label }}" class="form-label">Duration (seconds)</label>
+                {{ form.duration }}
+                <div class="form-text">{{ form.duration.help_text }}</div>
+                {% if form.duration.errors %}
+                  <div class="text-danger small">{{ form.duration.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
 
           <!-- Video Preview -->
-          {% if video.video_url %}
+          {% if lesson.youtube_url %}
           <div class="mb-4">
             <h5 class="mb-3">Current Video Preview</h5>
             <div class="card bg-light">
@@ -110,10 +137,10 @@
                     <i class="ti ti-video text-white"></i>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ video.title }}</h6>
-                    <small class="text-muted">{{ video.video_url }}</small>
+                    <h6 class="mb-1">{{ lesson.title }}</h6>
+                    <small class="text-muted">{{ lesson.youtube_url }}</small>
                   </div>
-                  <a href="{{ video.video_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                  <a href="{{ lesson.youtube_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
                     <i class="ti ti-external-link me-1"></i>Watch
                   </a>
                 </div>
@@ -122,18 +149,14 @@
           </div>
           {% endif %}
 
-          <!-- Learning Objectives -->
+          <!-- Resource File -->
           <div class="mb-4">
-            <label for="learning_objectives" class="form-label">Learning Objectives</label>
-            <textarea class="form-control" id="learning_objectives" name="learning_objectives" rows="4"
-                      placeholder="What will students learn from this video? List key learning points">{{ video.learning_objectives|default:'' }}</textarea>
-          </div>
-
-          <!-- Additional Resources -->
-          <div class="mb-4">
-            <label for="resources" class="form-label">Additional Resources</label>
-            <textarea class="form-control" id="resources" name="resources" rows="3"
-                      placeholder="Links to related materials, documentation, or supplementary content">{{ video.resources|default:'' }}</textarea>
+            <label for="{{ form.resource_file.id_for_label }}" class="form-label">Resource File</label>
+            {{ form.resource_file }}
+            <div class="form-text">{{ form.resource_file.help_text }}</div>
+            {% if form.resource_file.errors %}
+              <div class="text-danger small">{{ form.resource_file.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Video Settings -->
@@ -144,119 +167,30 @@
             
             <div class="col-md-6">
               <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
-                       {% if video.is_published %}checked{% endif %}>
-                <label class="form-check-label" for="is_published">
-                  <strong>Published</strong>
-                  <small class="text-muted d-block">Video is visible to students</small>
-                </label>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" id="is_free_preview" name="is_free_preview"
-                       {% if video.is_free_preview %}checked{% endif %}>
-                <label class="form-check-label" for="is_free_preview">
+                {{ form.is_preview }}
+                <label class="form-check-label" for="{{ form.is_preview.id_for_label }}">
                   <strong>Free Preview</strong>
-                  <small class="text-muted d-block">Available without course enrollment</small>
+                  <small class="text-muted d-block">{{ form.is_preview.help_text }}</small>
                 </label>
+                {% if form.is_preview.errors %}
+                  <div class="text-danger small">{{ form.is_preview.errors.0 }}</div>
+                {% endif %}
               </div>
             </div>
           </div>
-
-          <!-- Advanced Settings -->
-          <div class="row mb-4">
-            <div class="col-12">
-              <h5 class="mb-3">Advanced Settings</h5>
-            </div>
-            
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label for="video_quality" class="form-label">Video Quality</label>
-                <select class="form-select" id="video_quality" name="video_quality">
-                  <option value="720p" {% if video.video_quality == '720p' %}selected{% endif %}>720p HD</option>
-                  <option value="1080p" {% if video.video_quality == '1080p' %}selected{% endif %}>1080p Full HD</option>
-                  <option value="1440p" {% if video.video_quality == '1440p' %}selected{% endif %}>1440p 2K</option>
-                  <option value="2160p" {% if video.video_quality == '2160p' %}selected{% endif %}>2160p 4K</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label for="language" class="form-label">Language</label>
-                <select class="form-select" id="language" name="language">
-                  <option value="english" {% if video.language == 'english' %}selected{% endif %}>English</option>
-                  <option value="hindi" {% if video.language == 'hindi' %}selected{% endif %}>Hindi</option>
-                  <option value="both" {% if video.language == 'both' %}selected{% endif %}>Both</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tags -->
-          <div class="mb-4">
-            <label for="tags" class="form-label">Tags</label>
-            <input type="text" class="form-control" id="tags" name="tags" 
-                   value="{{ video.tags|default:'' }}"
-                   placeholder="programming, tutorial, basics (comma separated)">
-            <div class="form-text">Enter relevant tags separated by commas</div>
-          </div>
-
-          <!-- Video Analytics Preview -->
-          {% if video %}
-          <div class="mb-4">
-            <h5 class="mb-3">Video Statistics</h5>
-            <div class="row">
-              <div class="col-md-3">
-                <div class="card bg-primary-subtle border-0">
-                  <div class="card-body text-center">
-                    <h4 class="mb-0 text-primary">{{ video.view_count|default:"0" }}</h4>
-                    <small class="text-muted">Total Views</small>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card bg-success-subtle border-0">
-                  <div class="card-body text-center">
-                    <h4 class="mb-0 text-success">{{ video.completion_rate|default:"0" }}%</h4>
-                    <small class="text-muted">Completion Rate</small>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card bg-warning-subtle border-0">
-                  <div class="card-body text-center">
-                    <h4 class="mb-0 text-warning">{{ video.avg_watch_time|default:"0" }}</h4>
-                    <small class="text-muted">Avg Watch Time</small>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card bg-info-subtle border-0">
-                  <div class="card-body text-center">
-                    <h4 class="mb-0 text-info">{{ video.rating|default:"0" }}/5</h4>
-                    <small class="text-muted">Rating</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endif %}
 
           <!-- Submit Buttons -->
           <div class="d-flex justify-content-end gap-2">
             <a href="{% url 'custom_admin:video_lessons_list' %}" class="btn btn-outline-secondary">
               <i class="ti ti-x me-1"></i>Cancel
             </a>
-            {% if video.video_url %}
-            <a href="{{ video.video_url }}" target="_blank" class="btn btn-outline-success">
+            {% if lesson.youtube_url %}
+            <a href="{{ lesson.youtube_url }}" target="_blank" class="btn btn-outline-success">
               <i class="ti ti-play me-1"></i>Preview Video
             </a>
             {% endif %}
             <button type="submit" class="btn btn-primary">
-              <i class="ti ti-check me-1"></i>{% if video %}Update Video{% else %}Create Video{% endif %}
+              <i class="ti ti-check me-1"></i>{% if lesson %}Update Video{% else %}Create Video{% endif %}
             </button>
           </div>
         </form>
@@ -266,34 +200,56 @@
 </div>
 
 <script>
-// Auto-format tags
-document.getElementById('tags').addEventListener('blur', function() {
-  let tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
-  this.value = tags.join(', ');
-});
+// Video URL validation and YouTube ID extraction
+document.addEventListener('DOMContentLoaded', function() {
+  const youtubeUrlField = document.getElementById('{{ form.youtube_url.id_for_label }}');
+  const youtubeIdField = document.getElementById('{{ form.youtube_video_id.id_for_label }}');
+  const thumbnailField = document.getElementById('{{ form.thumbnail_url.id_for_label }}');
 
-// Video URL validation and preview
-document.getElementById('video_url').addEventListener('blur', function() {
-  const url = this.value;
-  if (url && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com'))) {
-    // You could add video preview functionality here
-    console.log('Valid video URL detected:', url);
+  // Extract YouTube ID from URL
+  function extractYouTubeId(url) {
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/,
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
   }
-});
 
-// Auto-update order based on selected module
-document.getElementById('module').addEventListener('change', function() {
-  const moduleId = this.value;
-  if (moduleId && !document.getElementById('order').value) {
-    // You could add AJAX here to get the next order number for the selected module
-    fetch(`/admin/api/modules/${moduleId}/next-video-order/`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.next_order) {
-          document.getElementById('order').value = data.next_order;
+  // Auto-extract video ID when URL is entered
+  if (youtubeUrlField) {
+    youtubeUrlField.addEventListener('blur', function() {
+      const url = this.value.trim();
+      if (url && !youtubeIdField.value) {
+        const videoId = extractYouTubeId(url);
+        if (videoId) {
+          youtubeIdField.value = videoId;
+          // Auto-generate thumbnail if not set
+          if (!thumbnailField.value) {
+            thumbnailField.value = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+          }
         }
-      })
-      .catch(error => console.log('Could not fetch next order:', error));
+      }
+    });
+  }
+
+  // Auto-update order based on selected module
+  const moduleField = document.getElementById('{{ form.module.id_for_label }}');
+  const orderField = document.getElementById('{{ form.order.id_for_label }}');
+  
+  if (moduleField && orderField) {
+    moduleField.addEventListener('change', function() {
+      const moduleId = this.value;
+      if (moduleId && !orderField.value) {
+        // Set a default order (you could enhance this with AJAX to get the next available order)
+        orderField.value = 1;
+      }
+    });
   }
 });
 </script>

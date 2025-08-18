@@ -1,0 +1,173 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Reset Quiz Attempts - {{ quiz.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h4 class="card-title mb-0">Reset Quiz Attempts</h4>
+          <a href="{% url 'custom_admin:quiz_detail' quiz.id %}" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Back to Quiz
+          </a>
+        </div>
+
+        <div class="alert alert-info mb-4">
+          <div class="d-flex align-items-center">
+            <i class="ti ti-info-circle me-2"></i>
+            <div>
+              <strong>Quiz:</strong> {{ quiz.title }}<br>
+              <small class="text-muted">Choose how to reset quiz attempts for this quiz</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset All Users -->
+        <div class="card mb-4">
+          <div class="card-header bg-warning-subtle">
+            <h5 class="mb-0 text-warning"><i class="ti ti-users me-2"></i>Reset for All Users</h5>
+          </div>
+          <div class="card-body">
+            <form method="post" class="mb-3">
+              {% csrf_token %}
+              <input type="hidden" name="user_id" value="all">
+              
+              <div class="mb-3">
+                <label class="form-label">Reset Type:</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="reset_type" value="incomplete_only" id="incomplete_all" checked>
+                  <label class="form-check-label" for="incomplete_all">
+                    <strong>Incomplete attempts only</strong> (Recommended)
+                    <small class="text-muted d-block">Delete only unfinished attempts. Completed attempts with scores are preserved.</small>
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="reset_type" value="all" id="all_all">
+                  <label class="form-check-label" for="all_all">
+                    <strong>All attempts</strong> <span class="text-danger">(Destructive)</span>
+                    <small class="text-muted d-block">Delete ALL attempts including completed ones with scores. This cannot be undone!</small>
+                  </label>
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to reset quiz attempts for ALL users?')">
+                <i class="ti ti-refresh me-1"></i>Reset All Users
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Reset Individual Users -->
+        {% if attempted_users %}
+        <div class="card">
+          <div class="card-header bg-primary-subtle">
+            <h5 class="mb-0 text-primary"><i class="ti ti-user me-2"></i>Reset for Individual Users</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student</th>
+                    <th>Total Attempts</th>
+                    <th>Completed</th>
+                    <th>Incomplete</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in attempted_users %}
+                  {% with counts=attempt_counts|lookup:user.id %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                          <i class="ti ti-user text-primary"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{ user.name|default:user.username }}</h6>
+                          <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-info-subtle text-info">{{ counts.total|default:0 }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-success-subtle text-success">{{ counts.completed|default:0 }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-warning-subtle text-warning">{{ counts.incomplete|default:0 }}</span>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <!-- Reset incomplete only -->
+                        {% if counts.incomplete > 0 %}
+                        <form method="post" class="d-inline">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ user.id }}">
+                          <input type="hidden" name="reset_type" value="incomplete_only">
+                          <button type="submit" class="btn btn-outline-warning btn-sm" title="Reset incomplete attempts only"
+                                  onclick="return confirm('Reset incomplete attempts for {{ user.name|default:user.username }}?')">
+                            <i class="ti ti-refresh"></i> Incomplete
+                          </button>
+                        </form>
+                        {% endif %}
+                        
+                        <!-- Reset all -->
+                        <form method="post" class="d-inline">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ user.id }}">
+                          <input type="hidden" name="reset_type" value="all">
+                          <button type="submit" class="btn btn-outline-danger btn-sm" title="Reset all attempts"
+                                  onclick="return confirm('Reset ALL attempts for {{ user.name|default:user.username }}? This will delete completed attempts with scores!')">
+                            <i class="ti ti-trash"></i> All
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <i class="ti ti-clipboard-data fs-1 text-muted mb-3"></i>
+            <h5 class="mb-2">No Attempts Yet</h5>
+            <p class="text-muted mb-0">No students have attempted this quiz yet.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Add custom filter for template
+document.addEventListener('DOMContentLoaded', function() {
+    // Custom confirmation for destructive actions
+    const allRadio = document.getElementById('all_all');
+    const form = document.querySelector('form');
+    
+    if (allRadio && form) {
+        form.addEventListener('submit', function(e) {
+            if (allRadio.checked) {
+                if (!confirm('⚠️ WARNING: This will delete ALL completed attempts and scores for ALL users. This action cannot be undone. Are you absolutely sure?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

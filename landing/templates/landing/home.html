@@ -1,0 +1,169 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">Learn Topics That Matter</h1>
+            <p class="hero-subtitle">Master new skills with topic-wise courses, interactive quizzes, and practical assignments. Quality learning at affordable prices that won't break the bank.</p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn btn-primary">Get Started</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+                <a href="{% url 'student_portal:login' %}" class="btn btn-outline">
+                    <i class="fas fa-user me-1"></i>Student Login
+                </a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="simulator-container">
+                <img src="{% static 'landing/images/simulator.png' %}" alt="Uptrail App Simulator" class="simulator-image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Uptrail?</h2>
+            <p>Interactive learning with quizzes, assignments, and progress tracking at affordable prices</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Topic-Wise Learning</h3>
+                <p>Learn specific topics at your own pace with structured, focused content designed for effective understanding.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>Affordable Pricing</h3>
+                <p>Quality education at budget-friendly prices. Pay only for the topics you want to learn.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Learning</h3>
+                <p>Learn anywhere, anytime with our intuitive mobile app designed for on-the-go learning.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h3>Interactive Quizzes</h3>
+                <p>Test your knowledge with engaging quizzes after each topic to reinforce your learning and track understanding.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>Practical Assignments</h3>
+                <p>Apply what you've learned with hands-on assignments that help you practice and master new skills.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Progress Tracking</h3>
+                <p>Monitor your learning journey and see your improvement with detailed progress analytics and completion tracking.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>About Uptrail</h2>
+                <p>Uptrail makes quality education accessible and affordable for everyone. We believe learning should be focused, practical, and budget-friendly – that's why we offer topic-wise courses at unbeatable prices.</p>
+                <p>Our mobile-first approach ensures you can learn anytime, anywhere. Pay only for what you want to learn, and start building your skills today without the burden of expensive subscriptions.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <h3>1000+</h3>
+                        <p>Happy Learners</p>
+                    </div>
+                    <div class="stat">
+                        <h3>100+</h3>
+                        <p>Topics Available</p>
+                    </div>
+                    <div class="stat">
+                        <h3>₹99</h3>
+                        <p>Starting Price</p>
+                    </div>
+                    <div class="stat">
+                        <h3>24/7</h3>
+                        <p>Learn Anytime</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <div class="app-icon-container">
+                    <img src="{% static 'landing/images/appicon.png' %}" alt="Uptrail App Icon" class="app-icon">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Student Portal Section -->
+<section class="student-portal-section">
+    <div class="container">
+        <div class="student-portal-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2>Already a Student?</h2>
+                    <p>Access your enrolled courses, track your progress, and continue your learning journey on our web portal.</p>
+                    <ul class="portal-features">
+                        <li><i class="fas fa-play-circle"></i> Watch video lessons online</li>
+                        <li><i class="fas fa-chart-line"></i> Track your learning progress</li>
+                        <li><i class="fas fa-laptop"></i> Learn on any device</li>
+                        <li><i class="fas fa-cloud-sync"></i> Sync with mobile app</li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <a href="{% url 'student_portal:login' %}" class="btn btn-portal">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Access Student Portal
+                    </a>
+                    <p class="portal-note">Use your existing account credentials</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Download Section -->
+<section id="download" class="download">
+    <div class="container">
+        <div class="download-content">
+            <h2>Download Uptrail Today</h2>
+            <p>Start your learning journey with our mobile app. Available on all major platforms.</p>
+            <div class="download-buttons">
+                <a href="#" class="download-btn" aria-label="Download on App Store">
+                    <i class="fab fa-apple"></i>
+                    <div>
+                        <span>Download on the</span>
+                        <strong>App Store</strong>
+                    </div>
+                </a>
+                <a href="#" class="download-btn" aria-label="Get it on Google Play">
+                    <i class="fab fa-google-play"></i>
+                    <div>
+                        <span>Get it on</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

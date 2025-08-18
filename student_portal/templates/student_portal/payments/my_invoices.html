@@ -1,0 +1,83 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Invoices - Student Portal - UpTrail{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title mb-0">My Invoices</h4>
+        <p class="text-muted mb-0">Tax invoices for your course payments</p>
+      </div>
+      <div class="card-body">
+        {% if invoices %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Course</th>
+                  <th>Invoice Date</th>
+                  <th>Subtotal</th>
+                  <th>Tax ({{ invoices.0.tax_rate }}%)</th>
+                  <th>Total Amount</th>
+                  <th>Payment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for invoice in invoices %}
+                  <tr>
+                    <td><strong>{{ invoice.invoice_number }}</strong></td>
+                    <td>
+                      <div>
+                        <strong>{{ invoice.enrollment.course.title }}</strong><br>
+                        <small class="text-muted">{{ invoice.enrollment.course.category.name }}</small>
+                      </div>
+                    </td>
+                    <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+                    <td>₹{{ invoice.subtotal|floatformat:2 }}</td>
+                    <td>₹{{ invoice.tax_amount|floatformat:2 }}</td>
+                    <td><strong>₹{{ invoice.total_amount|floatformat:2 }}</strong></td>
+                    <td>
+                      {% if invoice.payment %}
+                        <span class="badge bg-success">
+                          Installment {{ invoice.payment.installment_number }}
+                        </span>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a href="{% url 'student_portal:invoice_detail' invoice.id %}" class="btn btn-outline-primary btn-sm">
+                          <i class="ti ti-eye"></i> View
+                        </a>
+                        {% if invoice.invoice_pdf_path %}
+                          <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                            <i class="ti ti-download"></i> PDF
+                          </a>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="ti ti-file-text-off fs-1 text-muted"></i>
+            <h5 class="mt-3">No Invoices Found</h5>
+            <p class="text-muted">You don't have any tax invoices yet. Invoices are generated after payments are processed.</p>
+            <a href="{% url 'student_portal:my_payments' %}" class="btn btn-primary">
+              <i class="ti ti-credit-card"></i> View Payments
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
