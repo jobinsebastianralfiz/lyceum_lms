@@ -30,10 +30,7 @@
           </div>
         </div>
         <div id="enrollment-overview" class="mt-4 mx-n6">
-          <div class="text-center py-5">
-            <i class="ti ti-chart-line fs-1 text-muted"></i>
-            <p class="text-muted mt-2">Enrollment chart will be displayed here</p>
-          </div>
+          <canvas id="enrollmentChart" height="100"></canvas>
         </div>
       </div>
     </div>
@@ -102,7 +99,7 @@
             <span class="badge bg-success-subtle text-success">{{ enrollments_growth }}%</span>
           </div>
         </div>
-        <div class="pt-3 mb-7 d-flex align-items-center">
+        <div class="py-3 d-flex align-items-center">
           <span class="btn btn-info rounded-circle round-48 hstack justify-content-center">
             <i class="ti ti-currency-rupee fs-6"></i>
           </span>
@@ -112,6 +109,18 @@
           </div>
           <div class="ms-auto">
             <span class="badge bg-info-subtle text-info">{{ revenue_growth }}%</span>
+          </div>
+        </div>
+        <div class="pt-3 mb-7 d-flex align-items-center">
+          <span class="btn btn-warning rounded-circle round-48 hstack justify-content-center">
+            <i class="ti ti-clock fs-6"></i>
+          </span>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bolder fs-4">₹{{ pending_income|floatformat:0 }}</h5>
+            <span class="text-muted fs-3">Pending Income</span>
+          </div>
+          <div class="ms-auto">
+            <span class="badge bg-warning-subtle text-warning">Pending</span>
           </div>
         </div>
       </div>
@@ -519,4 +528,85 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Enrollment Overview Chart
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('enrollmentChart').getContext('2d');
+    
+    const chartData = {
+        labels: {{ chart_months|safe }},
+        datasets: [{
+            label: 'Enrollments',
+            data: {{ chart_enrollments|safe }},
+            borderColor: 'rgb(79, 172, 254)',
+            backgroundColor: 'rgba(79, 172, 254, 0.1)',
+            tension: 0.4,
+            fill: true,
+            yAxisID: 'y'
+        }, {
+            label: 'Revenue (₹)',
+            data: {{ chart_revenue|safe }},
+            borderColor: 'rgb(22, 192, 152)',
+            backgroundColor: 'rgba(22, 192, 152, 0.1)',
+            tension: 0.4,
+            fill: true,
+            yAxisID: 'y1'
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Enrollments'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Revenue (₹)'
+                    }
+                }
+            }
+        }
+    };
+
+    new Chart(ctx, config);
+});
+</script>
 {% endblock %}

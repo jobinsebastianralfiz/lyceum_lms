@@ -14,6 +14,7 @@ urlpatterns = [
     # Courses
     path('my-courses/', views.my_courses, name='my_courses'),
     path('course/<int:course_id>/', views.course_detail, name='course_detail'),
+    path('course/<int:course_id>/checkout/', views.course_checkout, name='course_checkout'),
     path('lesson/<int:lesson_id>/', views.lesson_viewer, name='lesson_viewer'),
     
     # Profile
@@ -34,6 +35,9 @@ urlpatterns = [
     path('payments/<int:enrollment_id>/', views.payment_detail, name='payment_detail'),
     path('invoices/', views.my_invoices, name='my_invoices'),
     path('invoices/<int:invoice_id>/', views.invoice_detail, name='invoice_detail'),
+    
+    # Payment verification
+    path('api/verify-payment/', views.verify_payment, name='verify_payment'),
     
     # AJAX endpoints
     path('api/lesson/<int:lesson_id>/progress/', views.update_lesson_progress, name='update_lesson_progress'),

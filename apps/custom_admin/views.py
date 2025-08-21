@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login, logout
@@ -66,8 +67,49 @@ def dashboard_view(request):
         status='completed'
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
+    # Calculate pending income from outstanding enrollment amounts
+    pending_income = 0
+    for enrollment in Enrollment.objects.filter(payment_status__in=['pending', 'partial']):
+        pending_income += enrollment.outstanding_amount
+    
     active_enrollments = Enrollment.objects.filter(active=True).count()
     revenue_growth = 22  # Mock data for now
+    
+    # Chart data for enrollment overview
+    import calendar
+    
+    # Get the last 6 months of data
+    current_date = timezone.now()
+    months_data = []
+    enrollments_data = []
+    revenue_data = []
+    
+    for i in range(5, -1, -1):
+        month_date = current_date - timedelta(days=30*i)
+        month_start = month_date.replace(day=1)
+        if i == 0:
+            month_end = current_date
+        else:
+            next_month = month_start.replace(month=month_start.month % 12 + 1) if month_start.month < 12 else month_start.replace(year=month_start.year + 1, month=1)
+            month_end = next_month - timedelta(days=1)
+        
+        month_name = calendar.month_abbr[month_date.month]
+        months_data.append(month_name)
+        
+        # Count enrollments for this month
+        monthly_enrollments = Enrollment.objects.filter(
+            enrolled_on__gte=month_start,
+            enrolled_on__lte=month_end
+        ).count()
+        enrollments_data.append(monthly_enrollments)
+        
+        # Calculate revenue for this month
+        monthly_revenue = Payment.objects.filter(
+            status='completed',
+            payment_date__gte=month_start,
+            payment_date__lte=month_end
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        revenue_data.append(float(monthly_revenue))
     
     # Quick stats for sidebar
     users_growth = 12  # +12%
@@ -111,11 +153,17 @@ def dashboard_view(request):
         
         # Revenue & Growth
         'total_revenue': total_revenue,
+        'pending_income': pending_income,
         'active_enrollments': active_enrollments,
         'revenue_growth': revenue_growth,
         'users_growth': users_growth,
         'courses_growth': courses_growth,
         'enrollments_growth': enrollments_growth,
+        
+        # Chart data (JSON-ready)
+        'chart_months': json.dumps(months_data),
+        'chart_enrollments': json.dumps(enrollments_data),
+        'chart_revenue': json.dumps(revenue_data),
         
         # Recent Activities
         'recent_enrollments': recent_enrollments,
@@ -1161,9 +1209,9 @@ def payment_create_view(request):
                 notes=notes if notes else None
             )
             
-            # Auto-generate tax invoice if requested and payment is completed with tax amount
+            # Auto-generate tax invoice if requested and payment is completed
             generate_tax_invoice = request.POST.get('generate_tax_invoice') == 'on'
-            if generate_tax_invoice and status == 'completed' and float(tax_amount) > 0:
+            if generate_tax_invoice and status == 'completed':
                 from datetime import datetime
                 auto_invoice_number = f"INV-{enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
                 
@@ -1252,13 +1300,12 @@ def payment_edit_view(request, payment_id):
             payment.notes = notes if notes else None
             payment.save()
             
-            # Auto-generate tax invoice if requested and status changed to completed with tax amount
+            # Auto-generate tax invoice if requested and status changed to completed
             generate_tax_invoice = request.POST.get('generate_tax_invoice') == 'on'
             should_generate_invoice = (
                 generate_tax_invoice and 
                 old_status != 'completed' and 
-                status == 'completed' and 
-                float(tax_amount) > 0
+                status == 'completed'
             )
             
             if should_generate_invoice:
@@ -1890,6 +1937,8 @@ def assignment_delete_view(request, assignment_id):
 def assignment_submissions_list_view(request):
     """List all assignment submissions"""
     search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    
     submissions = AssignmentSubmission.objects.select_related(
         'assignment', 'student', 'assignment__module', 'assignment__module__course'
     ).order_by('-submitted_at')
@@ -1901,6 +1950,18 @@ def assignment_submissions_list_view(request):
             Q(assignment__module__course__title__icontains=search_query)
         )
     
+    if status_filter:
+        submissions = submissions.filter(status=status_filter)
+    
+    # Calculate statistics
+    all_submissions = AssignmentSubmission.objects.all()
+    stats = {
+        'total': all_submissions.count(),
+        'pending': all_submissions.filter(status__in=['submitted', 'under_review']).count(),
+        'graded': all_submissions.filter(status='graded').count(),
+        'returned': all_submissions.filter(status='returned').count(),
+    }
+    
     paginator = Paginator(submissions, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -1908,6 +1969,8 @@ def assignment_submissions_list_view(request):
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
+        'status_filter': status_filter,
+        'stats': stats,
     }
     
     return render(request, 'custom_admin/assignment_submissions/list.html', context)

@@ -56,6 +56,40 @@
       z-index: 1001 !important;
     }
     
+    /* Logo styling */
+    .brand-logo {
+      padding: 1.5rem 1.25rem !important;
+      border-bottom: 1px solid #e9ecef !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .logo-img {
+      display: flex !important;
+      align-items: center !important;
+      text-decoration: none !important;
+    }
+    
+    .logo-img img {
+      height: 45px !important;
+      width: auto !important;
+      max-width: 180px !important;
+      transition: opacity 0.3s ease !important;
+    }
+    
+    .logo-img:hover img {
+      opacity: 0.8 !important;
+    }
+    
+    /* Ensure logo area has proper spacing */
+    .left-sidebar .brand-logo {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border-bottom: none !important;
+    }
+    
+    .left-sidebar .brand-logo .logo-img img {
+      filter: brightness(0) invert(1) !important; /* Make logo white */
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 1199.98px) {
       .body-wrapper {
@@ -86,6 +120,14 @@
         background: rgba(0,0,0,0.5);
         z-index: 1000;
       }
+      
+      .brand-logo {
+        padding: 1rem !important;
+      }
+      
+      .logo-img img {
+        height: 35px !important;
+      }
     }
   </style>
   {% block extra_css %}{% endblock %}
@@ -103,7 +145,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="{% url 'student_portal:dashboard' %}" class="text-nowrap logo-img">
-            <h4 class="mb-0 text-primary fw-bold">UpTrail</h4>
+            <img src="{% static 'images/logos/logo.svg' %}" alt="UpTrail">
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>

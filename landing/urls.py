@@ -7,4 +7,16 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('terms/', views.terms_conditions, name='terms_conditions'),
+    
+    # Authentication URLs
+    path('register/', views.register, name='register'),
+    
+    # Public enrollment URLs
+    path('courses/', views.courses, name='courses'),
+    path('courses/<int:course_id>/', views.course_detail, name='course_detail'),
+    path('courses/<int:course_id>/enroll/', views.enroll_course, name='enroll_course'),
+    
+    # Payment handling URLs
+    path('payment/success/', views.payment_success, name='payment_success'),
+    path('payment/failed/', views.payment_failed, name='payment_failed'),
 ]

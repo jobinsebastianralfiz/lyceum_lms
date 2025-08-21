@@ -2,26 +2,176 @@
 
 {% block title %}Payment Details - {{ enrollment.course.title }} - Student Portal - UpTrail{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* Responsive improvements for payment details */
+  @media (max-width: 768px) {
+    .detail-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+    
+    .info-cards .col-md-6 {
+      margin-bottom: 1rem;
+    }
+    
+    .installment-grid .col-md-3 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .installment-value {
+      display: block;
+      margin-top: 0.5rem;
+    }
+    
+    /* Hide table on mobile, show card layout */
+    .payment-history-table {
+      display: none;
+    }
+    
+    .payment-history-mobile {
+      display: block;
+    }
+    
+    .payment-card-mobile {
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      background: #f8f9fa;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .payment-field-mobile {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .payment-field-mobile:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .field-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #495057;
+      margin-bottom: 0.25rem;
+    }
+    
+    .field-value {
+      font-size: 0.9rem;
+      color: #212529;
+    }
+    
+    .transaction-code {
+      background: #e9ecef;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .payment-history-table {
+      display: block;
+    }
+    
+    .payment-history-mobile {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .detail-header h4 {
+      font-size: 1.25rem;
+    }
+    
+    .info-card {
+      margin-bottom: 1rem;
+    }
+    
+    .info-card h6 {
+      font-size: 1rem;
+    }
+    
+    .info-card ul {
+      font-size: 0.9rem;
+    }
+    
+    .installment-plan-card {
+      margin-bottom: 1rem;
+    }
+    
+    .installment-grid .col-md-3 {
+      margin-bottom: 1rem;
+    }
+    
+    .payment-card-mobile {
+      padding: 1rem;
+    }
+    
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.375rem 0.5rem;
+    }
+    
+    .btn-sm {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+  
+  /* Enhanced mobile card styling */
+  .payment-header-mobile {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+    margin: -1.25rem -1.25rem 1rem -1.25rem;
+    text-align: center;
+  }
+  
+  .installment-number-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  
+  /* Status color indicators */
+  .status-completed .field-value { color: #198754; font-weight: 600; }
+  .status-pending .field-value { color: #fd7e14; font-weight: 600; }
+  .status-overdue .field-value { color: #dc3545; font-weight: 600; }
+  .status-failed .field-value { color: #dc3545; font-weight: 600; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
-  <div class="col-lg-12">
+  <div class="col-12">
     <div class="card">
       <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center detail-header">
           <div>
             <h4 class="card-title mb-1">Payment Details</h4>
-            <p class="mb-0 text-muted">{{ enrollment.course.title }}</p>
+            <p class="mb-0 text-muted">{{ enrollment.course.title|truncatechars:50 }}</p>
           </div>
           <a href="{% url 'student_portal:my_payments' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="ti ti-arrow-left"></i> Back to Payments
+            <i class="ti ti-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Payments</span><span class="d-sm-none">Back</span>
           </a>
         </div>
       </div>
       <div class="card-body">
         <!-- Course and Enrollment Information -->
-        <div class="row mb-4">
-          <div class="col-md-6">
-            <div class="card bg-light">
+        <div class="row mb-4 info-cards">
+          <div class="col-12 col-md-6">
+            <div class="card bg-light info-card h-100">
               <div class="card-body">
                 <h6 class="card-title">Course Information</h6>
                 <ul class="list-unstyled mb-0">
@@ -42,8 +192,8 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="card bg-light">
+          <div class="col-12 col-md-6">
+            <div class="card bg-light info-card h-100">
               <div class="card-body">
                 <h6 class="card-title">Payment Summary</h6>
                 <ul class="list-unstyled mb-0">
@@ -63,27 +213,27 @@
 
         <!-- Installment Plan Information -->
         {% if installment_plan %}
-          <div class="card mb-4">
+          <div class="card mb-4 installment-plan-card">
             <div class="card-header bg-primary text-white">
               <h6 class="mb-0">Installment Plan Details</h6>
             </div>
             <div class="card-body">
-              <div class="row">
-                <div class="col-md-3">
-                  <strong>Total Installments:</strong><br>
-                  <span class="h5">{{ installment_plan.total_installments }}</span>
+              <div class="row installment-grid">
+                <div class="col-12 col-sm-6 col-md-3">
+                  <strong>Total Installments:</strong>
+                  <span class="h5 installment-value d-block d-md-inline">{{ installment_plan.total_installments }}</span>
                 </div>
-                <div class="col-md-3">
-                  <strong>Amount per Installment:</strong><br>
-                  <span class="h5 text-primary">₹{{ installment_plan.installment_amount|floatformat:2 }}</span>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <strong>Amount per Installment:</strong>
+                  <span class="h5 text-primary installment-value d-block d-md-inline">₹{{ installment_plan.installment_amount|floatformat:2 }}</span>
                 </div>
-                <div class="col-md-3">
-                  <strong>Frequency:</strong><br>
-                  <span class="h6">{{ installment_plan.get_frequency_display }}</span>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <strong>Frequency:</strong>
+                  <span class="h6 installment-value d-block d-md-inline">{{ installment_plan.get_frequency_display }}</span>
                 </div>
-                <div class="col-md-3">
-                  <strong>Start Date:</strong><br>
-                  <span class="h6">{{ installment_plan.start_date|date:"M d, Y" }}</span>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <strong>Start Date:</strong>
+                  <span class="h6 installment-value d-block d-md-inline">{{ installment_plan.start_date|date:"M d, Y" }}</span>
                 </div>
               </div>
             </div>
@@ -97,73 +247,158 @@
               <h6 class="mb-0">Payment History</h6>
             </div>
             <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead class="table-dark">
-                    <tr>
-                      <th>Installment #</th>
-                      <th>Amount</th>
-                      <th>Tax Amount</th>
-                      <th>Due Date</th>
-                      <th>Payment Date</th>
-                      <th>Payment Method</th>
-                      <th>Transaction ID</th>
-                      <th>Status</th>
-                      <th>Invoice</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for payment in payments %}
+              <!-- Desktop Table View -->
+              <div class="payment-history-table">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead class="table-dark">
                       <tr>
-                        <td>{{ payment.installment_number }}</td>
-                        <td>₹{{ payment.amount|floatformat:2 }}</td>
-                        <td>₹{{ payment.tax_amount|floatformat:2 }}</td>
-                        <td>{{ payment.due_date|date:"M d, Y" }}</td>
-                        <td>
-                          {% if payment.payment_date %}
-                            {{ payment.payment_date|date:"M d, Y H:i" }}
-                          {% else %}
-                            <span class="text-muted">Not paid</span>
-                          {% endif %}
-                        </td>
-                        <td>{{ payment.get_payment_method_display }}</td>
-                        <td>
-                          {% if payment.transaction_id %}
-                            <code>{{ payment.transaction_id }}</code>
-                          {% else %}
-                            <span class="text-muted">-</span>
-                          {% endif %}
-                        </td>
-                        <td>
-                          <span class="badge 
-                            {% if payment.status == 'completed' %}bg-success
-                            {% elif payment.status == 'overdue' %}bg-danger
-                            {% elif payment.status == 'failed' %}bg-danger
-                            {% else %}bg-warning
-                            {% endif %}">
-                            {{ payment.get_status_display }}
-                          </span>
-                        </td>
-                        <td>
-                          {% if payment.invoice_number %}
-                            <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-primary btn-sm">
-                              <i class="ti ti-file-text"></i> View
-                            </a>
-                          {% else %}
-                            <span class="text-muted">-</span>
-                          {% endif %}
-                        </td>
+                        <th>Installment #</th>
+                        <th>Amount</th>
+                        <th>Tax Amount</th>
+                        <th>Due Date</th>
+                        <th>Payment Date</th>
+                        <th>Payment Method</th>
+                        <th>Transaction ID</th>
+                        <th>Status</th>
+                        <th>Invoice</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {% for payment in payments %}
+                        <tr>
+                          <td>{{ payment.installment_number }}</td>
+                          <td>₹{{ payment.amount|floatformat:2 }}</td>
+                          <td>₹{{ payment.tax_amount|floatformat:2 }}</td>
+                          <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                          <td>
+                            {% if payment.payment_date %}
+                              {{ payment.payment_date|date:"M d, Y H:i" }}
+                            {% else %}
+                              <span class="text-muted">Not paid</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ payment.get_payment_method_display }}</td>
+                          <td>
+                            {% if payment.transaction_id %}
+                              <code>{{ payment.transaction_id }}</code>
+                            {% else %}
+                              <span class="text-muted">-</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            <span class="badge 
+                              {% if payment.status == 'completed' %}bg-success
+                              {% elif payment.status == 'overdue' %}bg-danger
+                              {% elif payment.status == 'failed' %}bg-danger
+                              {% else %}bg-warning
+                              {% endif %}">
+                              {{ payment.get_status_display }}
+                            </span>
+                          </td>
+                          <td>
+                            {% if payment.invoice_number %}
+                              <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="ti ti-file-text"></i> View
+                              </a>
+                            {% else %}
+                              <span class="text-muted">-</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Mobile Card View -->
+              <div class="payment-history-mobile">
+                {% for payment in payments %}
+                  <div class="payment-card-mobile">
+                    <div class="payment-header-mobile">
+                      <div class="installment-number-badge">Installment #{{ payment.installment_number }}</div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Amount</div>
+                      <div class="field-value">₹{{ payment.amount|floatformat:2 }}</div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Tax Amount</div>
+                      <div class="field-value">₹{{ payment.tax_amount|floatformat:2 }}</div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Due Date</div>
+                      <div class="field-value">{{ payment.due_date|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Payment Date</div>
+                      <div class="field-value">
+                        {% if payment.payment_date %}
+                          {{ payment.payment_date|date:"M d, Y H:i" }}
+                        {% else %}
+                          <span class="text-muted">Not paid</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Payment Method</div>
+                      <div class="field-value">{{ payment.get_payment_method_display }}</div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Transaction ID</div>
+                      <div class="field-value">
+                        {% if payment.transaction_id %}
+                          <div class="transaction-code">{{ payment.transaction_id }}</div>
+                        {% else %}
+                          <span class="text-muted">-</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    <div class="payment-field-mobile status-{{ payment.status }}">
+                      <div class="field-label">Status</div>
+                      <div class="field-value">
+                        <span class="badge 
+                          {% if payment.status == 'completed' %}bg-success
+                          {% elif payment.status == 'overdue' %}bg-danger
+                          {% elif payment.status == 'failed' %}bg-danger
+                          {% else %}bg-warning
+                          {% endif %}">
+                          {{ payment.get_status_display }}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="payment-field-mobile">
+                      <div class="field-label">Invoice</div>
+                      <div class="field-value">
+                        {% if payment.invoice_number %}
+                          <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="ti ti-file-text me-1"></i> View Invoice
+                          </a>
+                        {% else %}
+                          <span class="text-muted">No invoice available</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
               </div>
             </div>
           </div>
         {% else %}
-          <div class="text-center py-4">
-            <i class="ti ti-credit-card-off fs-1 text-muted"></i>
-            <h5 class="mt-3">No Payment History</h5>
+          <div class="text-center py-4 py-md-5">
+            <div class="mb-4">
+              <i class="ti ti-credit-card-off text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="mb-3">No Payment History</h5>
             <p class="text-muted">No payment records found for this enrollment.</p>
           </div>
         {% endif %}

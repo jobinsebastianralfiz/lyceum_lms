@@ -45,6 +45,7 @@ LOCAL_APPS = [
     'apps.custom_admin',
     'landing',
     'student_portal',
+    'emails',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

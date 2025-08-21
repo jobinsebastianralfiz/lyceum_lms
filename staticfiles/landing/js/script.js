@@ -1,33 +1,29 @@
-// Mobile Navigation Toggle
+// Simplified Mobile Navigation Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Get elements
     const navToggle = document.getElementById('nav-toggle');
     const navMenu = document.getElementById('nav-menu');
-
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            navToggle.classList.toggle('active');
-        });
-
-        // Close mobile menu when clicking on a link
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-            });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const isClickInsideNav = navMenu.contains(event.target) || navToggle.contains(event.target);
-            if (!isClickInsideNav && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
+    
+    // Basic click handler for mobile toggle
+    if (navToggle) {
+        navToggle.onclick = function() {
+            if (navMenu) {
+                navMenu.classList.toggle('active');
+                navToggle.classList.toggle('active');
             }
+        };
+    }
+    
+    // Close menu when clicking nav links
+    if (navMenu) {
+        const navLinks = navMenu.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.onclick = function() {
+                navMenu.classList.remove('active');
+                if (navToggle) navToggle.classList.remove('active');
+            };
         });
     }
-
     // Smooth scrolling for anchor links
     const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
     smoothScrollLinks.forEach(link => {
@@ -49,18 +45,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Navbar background on scroll
+    // Navbar background on scroll - DISABLED
+    // Keep navbar color consistent across all pages
     const navbar = document.querySelector('.navbar');
     if (navbar) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 50) {
-                navbar.style.background = '#263233';
-                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.2)';
-            } else {
-                navbar.style.background = '#263233';
-                navbar.style.boxShadow = 'none';
-            }
-        });
+        // Remove any inline styles that might override CSS
+        navbar.style.background = '';
+        navbar.style.boxShadow = '';
     }
 
     // Intersection Observer for animations

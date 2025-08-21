@@ -108,8 +108,8 @@ class CourseEnrollmentView(APIView):
                     notes=f"Auto-generated from app purchase. Gateway Response: {payment_gateway_response}"
                 )
                 
-                # 3. Create Tax Invoice (if needed)
-                if not course.is_free and total_amount > 0:
+                # 3. Create Tax Invoice for all payments (including zero-tax payments)
+                if not course.is_free:  # Create invoice for all paid courses
                     invoice_number = f"INV-{enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d')}"
                     TaxInvoice.objects.create(
                         enrollment=enrollment,

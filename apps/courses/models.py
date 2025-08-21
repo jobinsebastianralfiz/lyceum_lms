@@ -235,7 +235,7 @@ class AssignmentSubmission(models.Model):
     
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assignment_submissions')
-    github_url = models.URLField(help_text="GitHub repository or file URL")
+    github_url = models.URLField(help_text="URL to submission (GitHub, GitLab, Figma, CodePen, Repl.it, CodeSandbox, Vercel, Netlify, or any public URL)")
     submission_notes = models.TextField(blank=True, null=True, help_text="Student's notes about the submission")
     status = models.CharField(max_length=20, choices=SUBMISSION_STATUS, default='draft')
     

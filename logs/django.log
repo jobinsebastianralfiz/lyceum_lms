@@ -8553,3 +8553,47 @@ INFO 2025-08-17 15:25:00,357 autoreload 29545 8444092160 /Users/jobinsebastian/d
 INFO 2025-08-17 15:25:00,592 autoreload 29779 8444092160 Watching for file changes with StatReloader
 INFO 2025-08-17 15:32:32,291 autoreload 29779 8444092160 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
 INFO 2025-08-17 15:32:32,693 autoreload 31007 8444092160 Watching for file changes with StatReloader
+INFO 2025-08-20 14:10:57,740 autoreload 30339 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 15:05:41,176 autoreload 30339 8302534848 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/settings.py changed, reloading.
+INFO 2025-08-20 15:05:41,618 autoreload 33673 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 15:06:25,190 autoreload 33673 8302534848 /Users/jobinsebastian/djangoprojects/lms/emails/models.py changed, reloading.
+INFO 2025-08-20 15:06:25,625 autoreload 33886 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 15:07:44,327 autoreload 33886 8302534848 /Users/jobinsebastian/djangoprojects/lms/codelearn_lms/urls.py changed, reloading.
+INFO 2025-08-20 15:07:44,824 autoreload 34250 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 15:08:07,788 autoreload 34250 8302534848 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-20 15:08:08,181 autoreload 34423 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 15:08:57,915 autoreload 34423 8302534848 /Users/jobinsebastian/djangoprojects/lms/emails/admin.py changed, reloading.
+INFO 2025-08-20 15:08:58,327 autoreload 34771 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 16:40:45,457 autoreload 34771 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 16:40:45,948 autoreload 38213 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 16:45:16,417 autoreload 38213 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 16:45:16,917 autoreload 39051 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 17:31:33,109 autoreload 39051 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 17:31:33,589 autoreload 41759 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 17:31:41,076 autoreload 41759 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 17:31:41,485 autoreload 41829 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 17:31:56,163 autoreload 41829 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 17:31:56,415 autoreload 41876 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:05:36,007 autoreload 41876 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-20 19:05:36,505 autoreload 42822 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:05:41,899 autoreload 42822 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-20 19:05:42,238 autoreload 42868 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:07:12,209 autoreload 42868 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:07:12,663 autoreload 43238 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:07:30,475 autoreload 43238 8302534848 /Users/jobinsebastian/djangoprojects/lms/apps/payments/models.py changed, reloading.
+INFO 2025-08-20 19:07:30,736 autoreload 43403 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:07:37,103 autoreload 43403 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:07:37,345 autoreload 43458 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:07:44,733 autoreload 43458 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:07:44,964 autoreload 43490 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:12:37,012 autoreload 43490 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:12:37,494 autoreload 43912 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:12:44,949 autoreload 43912 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:12:45,223 autoreload 43960 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:17:31,084 autoreload 43960 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:17:31,620 autoreload 44526 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-20 19:20:33,067 autoreload 44526 8302534848 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-20 19:20:33,550 autoreload 44816 8302534848 Watching for file changes with StatReloader
+INFO 2025-08-21 09:42:54,867 basehttp 3278 6116044800 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-21 09:43:05,497 basehttp 3278 6116044800 "GET /student/course/1/ HTTP/1.1" 302 0
+INFO 2025-08-21 09:43:14,578 basehttp 3278 6116044800 "GET /student/course/1/checkout/ HTTP/1.1" 302 0

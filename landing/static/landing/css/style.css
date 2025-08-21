@@ -6,17 +6,28 @@
 }
 
 :root {
-    /* Brand Colors from Logo */
-    --primary-blue: #229BCE;
-    --dark-green: #153234;
-    --header-footer-color: #263233;
-    --light-green: #6FB844;
-    --brand-yellow: #FFE500;
-    --light-gray: #F9FAF9;
-    --white: #FAFBFA;
-    --dark-text: #153234;
-    --light-text: #666;
-    --hover-blue: #1a7ba5;
+    /* Modern Blue Brand Colors */
+    --primary-blue: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary-orange: #ea580c;
+    --secondary-light: #fed7aa;
+    --dark-bg: #0f172a;
+    --dark-card: #1e293b;
+    --light-gray: #f8fafc;
+    --text-dark: #0f172a;
+    --text-light: #64748b;
+    --white: #ffffff;
+    --success: #10b981;
+    --warning: #f59e0b;
+    
+    /* Legacy aliases for compatibility */
+    --primary-color: #ffffff;
+    --accent-color: #2563eb;
+    --dark-text: #0f172a;
+    --light-text: #64748b;
+    --header-footer-color: #2563eb;
+    --brand-yellow: #2563eb;
+    --hover-blue: #1d4ed8;
 }
 
 html {
@@ -41,36 +52,32 @@ body {
     position: fixed;
     top: 0;
     width: 100%;
-    background: var(--header-footer-color);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--primary-blue);
+    background: var(--white);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid #e2e8f0;
     z-index: 1000;
     transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
 }
 
 .nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 80px;
 }
 
 .nav-logo {
     display: flex;
     align-items: center;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--brand-yellow);
-    text-decoration: none;
 }
 
 .logo-svg {
-    height: 40px;
+    height: 32px;
     width: auto;
-    margin-right: 12px;
     transition: transform 0.3s ease;
 }
 
@@ -81,53 +88,36 @@ body {
 .nav-menu {
     display: flex;
     gap: 2rem;
+    align-items: center;
 }
 
 .nav-link {
-    color: #fff;
+    color: var(--text-dark);
     text-decoration: none;
     font-weight: 500;
+    font-size: 0.95rem;
     transition: color 0.3s ease;
-    position: relative;
 }
 
 .nav-link:hover {
-    color: var(--brand-yellow);
+    color: var(--primary-blue);
 }
 
-.nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -5px;
-    left: 0;
-    background-color: var(--brand-yellow);
-    transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-/* Student Portal Login Button */
+/* Navigation Login/Signup Button */
 .nav-login-btn {
-    background: linear-gradient(135deg, var(--brand-yellow) 0%, #e6cc00 100%);
-    color: var(--dark-text) !important;
-    padding: 10px 20px;
-    border-radius: 25px;
+    background: var(--primary-blue) !important;
+    color: var(--white) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px;
     font-weight: 600;
-    margin-left: 15px;
+    font-size: 0.875rem;
+    text-decoration: none;
     transition: all 0.3s ease;
-    border: 2px solid var(--brand-yellow);
-    box-shadow: 0 2px 10px rgba(255, 229, 0, 0.3);
 }
 
 .nav-login-btn:hover {
-    background: var(--brand-yellow);
-    color: var(--dark-text) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 229, 0, 0.4);
+    background: var(--primary-dark) !important;
+    transform: translateY(-1px);
 }
 
 .nav-login-btn::after {
@@ -143,7 +133,7 @@ body {
 .bar {
     width: 25px;
     height: 3px;
-    background-color: #fff;
+    background-color: var(--text-dark);
     margin: 3px 0;
     transition: 0.3s;
 }
@@ -679,20 +669,25 @@ body {
 
     .nav-menu {
         position: fixed;
-        left: -100%;
-        top: 80px;
+        right: -300px;
+        left: auto;
+        top: 60px;
         flex-direction: column;
-        background-color: var(--header-footer-color);
-        backdrop-filter: blur(10px);
-        width: 100%;
+        background-color: var(--white) !important;
+        width: 280px;
+        max-height: calc(100vh - 60px);
         text-align: center;
-        transition: 0.3s;
-        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.2);
-        padding: 1.5rem 0;
+        transition: right 0.3s ease;
+        z-index: 9999;
+        padding: 2rem 1rem;
+        gap: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border-radius: 0 0 0 12px;
     }
 
     .nav-menu.active {
-        left: 0;
+        right: 0 !important;
+        display: flex !important;
     }
 
     .nav-toggle {
@@ -713,9 +708,9 @@ body {
     
     /* Mobile Student Portal Button */
     .nav-login-btn {
-        margin: 15px 20px 0 20px;
+        margin: 0;
         display: inline-block;
-        width: calc(100% - 40px);
+        width: auto;
         text-align: center;
     }
 

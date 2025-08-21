@@ -1,0 +1,434 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Dashboard - CodeLearn Student Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-title {
+    margin-bottom: 2rem;
+  }
+  
+  .overview-card {
+    background: linear-gradient(135deg, #5d87ff 0%, #4570ea 100%);
+    color: white;
+    border-radius: 15px;
+    border: none;
+    margin-bottom: 2rem;
+  }
+  
+  .stats-grid {
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #5d87ff;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  
+  .content-section {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+  
+  .section-body {
+    padding: 1.5rem;
+  }
+  
+  .course-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+    height: 100%;
+  }
+  
+  .course-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #5d87ff;
+  }
+  
+  .course-image {
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .course-card:hover .course-image img {
+    transform: scale(1.05);
+  }
+  
+  .course-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  
+  .course-meta {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+  }
+  
+  .course-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    border-radius: 4px;
+  }
+  
+  .sidebar-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f8f9fa;
+    transition: all 0.2s ease;
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-item:hover {
+    background: #f8f9fa;
+    margin: 0 -1rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .quick-action-item {
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  
+  .quick-action-item:hover {
+    background: #f8f9fa;
+    border-color: #5d87ff;
+    color: inherit;
+    transform: translateY(-2px);
+  }
+  
+  .quick-action-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Title -->
+  <div class="page-title">
+    <h4 class="fw-semibold">Dashboard</h4>
+    <p class="text-muted">Welcome back, {{ user.name }}! Here's your learning overview.</p>
+  </div>
+
+  <!-- Overview Card -->
+  <div class="overview-card">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h3 class="fw-bold mb-2">Hello, {{ user.name }}! 👋</h3>
+          <p class="mb-3 opacity-90">Ready to continue your learning journey? You have {{ in_progress_courses }} course{{ in_progress_courses|pluralize }} in progress.</p>
+          <div class="row text-center">
+            <div class="col-4">
+              <h4 class="fw-bold">{{ total_courses }}</h4>
+              <small class="opacity-75">Total Courses</small>
+            </div>
+            <div class="col-4">
+              <h4 class="fw-bold">{{ completed_courses }}</h4>
+              <small class="opacity-75">Completed</small>
+            </div>
+            <div class="col-4">
+              <h4 class="fw-bold">{{ in_progress_courses }}</h4>
+              <small class="opacity-75">In Progress</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="d-inline-flex align-items-center justify-content-center bg-white bg-opacity-20 rounded-circle" style="width: 80px; height: 80px;">
+            <i class="ti ti-user fs-1"></i>
+          </div>
+          <p class="mt-2 mb-0 opacity-75">{{ user.email }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- My Courses -->
+      <div class="content-section">
+        <div class="section-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-semibold mb-0"><i class="ti ti-book-2 me-2"></i>My Courses</h5>
+            <a href="{% url 'student_portal:my_courses' %}" class="btn btn-primary btn-sm">View All</a>
+          </div>
+        </div>
+        <div class="section-body">
+          {% if enrollments %}
+            <div class="row g-3">
+              {% for enrollment in enrollments %}
+              <div class="col-md-6">
+                <div class="course-card">
+                  <div class="course-image">
+                    {% if enrollment.course.thumbnail %}
+                      <img src="{{ enrollment.course.thumbnail.url }}" alt="{{ enrollment.course.title }}">
+                    {% else %}
+                      <div class="course-image-placeholder">
+                        <i class="ti ti-book" style="font-size: 2.5rem;"></i>
+                      </div>
+                    {% endif %}
+                    <div class="course-meta">
+                      <span class="badge bg-primary">{{ enrollment.course.category.name }}</span>
+                    </div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="fw-semibold mb-2">{{ enrollment.course.title }}</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <small class="text-muted">Progress</small>
+                      <small class="fw-semibold text-primary">{{ enrollment.progress_percentage|default:0 }}%</small>
+                    </div>
+                    <div class="progress mb-3">
+                      <div class="progress-bar bg-primary" style="width: {{ enrollment.progress_percentage|default:0 }}%"></div>
+                    </div>
+                    {% if enrollment.course.id %}
+                    <a href="{% url 'student_portal:course_detail' enrollment.course.id %}" class="btn btn-primary btn-sm w-100">
+                      <i class="ti ti-play me-1"></i>Continue Learning
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary btn-sm w-100" disabled>
+                      <i class="ti ti-alert-triangle me-1"></i>Unavailable
+                    </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="ti ti-book-off"></i>
+              <h6 class="fw-semibold">No courses enrolled yet</h6>
+              <p class="mb-3">Start your learning journey by exploring our courses</p>
+              <a href="{% url 'landing:courses' %}" class="btn btn-primary">Browse Courses</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Available Courses -->
+      {% if available_courses %}
+      <div class="content-section">
+        <div class="section-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-semibold mb-0"><i class="ti ti-search me-2"></i>Available Courses</h5>
+            <a href="{% url 'landing:courses' %}" class="btn btn-outline-primary btn-sm">View All</a>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="row g-3">
+            {% for course in available_courses %}
+            <div class="col-md-6">
+              <div class="course-card">
+                <div class="course-image">
+                  {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                  {% else %}
+                    <div class="course-image-placeholder">
+                      <i class="ti ti-book" style="font-size: 2.5rem;"></i>
+                    </div>
+                  {% endif %}
+                  <div class="course-meta">
+                    <span class="badge bg-success">{{ course.category.name|default:"General" }}</span>
+                  </div>
+                  <div class="course-price">
+                    <span class="badge bg-dark">₹{{ course.price }}</span>
+                  </div>
+                </div>
+                <div class="card-body p-3">
+                  <h6 class="fw-semibold mb-2">{{ course.title }}</h6>
+                  <p class="text-muted small mb-3">{{ course.description|truncatechars:80 }}</p>
+                  {% if course.id %}
+                  <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-success btn-sm w-100">
+                    <i class="ti ti-eye me-1"></i>View Details
+                  </a>
+                  {% else %}
+                  <button class="btn btn-secondary btn-sm w-100" disabled>
+                    <i class="ti ti-alert-triangle me-1"></i>Unavailable
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Recent Activity -->
+      <div class="sidebar-card">
+        <div class="card-body p-4">
+          <h5 class="fw-semibold mb-3"><i class="ti ti-clock me-2"></i>Recent Activity</h5>
+          {% if recent_activity %}
+            {% for activity in recent_activity %}
+            <div class="activity-item">
+              <div class="d-flex align-items-center">
+                <div class="activity-icon bg-primary-subtle text-primary me-3">
+                  <i class="ti ti-play"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="fw-semibold mb-1">{{ activity.video_lesson.title|truncatechars:20 }}</h6>
+                  <p class="text-muted mb-1 small">{{ activity.course.title|truncatechars:25 }}</p>
+                  <span class="badge bg-success-subtle text-success small">{{ activity.completed_percentage|floatformat:0 }}% complete</span>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <i class="ti ti-clock"></i>
+              <p class="mb-0">No recent activity</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="sidebar-card">
+        <div class="card-body p-4">
+          <h5 class="fw-semibold mb-3"><i class="ti ti-zap me-2"></i>Quick Actions</h5>
+          
+          <a href="{% url 'student_portal:my_courses' %}" class="quick-action-item">
+            <div class="d-flex align-items-center">
+              <i class="ti ti-book text-primary me-3 fs-5"></i>
+              <div>
+                <h6 class="fw-semibold mb-0">My Courses</h6>
+                <small class="text-muted">Continue learning</small>
+              </div>
+            </div>
+          </a>
+
+          <a href="{% url 'landing:courses' %}" class="quick-action-item">
+            <div class="d-flex align-items-center">
+              <i class="ti ti-search text-success me-3 fs-5"></i>
+              <div>
+                <h6 class="fw-semibold mb-0">Browse Courses</h6>
+                <small class="text-muted">Discover new skills</small>
+              </div>
+            </div>
+          </a>
+
+          <a href="{% url 'student_portal:my_payments' %}" class="quick-action-item">
+            <div class="d-flex align-items-center">
+              <i class="ti ti-credit-card text-warning me-3 fs-5"></i>
+              <div>
+                <h6 class="fw-semibold mb-0">Payments</h6>
+                <small class="text-muted">View transactions</small>
+              </div>
+            </div>
+          </a>
+
+          <a href="{% url 'student_portal:profile' %}" class="quick-action-item">
+            <div class="d-flex align-items-center">
+              <i class="ti ti-user text-info me-3 fs-5"></i>
+              <div>
+                <h6 class="fw-semibold mb-0">Profile</h6>
+                <small class="text-muted">Update settings</small>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard loaded for user: {{ user.name }}');
+});
+</script>
+{% endblock %}

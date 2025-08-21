@@ -9,6 +9,10 @@ from django.middleware.csrf import get_token
 from django.db.models import Q, Count, Avg
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.conf import settings
+from datetime import date
+import razorpay
+import json
 from apps.users.models import User
 from apps.courses.models import (
     Course, Module, VideoLesson, StudentProgress, ModuleProgress,
@@ -33,9 +37,19 @@ def student_login(request):
         password = request.POST.get('password')
         
         if email and password:
-            # Authenticate user
+            # Try to authenticate with email as username
             user = authenticate(request, username=email, password=password)
-            if user and hasattr(user, 'role') and user.role == 'student':
+            
+            # If that fails, try to find user by email and authenticate with username
+            if not user:
+                try:
+                    user_obj = User.objects.get(email=email)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except User.DoesNotExist:
+                    pass
+            
+            # Check if user is valid and has student role (or no role restrictions for public users)
+            if user and (hasattr(user, 'role') and user.role == 'student' or not user.is_staff):
                 # Create session if it doesn't exist
                 if not request.session.session_key:
                     request.session.create()
@@ -143,9 +157,19 @@ def dashboard(request):
         user=user
     ).select_related('video_lesson', 'course').order_by('-last_watched_at')[:5]
     
+    # Get courses available for purchase (not enrolled)
+    enrolled_course_ids = enrollments.values_list('course_id', flat=True)
+    available_courses = Course.objects.filter(
+        is_published=True,
+        id__isnull=False  # Ensure course has a valid ID
+    ).exclude(
+        id__in=enrolled_course_ids
+    ).select_related('category').order_by('-created_at')[:6]
+    
     context = {
         'user': user,
         'enrollments': enrollments[:6],  # Show first 6 courses
+        'available_courses': available_courses,  # Courses to purchase
         'total_courses': total_courses,
         'completed_courses': completed_courses,
         'in_progress_courses': in_progress_courses,
@@ -179,16 +203,52 @@ def my_courses(request):
             Q(course__description__icontains=search)
         )
     
-    # Apply status filter
+    # Store enrollments list before pagination for filtering
+    enrollments_list = list(enrollments)
+    
+    # Calculate progress for each enrollment (same logic as dashboard)
+    for enrollment in enrollments_list:
+        modules = enrollment.course.modules.all()
+        total_modules = modules.count()
+        
+        if total_modules > 0:
+            total_progress = 0
+            modules_with_progress = 0
+            
+            for module in modules:
+                try:
+                    module_progress = ModuleProgress.objects.get(student=user, module=module)
+                    total_progress += module_progress.completion_percentage
+                    modules_with_progress += 1
+                except ModuleProgress.DoesNotExist:
+                    # Module not started, contributes 0% to progress
+                    modules_with_progress += 1
+            
+            # Calculate average completion across all modules
+            progress_percentage = total_progress / modules_with_progress if modules_with_progress > 0 else 0
+        else:
+            progress_percentage = 0
+        
+        # Count truly completed modules for statistics
+        completed_modules = ModuleProgress.objects.filter(
+            student=user,
+            module__course=enrollment.course,
+            is_completed=True
+        ).count()
+        
+        # Attach progress to enrollment object for template access
+        enrollment.progress_percentage = round(progress_percentage, 1)
+        enrollment.completed_modules = completed_modules
+        enrollment.total_modules = total_modules
+    
+    # Apply status filter after progress calculation
     if status == 'completed':
-        # Filter completed courses (this would need more complex logic)
-        pass
+        enrollments_list = [e for e in enrollments_list if e.completed_modules == e.total_modules and e.total_modules > 0]
     elif status == 'in_progress':
-        # Filter in-progress courses
-        pass
+        enrollments_list = [e for e in enrollments_list if e.completed_modules < e.total_modules and e.completed_modules > 0]
     
     # Pagination
-    paginator = Paginator(enrollments, 12)
+    paginator = Paginator(enrollments_list, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -210,38 +270,181 @@ def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id, is_published=True)
     
     # Check if user is enrolled
+    enrollment = None
+    is_enrolled = False
     try:
         enrollment = Enrollment.objects.get(user=user, course=course, active=True)
+        is_enrolled = True
     except Enrollment.DoesNotExist:
-        messages.error(request, 'You are not enrolled in this course.')
-        return redirect('student_portal:my_courses')
+        is_enrolled = False
     
-    # Get modules with progress, assignments, and quizzes
-    modules = course.modules.prefetch_related(
-        'video_lessons', 'assignments', 'quizzes'
-    ).order_by('order')
+    if is_enrolled:
+        # For enrolled users - show full course content
+        modules = course.modules.prefetch_related(
+            'video_lessons', 'assignments', 'quizzes'
+        ).order_by('order')
+        
+        # Get user's module progress and attach to each module
+        for module in modules:
+            try:
+                progress = ModuleProgress.objects.get(student=user, module=module)
+            except ModuleProgress.DoesNotExist:
+                # Create initial progress if doesn't exist
+                progress = ModuleProgress.objects.create(
+                    student=user,
+                    module=module,
+                    is_unlocked=(module.order == 1)  # Unlock first module
+                )
+            # Attach progress to module object for easy template access
+            module.progress = progress
+        
+        context = {
+            'course': course,
+            'enrollment': enrollment,
+            'modules': modules,
+            'is_enrolled': True,
+        }
+        return render(request, 'student_portal/courses/course_detail.html', context)
+    else:
+        # For non-enrolled users - show course preview and purchase option
+        modules = course.modules.order_by('order')[:3]  # Show first 3 modules as preview
+        
+        context = {
+            'course': course,
+            'modules': modules,
+            'is_enrolled': False,
+            'can_purchase': True,
+        }
     
-    # Get user's module progress and attach to each module
-    for module in modules:
-        try:
-            progress = ModuleProgress.objects.get(student=user, module=module)
-        except ModuleProgress.DoesNotExist:
-            # Create initial progress if doesn't exist
-            progress = ModuleProgress.objects.create(
-                student=user,
-                module=module,
-                is_unlocked=(module.order == 1)  # Unlock first module
-            )
-        # Attach progress to module object for easy template access
-        module.progress = progress
+    return render(request, 'student_portal/courses/course_detail.html', context)
+
+
+def course_checkout(request, course_id):
+    """Razorpay checkout page for course purchase"""
+    if not request.user.is_authenticated:
+        return redirect('student_portal:login')
+    
+    user = request.user
+    course = get_object_or_404(Course, id=course_id, is_published=True)
+    
+    # Check if already enrolled
+    existing_enrollment = Enrollment.objects.filter(user=user, course=course, active=True).first()
+    if existing_enrollment:
+        messages.info(request, 'You are already enrolled in this course.')
+        return redirect('student_portal:course_detail', course_id=course.id)
+    
+    # Calculate pricing
+    base_price = float(course.price)
+    discount_amount = 0
+    
+    # Calculate tax (18% GST)
+    tax_rate = 0.18
+    tax_amount = base_price * tax_rate
+    total_amount = base_price + tax_amount
+    
+    # Convert to paisa (Razorpay expects amount in paisa)
+    razorpay_amount = int(total_amount * 100)
+    
+    # Check if Razorpay is configured
+    razorpay_key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
+    if not razorpay_key_id:
+        messages.error(request, f'Payment gateway is not configured. Key: {razorpay_key_id}. Please contact support.')
+        return redirect('student_portal:course_detail', course_id=course.id)
     
     context = {
         'course': course,
-        'enrollment': enrollment,
-        'modules': modules,
+        'user': user,
+        'base_price': base_price,
+        'discount_amount': discount_amount,
+        'tax_amount': tax_amount,
+        'tax_rate': int(tax_rate * 100),
+        'total_amount': total_amount,
+        'razorpay_amount': razorpay_amount,
+        'razorpay_key_id': razorpay_key_id,
     }
     
-    return render(request, 'student_portal/courses/course_detail.html', context)
+    return render(request, 'student_portal/courses/checkout.html', context)
+
+
+@require_http_methods(["POST"])
+def verify_payment(request):
+    """Verify Razorpay payment and create enrollment"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        # Get payment data from request
+        data = json.loads(request.body)
+        razorpay_payment_id = data.get('razorpay_payment_id')
+        razorpay_order_id = data.get('razorpay_order_id') 
+        razorpay_signature = data.get('razorpay_signature')
+        course_id = data.get('course_id')
+        
+        if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature, course_id]):
+            return JsonResponse({'error': 'Missing required payment data'}, status=400)
+        
+        # Initialize Razorpay client
+        client = razorpay.Client(
+            auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+        )
+        
+        # Verify payment signature
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature
+        }
+        
+        try:
+            client.utility.verify_payment_signature(params_dict)
+        except:
+            return JsonResponse({'error': 'Payment verification failed'}, status=400)
+        
+        # Get course and user
+        course = get_object_or_404(Course, id=course_id, is_published=True)
+        user = request.user
+        
+        # Check if already enrolled
+        if Enrollment.objects.filter(user=user, course=course, active=True).exists():
+            return JsonResponse({'error': 'Already enrolled in this course'}, status=400)
+        
+        # Calculate amounts (same logic as checkout)
+        base_price = float(course.price)
+        tax_amount = base_price * 0.18
+        total_amount = base_price + tax_amount
+        
+        # Create enrollment and payment records
+        enrollment = Enrollment.objects.create(
+            user=user,
+            course=course,
+            total_amount=total_amount,
+            tax_amount=tax_amount,
+            payment_status='completed'
+        )
+        
+        payment = Payment.objects.create(
+            enrollment=enrollment,
+            amount=total_amount,
+            tax_amount=tax_amount,
+            payment_method='razorpay',
+            transaction_id=razorpay_payment_id,
+            payment_date=timezone.now(),
+            due_date=date.today(),
+            status='completed',
+            razorpay_order_id=razorpay_order_id,
+            razorpay_payment_id=razorpay_payment_id,
+            razorpay_signature=razorpay_signature
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Payment successful! Course enrollment completed.',
+            'enrollment_id': enrollment.id,
+            'redirect_url': f'/student-portal/course/{course.id}/'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Payment processing failed: {str(e)}'}, status=500)
 
 
 def lesson_viewer(request, lesson_id):

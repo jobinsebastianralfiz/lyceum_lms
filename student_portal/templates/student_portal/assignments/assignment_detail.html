@@ -76,11 +76,14 @@
             <form id="assignmentSubmissionForm">
               {% csrf_token %}
               <div class="mb-3">
-                <label for="github_url" class="form-label fw-semibold">GitHub Repository URL *</label>
+                <label for="github_url" class="form-label fw-semibold">Submission URL *</label>
                 <input type="url" class="form-control" id="github_url" name="github_url" 
                        value="{% if submission %}{{ submission.github_url }}{% endif %}" 
-                       placeholder="https://github.com/username/repository" required>
-                <div class="form-text">Please provide the URL to your GitHub repository containing the assignment solution.</div>
+                       placeholder="https://github.com/username/repo or https://figma.com/..." required>
+                <div class="form-text">
+                  <strong>Supported platforms:</strong> GitHub, GitLab, Figma, CodePen, Repl.it, CodeSandbox, Vercel, Netlify, or any public URL containing your work.
+                  <br><small class="text-muted">Examples: github.com/user/repo, figma.com/file/123, codepen.io/user/pen/abc</small>
+                </div>
               </div>
               
               <div class="mb-3">
@@ -113,11 +116,32 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <strong>GitHub URL:</strong><br>
+                <strong>Submission URL:</strong><br>
                 <a href="{{ submission.github_url }}" target="_blank" class="text-primary">
-                  {{ submission.github_url }}
+                  {{ submission.github_url|truncatechars:50 }}
                   <i class="ti ti-external-link ms-1"></i>
                 </a>
+                <small class="d-block text-muted mt-1">
+                  {% if 'github.com' in submission.github_url %}
+                    <i class="ti ti-brand-github me-1"></i>GitHub Repository
+                  {% elif 'figma.com' in submission.github_url %}
+                    <i class="ti ti-device-desktop me-1"></i>Figma Design
+                  {% elif 'codepen.io' in submission.github_url %}
+                    <i class="ti ti-code me-1"></i>CodePen Project
+                  {% elif 'repl.it' in submission.github_url or 'replit.com' in submission.github_url %}
+                    <i class="ti ti-terminal me-1"></i>Repl.it Project
+                  {% elif 'codesandbox.io' in submission.github_url %}
+                    <i class="ti ti-box me-1"></i>CodeSandbox
+                  {% elif 'gitlab.com' in submission.github_url %}
+                    <i class="ti ti-brand-gitlab me-1"></i>GitLab Repository
+                  {% elif 'vercel.app' in submission.github_url or 'vercel.com' in submission.github_url %}
+                    <i class="ti ti-world me-1"></i>Vercel Deployment
+                  {% elif 'netlify.app' in submission.github_url or 'netlify.com' in submission.github_url %}
+                    <i class="ti ti-world me-1"></i>Netlify Deployment
+                  {% else %}
+                    <i class="ti ti-link me-1"></i>External Link
+                  {% endif %}
+                </small>
               </div>
               <div class="col-md-6 mb-3">
                 <strong>Submitted At:</strong><br>
@@ -177,7 +201,9 @@
         
         <div class="mb-3">
           <small class="text-muted d-block">Passing Score</small>
-          <strong>{{ assignment.passing_score }} points ({{ assignment.passing_score|mul:100|div:assignment.max_points|floatformat:0 }}%)</strong>
+          <strong>{{ assignment.passing_score }} points 
+            {% widthratio assignment.passing_score assignment.max_points 100 %}%
+          </strong>
         </div>
         
         <div class="mb-3">
@@ -219,7 +245,57 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const urlInput = document.getElementById('github_url');
     const form = document.getElementById('assignmentSubmissionForm');
+    
+    // URL validation and platform detection
+    if (urlInput) {
+        urlInput.addEventListener('input', function() {
+            const url = this.value.toLowerCase();
+            const helpText = this.parentNode.querySelector('.form-text');
+            
+            if (url && this.checkValidity()) {
+                let platformInfo = '';
+                if (url.includes('github.com')) {
+                    platformInfo = '<i class="ti ti-brand-github text-success me-1"></i><span class="text-success">GitHub repository detected</span>';
+                } else if (url.includes('figma.com')) {
+                    platformInfo = '<i class="ti ti-device-desktop text-info me-1"></i><span class="text-info">Figma design detected</span>';
+                } else if (url.includes('codepen.io')) {
+                    platformInfo = '<i class="ti ti-code text-warning me-1"></i><span class="text-warning">CodePen project detected</span>';
+                } else if (url.includes('repl.it') || url.includes('replit.com')) {
+                    platformInfo = '<i class="ti ti-terminal text-primary me-1"></i><span class="text-primary">Repl.it project detected</span>';
+                } else if (url.includes('codesandbox.io')) {
+                    platformInfo = '<i class="ti ti-box text-success me-1"></i><span class="text-success">CodeSandbox detected</span>';
+                } else if (url.includes('gitlab.com')) {
+                    platformInfo = '<i class="ti ti-brand-gitlab text-orange me-1"></i><span class="text-orange">GitLab repository detected</span>';
+                } else if (url.includes('vercel.app') || url.includes('vercel.com')) {
+                    platformInfo = '<i class="ti ti-world text-dark me-1"></i><span class="text-dark">Vercel deployment detected</span>';
+                } else if (url.includes('netlify.app') || url.includes('netlify.com')) {
+                    platformInfo = '<i class="ti ti-world text-success me-1"></i><span class="text-success">Netlify deployment detected</span>';
+                } else {
+                    platformInfo = '<i class="ti ti-link text-muted me-1"></i><span class="text-muted">External URL detected</span>';
+                }
+                
+                helpText.innerHTML = `
+                    <div class="mb-2">${platformInfo}</div>
+                    <strong>Supported platforms:</strong> GitHub, GitLab, Figma, CodePen, Repl.it, CodeSandbox, Vercel, Netlify, or any public URL containing your work.
+                    <br><small class="text-muted">Examples: github.com/user/repo, figma.com/file/123, codepen.io/user/pen/abc</small>
+                `;
+            } else if (url) {
+                helpText.innerHTML = `
+                    <div class="mb-2"><i class="ti ti-alert-circle text-danger me-1"></i><span class="text-danger">Please enter a valid URL</span></div>
+                    <strong>Supported platforms:</strong> GitHub, GitLab, Figma, CodePen, Repl.it, CodeSandbox, Vercel, Netlify, or any public URL containing your work.
+                    <br><small class="text-muted">Examples: github.com/user/repo, figma.com/file/123, codepen.io/user/pen/abc</small>
+                `;
+            } else {
+                helpText.innerHTML = `
+                    <strong>Supported platforms:</strong> GitHub, GitLab, Figma, CodePen, Repl.it, CodeSandbox, Vercel, Netlify, or any public URL containing your work.
+                    <br><small class="text-muted">Examples: github.com/user/repo, figma.com/file/123, codepen.io/user/pen/abc</small>
+                `;
+            }
+        });
+    }
+    
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();

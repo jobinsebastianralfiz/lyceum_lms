@@ -12,6 +12,9 @@ urlpatterns = [
     # Landing Pages
     path('', include('landing.urls')),
     
+    # Email System
+    path('', include('emails.urls')),
+    
     # Student Portal
     path('student/', include('student_portal.urls')),
     

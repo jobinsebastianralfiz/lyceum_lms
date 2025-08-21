@@ -1,0 +1,400 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - CodeLearn LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.course-hero {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f7f5 100%);
+    padding: 120px 0 80px;
+}
+
+.course-hero-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.course-info h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.course-description {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.course-meta-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.meta-item i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+.enrollment-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(189, 208, 202, 0.2);
+    border: 1px solid rgba(189, 208, 202, 0.3);
+    position: sticky;
+    top: 100px;
+}
+
+.price-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(189, 208, 202, 0.2);
+}
+
+.price-display {
+    margin-bottom: 1rem;
+}
+
+.current-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.free-badge {
+    background: var(--accent-color);
+    color: var(--white);
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.tax-info {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.enrollment-benefits {
+    margin-bottom: 2rem;
+}
+
+.enrollment-benefits h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.benefits-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+.benefits-list i {
+    color: var(--accent-color);
+    font-size: 1rem;
+    width: 16px;
+}
+
+.enroll-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: var(--gradient);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.enroll-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(189, 208, 202, 0.4);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.enroll-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.enrolled-badge {
+    background: var(--accent-color);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.login-required {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(189, 208, 202, 0.1);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.login-required p {
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--accent-color);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.course-content-section {
+    background: var(--white);
+    padding: 80px 0;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+}
+
+.content-block {
+    background: #f8fffe;
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(189, 208, 202, 0.2);
+}
+
+.content-block h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.content-block p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .course-hero {
+        padding: 100px 0 60px;
+    }
+
+    .course-hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .course-info h1 {
+        font-size: 2.2rem;
+    }
+
+    .enrollment-card {
+        position: static;
+        top: auto;
+    }
+
+    .current-price {
+        font-size: 2rem;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Course Hero Section -->
+<section class="course-hero">
+    <div class="container">
+        <div class="course-hero-content">
+            <div class="course-info">
+                <h1>{{ course.title }}</h1>
+                <p class="course-description">{{ course.description }}</p>
+                
+                <div class="course-meta-list">
+                    <div class="meta-item">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ course.category.name }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Self-paced learning</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-certificate"></i>
+                        <span>Certificate included</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-users"></i>
+                        <span>{{ course.enrollments.count }} enrolled</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="enrollment-card">
+                <div class="price-section">
+                    {% if course.is_free_course %}
+                        <div class="price-display">
+                            <div class="free-badge">FREE COURSE</div>
+                        </div>
+                    {% else %}
+                        <div class="price-display">
+                            <div class="current-price">₹{{ course.total_price|floatformat:0 }}</div>
+                        </div>
+                        {% if course.tax_amount > 0 %}
+                            <div class="tax-info">
+                                Includes ₹{{ course.tax_amount|floatformat:0 }} taxes ({{ course.tax_rate }}%)
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <div class="enrollment-benefits">
+                    <h4>What you'll get:</h4>
+                    <ul class="benefits-list">
+                        <li><i class="fas fa-check"></i> Full course access</li>
+                        <li><i class="fas fa-check"></i> Video lessons & materials</li>
+                        <li><i class="fas fa-check"></i> Practical assignments</li>
+                        <li><i class="fas fa-check"></i> Interactive quizzes</li>
+                        <li><i class="fas fa-check"></i> Progress tracking</li>
+                        <li><i class="fas fa-check"></i> Certificate of completion</li>
+                    </ul>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    {% if is_enrolled %}
+                        <div class="enrolled-badge">
+                            <i class="fas fa-check-circle"></i> Already Enrolled
+                        </div>
+                        <a href="{% url 'student_portal:dashboard' %}" class="btn btn-outline-primary" style="width: 100%; text-align: center;">
+                            Go to Course
+                        </a>
+                    {% else %}
+                        <form method="post" action="{% url 'landing:enroll_course' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="enroll-btn">
+                                {% if course.is_free_course %}
+                                    <i class="fas fa-play"></i> Enroll for Free
+                                {% else %}
+                                    <i class="fas fa-credit-card"></i> Enroll Now
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <div class="login-required">
+                        <p>Please create an account or login to enroll in this course</p>
+                        <a href="{% url 'landing:register' %}" 
+                           class="btn btn-outline-primary" style="margin-bottom: 0.5rem;">
+                            Create Free Account
+                        </a>
+                        <a href="{% url 'student_portal:login' %}?next={% url 'landing:course_detail' course.id %}" 
+                           class="btn btn-outline-primary">
+                            Already have an account? Login
+                        </a>
+                    </div>
+                {% endif %}
+                
+                <div class="text-center" style="font-size: 0.9rem; color: var(--text-light);">
+                    <i class="fas fa-lock"></i> Secure payment with Razorpay
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Course Content Section -->
+<section class="course-content-section">
+    <div class="container">
+        <h2 class="section-title">Course Overview</h2>
+        
+        <div class="content-grid">
+            <div class="content-block">
+                <h3><i class="fas fa-target"></i> Learning Objectives</h3>
+                <p>Master the fundamentals and practical applications of {{ course.title }}. Build real-world projects and gain hands-on experience with modern tools and techniques.</p>
+            </div>
+            
+            <div class="content-block">
+                <h3><i class="fas fa-users"></i> Who Should Take This</h3>
+                <p>Perfect for beginners and intermediate learners who want to enhance their skills. No prior experience required - we'll guide you from basics to advanced concepts.</p>
+            </div>
+            
+            <div class="content-block">
+                <h3><i class="fas fa-laptop-code"></i> Hands-on Projects</h3>
+                <p>Apply your learning through practical assignments and real-world projects. Build a portfolio that showcases your new skills to potential employers.</p>
+            </div>
+            
+            <div class="content-block">
+                <h3><i class="fas fa-headset"></i> Support & Community</h3>
+                <p>Get help when you need it with our responsive support system. Connect with fellow learners and share your progress throughout the course.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

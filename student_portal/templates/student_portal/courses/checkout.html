@@ -1,0 +1,262 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Checkout - {{ course.title }} - Student Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-card {
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    
+    .course-summary {
+        background: linear-gradient(135deg, #BDD0CA, #2C5F5F);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .price-breakdown {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .total-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2C5F5F;
+    }
+    
+    .payment-button {
+        background: linear-gradient(135deg, #2C5F5F, #BDD0CA);
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    
+    .payment-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 95, 95, 0.3);
+    }
+    
+    .security-badge {
+        background-color: #e8f5e8;
+        border: 1px solid #c3e6c3;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card checkout-card border-0">
+                <!-- Course Summary Header -->
+                <div class="course-summary p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" class="img-fluid rounded" alt="{{ course.title }}" style="height: 120px; width: 100%; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-white bg-opacity-25 rounded d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="ti ti-book text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="mb-2">{{ course.title }}</h3>
+                            <p class="mb-2 opacity-90">{{ course.description|truncatechars:150 }}</p>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-white text-primary">{{ course.category.name|default:"General" }}</span>
+                                <span><i class="ti ti-users me-1"></i>{{ course.enrollments.count }} Students</span>
+                                <span><i class="ti ti-clock me-1"></i>Lifetime Access</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Payment Details -->
+                        <div class="col-md-8">
+                            <h5 class="mb-4">Complete Your Purchase</h5>
+                            
+                            <!-- Billing Details -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">Billing Information</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" value="{{ user.name }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Info -->
+                            <div class="security-badge mb-4">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-shield-check text-success me-2" style="font-size: 1.2rem;"></i>
+                                    <span><strong>Secure Payment</strong> - Your payment information is encrypted and secure</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div class="col-md-4">
+                            <div class="price-breakdown p-3">
+                                <h6 class="mb-3">Order Summary</h6>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Course Price:</span>
+                                    <span>Rs.{{ base_price|floatformat:2 }}</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>GST ({{ tax_rate }}%):</span>
+                                    <span>Rs.{{ tax_amount|floatformat:2 }}</span>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between total-amount">
+                                    <span>Total Amount:</span>
+                                    <span>Rs.{{ total_amount|floatformat:2 }}</span>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <button id="payButton" class="btn btn-primary payment-button w-100">
+                                        <i class="ti ti-credit-card me-2"></i>
+                                        Pay Rs.{{ total_amount|floatformat:2 }}
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-3 text-center">
+                                    <small class="text-muted">
+                                        <i class="ti ti-info-circle me-1"></i>
+                                        You will get instant access after payment
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-body py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0">Processing payment...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('payButton');
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    
+    payButton.addEventListener('click', function() {
+        // Show loading
+        loadingModal.show();
+        
+        const options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": {{ razorpay_amount }}, // Amount in paisa
+            "currency": "INR",
+            "name": "CodeLearn",
+            "description": "{{ course.title }}",
+            "image": "{% if course.image %}{{ course.image.url }}{% endif %}",
+            "prefill": {
+                "name": "{{ user.name }}",
+                "email": "{{ user.email }}"
+            },
+            "theme": {
+                "color": "#2C5F5F"
+            },
+            "handler": function (response) {
+                // Payment successful
+                verifyPayment(response);
+            },
+            "modal": {
+                "ondismiss": function() {
+                    // Hide loading when payment modal is dismissed
+                    loadingModal.hide();
+                }
+            }
+        };
+        
+        const rzp = new Razorpay(options);
+        
+        rzp.on('payment.failed', function (response) {
+            loadingModal.hide();
+            alert('Payment failed: ' + response.error.description);
+        });
+        
+        // Hide loading and open Razorpay
+        loadingModal.hide();
+        rzp.open();
+    });
+    
+    function verifyPayment(payment) {
+        loadingModal.show();
+        
+        fetch('{% url "student_portal:verify_payment" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: payment.razorpay_payment_id,
+                razorpay_order_id: payment.razorpay_order_id,
+                razorpay_signature: payment.razorpay_signature,
+                course_id: {{ course.id }}
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingModal.hide();
+            
+            if (data.success) {
+                // Success - redirect to course
+                alert('Payment successful! Redirecting to your course...');
+                window.location.href = data.redirect_url;
+            } else {
+                // Error
+                alert('Payment verification failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            loadingModal.hide();
+            console.error('Error:', error);
+            alert('Payment verification failed. Please contact support.');
+        });
+    }
+});
+</script>
+{% endblock %}
