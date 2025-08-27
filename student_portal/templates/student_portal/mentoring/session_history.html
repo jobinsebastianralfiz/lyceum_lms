@@ -1,0 +1,220 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Mentoring Sessions - {{ request.user.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .session-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+        border-left: 4px solid;
+    }
+    .session-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .session-card.one-on-one { border-left-color: #007bff; }
+    .session-card.group { border-left-color: #28a745; }
+    .session-card.follow-up { border-left-color: #ffc107; }
+    .session-card.career { border-left-color: #17a2b8; }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+    
+    .session-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>My Mentoring Sessions</h2>
+            <p class="text-muted">Complete history of your mentoring journey</p>
+        </div>
+        <div>
+            <a href="{% url 'student_portal:mentoring_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Session Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-comments fa-2x mb-3"></i>
+                    <h3 class="mb-0">{{ session_stats.total_sessions }}</h3>
+                    <small>Total Sessions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-3"></i>
+                    <h3 class="mb-0">{{ session_stats.total_duration }}</h3>
+                    <small>Total Minutes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-stopwatch fa-2x mb-3"></i>
+                    <h3 class="mb-0">{{ session_stats.avg_duration|floatformat:0 }}</h3>
+                    <small>Avg Duration</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar fa-2x mb-3"></i>
+                    <h3 class="mb-0">{{ session_stats.sessions_this_month }}</h3>
+                    <small>This Month</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session History -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+            <h5 class="mb-0">
+                <i class="fas fa-history me-2"></i>Session History
+            </h5>
+        </div>
+        <div class="card-body">
+            {% for session in sessions %}
+            <div class="card session-card {{ session.session_type }} border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="session-type-badge bg-primary text-white me-3">
+                                    {{ session.get_session_type_display }}
+                                </span>
+                                <h6 class="mb-0">{{ session.session_date|date:"F d, Y" }}</h6>
+                                <span class="text-muted ms-3">
+                                    <i class="fas fa-clock me-1"></i>{{ session.duration_minutes }} minutes
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-user-tie me-2 text-muted"></i>
+                                    <span class="fw-semibold">{{ session.mentor.name|default:session.mentor.username }}</span>
+                                    {% if session.course %}
+                                    <span class="text-muted ms-3">
+                                        <i class="fas fa-book me-1"></i>{{ session.course.title }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if session.topics_discussed %}
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Topics Discussed:</h6>
+                                <p class="mb-0">{{ session.topics_discussed }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if session.action_items %}
+                            <div class="mb-3">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-tasks me-1"></i>Action Items:
+                                </h6>
+                                <div class="bg-light p-3 rounded">
+                                    {{ session.action_items|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if session.student_feedback %}
+                            <div class="mb-3">
+                                <h6 class="text-success mb-2">
+                                    <i class="fas fa-comment me-1"></i>My Feedback:
+                                </h6>
+                                <p class="mb-0 fst-italic">"{{ session.student_feedback }}"</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 text-center">
+                            {% if session.session_type == 'one_on_one' %}
+                                <i class="fas fa-user-friends fa-3x text-primary mb-2"></i>
+                            {% elif session.session_type == 'group' %}
+                                <i class="fas fa-users fa-3x text-success mb-2"></i>
+                            {% elif session.session_type == 'follow_up' %}
+                                <i class="fas fa-redo fa-3x text-warning mb-2"></i>
+                            {% elif session.session_type == 'career' %}
+                                <i class="fas fa-briefcase fa-3x text-info mb-2"></i>
+                            {% endif %}
+                            
+                            <div class="text-muted small">
+                                {{ session.session_date|timesince }} ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No mentoring sessions yet</h5>
+                <p class="text-muted">Your mentoring sessions will appear here once they're scheduled.</p>
+            </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if sessions.has_other_pages %}
+            <div class="d-flex justify-content-center mt-4">
+                <nav aria-label="Session pagination">
+                    <ul class="pagination">
+                        {% if sessions.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ sessions.previous_page_number }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in sessions.paginator.page_range %}
+                        {% if sessions.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > sessions.number|add:'-3' and num < sessions.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        
+                        {% if sessions.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ sessions.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ sessions.paginator.num_pages }}">Last &raquo;</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

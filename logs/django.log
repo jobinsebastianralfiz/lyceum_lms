@@ -8597,3 +8597,658 @@ INFO 2025-08-20 19:20:33,550 autoreload 44816 8302534848 Watching for file chang
 INFO 2025-08-21 09:42:54,867 basehttp 3278 6116044800 "GET /student/ HTTP/1.1" 302 0
 INFO 2025-08-21 09:43:05,497 basehttp 3278 6116044800 "GET /student/course/1/ HTTP/1.1" 302 0
 INFO 2025-08-21 09:43:14,578 basehttp 3278 6116044800 "GET /student/course/1/checkout/ HTTP/1.1" 302 0
+INFO 2025-08-27 09:31:30,720 autoreload 5140 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 09:36:32,539 autoreload 5140 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 09:36:33,449 autoreload 14251 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 09:36:45,024 autoreload 14251 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 09:36:45,251 autoreload 14310 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 09:49:50,700 autoreload 14310 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 09:49:50,941 autoreload 15519 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 09:50:36,890 autoreload 15519 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 09:50:37,116 autoreload 15591 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:00:48,143 autoreload 16847 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:04:58,059 autoreload 17347 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:05:23,044 autoreload 17575 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:06:08,987 autoreload 17771 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:06:11,635 basehttp 17771 6136541184 "GET / HTTP/1.1" 200 24601
+INFO 2025-08-27 10:06:11,658 basehttp 17771 6136541184 "GET /static/landing/css/style.css HTTP/1.1" 200 23370
+INFO 2025-08-27 10:06:11,661 basehttp 17771 6153367552 "GET /static/landing/images/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-27 10:06:11,661 basehttp 17771 6170193920 "GET /static/landing/js/script.js HTTP/1.1" 200 7990
+INFO 2025-08-27 10:06:11,664 basehttp 17771 6136541184 "GET /static/landing/images/simulator.png HTTP/1.1" 200 1259634
+WARNING 2025-08-27 10:06:11,994 log 17771 6187020288 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-27 10:06:11,994 log 17771 6203846656 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-27 10:06:11,995 log 17771 6220673024 Not Found: /apple-touch-icon.png
+WARNING 2025-08-27 10:06:11,996 log 17771 6237499392 Not Found: /favicon.ico
+WARNING 2025-08-27 10:06:11,996 basehttp 17771 6187020288 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 6802
+WARNING 2025-08-27 10:06:11,996 basehttp 17771 6203846656 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 6802
+WARNING 2025-08-27 10:06:11,997 basehttp 17771 6220673024 "GET /apple-touch-icon.png HTTP/1.1" 404 6766
+WARNING 2025-08-27 10:06:11,997 basehttp 17771 6237499392 "GET /favicon.ico HTTP/1.1" 404 6739
+WARNING 2025-08-27 10:06:12,052 log 17771 6187020288 Not Found: /apple-touch-icon.png
+WARNING 2025-08-27 10:06:12,052 basehttp 17771 6187020288 "GET /apple-touch-icon.png HTTP/1.1" 404 6766
+INFO 2025-08-27 10:06:14,251 basehttp 17771 6170193920 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-27 10:06:14,262 basehttp 17771 6254325760 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 200 2542
+INFO 2025-08-27 10:06:14,262 basehttp 17771 6271152128 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 200 1263
+INFO 2025-08-27 10:06:14,262 basehttp 17771 6153367552 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-27 10:06:14,263 basehttp 17771 6170193920 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-27 10:06:14,264 basehttp 17771 6136541184 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-27 10:06:14,269 basehttp 17771 6254325760 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 200 3890
+INFO 2025-08-27 10:06:14,270 basehttp 17771 6153367552 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-27 10:06:14,376 basehttp 17771 6271152128 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+INFO 2025-08-27 10:07:10,348 basehttp 17771 6136541184 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-27 10:07:10,358 basehttp 17771 6136541184 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,362 basehttp 17771 6220673024 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,362 basehttp 17771 6170193920 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,363 basehttp 17771 6187020288 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,363 basehttp 17771 6203846656 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,363 basehttp 17771 6153367552 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,366 basehttp 17771 6136541184 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:10,366 basehttp 17771 6220673024 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,936 basehttp 17771 6170193920 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-27 10:07:24,943 basehttp 17771 6187020288 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,943 basehttp 17771 6136541184 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,944 basehttp 17771 6203846656 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,944 basehttp 17771 6153367552 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,944 basehttp 17771 6220673024 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,944 basehttp 17771 6170193920 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,947 basehttp 17771 6136541184 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:24,947 basehttp 17771 6187020288 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:27,907 basehttp 17771 6254325760 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+WARNING 2025-08-27 10:07:27,914 log 17771 6237499392 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2025-08-27 10:07:27,915 basehttp 17771 6237499392 "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 6802
+WARNING 2025-08-27 10:07:27,916 log 17771 6271152128 Not Found: /apple-touch-icon.png
+WARNING 2025-08-27 10:07:27,917 log 17771 6287978496 Not Found: /favicon.ico
+WARNING 2025-08-27 10:07:27,918 basehttp 17771 6287978496 "GET /favicon.ico HTTP/1.1" 404 6739
+WARNING 2025-08-27 10:07:27,918 basehttp 17771 6271152128 "GET /apple-touch-icon.png HTTP/1.1" 404 6766
+INFO 2025-08-27 10:07:31,208 basehttp 17771 6304804864 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-27 10:07:31,224 basehttp 17771 6355283968 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:31,224 basehttp 17771 6372110336 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:31,225 basehttp 17771 6388936704 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:31,225 basehttp 17771 6304804864 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-27 10:07:31,226 basehttp 17771 6321631232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-27 10:07:31,226 basehttp 17771 6338457600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-27 10:07:31,228 basehttp 17771 6321631232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:31,229 basehttp 17771 6338457600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-27 10:07:31,291 basehttp 17771 6338457600 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 304 0
+INFO 2025-08-27 10:07:43,008 basehttp 17771 6338457600 "POST /student/login/ HTTP/1.1" 200 15065
+INFO 2025-08-27 10:07:55,550 basehttp 17771 6338457600 "POST /student/login/ HTTP/1.1" 200 15065
+INFO 2025-08-27 10:08:23,887 basehttp 17771 6338457600 "POST /student/login/ HTTP/1.1" 200 15065
+INFO 2025-08-27 10:08:46,360 basehttp 17771 6338457600 "POST /student/login/ HTTP/1.1" 200 15065
+INFO 2025-08-27 10:09:42,264 basehttp 17771 6338457600 "GET / HTTP/1.1" 200 24601
+INFO 2025-08-27 10:09:42,271 basehttp 17771 6321631232 "GET /static/landing/css/style.css HTTP/1.1" 200 23370
+INFO 2025-08-27 10:09:42,274 basehttp 17771 6338457600 "GET /static/landing/images/simulator.png HTTP/1.1" 200 1259634
+INFO 2025-08-27 10:09:42,277 basehttp 17771 6338457600 "GET /static/landing/js/script.js HTTP/1.1" 200 7990
+INFO 2025-08-27 10:09:46,334 basehttp 17771 6338457600 "GET /admin/login HTTP/1.1" 301 0
+INFO 2025-08-27 10:09:46,348 basehttp 17771 6321631232 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-27 10:09:46,360 basehttp 17771 6321631232 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-27 10:09:56,072 basehttp 17771 6321631232 "POST /admin/login/ HTTP/1.1" 302 0
+ERROR 2025-08-27 10:09:56,091 log 17771 6321631232 Internal Server Error: /admin/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: payments.razorpay_order_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py", line 73, in dashboard_view
+    pending_income += enrollment.outstanding_amount
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/payments/models.py", line 57, in outstanding_amount
+    paid = self.paid_amount
+           ^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/payments/models.py", line 52, in paid_amount
+    return sum(payment.amount or 0 for payment in payments)
+                                                  ^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 398, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: payments.razorpay_order_id
+ERROR 2025-08-27 10:09:56,092 basehttp 17771 6321631232 "GET /admin/ HTTP/1.1" 500 156184
+WARNING 2025-08-27 10:09:56,157 log 17771 6321631232 Not Found: /favicon.ico
+WARNING 2025-08-27 10:09:56,157 basehttp 17771 6321631232 "GET /favicon.ico HTTP/1.1" 404 6739
+INFO 2025-08-27 10:10:29,235 autoreload 18622 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:10:30,570 basehttp 18622 6129348608 "GET /admin/ HTTP/1.1" 200 37729
+INFO 2025-08-27 10:10:30,581 basehttp 18622 6129348608 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 200 8191
+INFO 2025-08-27 10:10:30,582 basehttp 18622 6146174976 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 200 171895
+INFO 2025-08-27 10:10:30,590 basehttp 18622 6146174976 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 200 552144
+INFO 2025-08-27 10:10:40,700 basehttp 18622 6146174976 "GET /admin/users/ HTTP/1.1" 200 50687
+WARNING 2025-08-27 10:10:54,747 log 18622 6146174976 Not Found: /admin/mentor/
+WARNING 2025-08-27 10:10:54,747 basehttp 18622 6146174976 "GET /admin/mentor/ HTTP/1.1" 404 26493
+ERROR 2025-08-27 10:11:12,296 log 18622 6146174976 Internal Server Error: /mentor/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py", line 62, in mentor_dashboard
+    return render(request, 'courses/mentor/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 953, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 484, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 698, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 606, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'mul'
+ERROR 2025-08-27 10:11:12,299 basehttp 18622 6146174976 "GET /mentor/ HTTP/1.1" 500 282820
+INFO 2025-08-27 10:12:58,304 autoreload 18622 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-27 10:12:58,760 autoreload 19250 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:13:07,262 autoreload 19250 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-27 10:13:07,507 autoreload 19285 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:13:13,892 autoreload 19285 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-27 10:13:14,109 autoreload 19316 8620859584 Watching for file changes with StatReloader
+ERROR 2025-08-27 10:25:38,783 log 19316 6165164032 Internal Server Error: /mentor/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py", line 62, in mentor_dashboard
+    return render(request, 'courses/mentor/dashboard.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 953, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 484, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 698, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 606, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'mul'
+ERROR 2025-08-27 10:25:38,785 basehttp 19316 6165164032 "GET /mentor/ HTTP/1.1" 500 286176
+INFO 2025-08-27 10:26:18,797 autoreload 19316 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:26:19,078 autoreload 19741 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:26:24,313 basehttp 19741 6155481088 "GET /mentor/ HTTP/1.1" 302 0
+INFO 2025-08-27 10:26:41,549 autoreload 19873 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:35:46,245 basehttp 19741 6155481088 "GET /mentor/ HTTP/1.1" 200 31056
+INFO 2025-08-27 10:35:46,257 basehttp 19741 6155481088 "GET /static/images/logos/logo.svg HTTP/1.1" 200 3383
+INFO 2025-08-27 10:35:57,131 basehttp 19741 6155481088 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-27 10:35:57,140 basehttp 19741 6155481088 "GET /student/login/ HTTP/1.1" 200 16653
+INFO 2025-08-27 10:35:58,681 basehttp 19741 6155481088 "GET /student/my-courses/ HTTP/1.1" 200 13422
+INFO 2025-08-27 10:35:59,564 basehttp 19741 6155481088 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-27 10:35:59,574 basehttp 19741 6155481088 "GET /student/login/ HTTP/1.1" 200 16653
+INFO 2025-08-27 10:36:00,246 basehttp 19741 6155481088 "GET /student/payments/ HTTP/1.1" 200 14047
+INFO 2025-08-27 10:36:00,802 basehttp 19741 6155481088 "GET /student/invoices/ HTTP/1.1" 200 12468
+INFO 2025-08-27 10:36:03,445 basehttp 19741 6155481088 "GET /student/ HTTP/1.1" 302 0
+INFO 2025-08-27 10:36:03,453 basehttp 19741 6155481088 "GET /student/login/ HTTP/1.1" 200 16653
+INFO 2025-08-27 10:36:17,480 basehttp 19741 6155481088 "GET / HTTP/1.1" 200 24577
+INFO 2025-08-27 10:36:20,941 basehttp 19741 6155481088 "GET /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-27 10:36:20,970 basehttp 19741 6155481088 "GET /admin/ HTTP/1.1" 200 42177
+INFO 2025-08-27 10:36:25,097 basehttp 19741 6155481088 "GET /mentor/ HTTP/1.1" 200 31056
+INFO 2025-08-27 10:37:44,707 autoreload 19741 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:37:45,127 autoreload 20416 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:38:21,450 autoreload 20416 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:38:21,759 autoreload 20515 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:39:00,126 autoreload 20515 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:39:00,343 autoreload 20593 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:39:38,741 autoreload 20593 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:39:39,000 autoreload 20681 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:40:13,232 autoreload 20681 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:40:13,477 autoreload 20755 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:40:19,832 autoreload 20755 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 10:40:20,079 autoreload 20790 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 10:52:18,752 basehttp 20790 6162788352 "GET /admin/ HTTP/1.1" 200 42177
+INFO 2025-08-27 10:52:21,505 basehttp 20790 6162788352 "GET /mentor/ HTTP/1.1" 200 38675
+INFO 2025-08-27 10:52:26,241 basehttp 20790 6162788352 "GET /mentor/students/ HTTP/1.1" 200 44144
+ERROR 2025-08-27 10:52:29,518 log 20790 6162788352 Internal Server Error: /mentor/student/2/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py", line 207, in student_detail
+    return render(request, 'custom_admin/mentor/student_detail.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 484, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 703, in __init__
+    raise TemplateSyntaxError(
+    ...<2 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' == 'critical' and 'danger' or analytics.risk_level == 'high' and 'warning' or 'success'' from 'analytics.risk_level == 'critical' and 'danger' or analytics.risk_level == 'high' and 'warning' or 'success''
+ERROR 2025-08-27 10:52:29,520 basehttp 20790 6162788352 "GET /mentor/student/2/ HTTP/1.1" 500 251416
+ERROR 2025-08-27 10:52:35,854 log 20790 6162788352 Internal Server Error: /mentor/alerts/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py", line 253, in alerts_list
+    return render(request, 'custom_admin/mentor/alerts_list.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 853, in do_for
+    nodelist_loop = parser.parse(
+        (
+    ...<2 lines>...
+        )
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 484, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 703, in __init__
+    raise TemplateSyntaxError(
+    ...<2 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' == 'urgent' and 'danger' or alert.priority == 'high' and 'warning' or alert.priority == 'medium' and 'info' or 'secondary'' from 'alert.priority == 'urgent' and 'danger' or alert.priority == 'high' and 'warning' or alert.priority == 'medium' and 'info' or 'secondary''
+ERROR 2025-08-27 10:52:35,857 basehttp 20790 6162788352 "GET /mentor/alerts/ HTTP/1.1" 500 297888
+INFO 2025-08-27 10:52:39,297 basehttp 20790 6162788352 "GET /mentor/sessions/create/ HTTP/1.1" 200 29699
+INFO 2025-08-27 10:52:45,364 basehttp 20790 6162788352 "GET /mentor/ HTTP/1.1" 200 38675
+INFO 2025-08-27 11:19:19,922 basehttp 20790 6162788352 "GET /mentor/students/ HTTP/1.1" 200 44144
+ERROR 2025-08-27 11:19:21,887 log 20790 6162788352 Internal Server Error: /mentor/student/2/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py", line 207, in student_detail
+    return render(request, 'custom_admin/mentor/student_detail.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 175, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/engine.py", line 157, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 200, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 293, in do_extends
+    nodelist = parser.parse()
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 513, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 511, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 232, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 484, in parse
+    raise self.error(token, e)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 482, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 600, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/base.py", line 703, in __init__
+    raise TemplateSyntaxError(
+    ...<2 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' == 'critical' and 'danger' or analytics.risk_level == 'high' and 'warning' or 'success'' from 'analytics.risk_level == 'critical' and 'danger' or analytics.risk_level == 'high' and 'warning' or 'success''
+ERROR 2025-08-27 11:19:21,889 basehttp 20790 6162788352 "GET /mentor/student/2/ HTTP/1.1" 500 251416
+INFO 2025-08-27 11:20:19,469 basehttp 20790 12918534144 "GET /mentor/student/2/ HTTP/1.1" 302 0
+INFO 2025-08-27 11:23:19,585 basehttp 20790 6162788352 "GET /mentor/student/2/ HTTP/1.1" 200 25898
+INFO 2025-08-27 11:23:28,990 basehttp 20790 6162788352 "GET /mentor/alerts/ HTTP/1.1" 200 28954
+INFO 2025-08-27 11:23:31,615 basehttp 20790 6162788352 "GET /mentor/student/13/ HTTP/1.1" 200 26438
+INFO 2025-08-27 11:23:34,930 basehttp 20790 6162788352 "GET /mentor/sessions/create/ HTTP/1.1" 200 29699
+INFO 2025-08-27 11:23:37,751 basehttp 20790 6162788352 "GET /mentor/ HTTP/1.1" 200 38700
+INFO 2025-08-27 11:37:39,697 basehttp 20790 6162788352 "POST /mentor/alerts/3/resolve/ HTTP/1.1" 200 59
+INFO 2025-08-27 11:37:39,722 basehttp 20790 6162788352 "GET /mentor/ HTTP/1.1" 200 37539
+INFO 2025-08-27 11:37:45,304 basehttp 20790 6162788352 "GET /mentor/alerts/ HTTP/1.1" 200 27376
+INFO 2025-08-27 11:37:51,086 basehttp 20790 6162788352 "GET /mentor/ HTTP/1.1" 200 37539
+INFO 2025-08-27 11:38:29,683 autoreload 20790 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 11:38:30,119 autoreload 22107 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 11:40:46,381 basehttp 22107 6125416448 "GET /mentor/ HTTP/1.1" 200 44312
+INFO 2025-08-27 11:40:49,166 basehttp 22107 6125416448 "GET /mentor/?critical_page=2 HTTP/1.1" 200 37832
+INFO 2025-08-27 11:40:55,332 basehttp 22107 6125416448 "GET /mentor/?critical_page=1 HTTP/1.1" 200 44312
+INFO 2025-08-27 11:41:24,884 autoreload 22107 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 11:41:25,153 autoreload 22499 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 11:41:56,087 basehttp 22499 6156627968 "GET /mentor/?critical_page=1 HTTP/1.1" 200 39357
+INFO 2025-08-27 11:41:58,495 basehttp 22499 6156627968 "GET /mentor/?critical_page=2 HTTP/1.1" 200 39585
+INFO 2025-08-27 11:42:01,834 basehttp 22499 6156627968 "GET /mentor/?critical_page=3 HTTP/1.1" 200 37886
+INFO 2025-08-27 11:44:32,877 basehttp 22499 6156627968 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 11:44:36,351 basehttp 22499 6156627968 "GET /mentor/student/12/ HTTP/1.1" 200 24112
+INFO 2025-08-27 11:44:46,717 basehttp 22499 6156627968 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 11:44:51,189 basehttp 22499 6156627968 "GET /mentor/ HTTP/1.1" 200 39357
+INFO 2025-08-27 11:44:57,030 autoreload 22499 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-27 11:44:57,251 autoreload 23019 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 11:44:57,886 basehttp 23019 6130364416 "GET /mentor/?critical_page=2 HTTP/1.1" 200 39585
+INFO 2025-08-27 11:45:03,503 basehttp 23019 6130364416 "GET /mentor/alerts/?priority=urgent HTTP/1.1" 200 24415
+INFO 2025-08-27 11:45:05,682 autoreload 23019 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-27 11:45:05,949 autoreload 23054 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 11:45:06,583 basehttp 23054 6160445440 "GET /mentor/students/?risk_level=critical HTTP/1.1" 200 44144
+INFO 2025-08-27 11:45:10,201 basehttp 23054 6160445440 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 11:45:16,038 basehttp 23054 6160445440 "GET /mentor/student/10/ HTTP/1.1" 200 24096
+INFO 2025-08-27 11:45:23,821 basehttp 23054 6160445440 "GET /mentor/student/12/ HTTP/1.1" 200 24112
+INFO 2025-08-27 11:45:29,000 basehttp 23054 6160445440 "GET /mentor/student/14/ HTTP/1.1" 200 24121
+INFO 2025-08-27 11:45:33,087 basehttp 23054 6160445440 "GET /admin/ HTTP/1.1" 200 42177
+INFO 2025-08-27 12:14:18,532 basehttp 23054 6160445440 "GET /admin/ HTTP/1.1" 200 42177
+INFO 2025-08-27 12:14:20,336 basehttp 23054 6160445440 "GET /mentor/ HTTP/1.1" 200 39333
+INFO 2025-08-27 12:16:08,602 basehttp 23054 6160445440 "GET /mentor/ HTTP/1.1" 200 39357
+INFO 2025-08-27 12:16:08,624 basehttp 23054 6177271808 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg HTTP/1.1" 200 1890
+INFO 2025-08-27 12:16:08,625 basehttp 23054 6227750912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/app.min.js HTTP/1.1" 200 1263
+INFO 2025-08-27 12:16:08,625 basehttp 23054 6210924544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/js/sidebarmenu.js HTTP/1.1" 200 2542
+INFO 2025-08-27 12:16:08,628 basehttp 23054 6227750912 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg HTTP/1.1" 200 8191
+INFO 2025-08-27 12:16:08,629 basehttp 23054 6244577280 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js HTTP/1.1" 200 80721
+INFO 2025-08-27 12:16:08,630 basehttp 23054 6194098176 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/jquery/dist/jquery.min.js HTTP/1.1" 200 87533
+INFO 2025-08-27 12:16:08,631 basehttp 23054 6210924544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js HTTP/1.1" 200 171895
+INFO 2025-08-27 12:16:08,632 basehttp 23054 6160445440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-27 12:16:08,634 basehttp 23054 6160445440 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.css HTTP/1.1" 200 3890
+INFO 2025-08-27 12:16:08,635 basehttp 23054 6210924544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/tabler-icons.css HTTP/1.1" 200 146896
+INFO 2025-08-27 12:16:08,716 basehttp 23054 6210924544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 200 552144
+INFO 2025-08-27 12:16:08,802 basehttp 23054 6210924544 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png HTTP/1.1" 200 612
+INFO 2025-08-27 12:16:10,321 basehttp 23054 6210924544 "GET /mentor/ HTTP/1.1" 200 39357
+INFO 2025-08-27 12:25:56,196 basehttp 23054 6160445440 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 12:25:59,610 basehttp 23054 6160445440 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 12:30:19,712 basehttp 23054 6160445440 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 12:30:23,399 basehttp 23054 6160445440 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:32:21,315 autoreload 23054 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 14:32:21,763 autoreload 26831 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:32:33,337 autoreload 26831 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 14:32:33,608 autoreload 26924 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:38:04,265 basehttp 26924 6197030912 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:38:06,775 basehttp 26924 6197030912 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:38:08,515 basehttp 26924 6197030912 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:38:10,098 basehttp 26924 6197030912 "GET /mentor/students/ HTTP/1.1" 200 44144
+INFO 2025-08-27 14:38:11,917 basehttp 26924 6197030912 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:40:11,862 autoreload 26924 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/student_mentoring_views.py changed, reloading.
+INFO 2025-08-27 14:40:12,270 autoreload 27577 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:40:20,751 autoreload 27577 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/student_mentoring_views.py changed, reloading.
+INFO 2025-08-27 14:40:21,051 autoreload 27627 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:40:30,511 autoreload 27627 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/student_mentoring_views.py changed, reloading.
+INFO 2025-08-27 14:40:30,795 autoreload 27676 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:41:02,980 autoreload 27676 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 14:41:03,388 autoreload 27873 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:41:14,939 autoreload 27873 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 14:41:15,199 autoreload 27990 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 14:51:03,982 basehttp 27990 6155825152 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 14:51:07,317 basehttp 27990 6155825152 "GET /mentor/ HTTP/1.1" 200 39359
+INFO 2025-08-27 15:14:10,531 autoreload 27990 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 15:14:11,020 autoreload 29733 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:14:31,898 autoreload 29733 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 15:14:32,158 autoreload 29871 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:14:38,536 autoreload 29871 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_urls.py changed, reloading.
+INFO 2025-08-27 15:14:38,790 autoreload 29918 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:28:05,868 basehttp 29918 6168064000 "GET /admin/assignment-submissions/ HTTP/1.1" 200 23237
+INFO 2025-08-27 15:28:06,927 basehttp 29918 6168064000 "GET /admin/quizzes/ HTTP/1.1" 200 23313
+INFO 2025-08-27 15:28:08,082 basehttp 29918 6168064000 "GET /admin/quiz-attempts/ HTTP/1.1" 200 23137
+INFO 2025-08-27 15:28:10,557 basehttp 29918 6168064000 "GET /admin/quizzes/ HTTP/1.1" 200 23313
+INFO 2025-08-27 15:29:22,777 autoreload 29918 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-27 15:29:23,067 autoreload 30835 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:29:34,656 autoreload 30835 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-27 15:29:34,910 autoreload 30888 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:30:30,783 autoreload 30888 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-27 15:30:31,017 autoreload 31226 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:30:44,601 autoreload 31226 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-27 15:30:44,820 autoreload 31320 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:39:55,870 autoreload 31320 8620859584 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-27 15:39:56,315 autoreload 31892 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:42:01,369 autoreload 31892 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 15:42:01,654 autoreload 32175 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:43:30,460 autoreload 32175 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/views.py changed, reloading.
+INFO 2025-08-27 15:43:30,702 autoreload 32589 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:56:57,300 autoreload 32589 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 15:56:57,738 autoreload 32999 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:58:33,835 autoreload 32999 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 15:58:34,110 autoreload 33284 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 15:58:48,728 autoreload 33284 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/models.py changed, reloading.
+INFO 2025-08-27 15:58:49,017 autoreload 33437 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 16:13:21,732 autoreload 33437 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/custom_admin/templatetags/custom_filters.py changed, reloading.
+INFO 2025-08-27 16:13:22,016 autoreload 37221 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 16:17:17,697 autoreload 37221 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 16:17:18,069 autoreload 37826 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 16:17:29,644 autoreload 37826 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 16:17:29,916 autoreload 37874 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-27 16:17:36,315 autoreload 37874 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
+INFO 2025-08-27 16:17:36,573 autoreload 37924 8620859584 Watching for file changes with StatReloader

@@ -17,7 +17,7 @@ from apps.users.models import User
 from apps.courses.models import (
     Course, Module, VideoLesson, StudentProgress, ModuleProgress,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer
+    QuizAttempt, QuizAnswer, StudentAnalytics
 )
 from apps.payments.models import Enrollment, Payment, TaxInvoice, InstallmentPlan
 
@@ -293,7 +293,7 @@ def course_detail(request, course_id):
                 progress = ModuleProgress.objects.create(
                     student=user,
                     module=module,
-                    is_unlocked=(module.order == 1)  # Unlock first module
+                    is_unlocked=True  # Unlock all modules
                 )
             # Attach progress to module object for easy template access
             module.progress = progress
@@ -623,6 +623,13 @@ def update_lesson_progress(request, lesson_id):
     module_progress = ModuleProgress.objects.get(student=user, module=lesson.module)
     module_progress.check_completion()
     
+    # Update analytics for mentoring system
+    from apps.courses.models import StudentAnalytics
+    analytics, created = StudentAnalytics.objects.get_or_create(student=user)
+    analytics.last_login = timezone.now()
+    analytics.total_videos_watched = StudentProgress.objects.filter(user=user, completed=True).count()
+    analytics.save()
+    
     return JsonResponse({
         'success': True,
         'completed_percentage': progress.completed_percentage,
@@ -738,6 +745,31 @@ def submit_assignment(request, assignment_id):
     # Update module progress
     module_progress = ModuleProgress.objects.get(student=user, module=assignment.module)
     module_progress.check_completion()
+    
+    # Update student analytics in real-time
+    try:
+        analytics, _ = StudentAnalytics.objects.get_or_create(student=user)
+        
+        # Update assignment metrics
+        analytics.total_assignments_submitted = AssignmentSubmission.objects.filter(
+            student=user
+        ).exclude(status='draft').count()
+        
+        # Update modules completed
+        analytics.modules_completed = user.module_progress.filter(
+            is_completed=True
+        ).count()
+        
+        # Update last activity
+        analytics.last_activity_date = timezone.now()
+        
+        # Recalculate risk score
+        analytics.calculate_risk_score()
+        analytics.save()
+        
+    except Exception as e:
+        # Log error but don't break assignment submission
+        print(f"Error updating analytics for user {user.id}: {e}")
     
     return JsonResponse({
         'success': True,
@@ -943,6 +975,12 @@ def submit_quiz_answers(request, attempt_id):
     
     # Update attempt
     attempt.score = total_score
+    
+    # Calculate time taken (in seconds)
+    if attempt.started_at:
+        time_taken_seconds = int((timezone.now() - attempt.started_at).total_seconds())
+        attempt.time_taken = time_taken_seconds
+    
     attempt.complete()
     
     # Update module progress
@@ -954,6 +992,38 @@ def submit_quiz_answers(request, attempt_id):
         module_progress.check_completion()
     except ModuleProgress.DoesNotExist:
         pass
+    
+    # Update student analytics in real-time
+    try:
+        from django.db.models import Avg
+        analytics, _ = StudentAnalytics.objects.get_or_create(student=user)
+        
+        # Update quiz metrics
+        analytics.total_quizzes_attempted = QuizAttempt.objects.filter(
+            student=user, completed=True
+        ).count()
+        
+        # Update average quiz score
+        quiz_avg = QuizAttempt.objects.filter(
+            student=user, completed=True
+        ).aggregate(avg_score=Avg('score_percentage'))['avg_score']
+        analytics.avg_quiz_score = quiz_avg or 0
+        
+        # Update modules completed
+        analytics.modules_completed = user.module_progress.filter(
+            is_completed=True
+        ).count()
+        
+        # Update last activity
+        analytics.last_activity_date = timezone.now()
+        
+        # Recalculate risk score
+        analytics.calculate_risk_score()
+        analytics.save()
+        
+    except Exception as e:
+        # Log error but don't break quiz submission
+        print(f"Error updating analytics for user {user.id}: {e}")
     
     return JsonResponse({
         'success': True,

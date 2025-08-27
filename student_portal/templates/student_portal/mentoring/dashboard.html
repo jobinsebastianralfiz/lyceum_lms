@@ -1,0 +1,652 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Mentoring Journey - {{ student.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modern Card Design */
+    .mentoring-card {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    
+    .mentoring-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        color: white;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    /* Stats Cards */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--stat-color);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    /* Achievement Badges */
+    .achievement-badge {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        border-radius: 50px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .achievement-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+    
+    /* Progress Ring */
+    .progress-ring-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+    }
+    
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-bg {
+        fill: none;
+        stroke: #e9ecef;
+        stroke-width: 8;
+    }
+    
+    .progress-ring-fill {
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+        transition: stroke-dasharray 1s ease-in-out;
+    }
+    
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        font-weight: 700;
+    }
+    
+    /* Session Cards */
+    .session-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .session-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Activity Cards */
+    .activity-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .activity-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .activity-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    /* Suggestion Cards */
+    .suggestion-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        border-left: 4px solid;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .suggestion-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .suggestion-card.warning { border-left-color: #ffc107; background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); }
+    .suggestion-card.info { border-left-color: #17a2b8; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); }
+    .suggestion-card.primary { border-left-color: #007bff; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); }
+    .suggestion-card.success { border-left-color: #28a745; background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%); }
+    
+    /* Modern Buttons */
+    .btn-modern {
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-modern:hover::before {
+        left: 100%;
+    }
+    
+    /* Responsive Grid */
+    .mentoring-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Custom scrollbar */
+    .custom-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+    
+    /* Color Variables */
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --info-color: #17a2b8;
+        --danger-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <!-- Hero Section -->
+    <div class="hero-section mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div style="position: relative; z-index: 2;">
+                    <h1 class="display-6 fw-bold mb-2">Welcome to Your Mentoring Journey</h1>
+                    <p class="lead mb-3 opacity-90">Track your progress, celebrate achievements, and unlock your potential with personalized insights</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'student_portal:mentoring_sessions' %}" class="btn btn-light btn-modern">
+                            <i class="ti ti-history me-2"></i>Session History
+                        </a>
+                        <a href="{% url 'student_portal:mentoring_insights' %}" class="btn btn-outline-light btn-modern">
+                            <i class="ti ti-chart-line me-2"></i>Detailed Insights
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" viewBox="0 0 120 120">
+                        <circle class="progress-ring-bg" cx="60" cy="60" r="50"></circle>
+                        <circle class="progress-ring-fill" cx="60" cy="60" r="50" 
+                                style="stroke: #ffffff; stroke-dasharray: {{ overall_progress_stroke|default:'0' }}, 314.16;"></circle>
+                    </svg>
+                    <div class="progress-text">
+                        <div class="h3 mb-0">{{ overall_progress|default:'0' }}%</div>
+                        <small class="opacity-75">Overall Progress</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements & Highlights -->
+    {% if achievements %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="mentoring-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="stat-icon me-3" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                            <i class="ti ti-trophy"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-1 fw-bold">Your Achievements</h4>
+                            <p class="text-muted mb-0">Celebrate your learning milestones</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for achievement in achievements %}
+                        <div class="col-lg-6 mb-3">
+                            <div class="achievement-badge">
+                                <i class="{{ achievement.icon }} fa-2x me-3"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold fs-6">{{ achievement.title }}</div>
+                                    <small class="opacity-90">{{ achievement.message }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Learning Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="mentoring-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div>
+                            <h4 class="mb-1 fw-bold">Learning Analytics</h4>
+                            <p class="text-muted mb-0">Your comprehensive progress overview</p>
+                        </div>
+                        <div class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-7">
+                            This Month: {{ current_month_activity|default:'5' }} activities
+                        </div>
+                    </div>
+                    
+                    <!-- Main Stats Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="stat-card" style="--stat-color: #667eea;">
+                                <div class="stat-icon" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                                    <i class="ti ti-video"></i>
+                                </div>
+                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_videos_watched|default:'0' }}</div>
+                                <p class="text-muted mb-0 small fw-medium">Videos Watched</p>
+                                <div class="progress mt-2" style="height: 4px;">
+                                    <div class="progress-bar" style="background: linear-gradient(45deg, #667eea, #764ba2); width: {{ study_insights.video_progress_percentage|default:'0' }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="stat-card" style="--stat-color: #28a745;">
+                                <div class="stat-icon" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                                    <i class="ti ti-clipboard-check"></i>
+                                </div>
+                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_assignments_submitted|default:'0' }}</div>
+                                <p class="text-muted mb-0 small fw-medium">Assignments</p>
+                                <div class="progress mt-2" style="height: 4px;">
+                                    <div class="progress-bar bg-success" style="width: {{ study_insights.assignment_progress_percentage|default:'0' }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="stat-card" style="--stat-color: #ffc107;">
+                                <div class="stat-icon" style="background: linear-gradient(45deg, #ffc107, #fd7e14);">
+                                    <i class="ti ti-clipboard-list"></i>
+                                </div>
+                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_quizzes_attempted|default:'0' }}</div>
+                                <p class="text-muted mb-0 small fw-medium">Quiz Attempts</p>
+                                <div class="progress mt-2" style="height: 4px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ study_insights.quiz_progress_percentage|default:'0' }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="stat-card" style="--stat-color: #17a2b8;">
+                                <div class="stat-icon" style="background: linear-gradient(45deg, #17a2b8, #6f42c1);">
+                                    <i class="ti ti-award"></i>
+                                </div>
+                                <div class="h2 mb-1 fw-bold">{{ study_insights.modules_completed|default:'0' }}</div>
+                                <p class="text-muted mb-0 small fw-medium">Modules Complete</p>
+                                <div class="progress mt-2" style="height: 4px;">
+                                    <div class="progress-bar bg-info" style="width: {{ study_insights.module_progress_percentage|default:'0' }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-success-subtle rounded-3">
+                                <div class="h4 mb-1 text-success fw-bold">{{ study_insights.avg_quiz_score|floatformat:1|default:'0' }}%</div>
+                                <small class="text-muted fw-medium">Average Quiz Score</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-primary-subtle rounded-3">
+                                <div class="h4 mb-1 text-primary fw-bold">{{ study_insights.learning_streak|default:'0' }}</div>
+                                <small class="text-muted fw-medium">Day Learning Streak</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-warning-subtle rounded-3">
+                                <div class="h4 mb-1 text-warning fw-bold">{{ study_insights.study_hours|default:'0' }}h</div>
+                                <small class="text-muted fw-medium">Total Study Time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Two Column Layout -->
+    <div class="row">
+        <!-- Left Column: Recent Activity -->
+        <div class="col-lg-8 mb-4">
+            <div class="mentoring-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div>
+                            <h5 class="mb-1 fw-bold">Recent Learning Activity</h5>
+                            <p class="text-muted mb-0 small">Your latest progress updates</p>
+                        </div>
+                        <a href="{% url 'student_portal:my_courses' %}" class="btn btn-outline-primary btn-sm btn-modern">
+                            <i class="ti ti-arrow-right me-1"></i>View All
+                        </a>
+                    </div>
+                    
+                    <div class="row g-3">
+                        {% for activity in recent_activity|slice:":6" %}
+                        <div class="col-md-6">
+                            <div class="activity-card">
+                                <div class="activity-icon" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                                    <i class="ti ti-play"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold mb-1">{{ activity.video_lesson.title|truncatechars:25 }}</div>
+                                    <small class="text-muted">{{ activity.last_watched_at|timesince }} ago</small>
+                                    <div class="progress mt-2" style="height: 6px; border-radius: 10px;">
+                                        <div class="progress-bar" style="background: linear-gradient(45deg, #28a745, #20c997); width: {{ activity.completed_percentage }}%; border-radius: 10px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="text-center py-5">
+                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(45deg, #e9ecef, #dee2e6);">
+                                    <i class="ti ti-book text-muted"></i>
+                                </div>
+                                <h6 class="text-muted mb-2">No Recent Activity</h6>
+                                <p class="text-muted mb-3 small">Start learning to see your activity here!</p>
+                                <a href="{% url 'student_portal:my_courses' %}" class="btn btn-primary btn-modern">
+                                    <i class="ti ti-book-open me-2"></i>Browse Courses
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Sessions & Recommendations -->
+        <div class="col-lg-4">
+            <div class="row">
+                <!-- Recent Sessions -->
+                <div class="col-12 mb-4">
+                    <div class="mentoring-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h6 class="mb-0 fw-bold">
+                                    <i class="ti ti-users me-2 text-primary"></i>Recent Sessions
+                                </h6>
+                                <span class="badge bg-info-subtle text-info">{{ total_sessions|default:'0' }} total</span>
+                            </div>
+                            
+                            <div class="custom-scroll" style="max-height: 300px; overflow-y: auto;">
+                                {% for session in recent_sessions %}
+                                <div class="session-card border-left-primary" style="border-left-color: {% cycle '#667eea' '#28a745' '#ffc107' '#17a2b8' %};">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold small text-primary">{{ session.get_session_type_display }}</div>
+                                            <div class="text-muted small mb-2">
+                                                <i class="ti ti-user me-1"></i>{{ session.mentor.name|default:session.mentor.username }}
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ session.session_date|date:"M d" }}</small>
+                                    </div>
+                                    
+                                    <p class="small text-dark mb-2">{{ session.topics_discussed|truncatechars:60 }}</p>
+                                    
+                                    {% if session.action_items %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="ti ti-checklist me-2 text-success"></i>
+                                        <small class="text-success fw-medium">Action items provided</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-4">
+                                    <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(45deg, #e9ecef, #dee2e6); width: 50px; height: 50px;">
+                                        <i class="ti ti-calendar-plus text-muted"></i>
+                                    </div>
+                                    <p class="small text-muted mb-3">No mentoring sessions yet</p>
+                                    <button class="btn btn-outline-primary btn-sm btn-modern">
+                                        <i class="ti ti-plus me-1"></i>Request Session
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personalized Tips -->
+                {% if suggestions %}
+                <div class="col-12">
+                    <div class="mentoring-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="stat-icon me-3" style="background: linear-gradient(45deg, #ffc107, #fd7e14); width: 40px; height: 40px;">
+                                    <i class="ti ti-bulb"></i>
+                                </div>
+                                <h6 class="mb-0 fw-bold">Personalized Tips</h6>
+                            </div>
+                            
+                            {% for suggestion in suggestions %}
+                            <div class="suggestion-card {{ suggestion.color }}">
+                                <div class="d-flex align-items-start">
+                                    <i class="{{ suggestion.icon }} me-3 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small mb-1">{{ suggestion.title }}</div>
+                                        <div class="small text-muted">{{ suggestion.message }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress rings
+    const progressRings = document.querySelectorAll('.progress-ring-fill');
+    progressRings.forEach(ring => {
+        const strokeDashArray = ring.getAttribute('stroke-dasharray');
+        if (strokeDashArray && strokeDashArray !== '0, 314.16') {
+            ring.style.strokeDasharray = '0, 314.16';
+            setTimeout(() => {
+                ring.style.strokeDasharray = strokeDashArray;
+            }, 800);
+        }
+    });
+    
+    // Animate stat cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Animate cards on load
+    document.querySelectorAll('.mentoring-card, .stat-card').forEach(card => {
+        card.style.opacity = '0.8';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        observer.observe(card);
+    });
+    
+    // Stagger animation for stat cards
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+    
+    // Add hover effects for interactive elements
+    document.querySelectorAll('.btn-modern').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px) scale(1.02)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Animate progress bars
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            bar.style.transition = 'width 1s ease-in-out';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 200);
+        });
+    }, 500);
+});
+
+// Add smooth scrolling for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

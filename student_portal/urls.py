@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import student_mentoring_views
 
 app_name = 'student_portal'
 
@@ -38,6 +39,11 @@ urlpatterns = [
     
     # Payment verification
     path('api/verify-payment/', views.verify_payment, name='verify_payment'),
+    
+    # Mentoring (Student View)
+    path('mentoring/', student_mentoring_views.student_mentoring_dashboard, name='mentoring_dashboard'),
+    path('mentoring/sessions/', student_mentoring_views.student_session_history, name='mentoring_sessions'),
+    path('mentoring/insights/', student_mentoring_views.student_progress_insights, name='mentoring_insights'),
     
     # AJAX endpoints
     path('api/lesson/<int:lesson_id>/progress/', views.update_lesson_progress, name='update_lesson_progress'),

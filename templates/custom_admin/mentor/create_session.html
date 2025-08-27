@@ -1,0 +1,161 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Create Mentoring Session{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Create Mentoring Session</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'mentor:mentor_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Session Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Student <span class="text-danger">*</span></label>
+                            <select name="student_id" class="form-select" required>
+                                <option value="">Select Student</option>
+                                {% for student in students %}
+                                <option value="{{ student.id }}">{{ student.name|default:student.username }} ({{ student.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Course (Optional)</label>
+                            <select name="course_id" class="form-select">
+                                <option value="">General Session</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Session Type <span class="text-danger">*</span></label>
+                            <select name="session_type" class="form-select" required>
+                                {% for value, label in session_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Duration (minutes) <span class="text-danger">*</span></label>
+                            <input type="number" name="duration_minutes" class="form-control" min="5" max="480" value="30" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Session Date & Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="session_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Follow-up Required</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="follow_up_required" class="form-check-input" id="followUpCheck">
+                                <label class="form-check-label" for="followUpCheck">
+                                    Schedule follow-up session
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="followUpDate" style="display: none;">
+                        <label class="form-label">Follow-up Date</label>
+                        <input type="date" name="follow_up_date" class="form-control">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Topics Discussed <span class="text-danger">*</span></label>
+                        <textarea name="topics_discussed" class="form-control" rows="4" placeholder="What topics were covered in this session?" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Action Items</label>
+                        <textarea name="action_items" class="form-control" rows="3" placeholder="Any action items or next steps for the student?"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mentor Notes</label>
+                        <textarea name="mentor_notes" class="form-control" rows="3" placeholder="Private notes about the session (not visible to student)"></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Session
+                        </button>
+                        <a href="{% url 'mentor:mentor_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h6 class="mb-0">Session Tips</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">Effective Mentoring</h6>
+                    <ul class="mb-0 small">
+                        <li>Listen actively to understand student concerns</li>
+                        <li>Ask open-ended questions to encourage reflection</li>
+                        <li>Provide specific, actionable feedback</li>
+                        <li>Set clear expectations and goals</li>
+                        <li>Follow up on previous action items</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">Documentation</h6>
+                    <p class="mb-0 small">
+                        Record detailed notes about the session to track student progress and identify patterns. This helps provide better support over time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle follow-up date field
+document.getElementById('followUpCheck').addEventListener('change', function() {
+    const followUpDate = document.getElementById('followUpDate');
+    followUpDate.style.display = this.checked ? 'block' : 'none';
+    
+    const dateInput = followUpDate.querySelector('input');
+    if (this.checked) {
+        // Set default follow-up date to 1 week from now
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        dateInput.value = nextWeek.toISOString().split('T')[0];
+    } else {
+        dateInput.value = '';
+    }
+});
+
+// Set default session date to current time
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.querySelector('input[name="session_date"]').value = now.toISOString().slice(0, 16);
+});
+</script>
+{% endblock %}

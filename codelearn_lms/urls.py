@@ -18,6 +18,9 @@ urlpatterns = [
     # Student Portal
     path('student/', include('student_portal.urls')),
     
+    # Mentor Dashboard
+    path('', include('apps.courses.mentor_urls')),
+    
     # Custom Admin Interface
     path('admin/', include('apps.custom_admin.urls')),
     

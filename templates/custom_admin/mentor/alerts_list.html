@@ -1,0 +1,202 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Progress Alerts - Mentor Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Progress Alerts</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'mentor:mentor_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Alert Type</label>
+                <select name="type" class="form-select">
+                    <option value="all" {% if alert_type == 'all' %}selected{% endif %}>All Types</option>
+                    {% for value, label in alert_types %}
+                    <option value="{{ value }}" {% if alert_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="all" {% if priority == 'all' %}selected{% endif %}>All Priorities</option>
+                    {% for value, label in alert_priorities %}
+                    <option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="resolved" {% if status == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="all" {% if status == 'all' %}selected{% endif %}>All</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                <a href="{% url 'mentor:alerts_list' %}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Alerts List -->
+<div class="card border-0 shadow-sm" style="border-radius: 15px;">
+    <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+        <h5 class="mb-0">Alerts ({{ page_obj.paginator.count }} total)</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for alert in page_obj %}
+        <div class="p-3 border-bottom {% if not forloop.last %}{% endif %}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge {% if alert.priority == 'urgent' %}bg-danger{% elif alert.priority == 'high' %}bg-warning{% elif alert.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %} me-2">{{ alert.get_priority_display }}</span>
+                        <span class="fw-semibold">{{ alert.title }}</span>
+                        {% if not alert.is_resolved %}
+                        <span class="badge bg-warning ms-2">Active</span>
+                        {% else %}
+                        <span class="badge bg-success ms-2">Resolved</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted small mb-2">
+                        <i class="fas fa-user me-1"></i>{{ alert.student.name|default:'No Name' }}
+                        <i class="fas fa-book ms-3 me-1"></i>{{ alert.course.title }}
+                        <i class="fas fa-clock ms-3 me-1"></i>{{ alert.created_at|timesince }} ago
+                    </div>
+                    <p class="mb-2">{{ alert.description }}</p>
+                    {% if alert.is_resolved %}
+                    <div class="small text-success">
+                        <strong>Resolved by:</strong> {{ alert.resolved_by.name|default:alert.resolved_by.username }} 
+                        ({{ alert.resolved_at|timesince }} ago)
+                        {% if alert.resolution_notes %}
+                        <br><strong>Notes:</strong> {{ alert.resolution_notes }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-end ms-3">
+                    <div class="btn-group-vertical">
+                        <a href="{% url 'mentor:student_detail' alert.student.id %}" class="btn btn-sm btn-outline-primary mb-1">
+                            View Student
+                        </a>
+                        {% if not alert.is_resolved %}
+                        <button class="btn btn-sm btn-success" onclick="resolveAlert({{ alert.id }})">
+                            Resolve
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-bell-slash fa-2x mb-2"></i>
+            <p>No alerts found matching your criteria</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Alerts pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<!-- Modal for resolve confirmation -->
+<div class="modal fade" id="resolveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resolve Alert</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resolveForm">
+                    <div class="mb-3">
+                        <label class="form-label">Resolution Notes</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Optional notes about how this alert was resolved..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmResolve()">Resolve Alert</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentAlertId = null;
+
+function resolveAlert(alertId) {
+    currentAlertId = alertId;
+    new bootstrap.Modal(document.getElementById('resolveModal')).show();
+}
+
+function confirmResolve() {
+    if (!currentAlertId) return;
+    
+    const notes = document.querySelector('#resolveForm textarea[name="notes"]').value;
+    
+    fetch(`/mentor/alerts/${currentAlertId}/resolve/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `notes=${encodeURIComponent(notes)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error resolving alert: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+{% endblock %}

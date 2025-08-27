@@ -46,8 +46,8 @@
           </div>
           <div class="col-md-3">
             <div class="text-center p-3 {{ attempt.is_passed|yesno:'bg-success-subtle,bg-danger-subtle' }} rounded">
-              {% if attempt.score is not null %}
-                <h3 class="mb-0 {{ attempt.is_passed|yesno:'text-success,text-danger' }}">{{ attempt.score|floatformat:1 }}%</h3>
+              {% if attempt.completed %}
+                <h3 class="mb-0 {{ attempt.is_passed|yesno:'text-success,text-danger' }}">{{ attempt.score_percentage|floatformat:1 }}%</h3>
                 <small class="text-muted">Final Score</small>
               {% else %}
                 <h3 class="mb-0 text-muted">-</h3>
@@ -63,8 +63,8 @@
           </div>
           <div class="col-md-3">
             <div class="text-center p-3 bg-warning-subtle rounded">
-              <h3 class="mb-0 text-warning">{{ attempt.time_taken|default:"-" }}</h3>
-              <small class="text-muted">{% if attempt.time_taken %}Minutes{% else %}Time Taken{% endif %}</small>
+              <h3 class="mb-0 text-warning">{{ attempt.time_taken_minutes|default:"-" }}</h3>
+              <small class="text-muted">Time Taken</small>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@
         
         <div class="text-center mb-3">
           <div class="circular-progress {{ attempt.is_passed|yesno:'text-success,text-danger' }}">
-            <h2 class="mb-0 {{ attempt.is_passed|yesno:'text-success,text-danger' }}">{{ attempt.score|floatformat:1 }}%</h2>
+            <h2 class="mb-0 {{ attempt.is_passed|yesno:'text-success,text-danger' }}">{{ attempt.score_percentage|floatformat:1 }}%</h2>
             <small class="text-muted">Final Score</small>
           </div>
         </div>

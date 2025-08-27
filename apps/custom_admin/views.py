@@ -15,7 +15,7 @@ from apps.users.models import User, Team, TeamMembership
 from apps.courses.models import (
     Course, Module, VideoLesson, Category,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer, ModuleProgress
+    QuizAttempt, QuizAnswer, ModuleProgress, StudentAnalytics, ProgressAlert, MentorSession
 )
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
@@ -126,6 +126,22 @@ def dashboard_view(request):
         'enrollment__user'
     ).filter(status='completed').order_by('-created_at')[:5]
     
+    # MENTORING & ANALYTICS Statistics
+    high_risk_students = StudentAnalytics.objects.filter(
+        risk_level__in=['critical', 'high']
+    ).count()
+    
+    inactive_students = User.objects.filter(
+        role='student',
+        last_login__lt=timezone.now() - timedelta(days=7)
+    ).count()
+    
+    mentor_sessions = MentorSession.objects.count()
+    
+    active_alerts = ProgressAlert.objects.filter(
+        is_resolved=False
+    ).count()
+    
     context = {
         # COURSES Management
         'total_categories': total_categories,
@@ -164,6 +180,12 @@ def dashboard_view(request):
         'chart_months': json.dumps(months_data),
         'chart_enrollments': json.dumps(enrollments_data),
         'chart_revenue': json.dumps(revenue_data),
+        
+        # MENTORING & ANALYTICS
+        'high_risk_students': high_risk_students,
+        'inactive_students': inactive_students,
+        'mentor_sessions': mentor_sessions,
+        'active_alerts': active_alerts,
         
         # Recent Activities
         'recent_enrollments': recent_enrollments,
@@ -2216,9 +2238,23 @@ def quiz_attempt_detail_view(request, attempt_id):
         'question', 'selected_choice'
     ).order_by('question__order')
     
+    # Get student's other attempts for this quiz
+    student_attempts = QuizAttempt.objects.filter(
+        quiz=attempt.quiz, 
+        student=attempt.student,
+        completed=True
+    ).order_by('-completed_at')
+    
+    # Calculate best score
+    student_best_score = None
+    if student_attempts.exists():
+        student_best_score = max([a.score_percentage for a in student_attempts])
+    
     context = {
         'attempt': attempt,
         'answers': answers,
+        'student_attempts': student_attempts,
+        'student_best_score': student_best_score,
     }
     
     return render(request, 'custom_admin/quiz_attempts/detail.html', context)

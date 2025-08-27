@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -312,6 +313,45 @@ class QuizAttempt(models.Model):
     def is_passed(self):
         return self.score_percentage >= self.quiz.passing_score
     
+    @property
+    def correct_answers(self):
+        """Count of correct answers"""
+        return self.answers.filter(is_correct=True).count()
+    
+    @property
+    def total_questions(self):
+        """Total number of questions in the quiz"""
+        return self.quiz.questions.count()
+    
+    @property
+    def accuracy(self):
+        """Accuracy percentage based on correct answers"""
+        if self.total_questions == 0:
+            return 0
+        return (self.correct_answers / self.total_questions) * 100
+    
+    @property
+    def time_taken_minutes(self):
+        """Time taken in minutes (formatted)"""
+        if self.time_taken is None:
+            return None
+        minutes = self.time_taken // 60
+        seconds = self.time_taken % 60
+        if minutes > 0:
+            return f"{minutes}m {seconds}s"
+        else:
+            return f"{seconds}s"
+    
+    @property
+    def status(self):
+        """Get attempt status"""
+        if not self.completed:
+            return 'in_progress'
+        elif self.completed:
+            return 'completed'
+        else:
+            return 'timed_out'
+    
     def complete(self):
         """Mark attempt as completed"""
         from django.utils import timezone
@@ -431,28 +471,14 @@ class ModuleProgress(models.Model):
             from django.utils import timezone
             self.completed_at = timezone.now()
             
-            # Unlock next module
-            self._unlock_next_module()
+            # Sequential unlocking disabled - all modules accessible
         
         self.save()
         return self.is_completed
     
     def _unlock_next_module(self):
-        """Unlock the next module in sequence"""
-        next_module = Module.objects.filter(
-            course=self.module.course,
-            order__gt=self.module.order
-        ).order_by('order').first()
-        
-        if next_module:
-            next_progress, created = ModuleProgress.objects.get_or_create(
-                student=self.student,
-                module=next_module,
-                defaults={'is_unlocked': True}
-            )
-            if not created and not next_progress.is_unlocked:
-                next_progress.is_unlocked = True
-                next_progress.save()
+        """Sequential unlocking disabled - method kept for compatibility"""
+        pass
     
     class Meta:
         db_table = 'module_progress'
@@ -475,3 +501,238 @@ class StudentProgress(models.Model):
     class Meta:
         db_table = 'student_progress'
         unique_together = ['user', 'video_lesson']
+
+
+class StudentAnalytics(models.Model):
+    """Comprehensive analytics for student performance and mentoring"""
+    student = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='analytics')
+    
+    # Engagement Metrics
+    total_login_days = models.PositiveIntegerField(default=0)
+    last_login = models.DateTimeField(null=True, blank=True)
+    avg_daily_study_time = models.DurationField(default=timezone.timedelta(0))
+    total_videos_watched = models.PositiveIntegerField(default=0)
+    total_assignments_submitted = models.PositiveIntegerField(default=0)
+    total_quizzes_attempted = models.PositiveIntegerField(default=0)
+    
+    # Performance Metrics
+    avg_quiz_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    avg_assignment_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    courses_completed = models.PositiveIntegerField(default=0)
+    modules_completed = models.PositiveIntegerField(default=0)
+    
+    # Risk Assessment
+    RISK_LEVELS = [
+        ('low', 'Low Risk'),
+        ('medium', 'Medium Risk'),
+        ('high', 'High Risk'),
+        ('critical', 'Critical Risk'),
+    ]
+    risk_level = models.CharField(max_length=10, choices=RISK_LEVELS, default='low')
+    risk_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="0-100 risk score")
+    needs_mentoring = models.BooleanField(default=False)
+    
+    # Mentoring Support
+    assigned_mentor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='mentee_analytics')
+    last_mentor_contact = models.DateTimeField(null=True, blank=True)
+    mentoring_notes = models.TextField(blank=True, null=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Analytics: {self.student.name}"
+    
+    def calculate_risk_score(self):
+        """Calculate risk score based on multiple factors"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        score = 0
+        
+        # Inactivity risk (40% weight)
+        if self.last_login:
+            days_inactive = (timezone.now() - self.last_login).days
+            if days_inactive > 14:
+                score += 40
+            elif days_inactive > 7:
+                score += 25
+            elif days_inactive > 3:
+                score += 10
+        else:
+            score += 40
+        
+        # Performance risk (35% weight)
+        if self.avg_quiz_score < 50:
+            score += 20
+        elif self.avg_quiz_score < 70:
+            score += 10
+        
+        if self.avg_assignment_score < 50:
+            score += 15
+        elif self.avg_assignment_score < 70:
+            score += 8
+        
+        # Engagement risk (25% weight)
+        if self.total_videos_watched == 0 and self.student.enrollments.filter(active=True).exists():
+            score += 15
+        
+        if self.avg_daily_study_time.total_seconds() < 1800:  # Less than 30 mins
+            score += 10
+        
+        self.risk_score = min(score, 100)  # Cap at 100
+        
+        # Set risk level
+        if self.risk_score >= 80:
+            self.risk_level = 'critical'
+            self.needs_mentoring = True
+        elif self.risk_score >= 60:
+            self.risk_level = 'high'
+            self.needs_mentoring = True
+        elif self.risk_score >= 40:
+            self.risk_level = 'medium'
+        else:
+            self.risk_level = 'low'
+            
+        self.save()
+        return self.risk_score
+    
+    def update_metrics(self):
+        """Update all metrics with current data from database"""
+        from django.db.models import Avg
+        
+        # Update basic counts
+        self.total_videos_watched = StudentProgress.objects.filter(
+            user=self.student, 
+            completed=True
+        ).count()
+        
+        self.total_assignments_submitted = AssignmentSubmission.objects.filter(
+            student=self.student
+        ).exclude(status='draft').count()
+        
+        self.total_quizzes_attempted = QuizAttempt.objects.filter(
+            student=self.student,
+            completed=True
+        ).count()
+        
+        # Update performance metrics
+        quiz_avg = QuizAttempt.objects.filter(
+            student=self.student,
+            completed=True
+        ).aggregate(avg_score=Avg('score_percentage'))['avg_score']
+        self.avg_quiz_score = quiz_avg or 0
+        
+        assignment_avg = AssignmentSubmission.objects.filter(
+            student=self.student
+        ).exclude(status='draft').exclude(grade__isnull=True).aggregate(
+            avg_grade=Avg('grade')
+        )['avg_grade']
+        self.avg_assignment_score = assignment_avg or 0
+        
+        # Update login data
+        self.last_login = self.student.last_login
+        
+        # Calculate completed modules
+        completed_modules = StudentProgress.objects.filter(
+            user=self.student,
+            completed=True
+        ).values('video_lesson__module').distinct().count()
+        self.modules_completed = completed_modules
+        
+        # Recalculate risk score with updated data
+        self.calculate_risk_score()
+    
+    class Meta:
+        db_table = 'student_analytics'
+        verbose_name_plural = 'Student Analytics'
+
+
+class ProgressAlert(models.Model):
+    """Alerts for mentors about at-risk students"""
+    ALERT_TYPES = [
+        ('inactive', 'Student Inactive'),
+        ('poor_performance', 'Poor Performance'),
+        ('no_submission', 'No Assignment Submissions'),
+        ('quiz_failure', 'Multiple Quiz Failures'),
+        ('course_stalled', 'Course Progress Stalled'),
+    ]
+    
+    ALERT_PRIORITY = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),  
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+    
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='alerts')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='alerts')
+    alert_type = models.CharField(max_length=20, choices=ALERT_TYPES)
+    priority = models.CharField(max_length=10, choices=ALERT_PRIORITY)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    
+    # Status
+    is_resolved = models.BooleanField(default=False)
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_alerts')
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolution_notes = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Alert: {self.student.name} - {self.title}"
+    
+    def resolve(self, resolved_by, notes=""):
+        """Mark alert as resolved"""
+        from django.utils import timezone
+        self.is_resolved = True
+        self.resolved_by = resolved_by
+        self.resolved_at = timezone.now()
+        self.resolution_notes = notes
+        self.save()
+    
+    class Meta:
+        db_table = 'progress_alerts'
+        ordering = ['-created_at']
+
+
+class MentorSession(models.Model):
+    """Track mentoring sessions with students"""
+    SESSION_TYPES = [
+        ('video_call', 'Video Call'),
+        ('phone_call', 'Phone Call'),
+        ('email', 'Email Support'),
+        ('chat', 'Chat Session'),
+        ('in_person', 'In Person'),
+    ]
+    
+    mentor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mentor_sessions')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mentoring_sessions')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='mentoring_sessions', null=True, blank=True)
+    
+    session_type = models.CharField(max_length=15, choices=SESSION_TYPES)
+    duration_minutes = models.PositiveIntegerField(help_text="Session duration in minutes")
+    
+    # Content
+    topics_discussed = models.TextField(help_text="What was discussed in the session")
+    action_items = models.TextField(blank=True, null=True, help_text="Action items for student")
+    follow_up_required = models.BooleanField(default=False)
+    follow_up_date = models.DateField(null=True, blank=True)
+    
+    # Ratings
+    student_satisfaction = models.PositiveIntegerField(null=True, blank=True, help_text="1-5 rating from student")
+    mentor_notes = models.TextField(blank=True, null=True)
+    
+    session_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Session: {self.mentor.name} -> {self.student.name} ({self.session_date.date()})"
+    
+    class Meta:
+        db_table = 'mentor_sessions'
+        ordering = ['-session_date']

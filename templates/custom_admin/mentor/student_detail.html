@@ -1,0 +1,215 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}{{ student.name }} - Student Analytics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3">{{ student.name|default:'Student' }}</h1>
+        <p class="text-muted">{{ student.email }} • Risk Level: 
+            {% if analytics.risk_level == 'critical' %}
+                <span class="badge bg-danger">Critical</span>
+            {% elif analytics.risk_level == 'high' %}
+                <span class="badge bg-warning">High</span>
+            {% elif analytics.risk_level == 'medium' %}
+                <span class="badge bg-info">Medium</span>
+            {% else %}
+                <span class="badge bg-success">Low</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'mentor:student_analytics_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+        <a href="{% url 'mentor:create_mentor_session' %}?student={{ student.id }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Session
+        </a>
+    </div>
+</div>
+
+<!-- Analytics Overview -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-primary mb-2">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                </div>
+                <h3 class="mb-0 {% if analytics.risk_level == 'critical' %}text-danger{% elif analytics.risk_level == 'high' %}text-warning{% else %}text-success{% endif %}">{{ analytics.risk_score|floatformat:1 }}</h3>
+                <small class="text-muted">Risk Score</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-success mb-2">
+                    <i class="fas fa-video fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ analytics.total_videos_watched }}</h3>
+                <small class="text-muted">Videos Watched</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-info mb-2">
+                    <i class="fas fa-clipboard-list fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ analytics.avg_quiz_score|floatformat:0 }}%</h3>
+                <small class="text-muted">Avg Quiz Score</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-warning mb-2">
+                    <i class="fas fa-tasks fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ analytics.total_assignments_submitted }}</h3>
+                <small class="text-muted">Assignments</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Progress -->
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Course Progress</h5>
+            </div>
+            <div class="card-body">
+                {% for progress in course_progress %}
+                <div class="mb-4 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">{{ progress.course.title }}</h6>
+                        <span class="badge bg-primary">{{ progress.video_completion_rate|floatformat:0 }}% Complete</span>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="text-success">
+                                <i class="fas fa-video"></i>
+                                <div class="fw-bold">{{ progress.videos_completed }}/{{ progress.videos_total }}</div>
+                                <small>Videos</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-warning">
+                                <i class="fas fa-clipboard-check"></i>
+                                <div class="fw-bold">{{ progress.assignments_submitted }}</div>
+                                <small>Assignments</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-info">
+                                <i class="fas fa-chart-bar"></i>
+                                <div class="fw-bold">{{ progress.avg_quiz_score|floatformat:0 }}%</div>
+                                <small>Quiz Avg</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 6px;">
+                        <div class="progress-bar bg-primary" style="width: {{ progress.video_completion_rate }}%"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-book fa-2x mb-2"></i>
+                    <p>No course enrollments found</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                {% for progress in recent_progress %}
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="fas fa-play" style="font-size: 12px;"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold small">{{ progress.video_lesson.title|truncatechars:30 }}</div>
+                        <small class="text-muted">{{ progress.last_watched_at|timesince }} ago</small>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-success">{{ progress.completed_percentage|floatformat:0 }}%</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <p>No recent activity</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts and Sessions -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Progress Alerts</h5>
+            </div>
+            <div class="card-body">
+                {% for alert in alerts %}
+                <div class="alert {% if alert.priority == 'urgent' %}alert-danger{% elif alert.priority == 'high' %}alert-warning{% else %}alert-info{% endif %} mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ alert.title }}</strong>
+                            <p class="mb-0 small">{{ alert.description|truncatechars:100 }}</p>
+                        </div>
+                        <small class="text-muted">{{ alert.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <p>No active alerts</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0">Mentoring Sessions</h5>
+            </div>
+            <div class="card-body">
+                {% for session in sessions %}
+                <div class="border-bottom pb-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold">{{ session.session_type|title }}</div>
+                            <small class="text-muted">{{ session.topics_discussed|truncatechars:50 }}</small>
+                            <div class="small text-info">{{ session.duration_minutes }} minutes</div>
+                        </div>
+                        <small class="text-muted">{{ session.session_date|date:"M d" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-user-friends fa-2x mb-2"></i>
+                    <p>No mentoring sessions yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

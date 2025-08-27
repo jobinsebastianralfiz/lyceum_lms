@@ -1,0 +1,344 @@
+{% extends 'student_portal/base.html' %}
+{% load math_filters %}
+
+{% block title %}Progress Insights - {{ request.user.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .insight-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+    }
+    .insight-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .course-progress-card {
+        border-left: 4px solid #007bff;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
+    
+    .progress-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(#28a745 0deg, #28a745 0deg, #e9ecef 0deg, #e9ecef 360deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .progress-circle::before {
+        content: '';
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        position: absolute;
+    }
+    
+    .progress-text {
+        position: relative;
+        z-index: 2;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .month-bar {
+        height: 200px;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        position: relative;
+        margin: 0 2px;
+    }
+    
+    .bar {
+        width: 100%;
+        border-radius: 4px 4px 0 0;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .bar:hover {
+        opacity: 0.8;
+        transform: scaleY(1.05);
+    }
+    
+    .videos-bar { background: linear-gradient(to top, #007bff, #0056b3); }
+    .quizzes-bar { background: linear-gradient(to top, #28a745, #1e7e34); }
+    .assignments-bar { background: linear-gradient(to top, #ffc107, #e0a800); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Detailed Progress Insights</h2>
+            <p class="text-muted">Deep dive into your learning analytics and performance</p>
+        </div>
+        <div>
+            <a href="{% url 'student_portal:mentoring_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Overall Analytics Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card insight-card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-line me-2"></i>Overall Learning Performance
+                    </h5>
+                    <div class="row text-center">
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-primary">
+                                <i class="fas fa-video fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.total_videos_watched }}</h4>
+                            <small class="text-muted">Videos Completed</small>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-success">
+                                <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.total_assignments_submitted }}</h4>
+                            <small class="text-muted">Assignments</small>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.total_quizzes_attempted }}</h4>
+                            <small class="text-muted">Quiz Attempts</small>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-info">
+                                <i class="fas fa-percentage fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.avg_quiz_score|floatformat:0 }}%</h4>
+                            <small class="text-muted">Quiz Average</small>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-purple">
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.modules_completed }}</h4>
+                            <small class="text-muted">Modules Done</small>
+                        </div>
+                        <div class="col-6 col-md-2 mb-3">
+                            <div class="text-dark">
+                                <i class="fas fa-calendar fa-2x mb-2"></i>
+                            </div>
+                            <h4 class="mb-0">{{ analytics.active_days }}</h4>
+                            <small class="text-muted">Active Days</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course-wise Progress -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card insight-card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-books me-2"></i>Course-wise Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for insight in course_insights %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card course-progress-card border-0 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-1">{{ insight.course.title }}</h6>
+                                            <small class="text-muted">{{ insight.course.description|truncatechars:50 }}</small>
+                                        </div>
+                                        <div class="progress-circle" style="background: conic-gradient(#28a745 {{ insight.completion_degrees }}deg, #e9ecef {{ insight.completion_degrees }}deg);">
+                                            <div class="progress-text">
+                                                {{ insight.completion_percentage|floatformat:0 }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row text-center">
+                                        <div class="col-6 col-md-3 mb-2">
+                                            <div class="small text-primary fw-bold">{{ insight.completed_videos }}</div>
+                                            <div class="small text-muted">of {{ insight.total_videos }} videos</div>
+                                        </div>
+                                        <div class="col-6 col-md-3 mb-2">
+                                            <div class="small text-success fw-bold">{{ insight.quiz_attempts }}</div>
+                                            <div class="small text-muted">quiz attempts</div>
+                                        </div>
+                                        <div class="col-6 col-md-3 mb-2">
+                                            <div class="small text-warning fw-bold">{{ insight.avg_quiz_score|floatformat:0 }}%</div>
+                                            <div class="small text-muted">quiz average</div>
+                                        </div>
+                                        <div class="col-6 col-md-3 mb-2">
+                                            <div class="small text-info fw-bold">{{ insight.assignments_submitted }}</div>
+                                            <div class="small text-muted">assignments</div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if insight.last_activity %}
+                                    <div class="mt-3 pt-3 border-top">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>Last activity: {{ insight.last_activity.last_watched_at|timesince }} ago
+                                            ({{ insight.last_activity.video_lesson.title|truncatechars:30 }})
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-4">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No course enrollments yet</h5>
+                            <p class="text-muted">Enroll in courses to see detailed progress insights here.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Progress Chart -->
+    <div class="card insight-card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Monthly Activity Trends
+                </h5>
+                <div class="d-flex gap-3">
+                    <div class="d-flex align-items-center">
+                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #007bff, #0056b3); border-radius: 2px;"></div>
+                        <small class="text-muted">Videos</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #28a745, #1e7e34); border-radius: 2px;"></div>
+                        <small class="text-muted">Quizzes</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #ffc107, #e0a800); border-radius: 2px;"></div>
+                        <small class="text-muted">Assignments</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <div class="row">
+                    {% for month in monthly_data %}
+                    <div class="col">
+                        <div class="text-center mb-2">
+                            <small class="text-muted fw-bold">{{ month.month }}</small>
+                        </div>
+                        <div class="month-bar">
+                            <div class="d-flex w-100 align-items-end">
+                                <div class="flex-fill me-1">
+                                    <div class="bar videos-bar" 
+                                         style="height: {{ month.videos_height }}%"
+                                         title="Videos: {{ month.videos }}">
+                                    </div>
+                                </div>
+                                <div class="flex-fill me-1">
+                                    <div class="bar quizzes-bar" 
+                                         style="height: {{ month.quizzes_height }}%"
+                                         title="Quizzes: {{ month.quizzes }}">
+                                    </div>
+                                </div>
+                                <div class="flex-fill">
+                                    <div class="bar assignments-bar" 
+                                         style="height: {{ month.assignments_height }}%"
+                                         title="Assignments: {{ month.assignments }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <div class="row">
+                                <div class="col-4 px-1">
+                                    <small class="text-primary fw-bold">{{ month.videos }}</small>
+                                </div>
+                                <div class="col-4 px-1">
+                                    <small class="text-success fw-bold">{{ month.quizzes }}</small>
+                                </div>
+                                <div class="col-4 px-1">
+                                    <small class="text-warning fw-bold">{{ month.assignments }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="row mt-4 pt-3 border-top">
+                <div class="col-md-4 text-center">
+                    <div class="text-primary">
+                        <i class="fas fa-trending-up fa-2x mb-2"></i>
+                    </div>
+                    <h6>Learning Streak</h6>
+                    <p class="text-muted mb-0">Keep up the great momentum!</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="text-success">
+                        <i class="fas fa-target fa-2x mb-2"></i>
+                    </div>
+                    <h6>Goal Achievement</h6>
+                    <p class="text-muted mb-0">You're on track to meet your goals</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="text-info">
+                        <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                    </div>
+                    <h6>Smart Insights</h6>
+                    <p class="text-muted mb-0">Personalized recommendations available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add tooltips to bars
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+        bar.addEventListener('mouseenter', function() {
+            const tooltip = this.getAttribute('title');
+            this.style.position = 'relative';
+        });
+    });
+    
+    // Animate progress circles
+    const progressCircles = document.querySelectorAll('.progress-circle');
+    progressCircles.forEach(circle => {
+        const percentage = circle.querySelector('.progress-text').textContent.replace('%', '');
+        const degrees = (percentage / 100) * 360;
+        circle.style.background = `conic-gradient(#28a745 ${degrees}deg, #e9ecef ${degrees}deg)`;
+    });
+});
+</script>
+{% endblock %}
