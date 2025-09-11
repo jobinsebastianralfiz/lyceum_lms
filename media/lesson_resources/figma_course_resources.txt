@@ -1,0 +1,6 @@
+This is a sample resource file for the Figma course.
+
+Contents:
+- Course materials
+- Practice files
+- Additional resources

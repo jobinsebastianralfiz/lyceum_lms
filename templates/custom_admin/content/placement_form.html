@@ -1,0 +1,243 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Add Placement - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-plus me-2"></i>Add New Placement
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:placements_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to List
+            </a>
+          </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row">
+            <!-- Basic Information -->
+            <div class="col-md-8">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Basic Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="student_name" class="form-label">Student Name *</label>
+                        <input type="text" class="form-control" id="student_name" name="student_name" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="batch_year" class="form-label">Batch Year</label>
+                        <input type="text" class="form-control" id="batch_year" name="batch_year" placeholder="2023-2024">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="company_name" class="form-label">Company Name *</label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="job_title" class="form-label">Job Title *</label>
+                        <input type="text" class="form-control" id="job_title" name="job_title" required>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="course_completed" class="form-label">Course Completed *</label>
+                        <input type="text" class="form-control" id="course_completed" name="course_completed" required>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="placement_type" class="form-label">Placement Type *</label>
+                        <select class="form-select" id="placement_type" name="placement_type" required>
+                          <option value="">Select Type</option>
+                          {% for type_code, type_name in placement_types %}
+                            <option value="{{ type_code }}">{{ type_name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="placement_date" class="form-label">Placement Date</label>
+                        <input type="date" class="form-control" id="placement_date" name="placement_date">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Package Information -->
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Package Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="package_amount" class="form-label">Package Amount (in Lakhs)</label>
+                        <input type="number" step="0.1" class="form-control" id="package_amount" name="package_amount">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="package_currency" class="form-label">Currency</label>
+                        <select class="form-select" id="package_currency" name="package_currency">
+                          <option value="INR">INR</option>
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="can_show_package" name="can_show_package">
+                    <label class="form-check-label" for="can_show_package">
+                      Can show package amount publicly
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Details -->
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Additional Details</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="success_story" class="form-label">Success Story</label>
+                    <textarea class="form-control" id="success_story" name="success_story" rows="4" placeholder="Brief success story..."></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="key_skills_gained" class="form-label">Key Skills Gained</label>
+                    <textarea class="form-control" id="key_skills_gained" name="key_skills_gained" rows="3" placeholder="Python, React, AWS..."></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="career_progression" class="form-label">Career Progression</label>
+                    <textarea class="form-control" id="career_progression" name="career_progression" rows="3" placeholder="Career growth details..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings & Media -->
+            <div class="col-md-4">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Publication Settings</h6>
+                </div>
+                <div class="card-body">
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="is_published" name="is_published">
+                    <label class="form-check-label" for="is_published">
+                      <strong>Publish immediately</strong>
+                    </label>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured">
+                    <label class="form-check-label" for="is_featured">
+                      <strong>Feature this placement</strong>
+                    </label>
+                  </div>
+                  
+                  <hr>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="consent_given" name="consent_given">
+                    <label class="form-check-label" for="consent_given">
+                      Student consent obtained
+                    </label>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="can_show_details" name="can_show_details">
+                    <label class="form-check-label" for="can_show_details">
+                      Can show student details
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">Media Files</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="student_photo" class="form-label">Student Photo</label>
+                    <input type="file" class="form-control" id="student_photo" name="student_photo" accept="image/*">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="company_logo" class="form-label">Company Logo</label>
+                    <input type="file" class="form-control" id="company_logo" name="company_logo" accept="image/*">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="certificate_image" class="form-label">Certificate Image</label>
+                    <input type="file" class="form-control" id="certificate_image" name="certificate_image" accept="image/*">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'custom_admin:placements_list' %}" class="btn btn-outline-secondary">
+                      <i class="ti ti-x"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="ti ti-check"></i> Create Placement
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

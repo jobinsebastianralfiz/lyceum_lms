@@ -20,6 +20,7 @@ from apps.courses.models import (
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
 from apps.notifications.models import Notification
+from apps.ratings.models import CourseRating, CourseReview, ReviewHelpful
 from .forms import CustomVideoLessonForm, CustomAssignmentForm, CustomQuizQuestionForm, CustomQuizChoiceForm, CustomQuizQuestionWithChoicesForm
 from .quiz_reset_views import quiz_attempt_reset_view, quiz_attempt_delete_view
 
@@ -506,6 +507,8 @@ def course_create_view(request):
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
+            curriculum = request.POST.get('curriculum', '')
+            what_you_will_learn = request.POST.get('what_you_will_learn', '')
             category_id = request.POST.get('category')
             price = request.POST.get('price', '0.00')
             is_free = request.POST.get('is_free') == 'on'
@@ -532,6 +535,8 @@ def course_create_view(request):
             course = Course.objects.create(
                 title=title,
                 description=description,
+                curriculum=curriculum,
+                what_you_will_learn=what_you_will_learn,
                 category=category,
                 price=float(price) if price else 0.00,
                 is_free=is_free,
@@ -565,6 +570,8 @@ def course_edit_view(request, course_id):
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
+            curriculum = request.POST.get('curriculum', '')
+            what_you_will_learn = request.POST.get('what_you_will_learn', '')
             category_id = request.POST.get('category')
             price = request.POST.get('price', '0.00')
             is_free = request.POST.get('is_free') == 'on'
@@ -588,6 +595,8 @@ def course_edit_view(request, course_id):
             # Update course fields
             course.title = title
             course.description = description
+            course.curriculum = curriculum
+            course.what_you_will_learn = what_you_will_learn
             course.category = category
             course.price = float(price) if price else 0.00
             course.is_free = is_free
@@ -2785,3 +2794,68 @@ def quiz_choice_delete_view(request, choice_id):
         messages.success(request, f'Quiz choice deleted successfully.')
         return redirect('custom_admin:quiz_question_detail', question_id=question_id)
     return render(request, 'custom_admin/quiz_choices/delete.html', {'choice': choice})
+
+# VIDEO LESSON ENHANCED VIEWS
+
+@user_passes_test(is_staff_user)
+def video_fetch_metadata_view(request):
+    """AJAX endpoint to fetch video metadata from APIs"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        url = data.get('url', '').strip()
+        
+        if not url:
+            return JsonResponse({'error': 'URL is required'}, status=400)
+        
+        # Import video service
+        from apps.courses.services import VideoIntegrationService
+        
+        # Fetch metadata
+        metadata = VideoIntegrationService.fetch_video_metadata(url)
+        
+        return JsonResponse(metadata)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+
+@user_passes_test(is_staff_user)
+def video_sync_metadata_view(request, lesson_id):
+    """AJAX endpoint to sync video metadata from API"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        from apps.courses.models import VideoLesson
+        
+        video = get_object_or_404(VideoLesson, id=lesson_id)
+        
+        # Attempt to sync from API
+        success, message = video.sync_from_api()
+        
+        if success:
+            video.save()
+            return JsonResponse({
+                'success': True,
+                'message': message,
+                'data': {
+                    'title': video.title,
+                    'description': video.description,
+                    'thumbnail_url': video.thumbnail_url,
+                    'duration': video.duration,
+                    'platform': video.platform,
+                    'auto_fetched': video.auto_fetched,
+                    'last_sync': video.last_api_sync.isoformat() if video.last_api_sync else None
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'error': message}, status=400)
+            
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'}, status=500)

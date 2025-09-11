@@ -1,0 +1,129 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Rate Course - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            {% if existing_rating %}Update Your Rating{% else %}Rate This Course{% endif %}
+        </h1>
+        <p class="text-muted">Share your experience with {{ course.title }}</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-body">
+                <div class="course-info mb-4 p-3 bg-light" style="border-radius: 10px;">
+                    <div class="d-flex align-items-center">
+                        {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" class="me-3">
+                        {% else %}
+                        <div class="bg-primary d-flex align-items-center justify-content-center text-white me-3" 
+                             style="width: 80px; height: 80px; border-radius: 8px;">
+                            <i class="fas fa-book fa-2x"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">{{ course.title }}</h5>
+                            <p class="text-muted mb-0">{{ course.description|truncatechars:100 }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-layer-group me-1"></i>
+                                {{ course.category.name }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                {% if existing_rating %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You have already rated this course. You can update your rating below.
+                </div>
+                {% endif %}
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.rating.id_for_label }}" class="form-label fw-bold">
+                            {{ form.rating.label }}
+                        </label>
+                        {{ form.rating }}
+                        {% if form.rating.help_text %}
+                        <div class="form-text">{{ form.rating.help_text }}</div>
+                        {% endif %}
+                        {% if form.rating.errors %}
+                        <div class="invalid-feedback d-block">{{ form.rating.errors.0 }}</div>
+                        {% endif %}
+                        <div class="rating-preview mt-2"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.review_text.id_for_label }}" class="form-label fw-bold">
+                            {{ form.review_text.label }}
+                        </label>
+                        {{ form.review_text }}
+                        {% if form.review_text.help_text %}
+                        <div class="form-text">{{ form.review_text.help_text }}</div>
+                        {% endif %}
+                        {% if form.review_text.errors %}
+                        <div class="invalid-feedback d-block">{{ form.review_text.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Course
+                        </a>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-star me-1"></i>
+                            {% if existing_rating %}Update Rating{% else %}Submit Rating{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+    
+    // Rating visualization
+    const ratingSelect = document.querySelector('select[name="rating"]');
+    if (ratingSelect) {
+        const ratingPreview = document.querySelector('.rating-preview');
+        
+        function updateRatingPreview() {
+            const rating = parseInt(ratingSelect.value) || 0;
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= rating ? '★' : '☆';
+            }
+            ratingPreview.innerHTML = `<span style="color: #fbbf24; font-size: 20px;">${stars}</span>`;
+        }
+        
+        ratingSelect.addEventListener('change', updateRatingPreview);
+        updateRatingPreview();
+    }
+});
+</script>
+{% endblock %}

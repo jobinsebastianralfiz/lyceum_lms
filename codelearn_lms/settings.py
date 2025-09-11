@@ -42,7 +42,9 @@ LOCAL_APPS = [
     'apps.payments',
     'apps.youtube_integration',
     'apps.notifications',
+    'apps.ratings',
     'apps.custom_admin',
+    'apps.content_management',
     'landing',
     'student_portal',
     'emails',
@@ -199,6 +201,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='apikey')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@codelearn.com')
 
+# Frontend URL for email links
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
+
 # Celery Configuration
 CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://localhost:6379/0')
@@ -210,10 +215,17 @@ CELERY_TIMEZONE = TIME_ZONE
 # Celery Beat Settings
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
+# Video Platform API Configuration
+
 # YouTube API Configuration
 YOUTUBE_API_KEY = config('YOUTUBE_API_KEY', default='')
 YOUTUBE_CLIENT_ID = config('YOUTUBE_CLIENT_ID', default='')
 YOUTUBE_CLIENT_SECRET = config('YOUTUBE_CLIENT_SECRET', default='')
+
+# Vimeo API Configuration
+VIMEO_CLIENT_ID = config('VIMEO_CLIENT_ID', default='')
+VIMEO_CLIENT_SECRET = config('VIMEO_CLIENT_SECRET', default='')
+VIMEO_ACCESS_TOKEN = config('VIMEO_ACCESS_TOKEN', default='')
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')

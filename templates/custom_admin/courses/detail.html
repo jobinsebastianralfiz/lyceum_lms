@@ -1,7 +1,82 @@
 {% extends 'custom_admin/base.html' %}
 {% load static %}
+{% load rich_text_filters %}
 
 {% block title %}{{ course.title }} - Course Details{% endblock %}
+
+{% block extra_css %}
+<style>
+.course-content-display {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  line-height: 1.6;
+  color: #495057;
+  min-height: 100px;
+}
+
+.course-content-display h6 {
+  color: #343a40;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  background: none;
+}
+
+.nav-tabs .nav-link.active {
+  color: #495057;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom-color: #f8f9fa;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #495057;
+  background: #f8f9fa;
+}
+
+.tab-content {
+  border: 1px solid #dee2e6;
+  border-top: none;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  min-height: 200px;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Bootstrap 5 handles tabs automatically - no custom JavaScript needed
+// Just ensure content is properly formatted
+document.addEventListener('DOMContentLoaded', function() {
+  // Clean up any formatting issues in rich text content
+  const richTextContent = document.querySelectorAll('.course-content-display');
+  richTextContent.forEach(function(content) {
+    // Remove empty paragraphs
+    const emptyPs = content.querySelectorAll('p:empty');
+    emptyPs.forEach(function(p) { p.remove(); });
+  });
+});
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -24,6 +99,58 @@
         {% if course.thumbnail %}
         <img src="{{ course.thumbnail.url }}" class="img-fluid rounded mb-3" alt="{{ course.title }}">
         {% endif %}
+
+        <!-- Course Content Tabs -->
+        <div class="mb-4">
+          <ul class="nav nav-tabs" id="courseContentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-content" type="button" role="tab">
+                <i class="ti ti-info-circle me-1"></i>Overview
+              </button>
+            </li>
+            {% if course.curriculum %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="curriculum-tab" data-bs-toggle="tab" data-bs-target="#curriculum-content" type="button" role="tab">
+                <i class="ti ti-list-details me-1"></i>Curriculum
+              </button>
+            </li>
+            {% endif %}
+            {% if course.what_you_will_learn %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="learning-tab" data-bs-toggle="tab" data-bs-target="#learning-content" type="button" role="tab">
+                <i class="ti ti-target me-1"></i>Learning Outcomes
+              </button>
+            </li>
+            {% endif %}
+          </ul>
+          
+          <div class="tab-content" id="courseContentTabsContent">
+            <div class="tab-pane fade show active p-3" id="overview-content" role="tabpanel" aria-labelledby="overview-tab">
+              <div class="course-content-display">
+                <h6 class="mb-3">Course Overview</h6>
+                {{ course.description }}
+              </div>
+            </div>
+            
+            {% if course.curriculum %}
+            <div class="tab-pane fade p-3" id="curriculum-content" role="tabpanel" aria-labelledby="curriculum-tab">
+              <div class="course-content-display">
+                <h6 class="mb-3">Course Curriculum</h6>
+                {{ course.curriculum|safe_rich_text }}
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if course.what_you_will_learn %}
+            <div class="tab-pane fade p-3" id="learning-content" role="tabpanel" aria-labelledby="learning-tab">
+              <div class="course-content-display">
+                <h6 class="mb-3">What Students Will Learn</h6>
+                {{ course.what_you_will_learn|safe_rich_text }}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
 
         <div class="row text-center mb-4">
           <div class="col-3">

@@ -1,5 +1,4 @@
 {% extends 'student_portal/base.html' %}
-{% load math_filters %}
 
 {% block title %}Progress Insights - {{ request.user.name }}{% endblock %}
 
@@ -142,8 +141,8 @@
                             <div class="text-dark">
                                 <i class="fas fa-calendar fa-2x mb-2"></i>
                             </div>
-                            <h4 class="mb-0">{{ analytics.active_days }}</h4>
-                            <small class="text-muted">Active Days</small>
+                            <h4 class="mb-0">{{ analytics.total_login_days|default:"0" }}</h4>
+                            <small class="text-muted">Login Days</small>
                         </div>
                     </div>
                 </div>

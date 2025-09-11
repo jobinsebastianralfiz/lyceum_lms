@@ -1,0 +1,155 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Review Votes - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="card-title fw-semibold mb-4">Review Votes Management</h5>
+                    
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h4>{{ total_votes }}</h4>
+                                    <p class="mb-0">Total Votes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h4>{{ helpful_votes }}</h4>
+                                    <p class="mb-0">Helpful Votes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h4>{{ not_helpful_votes }}</h4>
+                                    <p class="mb-0">Not Helpful Votes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="GET" class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" name="search" class="form-control" placeholder="Search by user or review..." value="{{ search_query }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'custom_admin:review_votes_list' %}" class="btn btn-secondary">Clear</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Votes Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Review</th>
+                                    <th>User</th>
+                                    <th>Vote Type</th>
+                                    <th>Date</th>
+                                    <th>Course</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vote in votes %}
+                                <tr>
+                                    <td>
+                                        <div style="max-width: 300px;">
+                                            <p class="mb-1">{{ vote.review.review|truncatechars:80 }}</p>
+                                            <small class="text-muted">
+                                                Review by: {{ vote.review.course_rating.user.first_name }} {{ vote.review.course_rating.user.last_name }}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ vote.user.first_name }} {{ vote.user.last_name }}<br>
+                                        <small class="text-muted">{{ vote.user.email }}</small>
+                                    </td>
+                                    <td>
+                                        {% if vote.is_helpful %}
+                                            <span class="badge bg-success">
+                                                <i class="ti ti-thumb-up"></i> Helpful
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="ti ti-thumb-down"></i> Not Helpful
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ vote.created_at|date:"M d, Y" }}<br>
+                                        <small class="text-muted">{{ vote.created_at|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ vote.review.course_rating.course.title }}</strong><br>
+                                        <small class="text-muted">{{ vote.review.course_rating.course.category.name }}</small>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="ti ti-thumb-up fs-3"></i>
+                                            <p class="mt-2">No votes found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if votes.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if votes.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ votes.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in votes.paginator.page_range %}
+                                {% if votes.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > votes.number|add:'-3' and num < votes.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if votes.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ votes.next_page_number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

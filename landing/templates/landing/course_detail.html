@@ -1,400 +1,738 @@
 {% extends 'landing/base.html' %}
 {% load static %}
+{% load rich_text_filters %}
+{% load rating_filters %}
 
-{% block title %}{{ course.title }} - CodeLearn LMS{% endblock %}
+{% block title %}{{ course.title }} - Uptrail{% endblock %}
 
 {% block extra_css %}
 <style>
-.course-hero {
-    background: linear-gradient(135deg, #f8fffe 0%, #f0f7f5 100%);
-    padding: 120px 0 80px;
+/* Course Details Specific Styling */
+.cs-course_details_meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
 }
 
-.course-hero-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 3rem;
-    align-items: start;
+.cs-course_details_meta span {
+  color: #64748b;
+  font-size: 14px;
 }
 
-.course-info h1 {
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 1rem;
-    line-height: 1.2;
+.cs-course_details_meta a {
+  color: #2563eb;
+  text-decoration: none;
 }
 
-.course-description {
-    font-size: 1.1rem;
-    color: var(--text-light);
-    line-height: 1.7;
-    margin-bottom: 2rem;
+.cs-enrolled_number {
+  padding: 4px 12px;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  background: rgba(37, 99, 235, 0.05);
 }
 
-.course-meta-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.cs-seller_review {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-dark);
-    font-weight: 500;
+.cs-seller_badge {
+  background: #2563eb;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.meta-item i {
-    color: var(--primary-color);
-    width: 20px;
+/* Star Rating System - Fixed to match online template */
+.cs-review {
+  position: relative;
+  display: inline-block;
+  color: #e5e7eb;
+  font-size: 14px;
+  line-height: 1;
 }
 
-.enrollment-card {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(189, 208, 202, 0.2);
-    border: 1px solid rgba(189, 208, 202, 0.3);
-    position: sticky;
-    top: 100px;
+.cs-review::before {
+  content: "★★★★★";
+  color: #e5e7eb;
 }
 
-.price-section {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(189, 208, 202, 0.2);
+.cs-review .cs-review_in {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #fbbf24;
 }
 
-.price-display {
-    margin-bottom: 1rem;
+.cs-review .cs-review_in::before {
+  content: "★★★★★";
+  color: #fbbf24;
 }
 
-.current-price {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
+.cs-course_image {
+  width: 100%;
+  max-width: 600px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 30px;
 }
 
-.free-badge {
-    background: var(--accent-color);
-    color: var(--white);
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: inline-block;
+.cs-enroll_card {
+  background: #f8fafc;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-.tax-info {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-top: 0.5rem;
+.cs-enroll_title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #0f172a;
 }
 
-.enrollment-benefits {
-    margin-bottom: 2rem;
+.cs-enroll_price {
+  margin-bottom: 20px;
 }
 
-.enrollment-benefits h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 1rem;
+.cs-enroll_price .cs-bold {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.benefits-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.cs-previous_price {
+  text-decoration: line-through;
+  color: #64748b;
+  margin-left: 10px;
 }
 
-.benefits-list li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-    color: var(--text-dark);
+.cs-list {
+  background: #f8fafc;
+  padding: 25px;
+  border-radius: 8px;
 }
 
-.benefits-list i {
-    color: var(--accent-color);
-    font-size: 1rem;
-    width: 16px;
+.cs-list_title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #0f172a;
 }
 
-.enroll-btn {
-    width: 100%;
-    padding: 1rem 2rem;
-    background: var(--gradient);
-    color: var(--white);
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    margin-bottom: 1rem;
+.cs-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.enroll-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(189, 208, 202, 0.4);
-    color: var(--white);
-    text-decoration: none;
+.cs-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.enroll-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+.cs-list li:last-child {
+  border-bottom: none;
 }
 
-.enrolled-badge {
-    background: var(--accent-color);
-    color: var(--white);
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 1rem;
+.cs-list li span:first-child {
+  color: #64748b;
+  font-size: 14px;
 }
 
-.login-required {
-    text-align: center;
-    padding: 1rem;
-    background: rgba(189, 208, 202, 0.1);
-    border-radius: 12px;
-    margin-bottom: 1rem;
+.cs-list li span:last-child {
+  color: #0f172a;
+  font-weight: 500;
 }
 
-.login-required p {
-    margin-bottom: 1rem;
-    color: var(--text-dark);
+.cs-list li i {
+  margin-right: 8px;
+  color: #2563eb;
+  width: 16px;
 }
 
-.btn-outline-primary {
-    background: transparent;
-    color: var(--accent-color);
-    border: 2px solid var(--accent-color);
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+/* Tabs Styling - Fixed to match online template */
+.cs-tabs {
+  margin-top: 40px;
 }
 
-.btn-outline-primary:hover {
-    background: var(--accent-color);
-    color: var(--white);
-    text-decoration: none;
+.cs-tab_links.cs-style3 {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
 }
 
-.course-content-section {
-    background: var(--white);
-    padding: 80px 0;
+.cs-tab_links.cs-style3 li {
+  margin-right: 0;
 }
 
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 2rem;
-    text-align: center;
+.cs-tab_links.cs-style3 a {
+  position: relative;
+  display: block;
+  padding: 15px 25px;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 500;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+  margin-right: 5px;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
 }
 
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    margin-top: 3rem;
+.cs-tab_links.cs-style3 li.active a,
+.cs-tab_links.cs-style3 a.active {
+  color: #2563eb;
+  background: white;
+  border-color: #2563eb;
+  position: relative;
+  z-index: 2;
 }
 
-.content-block {
-    background: #f8fffe;
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid rgba(189, 208, 202, 0.2);
+.cs-tab_links.cs-style3 li.active a::after,
+.cs-tab_links.cs-style3 a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: white;
+  z-index: 3;
 }
 
-.content-block h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 1rem;
+.cs-tab_links.cs-style3 a:hover {
+  color: #2563eb;
+  background: #f1f5f9;
 }
 
-.content-block p {
-    color: var(--text-light);
-    line-height: 1.6;
+.cs-tab_content {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0 8px 8px 8px;
+  padding: 30px;
+  min-height: 250px;
 }
 
+.cs-tab {
+  display: none;
+}
+
+.cs-tab.active {
+  display: block;
+}
+
+.cs-tab h4 {
+  color: #0f172a;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.cs-tab p {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.cs-tab ul.cs-list.cs-style3 {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0 0 0;
+}
+
+.cs-tab ul.cs-list.cs-style3 li {
+  padding: 8px 0;
+  color: #64748b;
+  display: flex;
+  align-items: flex-start;
+}
+
+.cs-tab ul.cs-list.cs-style3 li i {
+  color: #2563eb;
+  margin-right: 8px;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+/* Content Formatting */
+.course-content-formatted {
+  line-height: 1.8;
+  color: #374151;
+  font-size: 15px;
+  min-height: 60px;
+}
+
+.course-content-formatted p {
+  margin-bottom: 12px;
+}
+
+.course-content-formatted ul,
+.course-content-formatted ol {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.course-content-formatted ul li,
+.course-content-formatted ol li {
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.course-content-formatted ul li::marker {
+  color: #2563eb;
+}
+
+.course-content-formatted h1,
+.course-content-formatted h2,
+.course-content-formatted h3,
+.course-content-formatted h4,
+.course-content-formatted h5,
+.course-content-formatted h6 {
+  color: #1f2937;
+  font-weight: 600;
+  margin: 20px 0 10px 0;
+}
+
+.course-content-formatted strong,
+.course-content-formatted b {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.course-content-formatted em,
+.course-content-formatted i {
+  font-style: italic;
+  color: #4b5563;
+}
+
+/* Fix for Quill editor content */
+.course-content-formatted .ql-editor {
+  padding: 0;
+  border: none;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.course-content-formatted .ql-editor p:last-child {
+  margin-bottom: 0;
+}
+
+/* Prevent tab content from causing layout shifts */
+.cs-tabs .cs-tab {
+  min-height: 200px;
+  padding: 20px 0;
+}
+
+.cs-tabs .cs-tab.active {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .course-hero {
-        padding: 100px 0 60px;
-    }
-
-    .course-hero-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
-    .course-info h1 {
-        font-size: 2.2rem;
-    }
-
-    .enrollment-card {
-        position: static;
-        top: auto;
-    }
-
-    .current-price {
-        font-size: 2rem;
-    }
-
-    .content-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
+  .cs-course_details_meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .cs-seller_review {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .cs-enroll_card {
+    margin-top: 30px;
+    padding: 20px;
+  }
+  
+  .cs-tab_links.cs-style3 {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .cs-tab_links.cs-style3 a {
+    margin-right: 0;
+    margin-bottom: 5px;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  
+  .cs-tab_content {
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .cs-course_image {
+    height: 200px;
+  }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Course Hero Section -->
-<section class="course-hero">
-    <div class="container">
-        <div class="course-hero-content">
-            <div class="course-info">
-                <h1>{{ course.title }}</h1>
-                <p class="course-description">{{ course.description }}</p>
-                
-                <div class="course-meta-list">
-                    <div class="meta-item">
-                        <i class="fas fa-tag"></i>
-                        <span>{{ course.category.name }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-clock"></i>
-                        <span>Self-paced learning</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-certificate"></i>
-                        <span>Certificate included</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-users"></i>
-                        <span>{{ course.enrollments.count }} enrolled</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="enrollment-card">
-                <div class="price-section">
-                    {% if course.is_free_course %}
-                        <div class="price-display">
-                            <div class="free-badge">FREE COURSE</div>
-                        </div>
-                    {% else %}
-                        <div class="price-display">
-                            <div class="current-price">₹{{ course.total_price|floatformat:0 }}</div>
-                        </div>
-                        {% if course.tax_amount > 0 %}
-                            <div class="tax-info">
-                                Includes ₹{{ course.tax_amount|floatformat:0 }} taxes ({{ course.tax_rate }}%)
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                
-                <div class="enrollment-benefits">
-                    <h4>What you'll get:</h4>
-                    <ul class="benefits-list">
-                        <li><i class="fas fa-check"></i> Full course access</li>
-                        <li><i class="fas fa-check"></i> Video lessons & materials</li>
-                        <li><i class="fas fa-check"></i> Practical assignments</li>
-                        <li><i class="fas fa-check"></i> Interactive quizzes</li>
-                        <li><i class="fas fa-check"></i> Progress tracking</li>
-                        <li><i class="fas fa-check"></i> Certificate of completion</li>
-                    </ul>
-                </div>
-                
-                {% if user.is_authenticated %}
-                    {% if is_enrolled %}
-                        <div class="enrolled-badge">
-                            <i class="fas fa-check-circle"></i> Already Enrolled
-                        </div>
-                        <a href="{% url 'student_portal:dashboard' %}" class="btn btn-outline-primary" style="width: 100%; text-align: center;">
-                            Go to Course
-                        </a>
-                    {% else %}
-                        <form method="post" action="{% url 'landing:enroll_course' course.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="enroll-btn">
-                                {% if course.is_free_course %}
-                                    <i class="fas fa-play"></i> Enroll for Free
-                                {% else %}
-                                    <i class="fas fa-credit-card"></i> Enroll Now
-                                {% endif %}
-                            </button>
-                        </form>
-                    {% endif %}
-                {% else %}
-                    <div class="login-required">
-                        <p>Please create an account or login to enroll in this course</p>
-                        <a href="{% url 'landing:register' %}" 
-                           class="btn btn-outline-primary" style="margin-bottom: 0.5rem;">
-                            Create Free Account
-                        </a>
-                        <a href="{% url 'student_portal:login' %}?next={% url 'landing:course_detail' course.id %}" 
-                           class="btn btn-outline-primary">
-                            Already have an account? Login
-                        </a>
-                    </div>
-                {% endif %}
-                
-                <div class="text-center" style="font-size: 0.9rem; color: var(--text-light);">
-                    <i class="fas fa-lock"></i> Secure payment with Razorpay
-                </div>
-            </div>
-        </div>
+<!-- Start Hero -->
+<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 400px;">
+  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+  <div class="container">
+    <div class="cs-hero_text">
+      <h1 class="cs-hero_title">{{ course.title }}</h1>
+      <ol class="cs-breadcrumb cs-style2 cs-type1">
+        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
+        <li class="cs-breadcrumb_item"><a href="{% url 'landing:courses' %}" class="cs-primary_color">Courses</a></li>
+        <li class="cs-breadcrumb_item">{{ course.title|truncatechars:30 }}</li>
+      </ol>
     </div>
-</section>
+  </div>
+</div>
+<!-- End Hero -->
 
-<!-- Course Content Section -->
-<section class="course-content-section">
-    <div class="container">
-        <h2 class="section-title">Course Overview</h2>
-        
-        <div class="content-grid">
-            <div class="content-block">
-                <h3><i class="fas fa-target"></i> Learning Objectives</h3>
-                <p>Master the fundamentals and practical applications of {{ course.title }}. Build real-world projects and gain hands-on experience with modern tools and techniques.</p>
-            </div>
-            
-            <div class="content-block">
-                <h3><i class="fas fa-users"></i> Who Should Take This</h3>
-                <p>Perfect for beginners and intermediate learners who want to enhance their skills. No prior experience required - we'll guide you from basics to advanced concepts.</p>
-            </div>
-            
-            <div class="content-block">
-                <h3><i class="fas fa-laptop-code"></i> Hands-on Projects</h3>
-                <p>Apply your learning through practical assignments and real-world projects. Build a portfolio that showcases your new skills to potential employers.</p>
-            </div>
-            
-            <div class="content-block">
-                <h3><i class="fas fa-headset"></i> Support & Community</h3>
-                <p>Get help when you need it with our responsive support system. Connect with fellow learners and share your progress throughout the course.</p>
-            </div>
+<!-- Start Course Details -->
+<div class="cs-height_140 cs-height_lg_80"></div>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Course Meta Info -->
+      <div class="cs-course_details_meta">
+        {% if course.instructor %}
+        <span>Instructor: <a href="#" class="cs-accent_color">{{ course.instructor.get_full_name|default:course.instructor.username }}</a></span>
+        {% endif %}
+        <span class="cs-enrolled_number cs-accent_40_border_2">{{ course.enrollments.count }} students enrolled</span>
+      </div>
+      
+      <div class="cs-height_10 cs-height_lg_10"></div>
+      <h2>{{ course.title }}</h2>
+      
+      <!-- Course Rating and Badge -->
+      <div class="cs-seller_review">
+        {% if course.is_featured %}
+        <span class="cs-seller_badge cs-medium cs-primary_color cs-accent_bg_2">Featured Course</span>
+        {% endif %}
+        <div class="cs-review cs-accent_color_2 cs-accent_color_hover" data-review="4.5">
+          <div class="cs-review_in"></div>
         </div>
+      </div>
+      
+      <div class="cs-height_40 cs-height_lg_30"></div>
+      
+      <!-- Course Image -->
+      {% if course.thumbnail %}
+      <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="cs-course_image">
+      {% else %}
+      <img src="{% static 'landing/assets/img/online-education/course1.jpg' %}" alt="{{ course.title }}" class="cs-course_image">
+      {% endif %}
+      
+      <div class="cs-height_40 cs-height_lg_30"></div>
+      
+      <!-- Course Description -->
+      <div>
+        {{ course.description|default:"This course will provide you with comprehensive knowledge and practical skills to excel in your learning journey." }}
+      </div>
+      
+      <div class="cs-height_70 cs-height_lg_50"></div>
+      
+      <!-- Course Details Tabs -->
+      <div class="cs-tabs cs-fade_tabs cs-style1">
+        <div class="cs-medium">
+          <ul class="cs-tab_links cs-style3 cs-mp0 cs-primary_font">
+            <li class="active"><a href="#tab_one">Overview</a></li>
+            <li><a href="#tab_two">Curriculam</a></li>
+            <li><a href="#tab_three">What you'll learn</a></li>
+            <li><a href="#tab_four">Reviews</a></li>
+          </ul>
+        </div>
+        <div class="cs-height_40 cs-height_lg_30"></div>
+        
+        <!-- Tab Content -->
+        <div class="cs-tab_content">
+          <div id="tab_one" class="cs-tab active">
+            <h4 class="m-0">Overview</h4>
+            <div class="cs-height_10 cs-height_lg_10"></div>
+            <div>{{ course.description|default:"This comprehensive course is designed to provide you with practical knowledge and hands-on experience. Whether you're a beginner or looking to advance your skills, this course offers structured learning with real-world applications." }}</div>
+            <div class="cs-height_25 cs-height_lg_25"></div>
+            <ul class="cs-list cs-style3 cs-medium cs-mp0">
+              <li><i class="fas fa-angle-right"></i> Comprehensive learning materials and resources</li>
+              <li><i class="fas fa-angle-right"></i> Practical exercises and real-world projects</li>
+              <li><i class="fas fa-angle-right"></i> Expert guidance and support</li>
+              <li><i class="fas fa-angle-right"></i> Flexible self-paced learning</li>
+              <li><i class="fas fa-angle-right"></i> Industry-relevant skills and knowledge</li>
+              <li><i class="fas fa-angle-right"></i> Certificate upon successful completion</li>
+            </ul>
+          </div><!-- .cs-tab -->
+          
+          <div id="tab_two" class="cs-tab">
+            <h4 class="m-0">Curriculam</h4>
+            <div class="cs-height_10 cs-height_lg_10"></div>
+            {% if course.curriculum %}
+              <div class="course-content-formatted">{{ course.curriculum|safe_rich_text }}</div>
+            {% elif course.modules.exists %}
+              {% for module in course.modules.all %}
+              <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <h5 style="color: #2563eb; margin-bottom: 10px;">{{ module.title }}</h5>
+                {% if module.description %}
+                <p style="color: #64748b; margin-bottom: 10px;">{{ module.description }}</p>
+                {% endif %}
+                <small style="color: #64748b;">
+                  {% if module.duration %}{{ module.duration }} hours • {% endif %}
+                  {{ module.lessons.count }} lessons
+                </small>
+              </div>
+              {% endfor %}
+            {% else %}
+            <div>Detailed curriculum will be available soon. This course covers all essential topics with hands-on practical exercises and comprehensive learning modules designed to build your expertise step by step. <br><br>Our structured approach ensures you master each concept before moving to the next level, providing you with solid foundation and advanced skills needed in today's competitive environment.</div>
+            {% endif %}
+          </div><!-- .cs-tab -->
+          
+          <div id="tab_three" class="cs-tab">
+            <h4 class="m-0">What you'll learn</h4>
+            <div class="cs-height_10 cs-height_lg_10"></div>
+            {% if course.what_you_will_learn %}
+              <div class="course-content-formatted">{{ course.what_you_will_learn|safe_rich_text }}</div>
+            {% else %}
+            <div>By the end of this course, you will have gained comprehensive knowledge and practical skills. <br><br>Our carefully designed curriculum ensures you develop both theoretical understanding and hands-on experience needed to excel in your field.</div>
+            <div class="cs-height_25 cs-height_lg_25"></div>
+            <ul class="cs-list cs-style3 cs-medium cs-mp0">
+              <li><i class="fas fa-angle-right"></i> Master the fundamentals and advanced concepts</li>
+              <li><i class="fas fa-angle-right"></i> Apply knowledge through practical projects</li>
+              <li><i class="fas fa-angle-right"></i> Build real-world applications and solutions</li>
+              <li><i class="fas fa-angle-right"></i> Develop professional skills and best practices</li>
+              <li><i class="fas fa-angle-right"></i> Gain confidence in your technical abilities</li>
+              <li><i class="fas fa-angle-right"></i> Prepare for career advancement opportunities</li>
+            </ul>
+            {% endif %}
+          </div><!-- .cs-tab -->
+          
+          <div id="tab_four" class="cs-tab">
+            <h4 class="m-0">Student Reviews</h4>
+            <div class="cs-height_10 cs-height_lg_10"></div>
+            
+            {% if user.is_authenticated and is_enrolled %}
+            <div class="rating-actions mb-4 p-3" style="background: #f8fafc; border-radius: 8px; border-left: 4px solid #2563eb;">
+              {% if not user_rating %}
+              <p class="mb-2"><strong>Share your experience!</strong> Help other students by rating this course.</p>
+              <a href="{% url 'ratings:add_rating' course.id %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-star me-1"></i>Rate This Course
+              </a>
+              {% else %}
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <p class="mb-1"><strong>Your Rating:</strong> 
+                    <span class="text-warning">{{ user_rating.star_display }}</span> 
+                    ({{ user_rating.rating }}/5)
+                  </p>
+                  {% if user_rating.review_text %}
+                  <p class="mb-0 text-muted"><em>"{{ user_rating.review_text|truncatechars:80 }}"</em></p>
+                  {% endif %}
+                </div>
+                <a href="{% url 'ratings:add_rating' course.id %}" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-edit me-1"></i>Update
+                </a>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Rating Summary -->
+            {% if course.ratings.exists %}
+            <div class="rating-summary mb-4">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="text-center">
+                    <div class="display-4 fw-bold text-primary mb-1">{{ course|avg_rating|floatformat:1 }}</div>
+                    <div class="cs-review" data-review="{{ course|avg_rating|floatformat:1 }}">
+                      <div class="cs-review_in"></div>
+                    </div>
+                    <p class="text-muted mt-1">{{ course.ratings.count }} rating{{ course.ratings.count|pluralize }}</p>
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  {% for rating in course.ratings.all|slice:":3" %}
+                  <div class="d-flex align-items-start mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+                    <img src="{% static 'landing/assets/img/online-education/avatar1.jpg' %}" 
+                         alt="{{ rating.user.get_full_name|default:rating.user.username }}" 
+                         class="rounded-circle me-3" width="40" height="40">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center mb-1">
+                        <h6 class="mb-0 me-2">{{ rating.user.get_full_name|default:rating.user.username }}</h6>
+                        <small class="text-warning">{{ rating.star_display }}</small>
+                      </div>
+                      <small class="text-muted">{{ rating.created_at|date:"M d, Y" }}</small>
+                      {% if rating.review_text %}
+                      <p class="mt-2 mb-0">{{ rating.review_text|truncatechars:150 }}</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                  
+                  {% if course.ratings.count > 3 %}
+                  <div class="text-center">
+                    <a href="{% url 'ratings:course_reviews' course.id %}" class="btn btn-outline-primary">
+                      View All {{ course.ratings.count }} Reviews
+                    </a>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-star-half-alt display-1 text-muted mb-3"></i>
+              <h5 class="mb-2">No reviews yet</h5>
+              <p class="text-muted">Be the first to share your experience with this course!</p>
+            </div>
+            {% endif %}
+          </div><!-- .cs-tab -->
+        </div>
+      </div>
     </div>
-</section>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="cs-height_0 cs-height_lg_40"></div>
+      
+      <!-- Enrollment Card -->
+      <div class="cs-enroll_card cs-accent_5_bg">
+        <h3 class="cs-enroll_title">Course Cost</h3>
+        <div class="cs-enroll_price">
+          {% if course.is_free_course %}
+          <span class="cs-bold cs-primary_color">Free</span>
+          {% else %}
+          <span class="cs-bold cs-primary_color">₹{{ course.total_price|floatformat:0 }}</span>
+          {% if course.original_price and course.original_price > course.total_price %}
+          <span class="cs-previous_price cs-medium">₹{{ course.original_price|floatformat:0 }}</span>
+          {% endif %}
+          {% endif %}
+        </div>
+        <div class="cs-height_10 cs-height_lg_10"></div>
+        
+        {% if is_enrolled %}
+        <a href="{% url 'student_portal:dashboard' %}" class="cs-btn cs-style1 cs-btn_lg cs-medium cs-primary_font cs-accent_bg cs-white">
+          Go to Course
+        </a>
+        {% else %}
+        <form method="post" action="{% url 'landing:enroll_course' course.id %}">
+          {% csrf_token %}
+          <button type="submit" class="cs-btn cs-style1 cs-btn_lg cs-medium cs-primary_font cs-accent_bg_2 cs-accent_border_2 cs-primary_color cs-accent_bg_hover cs-white_hover cs-accent_border_hover">
+            Enroll Now
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      
+      <!-- Course Features -->
+      <div class="cs-list cs-style2 cs-accent_5_bg">
+        <h3 class="cs-list_title">Course Features</h3>
+        <ul class="cs-mp0">
+          <li>
+            <span><i class="far fa-chart-bar"></i> Course level: </span>
+            <span>{{ course.difficulty_level|default:"All Levels" }}</span>
+          </li>
+          <li>
+            <span><i class="far fa-clock"></i> Duration: </span>
+            <span>{% if course.duration %}{{ course.duration }} hours{% else %}Self-paced{% endif %}</span>
+          </li>
+          <li>
+            <span><i class="far fa-list-alt"></i> Modules: </span>
+            <span>{{ course.modules.count|default:"Multiple" }}</span>
+          </li>
+          <li>
+            <span><i class="far fa-calendar-alt"></i> Last Update: </span>
+            <span>{{ course.updated_at|date:"M d, Y" }}</span>
+          </li>
+          <li>
+            <span><i class="fas fa-language"></i> Language: </span>
+            <span>{{ course.language|default:"English" }}</span>
+          </li>
+          {% if course.certificate_available %}
+          <li>
+            <span><i class="fas fa-certificate"></i> Certificate: </span>
+            <span>Available</span>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cs-height_140 cs-height_lg_80"></div>
+<!-- End Course Details -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Course detail page functionality
+$(document).ready(function() {
+  console.log('Course detail page loaded');
+  
+  // Initialize star ratings using the main.js review function
+  $('.cs-review').each(function() {
+    var review = $(this).data('review');
+    var reviewVal = review * 20 + '%';
+    $(this).find('.cs-review_in').css('width', reviewVal);
+  });
+  
+  // Tab functionality using main.js structure
+  $('.cs-tabs.cs-fade_tabs .cs-tab_links a').on('click', function(e) {
+    var currentAttrValue = $(this).attr('href');
+    $('.cs-tabs ' + currentAttrValue)
+      .fadeIn(400)
+      .siblings()
+      .hide();
+    $(this).parents('li').addClass('active').siblings().removeClass('active');
+    e.preventDefault();
+  });
+  
+  // Ensure first tab is active on load
+  setTimeout(function() {
+    if ($('.cs-tab_links li.active').length === 0) {
+      $('.cs-tab_links li:first-child').addClass('active');
+      $('.cs-tab:first-child').addClass('active').show();
+    }
+  }, 100);
+  
+  // Clean up rich text content
+  $('.course-content-formatted').each(function() {
+    // Remove empty paragraphs
+    $(this).find('p:empty').remove();
+    $(this).find('p').filter(function() {
+      return $.trim($(this).text()) === '';
+    }).remove();
+    
+    // Clean up HTML
+    var html = $(this).html();
+    if (html) {
+      html = html.replace(/<p><br><\/p>/g, '');
+      html = html.replace(/<p>&nbsp;<\/p>/g, '');
+      html = html.replace(/<p>\s*<\/p>/g, '');
+      $(this).html(html);
+    }
+  });
+  
+  // Debug logging
+  console.log('Tabs initialized:', $('.cs-tab_links a').length);
+  console.log('Tab contents:', $('.cs-tab').length);
+  console.log('Active tab:', $('.cs-tab.active').attr('id'));
+});
+</script>
 {% endblock %}

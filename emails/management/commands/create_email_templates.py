@@ -383,6 +383,226 @@ Best regards,
 
 Need help? Contact us at {{ support_email }}
                 '''
+            },
+            {
+                'name': 'Enrollment Confirmation Email Template',
+                'template_type': 'enrollment_confirmation',
+                'subject': 'Welcome to {{ course.title }} - {{ site_name }}',
+                'html_content': '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollment Confirmation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fffe;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(189, 208, 202, 0.2);
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            padding: 40px 30px;
+            color: white;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-section {
+            background: #f8fffe;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #28a745;
+        }
+        .course-details {
+            background: #e8f5e8;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 18px 40px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px auto;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        .footer {
+            background: #2C5F5F;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer a {
+            color: #BDD0CA;
+            text-decoration: none;
+        }
+        .next-steps {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+        .celebration-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="celebration-icon">*</div>
+            <h1>Enrollment Confirmed!</h1>
+            <p>Welcome to {{ course.title }}</p>
+        </div>
+        
+        <div class="content">
+            <p style="font-size: 18px; color: #2C3E50; margin-bottom: 20px;">
+                Hi {{ user.name }},
+            </p>
+            
+            <div class="welcome-section">
+                <h3 style="color: #28a745; margin-bottom: 15px;">> Welcome to Your Learning Journey!</h3>
+                <p>Congratulations! You have successfully enrolled in <strong>{{ course.title }}</strong>. We're excited to have you join our community of learners!</p>
+            </div>
+
+            <div class="course-details">
+                <h3 style="color: #2C5F5F; margin-bottom: 20px;">- Course Details</h3>
+                <div class="detail-row">
+                    <span><strong>Course:</strong></span>
+                    <span>{{ course.title }}</span>
+                </div>
+                {% if course.description %}
+                <div class="detail-row">
+                    <span><strong>Description:</strong></span>
+                    <span>{{ course.description|truncatechars:100 }}</span>
+                </div>
+                {% endif %}
+                <div class="detail-row">
+                    <span><strong>Enrolled On:</strong></span>
+                    <span>{{ enrollment.enrolled_on|date:"F d, Y" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span><strong>Payment Status:</strong></span>
+                    <span style="color: #28a745;"><strong>{{ enrollment.payment_status|title }}</strong></span>
+                </div>
+                {% if enrollment.total_amount > 0 %}
+                <div class="detail-row">
+                    <span><strong>Total Amount Paid:</strong></span>
+                    <span><strong>Rs.{{ enrollment.total_amount }}</strong></span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="next-steps">
+                <h3 style="color: #2C5F5F; margin-bottom: 20px;">* What's Next?</h3>
+                <ul style="padding-left: 20px; color: #2C3E50;">
+                    <li style="margin: 10px 0;">Access your student dashboard to view course materials</li>
+                    <li style="margin: 10px 0;">Start with the first lesson or module</li>
+                    <li style="margin: 10px 0;">Track your progress and complete assignments</li>
+                    <li style="margin: 10px 0;">Join our community discussions and forums</li>
+                    <li style="margin: 10px 0;">Download your tax invoice (attached to this email)</li>
+                </ul>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="{{ student_portal_url|default:'/student/' }}" class="cta-button">
+                        > Start Learning Now
+                    </a>
+                </div>
+            </div>
+            
+            <p style="margin-top: 25px;">If you have any questions or need assistance, don't hesitate to reach out to our support team. We're here to help you succeed!</p>
+            
+            <p style="margin-top: 20px; color: #666; font-style: italic;">Happy Learning! *</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ site_name }} Team</strong></p>
+            <p>Need help? Contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a></p>
+            <p style="font-size: 12px; margin-top: 15px; opacity: 0.7;">
+                This email was sent to {{ user.email }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+                ''',
+                'text_content': '''
+ENROLLMENT CONFIRMED!
+
+Hi {{ user.name }},
+
+Congratulations! You have successfully enrolled in {{ course.title }}. We're excited to have you join our community of learners!
+
+COURSE DETAILS:
+- Course: {{ course.title }}
+{% if course.description %}- Description: {{ course.description|truncatechars:100 }}{% endif %}
+- Enrolled On: {{ enrollment.enrolled_on|date:"F d, Y" }}
+- Payment Status: {{ enrollment.payment_status|title }}
+{% if enrollment.total_amount > 0 %}- Total Amount Paid: Rs.{{ enrollment.total_amount }}{% endif %}
+
+WHAT'S NEXT?
+* Access your student dashboard to view course materials
+* Start with the first lesson or module  
+* Track your progress and complete assignments
+* Join our community discussions and forums
+* Download your tax invoice (attached to this email)
+
+Ready to start learning? Visit: {{ student_portal_url|default:"/student/" }}
+
+If you have any questions or need assistance, don't hesitate to reach out to our support team.
+
+Happy Learning! *
+
+Best regards,
+{{ site_name }} Team
+
+Need help? Contact us at {{ support_email }}
+                '''
             }
         ]
 

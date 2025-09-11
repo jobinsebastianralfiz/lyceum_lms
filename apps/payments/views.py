@@ -7,6 +7,9 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from datetime import date, datetime
 from decimal import Decimal
+import logging
+
+logger = logging.getLogger(__name__)
 
 from apps.courses.models import Course
 from .models import Enrollment, Payment, TaxInvoice, InstallmentPlan
@@ -111,7 +114,7 @@ class CourseEnrollmentView(APIView):
                 # 3. Create Tax Invoice for all payments (including zero-tax payments)
                 if not course.is_free:  # Create invoice for all paid courses
                     invoice_number = f"INV-{enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d')}"
-                    TaxInvoice.objects.create(
+                    tax_invoice = TaxInvoice.objects.create(
                         enrollment=enrollment,
                         payment=payment,
                         invoice_number=invoice_number,
@@ -120,6 +123,32 @@ class CourseEnrollmentView(APIView):
                         tax_amount=tax_amount,
                         total_amount=total_amount
                     )
+                    
+                    # Send enrollment confirmation email with invoice
+                    try:
+                        from emails.invoice_generator import generate_invoice_pdf
+                        from emails.utils import send_enrollment_confirmation_email
+                        
+                        # Generate PDF invoice
+                        invoice_pdf_content = generate_invoice_pdf(tax_invoice)
+                        
+                        # Send enrollment confirmation email with invoice attachment
+                        send_enrollment_confirmation_email(
+                            enrollment, 
+                            include_invoice=True, 
+                            invoice_pdf_content=invoice_pdf_content
+                        )
+                        
+                    except Exception as email_error:
+                        logger.error(f"Error sending enrollment email: {str(email_error)}")
+                        # Continue without failing the payment process
+                else:
+                    # For free courses, still send enrollment confirmation without invoice
+                    try:
+                        from emails.utils import send_enrollment_confirmation_email
+                        send_enrollment_confirmation_email(enrollment, include_invoice=False)
+                    except Exception as email_error:
+                        logger.error(f"Error sending enrollment email: {str(email_error)}")
                 
                 return Response({
                     "message": "Course purchased and enrollment created successfully",

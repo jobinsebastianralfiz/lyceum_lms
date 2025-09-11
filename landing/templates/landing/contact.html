@@ -1,0 +1,188 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Uptrail{% endblock %}
+{% block description %}Get in touch with Uptrail. We're here to help you with your learning journey.{% endblock %}
+
+{% block content %}
+<div class="cs-height_150 cs-height_lg_120"></div>
+
+<!-- Start Page Heading -->
+<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 300px;">
+  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+  <div class="container">
+    <div class="cs-hero_text">
+      <h1 class="cs-hero_title">Contact <b>Us</b></h1>
+      <ol class="cs-breadcrumb cs-style2 cs-type1">
+        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
+        <li class="cs-breadcrumb_item">Contact</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<!-- End Page Heading -->
+
+<!-- Start Content -->
+<div class="cs-height_140 cs-height_lg_80"></div>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="cs-text_box cs-style1">
+        <h2 class="cs-text_box_title">Get in Touch</h2>
+        <div class="cs-height_30"></div>
+        <p>We're here to help and answer any questions you might have. We look forward to hearing from you!</p>
+        <div class="cs-height_40"></div>
+        
+        <!-- Contact Information -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="cs-iconbox cs-style4">
+              <div class="cs-iconbox_icon cs-accent_color">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="cs-iconbox_right">
+                <h3 class="cs-iconbox_title">Email Support</h3>
+                <div class="cs-iconbox_subtitle">
+                  <a href="mailto:info@uptrail.info">info@uptrail.info</a>
+                </div>
+              </div>
+            </div>
+            <div class="cs-height_30"></div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="cs-iconbox cs-style4">
+              <div class="cs-iconbox_icon cs-accent_color">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="cs-iconbox_right">
+                <h3 class="cs-iconbox_title">Phone Support</h3>
+                <div class="cs-iconbox_subtitle">+91 123 456 7890</div>
+              </div>
+            </div>
+            <div class="cs-height_30"></div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="cs-iconbox cs-style4">
+              <div class="cs-iconbox_icon cs-accent_color">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="cs-iconbox_right">
+                <h3 class="cs-iconbox_title">Location</h3>
+                <div class="cs-iconbox_subtitle">Kerala, India</div>
+              </div>
+            </div>
+            <div class="cs-height_30"></div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="cs-iconbox cs-style4">
+              <div class="cs-iconbox_icon cs-accent_color">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="cs-iconbox_right">
+                <h3 class="cs-iconbox_title">Support Hours</h3>
+                <div class="cs-iconbox_subtitle">Mon - Fri: 9:00 AM - 6:00 PM IST</div>
+              </div>
+            </div>
+            <div class="cs-height_30"></div>
+          </div>
+        </div>
+        
+        <div class="cs-height_40"></div>
+        
+        <!-- FAQ Section -->
+        <h3 class="cs-text_box_title">Frequently Asked Questions</h3>
+        <div class="cs-height_30"></div>
+        
+        <div class="cs-accordian cs-style1">
+          <div class="cs-accordian_item active">
+            <div class="cs-accordian_head">
+              <h3 class="cs-accordian_title">How do I enroll in a course?</h3>
+              <span class="cs-accordian_toggle">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </div>
+            <div class="cs-accordian_body" style="display: block;">
+              <div class="cs-accordian_body_in">
+                <p>Simply browse our course catalog, select the course you're interested in, and click "Enroll Now". You'll need to create an account and complete the payment process for paid courses.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cs-accordian_item">
+            <div class="cs-accordian_head">
+              <h3 class="cs-accordian_title">Are there any free courses available?</h3>
+              <span class="cs-accordian_toggle">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </div>
+            <div class="cs-accordian_body">
+              <div class="cs-accordian_body_in">
+                <p>Yes! We offer several free courses to help you get started. Look for courses marked as "Free" in our course catalog.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cs-accordian_item">
+            <div class="cs-accordian_head">
+              <h3 class="cs-accordian_title">Can I get a refund if I'm not satisfied?</h3>
+              <span class="cs-accordian_toggle">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </div>
+            <div class="cs-accordian_body">
+              <div class="cs-accordian_body_in">
+                <p>Yes, we offer a 7-day money-back guarantee. Please check our <a href="{% url 'landing:refund_policy' %}">Refund Policy</a> for complete details.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cs-accordian_item">
+            <div class="cs-accordian_head">
+              <h3 class="cs-accordian_title">How long do I have access to a course?</h3>
+              <span class="cs-accordian_toggle">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </div>
+            <div class="cs-accordian_body">
+              <div class="cs-accordian_body_in">
+                <p>Once you enroll in a course, you have lifetime access to all course materials, including any future updates.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cs-accordian_item">
+            <div class="cs-accordian_head">
+              <h3 class="cs-accordian_title">Do you provide certificates?</h3>
+              <span class="cs-accordian_toggle">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </div>
+            <div class="cs-accordian_body">
+              <div class="cs-accordian_body_in">
+                <p>Yes, you'll receive a certificate of completion after successfully finishing a course. Certificates can be downloaded from your dashboard.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="cs-height_50"></div>
+        
+        <!-- Response Time Notice -->
+        <div class="cs-note cs-style1">
+          <div class="cs-note_left">
+            <i class="fas fa-info-circle cs-accent_color"></i>
+          </div>
+          <div class="cs-note_right">
+            <p><strong>Response Time:</strong> We typically respond to all inquiries within 24 hours during business days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cs-height_140 cs-height_lg_80"></div>
+<!-- End Content -->
+{% endblock %}

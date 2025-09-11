@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Sum
 from django.core.paginator import Paginator
 from django.utils import timezone
 from datetime import timedelta
@@ -75,6 +75,21 @@ def mentor_dashboard(request):
     critical_percentage = round((risk_distribution['critical'] / total_students * 100), 1) if total_students > 0 else 0
     high_percentage = round((risk_distribution['high'] / total_students * 100), 1) if total_students > 0 else 0
     
+    # Get recent mentoring sessions with pagination
+    sessions_page = request.GET.get('sessions_page', 1)
+    recent_sessions_qs = MentorSession.objects.filter(
+        mentor=request.user
+    ).select_related('student', 'course').order_by('-session_date')
+    
+    sessions_paginator = Paginator(recent_sessions_qs, 5)  # 5 per page
+    recent_sessions = sessions_paginator.get_page(sessions_page)
+    
+    # Session statistics for current mentor
+    total_sessions = recent_sessions_qs.count()
+    sessions_this_week = recent_sessions_qs.filter(
+        session_date__gte=timezone.now() - timedelta(days=7)
+    ).count()
+    
     context = {
         'risk_distribution': risk_distribution,
         'critical_students': critical_students,
@@ -84,6 +99,10 @@ def mentor_dashboard(request):
         'inactive_percentage': round((total_students - active_students) / total_students * 100, 1) if total_students > 0 else 0,
         'critical_percentage': critical_percentage,
         'high_percentage': high_percentage,
+        # Session data
+        'recent_sessions': recent_sessions,
+        'total_sessions': total_sessions,
+        'sessions_this_week': sessions_this_week,
     }
     
     return render(request, 'custom_admin/mentor/dashboard.html', context)
@@ -379,6 +398,86 @@ def create_mentor_session(request):
             logger.error(f'Error creating mentor session: {e}', exc_info=True)
     
     return render(request, 'custom_admin/mentor/create_session.html', context)
+
+
+@login_required
+def mentor_sessions_list(request):
+    """List all mentor sessions by the current mentor"""
+    if not hasattr(request.user, 'role') or request.user.role not in ['admin', 'instructor']:
+        messages.error(request, 'Access denied. Mentor role required.')
+        return redirect('custom_admin:login')
+    
+    # Filter parameters
+    student_id = request.GET.get('student', 'all')
+    course_id = request.GET.get('course', 'all')
+    session_type = request.GET.get('session_type', 'all')
+    search = request.GET.get('search', '')
+    
+    # Base queryset - sessions by current mentor
+    sessions = MentorSession.objects.filter(
+        mentor=request.user
+    ).select_related('student', 'course')
+    
+    # Apply filters
+    if student_id != 'all':
+        sessions = sessions.filter(student_id=student_id)
+    
+    if course_id != 'all':
+        sessions = sessions.filter(course_id=course_id)
+    
+    if session_type != 'all':
+        sessions = sessions.filter(session_type=session_type)
+    
+    if search:
+        sessions = sessions.filter(
+            Q(student__name__icontains=search) |
+            Q(student__email__icontains=search) |
+            Q(topics_discussed__icontains=search) |
+            Q(action_items__icontains=search)
+        )
+    
+    sessions = sessions.order_by('-session_date')
+    
+    # Pagination
+    paginator = Paginator(sessions, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get filter options
+    students = User.objects.filter(
+        role='student', 
+        mentoring_sessions__mentor=request.user
+    ).distinct().order_by('name')
+    
+    courses = Course.objects.filter(
+        is_published=True,
+        mentoring_sessions__mentor=request.user
+    ).distinct().order_by('title')
+    
+    # Session statistics
+    total_sessions = sessions.count()
+    total_duration = sessions.aggregate(
+        total=Sum('duration_minutes')
+    )['total'] or 0
+    avg_duration = sessions.aggregate(
+        avg=Avg('duration_minutes')
+    )['avg'] or 0
+    
+    context = {
+        'page_obj': page_obj,
+        'students': students,
+        'courses': courses,
+        'session_types': MentorSession.SESSION_TYPES,
+        'student_id': student_id,
+        'course_id': course_id,
+        'session_type': session_type,
+        'search': search,
+        'total_sessions': total_sessions,
+        'total_duration': total_duration,
+        'avg_duration': round(avg_duration, 1),
+    }
+    
+    return render(request, 'custom_admin/mentor/sessions_list.html', context)
 
 
 @login_required

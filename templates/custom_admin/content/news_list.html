@@ -1,0 +1,298 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}News Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-news me-2"></i>News Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+            <a href="{% url 'custom_admin:news_create' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-plus"></i> Add News
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_news }}</h4>
+                <p class="mb-0 small">Total News</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.published_news }}</h4>
+                <p class="mb-0 small">Published</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.draft_news }}</h4>
+                <p class="mb-0 small">Drafts</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.featured_news }}</h4>
+                <p class="mb-0 small">Featured</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search" 
+                       placeholder="Title, content..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Category</label>
+                <select class="form-select form-select-sm" name="category">
+                  <option value="">All Categories</option>
+                  {% for category_code, category_name in news_categories %}
+                    <option value="{{ category_code }}" {% if category_filter == category_code %}selected{% endif %}>
+                      {{ category_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                  <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                  <option value="featured" {% if status_filter == 'featured' %}selected{% endif %}>Featured</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:news_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- News Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 50px;">Image</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Author</th>
+                <th>Views</th>
+                <th>Published</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for article in news %}
+              <tr>
+                <td>
+                  {% if article.thumbnail %}
+                    <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}" 
+                         class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                  {% else %}
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                         style="width: 40px; height: 40px;">
+                      <i class="ti ti-news text-muted"></i>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div>
+                    <h6 class="mb-1">
+                      <a href="#" class="text-decoration-none">
+                        {{ article.title|truncatechars:50 }}
+                      </a>
+                    </h6>
+                    {% if article.excerpt %}
+                      <p class="small text-muted mb-0">{{ article.excerpt|truncatechars:80 }}</p>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ article.get_category_display }}
+                  </span>
+                </td>
+                <td>
+                  <div>
+                    {% if article.is_published %}
+                      <span class="badge bg-success">Published</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Draft</span>
+                    {% endif %}
+                    {% if article.is_featured %}
+                      <span class="badge bg-warning ms-1">Featured</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-xs bg-primary-subtle rounded-circle me-2">
+                      <span class="small text-primary">{{ article.created_by.name|first|upper }}</span>
+                    </div>
+                    <span class="small">{{ article.created_by.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark">{{ article.view_count|default:0 }}</span>
+                </td>
+                <td>
+                  {% if article.is_published and article.published_at %}
+                    <div class="small">
+                      {{ article.published_at|date:"M d, Y" }}<br>
+                      <span class="text-muted">{{ article.published_at|date:"H:i" }}</span>
+                    </div>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="#" class="btn btn-outline-primary btn-sm" title="View/Edit">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    {% if article.is_published %}
+                      <a href="/api/content/news/{{ article.slug }}/" target="_blank"
+                         class="btn btn-outline-success btn-sm" title="View Public">
+                        <i class="ti ti-external-link"></i>
+                      </a>
+                    {% endif %}
+                    <button class="btn btn-outline-danger btn-sm" title="Delete"
+                            onclick="confirmDelete({{ article.id }}, '{{ article.title|escapejs }}')">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-news-off fs-2 mb-3 d-block"></i>
+                    <h6>No news articles found</h6>
+                    <p class="mb-0">No articles match your current filters.</p>
+                    <a href="{% url 'custom_admin:news_create' %}" class="btn btn-primary btn-sm mt-3">
+                      <i class="ti ti-plus me-1"></i>Create First Article
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if news.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ news.start_index }} to {{ news.end_index }} of {{ news.paginator.count }} articles
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if news.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ news.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for page_num in news.paginator.page_range %}
+                {% if page_num == news.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > news.number|add:-3 and page_num < news.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if news.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ news.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the article "<span id="articleTitle"></span>"?</p>
+        <p class="text-danger small mb-0">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Article</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(articleId, articleTitle) {
+  document.getElementById('articleTitle').textContent = articleTitle;
+  document.getElementById('confirmDeleteBtn').onclick = function() {
+    // Here you would implement the actual delete functionality
+    // For now, we'll just show an alert
+    alert('Delete functionality needs to be implemented in the backend');
+    // You could make an AJAX call here to delete the article
+    // then reload the page or remove the row from the table
+  };
+  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

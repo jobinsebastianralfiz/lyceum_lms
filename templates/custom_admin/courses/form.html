@@ -3,6 +3,11 @@
 
 {% block title %}{% if course %}Edit Course{% else %}Create Course{% endif %} - CodeLearn LMS Admin{% endblock %}
 
+{% block extra_css %}
+<!-- Quill Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-lg-8 mx-auto">
@@ -58,6 +63,26 @@
             <label for="description" class="form-label">Course Description <span class="text-danger">*</span></label>
             <textarea class="form-control" id="description" name="description" rows="4" required
                       placeholder="Provide a detailed description of what students will learn">{{ course.description|default:'' }}</textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="curriculum" class="form-label">Course Curriculum</label>
+            <div id="curriculum-editor" style="height: 200px; border: 1px solid #ced4da; border-radius: 0.375rem;"></div>
+            <textarea id="curriculum" name="curriculum" style="display: none;">{{ course.curriculum|default:'' }}</textarea>
+            <div class="form-text">
+              <i class="ti ti-info-circle me-1"></i>
+              This content will be displayed on the course detail page. Use the toolbar to format your text with headings, lists, and emphasis.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="what_you_will_learn" class="form-label">What Students Will Learn</label>
+            <div id="learning-editor" style="height: 200px; border: 1px solid #ced4da; border-radius: 0.375rem;"></div>
+            <textarea id="what_you_will_learn" name="what_you_will_learn" style="display: none;">{{ course.what_you_will_learn|default:'' }}</textarea>
+            <div class="form-text">
+              <i class="ti ti-info-circle me-1"></i>
+              Describe specific skills, knowledge areas, or competencies students will gain. Use formatting to make content more readable.
+            </div>
           </div>
 
           <!-- Pricing Information -->
@@ -167,6 +192,25 @@
   </div>
 </div>
 
+<style>
+.enhanced-textarea {
+  font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 150px;
+}
+
+.enhanced-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+}
+
+.form-text i {
+  color: #2563eb;
+}
+</style>
+
 <script>
 // Toggle pricing fields based on free course checkbox
 document.getElementById('is_free').addEventListener('change', function() {
@@ -196,10 +240,77 @@ document.getElementById('thumbnail').addEventListener('change', function() {
   }
 });
 
-// Auto-format tags
-document.getElementById('tags').addEventListener('blur', function() {
-  let tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
-  this.value = tags.join(', ');
+// Auto-format tags (remove if no tags field exists)
+if (document.getElementById('tags')) {
+  document.getElementById('tags').addEventListener('blur', function() {
+    let tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    this.value = tags.join(', ');
+  });
+}
+</script>
+
+<!-- Quill Editor JavaScript -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+// Initialize Quill editors
+document.addEventListener('DOMContentLoaded', function() {
+  // Configure Quill toolbar
+  const toolbarOptions = [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['clean']
+  ];
+
+  // Initialize Curriculum Editor
+  const curriculumEditor = new Quill('#curriculum-editor', {
+    modules: {
+      toolbar: toolbarOptions
+    },
+    theme: 'snow',
+    placeholder: 'Enter detailed curriculum outline - what topics will be covered...\n\nYou can use:\n• Headings for modules/sections\n• Bullet points for topics\n• Numbered lists for sequential content'
+  });
+
+  // Initialize Learning Outcomes Editor
+  const learningEditor = new Quill('#learning-editor', {
+    modules: {
+      toolbar: toolbarOptions
+    },
+    theme: 'snow',
+    placeholder: 'Describe what students will learn and achieve...\n\nExamples:\n• Master the fundamentals of [topic]\n• Build real-world projects\n• Apply [skills] in practical scenarios'
+  });
+
+  // Load existing content
+  const curriculumTextarea = document.getElementById('curriculum');
+  const learningTextarea = document.getElementById('what_you_will_learn');
+
+  if (curriculumTextarea.value) {
+    curriculumEditor.root.innerHTML = curriculumTextarea.value;
+  }
+  
+  if (learningTextarea.value) {
+    learningEditor.root.innerHTML = learningTextarea.value;
+  }
+
+  // Sync editor content to hidden textareas on change
+  curriculumEditor.on('text-change', function() {
+    curriculumTextarea.value = curriculumEditor.root.innerHTML;
+  });
+
+  learningEditor.on('text-change', function() {
+    learningTextarea.value = learningEditor.root.innerHTML;
+  });
+
+  // Sync content before form submission
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function() {
+      curriculumTextarea.value = curriculumEditor.root.innerHTML;
+      learningTextarea.value = learningEditor.root.innerHTML;
+    });
+  }
 });
 </script>
 {% endblock %}

@@ -1,0 +1,434 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Dashboard - {{ request.user.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* Header */
+    .header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .header h1 {
+        font-size: 32px;
+        font-weight: 300;
+        color: #2d3748;
+        margin: 0 0 10px 0;
+    }
+
+    .header p {
+        color: #718096;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    /* Grid Layout */
+    .grid {
+        display: grid;
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .grid-2 {
+        grid-template-columns: 2fr 1fr;
+    }
+
+    /* Cards */
+    .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 20px;
+        background: #f7fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Stats */
+    .stat {
+        text-align: center;
+        padding: 30px 20px;
+    }
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: #38a169;
+    }
+
+    /* Course Items */
+    .course {
+        padding: 20px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .course:last-child {
+        border-bottom: none;
+    }
+
+    .course-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #2d3748;
+        margin: 0 0 12px 0;
+    }
+
+    .progress {
+        height: 6px;
+        background: #f1f5f9;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: #4299e1;
+        transition: width 0.6s ease;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #718096;
+    }
+
+    /* Activity */
+    .activity {
+        display: flex;
+        align-items: start;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .activity:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        background: #edf2f7;
+        color: #4a5568;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .activity-content h4 {
+        font-size: 14px;
+        font-weight: 500;
+        color: #2d3748;
+        margin: 0 0 4px 0;
+    }
+
+    .activity-content p {
+        font-size: 12px;
+        color: #718096;
+        margin: 0;
+    }
+
+    /* Actions */
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+    }
+
+    .action {
+        display: block;
+        text-align: center;
+        padding: 20px;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #4a5568;
+        transition: all 0.2s;
+    }
+
+    .action:hover {
+        background: #edf2f7;
+        text-decoration: none;
+        color: #2d3748;
+        border-color: #cbd5e0;
+    }
+
+    .action-icon {
+        font-size: 20px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .action-label {
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Empty States */
+    .empty {
+        text-align: center;
+        padding: 40px;
+        color: #a0aec0;
+    }
+
+    .empty i {
+        font-size: 32px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+
+    .empty h4 {
+        font-size: 16px;
+        margin: 0 0 8px 0;
+        color: #718096;
+    }
+
+    .empty p {
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #4299e1;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 12px;
+    }
+
+    .btn:hover {
+        background: #3182ce;
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px 15px;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Welcome back, {{ request.user.name|default:request.user.username }}</h1>
+        <p>{{ current_time|date:"l, F j, Y" }}</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-4">
+        <div class="card">
+            <div class="card-body stat">
+                <div class="stat-number">{{ completed_videos_count|default:0 }}</div>
+                <div class="stat-label">Videos</div>
+                <div class="stat-change">{{ videos_this_week|default:0 }} this week</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body stat">
+                <div class="stat-number">{{ submitted_assignments|default:0 }}</div>
+                <div class="stat-label">Assignments</div>
+                <div class="stat-change">{{ assignments_this_week|default:0 }} this week</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body stat">
+                <div class="stat-number">{{ quiz_attempts_count|default:0 }}</div>
+                <div class="stat-label">Quizzes</div>
+                <div class="stat-change">{{ average_quiz_score|floatformat:0|default:0 }}% average</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body stat">
+                <div class="stat-number">{{ modules_completed|default:0 }}</div>
+                <div class="stat-label">Modules</div>
+                <div class="stat-change">Completed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-2">
+        <!-- Courses -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Course Progress</h2>
+            </div>
+            <div class="card-body">
+                {% for enrollment in enrollments %}
+                {% if enrollment.active %}
+                <div class="course">
+                    <h3 class="course-title">{{ enrollment.course.title }}</h3>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ enrollment.progress_percentage|default:0 }}%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>{{ enrollment.progress_percentage|floatformat:0|default:0 }}%</span>
+                        <span>{{ enrollment.completed_videos|default:0 }}/{{ enrollment.total_videos|default:0 }} videos</span>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="empty">
+                    <i class="fas fa-book"></i>
+                    <h4>No courses enrolled</h4>
+                    <p>Start your learning journey</p>
+                    <a href="{% url 'student_portal:my_courses' %}" class="btn">Browse Courses</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Activity</h2>
+            </div>
+            <div class="card-body">
+                {% for progress in recent_progress|slice:":6" %}
+                <div class="activity">
+                    <div class="activity-icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>{{ progress.video_lesson.title|truncatechars:30 }}</h4>
+                        <p>{{ progress.last_watched_at|timesince }} ago</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty">
+                    <i class="fas fa-clock"></i>
+                    <h4>No activity</h4>
+                    <p>Start learning to see activity</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Quick Actions</h2>
+        </div>
+        <div class="card-body">
+            <div class="actions">
+                <a href="{% url 'student_portal:my_courses' %}" class="action">
+                    <i class="fas fa-book action-icon"></i>
+                    <div class="action-label">Courses</div>
+                </a>
+                <a href="{% url 'student_portal:my_courses' %}" class="action">
+                    <i class="fas fa-tasks action-icon"></i>
+                    <div class="action-label">Assignments</div>
+                </a>
+                <a href="{% url 'student_portal:mentoring_dashboard' %}" class="action">
+                    <i class="fas fa-user-graduate action-icon"></i>
+                    <div class="action-label">Mentoring</div>
+                </a>
+                <a href="{% url 'student_portal:profile' %}" class="action">
+                    <i class="fas fa-user action-icon"></i>
+                    <div class="action-label">Profile</div>
+                </a>
+                <a href="{% url 'student_portal:my_payments' %}" class="action">
+                    <i class="fas fa-credit-card action-icon"></i>
+                    <div class="action-label">Payments</div>
+                </a>
+                <a href="{% url 'student_portal:my_invoices' %}" class="action">
+                    <i class="fas fa-file-invoice action-icon"></i>
+                    <div class="action-label">Invoices</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bars
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 300);
+    });
+});
+</script>
+{% endblock %}

@@ -12,7 +12,7 @@ def verify_email(request, token):
     if success:
         messages.success(request, message)
         # Redirect to login page after successful verification
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     else:
         messages.error(request, message)
         return redirect('landing:register')

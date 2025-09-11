@@ -1,0 +1,277 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}News Details: {{ news.title|truncatechars:50 }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-news me-2"></i>News Details: {{ news.title|truncatechars:50 }}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:news_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to News
+            </a>
+          </div>
+        </div>
+
+        <!-- News Status Card -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="alert alert-light border d-flex align-items-center">
+              <div class="me-3">
+                {% if news.is_published %}
+                  <span class="badge bg-success fs-6 px-3 py-2">Published</span>
+                {% else %}
+                  <span class="badge bg-secondary fs-6 px-3 py-2">Draft</span>
+                {% endif %}
+                {% if news.is_featured %}
+                  <span class="badge bg-warning fs-6 px-3 py-2 ms-2">Featured</span>
+                {% endif %}
+              </div>
+              <div class="flex-fill">
+                <h6 class="mb-1">Created on {{ news.created_at|date:"F d, Y \a\\t H:i" }}</h6>
+                <p class="mb-0 text-muted">
+                  Category: <strong>{{ news.get_category_display }}</strong>
+                  {% if news.published_at %}
+                    • Published: <strong>{{ news.published_at|date:"M d, Y H:i" }}</strong>
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-8">
+            <!-- News Content Display -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-file-text me-2"></i>Article Content
+                </h6>
+                
+                <div class="mb-4">
+                  <h4 class="fw-bold">{{ news.title }}</h4>
+                  {% if news.excerpt %}
+                    <p class="text-muted mb-3"><em>{{ news.excerpt }}</em></p>
+                  {% endif %}
+                  
+                  {% if news.featured_image %}
+                    <div class="mb-3">
+                      <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" 
+                           class="img-fluid rounded" style="max-height: 300px;">
+                    </div>
+                  {% endif %}
+                  
+                  <div class="article-content">
+                    {{ news.content|linebreaks }}
+                  </div>
+                  
+                  {% if news.tags %}
+                    <div class="mt-4">
+                      <h6 class="fw-semibold mb-2">Tags:</h6>
+                      <span class="badge bg-primary-subtle text-primary">{{ news.tags }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Article Statistics -->
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-chart-bar me-2"></i>Article Statistics
+                </h6>
+                <div class="row">
+                  <div class="col-md-3 text-center">
+                    <div class="p-3 bg-light rounded">
+                      <i class="ti ti-eye fs-3 text-primary d-block mb-2"></i>
+                      <h5 class="fw-bold mb-1">{{ news.view_count|default:0 }}</h5>
+                      <small class="text-muted">Views</small>
+                    </div>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <div class="p-3 bg-light rounded">
+                      <i class="ti ti-share fs-3 text-success d-block mb-2"></i>
+                      <h5 class="fw-bold mb-1">0</h5>
+                      <small class="text-muted">Shares</small>
+                    </div>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <div class="p-3 bg-light rounded">
+                      <i class="ti ti-message-circle fs-3 text-warning d-block mb-2"></i>
+                      <h5 class="fw-bold mb-1">0</h5>
+                      <small class="text-muted">Comments</small>
+                    </div>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <div class="p-3 bg-light rounded">
+                      <i class="ti ti-heart fs-3 text-danger d-block mb-2"></i>
+                      <h5 class="fw-bold mb-1">0</h5>
+                      <small class="text-muted">Likes</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Quick Edit Form -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-edit me-2"></i>Quick Edit
+                </h6>
+                <form method="POST">
+                  {% csrf_token %}
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" name="title" value="{{ news.title }}">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                      {% for category_code, category_name in news_categories %}
+                        <option value="{{ category_code }}" {% if news.category == category_code %}selected{% endif %}>
+                          {{ category_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Excerpt</label>
+                    <textarea class="form-control" name="excerpt" rows="3">{{ news.excerpt }}</textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Tags</label>
+                    <input type="text" class="form-control" name="tags" value="{{ news.tags }}" 
+                           placeholder="Comma separated tags">
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_published" id="isPublished"
+                           {% if news.is_published %}checked{% endif %}>
+                    <label class="form-check-label" for="isPublished">
+                      Published
+                    </label>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
+                           {% if news.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                      Featured
+                    </label>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Content</label>
+                    <textarea class="form-control" name="content" rows="8">{{ news.content }}</textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" class="form-control" name="featured_image" accept="image/*">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Thumbnail</label>
+                    <input type="file" class="form-control" name="thumbnail" accept="image/*">
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="ti ti-check me-1"></i>Update Article
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Article Metadata -->
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-info-circle me-2"></i>Metadata
+                </h6>
+                <div class="small">
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Author:</span>
+                    <span class="fw-medium">{{ news.created_by.name }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Created:</span>
+                    <span class="fw-medium">{{ news.created_at|date:"M d, Y H:i" }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Last Updated:</span>
+                    <span class="fw-medium">{{ news.updated_at|date:"M d, Y H:i" }}</span>
+                  </div>
+                  {% if news.published_at %}
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Published:</span>
+                    <span class="fw-medium">{{ news.published_at|date:"M d, Y H:i" }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Slug:</span>
+                    <span class="fw-medium">{{ news.slug }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="text-muted">Article ID:</span>
+                    <span class="fw-medium">#{{ news.id }}</span>
+                  </div>
+                </div>
+                
+                {% if news.thumbnail %}
+                <div class="mt-3">
+                  <label class="form-label small text-muted">Current Thumbnail</label>
+                  <img src="{{ news.thumbnail.url }}" alt="{{ news.title }}" 
+                       class="img-fluid rounded" style="max-height: 100px;">
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.article-content {
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-content p {
+  margin-bottom: 1rem;
+}
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+}
+</style>
+{% endblock %}

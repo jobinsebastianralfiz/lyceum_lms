@@ -1,0 +1,317 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Leads Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-users me-2"></i>Leads Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_leads }}</h4>
+                <p class="mb-0 small">Total Leads</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.new_leads }}</h4>
+                <p class="mb-0 small">New Leads</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.leads_this_month }}</h4>
+                <p class="mb-0 small">This Month</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.conversion_rate }}</h4>
+                <p class="mb-0 small">Conversion Rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search" 
+                       placeholder="Name, email, phone..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  {% for status_code, status_name in lead_statuses %}
+                    <option value="{{ status_code }}" {% if status_filter == status_code %}selected{% endif %}>
+                      {{ status_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Interest</label>
+                <select class="form-select form-select-sm" name="interest">
+                  <option value="">All Interests</option>
+                  {% for interest_code, interest_name in interest_areas %}
+                    <option value="{{ interest_code }}" {% if interest_filter == interest_code %}selected{% endif %}>
+                      {{ interest_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Assigned To</label>
+                <select class="form-select form-select-sm" name="assigned_to">
+                  <option value="">All</option>
+                  <option value="unassigned" {% if assigned_filter == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                  {% for staff in staff_users %}
+                    <option value="{{ staff.id }}" {% if assigned_filter == staff.id|stringformat:"s" %}selected{% endif %}>
+                      {{ staff.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:leads_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Interest</th>
+                <th>Experience</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Follow-ups</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lead in leads %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:lead_detail' lead.id %}" class="text-decoration-none fw-medium">
+                    {{ lead.name }}
+                  </a>
+                </td>
+                <td>
+                  <div class="small">
+                    <div><i class="ti ti-mail me-1"></i>{{ lead.email }}</div>
+                    {% if lead.phone %}
+                      <div><i class="ti ti-phone me-1"></i>{{ lead.phone }}</div>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ lead.get_area_of_interest_display }}
+                  </span>
+                  {% if lead.other_interest %}
+                    <div class="small text-muted mt-1">{{ lead.other_interest|truncatechars:20 }}</div>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-secondary-subtle text-secondary">
+                    {{ lead.get_current_experience_display }}
+                  </span>
+                </td>
+                <td>
+                  {% if lead.status == 'new' %}
+                    <span class="badge bg-warning">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'contacted' %}
+                    <span class="badge bg-info">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'qualified' %}
+                    <span class="badge bg-primary">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'converted' %}
+                    <span class="badge bg-success">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'lost' %}
+                    <span class="badge bg-danger">{{ lead.get_status_display }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ lead.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if lead.assigned_to %}
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-xs bg-primary-subtle rounded-circle me-2">
+                        <span class="small text-primary">{{ lead.assigned_to.name|first|upper }}</span>
+                      </div>
+                      <span class="small">{{ lead.assigned_to.name }}</span>
+                    </div>
+                  {% else %}
+                    <span class="text-muted small">Unassigned</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% with follow_up_count=lead.follow_ups.count %}
+                    {% if follow_up_count > 0 %}
+                      <span class="badge bg-primary">{{ follow_up_count }}</span>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td>
+                  <div class="small">
+                    {{ lead.created_at|date:"M d, Y" }}<br>
+                    <span class="text-muted">{{ lead.created_at|date:"H:i" }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:lead_detail' lead.id %}" 
+                       class="btn btn-outline-primary btn-sm" title="View Details">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            title="Delete Lead" 
+                            onclick="confirmDelete({{ lead.id }}, '{{ lead.name|escapejs }}')">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-users-off fs-2 mb-3 d-block"></i>
+                    <h6>No leads found</h6>
+                    <p class="mb-0">No leads match your current filters.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if leads.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ leads.start_index }} to {{ leads.end_index }} of {{ leads.paginator.count }} leads
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if leads.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ leads.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for page_num in leads.paginator.page_range %}
+                {% if page_num == leads.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > leads.number|add:-3 and page_num < leads.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if leads.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ leads.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="ti ti-alert-triangle text-danger me-2"></i>Delete Lead
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger d-flex align-items-center">
+          <i class="ti ti-alert-triangle me-2"></i>
+          <div>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+        </div>
+        <p>Are you sure you want to delete the lead for <strong id="leadName"></strong>?</p>
+        <p class="text-muted small">This will also delete all associated follow-up records.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="ti ti-trash me-1"></i>Delete Lead
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(leadId, leadName) {
+    document.getElementById('leadName').textContent = leadName;
+    document.getElementById('deleteForm').action = '{% url "custom_admin:lead_delete" 0 %}'.replace('0', leadId);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

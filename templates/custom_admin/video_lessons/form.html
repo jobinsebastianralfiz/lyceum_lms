@@ -73,33 +73,74 @@
             {% endif %}
           </div>
 
-          <!-- Video Content -->
+          <!-- Video Content - Enhanced with Platform Support -->
           <div class="row mb-4">
             <div class="col-12">
-              <h5 class="mb-3">Video Content</h5>
+              <h5 class="mb-3">
+                <i class="ti ti-video me-2"></i>Video Content
+                <small class="badge bg-info-subtle text-info ms-2">Enhanced with API Support</small>
+              </h5>
             </div>
-            
-            <div class="col-md-8">
-              <div class="mb-3">
-                <label for="{{ form.youtube_url.id_for_label }}" class="form-label">YouTube URL</label>
-                {{ form.youtube_url }}
-                <div class="form-text">{{ form.youtube_url.help_text }}</div>
-                {% if form.youtube_url.errors %}
-                  <div class="text-danger small">{{ form.youtube_url.errors.0 }}</div>
-                {% endif %}
-              </div>
-            </div>
-            
+          </div>
+
+          <!-- Platform Selection -->
+          <div class="row mb-3">
             <div class="col-md-4">
-              <div class="mb-3">
-                <label for="{{ form.youtube_video_id.id_for_label }}" class="form-label">YouTube Video ID</label>
-                {{ form.youtube_video_id }}
-                <div class="form-text">{{ form.youtube_video_id.help_text }}</div>
-                {% if form.youtube_video_id.errors %}
-                  <div class="text-danger small">{{ form.youtube_video_id.errors.0 }}</div>
-                {% endif %}
+              <label for="{{ form.platform.id_for_label }}" class="form-label">Video Platform</label>
+              {{ form.platform }}
+              {% if form.platform.errors %}
+                <div class="text-danger small">{{ form.platform.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Video URL Input with API Sync -->
+          <div class="mb-4">
+            <div class="card border-primary">
+              <div class="card-body">
+                <div class="row align-items-end">
+                  <div class="col-md-8">
+                    <label for="id_video_url_input" class="form-label">Video URL 
+                      <span class="badge bg-primary-subtle text-primary">YouTube, Vimeo, or Direct URL</span>
+                    </label>
+                    <input type="url" class="form-control" id="id_video_url_input" 
+                           name="video_url_input" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+                           value="{{ form.video_url.value|default:'' }}{{ form.youtube_url.value|default:'' }}">
+                    <div class="form-text">
+                      <i class="ti ti-info-circle me-1"></i>
+                      Paste any YouTube, Vimeo, or direct video URL. You can manually fill details or use API sync.
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="d-grid gap-2">
+                      <button type="button" class="btn btn-outline-primary" id="btnFetchMetadata">
+                        <i class="ti ti-refresh me-1"></i>Fetch from API
+                      </button>
+                      <small class="text-muted text-center">Auto-fill metadata</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- API Status -->
+                <div id="apiStatus" class="mt-3" style="display: none;">
+                  <div class="alert alert-info d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span>Fetching video metadata...</span>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+
+          <!-- Legacy Fields (Hidden but kept for compatibility) -->
+          <div style="display: none;">
+            {{ form.youtube_url }}
+            {{ form.youtube_video_id }}
+            {{ form.video_url }}
+            {{ form.video_id }}
+            {{ form.vimeo_video_id }}
           </div>
           
           <div class="row mb-4">
@@ -200,11 +241,143 @@
 </div>
 
 <script>
-// Video URL validation and YouTube ID extraction
+// Enhanced Video Management with API Integration
 document.addEventListener('DOMContentLoaded', function() {
+  const videoUrlInput = document.getElementById('id_video_url_input');
+  const fetchBtn = document.getElementById('btnFetchMetadata');
+  const apiStatus = document.getElementById('apiStatus');
+  const titleField = document.getElementById('{{ form.title.id_for_label }}');
+  const descriptionField = document.getElementById('{{ form.description.id_for_label }}');
+  const thumbnailField = document.getElementById('{{ form.thumbnail_url.id_for_label }}');
+  const durationField = document.getElementById('{{ form.duration.id_for_label }}');
+  const platformField = document.getElementById('{{ form.platform.id_for_label }}');
+  
+  // Legacy fields (hidden)
   const youtubeUrlField = document.getElementById('{{ form.youtube_url.id_for_label }}');
   const youtubeIdField = document.getElementById('{{ form.youtube_video_id.id_for_label }}');
-  const thumbnailField = document.getElementById('{{ form.thumbnail_url.id_for_label }}');
+  const videoUrlField = document.getElementById('{{ form.video_url.id_for_label }}');
+  const videoIdField = document.getElementById('{{ form.video_id.id_for_label }}');
+  const vimeoIdField = document.getElementById('{{ form.vimeo_video_id.id_for_label }}');
+
+  // Auto-detect platform when URL changes
+  videoUrlInput.addEventListener('input', function() {
+    const url = this.value.trim();
+    if (!url) return;
+    
+    // Auto-detect platform
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      platformField.value = 'youtube';
+    } else if (url.includes('vimeo.com')) {
+      platformField.value = 'vimeo';
+    } else {
+      platformField.value = 'direct';
+    }
+    
+    // Update legacy fields immediately
+    updateLegacyFields(url);
+  });
+
+  // Fetch metadata from API
+  fetchBtn.addEventListener('click', async function() {
+    const url = videoUrlInput.value.trim();
+    
+    if (!url) {
+      alert('Please enter a video URL first');
+      videoUrlInput.focus();
+      return;
+    }
+
+    // Show loading state
+    showApiStatus('Fetching video metadata...', 'loading');
+    fetchBtn.disabled = true;
+
+    try {
+      const response = await fetch('{% url "custom_admin:video_fetch_metadata" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ url: url })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        showApiStatus(data.error, 'error');
+      } else {
+        // Fill form fields with API data (only if empty)
+        if (!titleField.value && data.title) titleField.value = data.title;
+        if (!descriptionField.value && data.description) descriptionField.value = data.description;
+        if (!thumbnailField.value && data.thumbnail_url) thumbnailField.value = data.thumbnail_url;
+        if (!durationField.value && data.duration) durationField.value = data.duration;
+        
+        // Update platform
+        if (data.platform) platformField.value = data.platform;
+        
+        // Update legacy fields
+        updateLegacyFields(url, data);
+        
+        showApiStatus('✓ Metadata fetched successfully! You can edit any field before saving.', 'success');
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      showApiStatus('Failed to fetch metadata. You can still enter details manually.', 'error');
+    }
+
+    fetchBtn.disabled = false;
+    setTimeout(() => hideApiStatus(), 5000);
+  });
+
+  function updateLegacyFields(url, metadata = {}) {
+    // Update hidden legacy fields for form submission
+    if (videoUrlField) videoUrlField.value = url;
+    
+    const platform = metadata.platform || detectPlatform(url);
+    const videoId = metadata.video_id || extractVideoId(url, platform);
+    
+    if (platform === 'youtube') {
+      if (youtubeUrlField) youtubeUrlField.value = url;
+      if (youtubeIdField) youtubeIdField.value = videoId;
+      if (videoIdField) videoIdField.value = videoId;
+    } else if (platform === 'vimeo') {
+      if (vimeoIdField) vimeoIdField.value = videoId;
+      if (videoIdField) videoIdField.value = videoId;
+    }
+  }
+
+  function detectPlatform(url) {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+    if (url.includes('vimeo.com')) return 'vimeo';
+    return 'direct';
+  }
+
+  function extractVideoId(url, platform) {
+    if (platform === 'youtube') {
+      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : '';
+    } else if (platform === 'vimeo') {
+      const regex = /vimeo\.com\/(\d+)/;
+      const match = url.match(regex);
+      return match ? match[1] : '';
+    }
+    return '';
+  }
+
+  function showApiStatus(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+    const icon = type === 'success' ? '<i class="ti ti-check-circle me-2"></i>' : 
+                 type === 'error' ? '<i class="ti ti-alert-circle me-2"></i>' : 
+                 '<div class="spinner-border spinner-border-sm me-2" role="status"><span class="visually-hidden">Loading...</span></div>';
+    
+    apiStatus.innerHTML = `<div class="alert ${alertClass} d-flex align-items-center">${icon}<span>${message}</span></div>`;
+    apiStatus.style.display = 'block';
+  }
+
+  function hideApiStatus() {
+    apiStatus.style.display = 'none';
+  }
 
   // Extract YouTube ID from URL
   function extractYouTubeId(url) {

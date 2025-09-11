@@ -23,17 +23,28 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class VideoLessonSerializer(serializers.ModelSerializer):
     """
-    Serializer for video lessons
+    Serializer for video lessons (backward compatible with Flutter app)
     """
     duration_display = serializers.SerializerMethodField()
     can_access = serializers.SerializerMethodField()
+    resource_file_url = serializers.SerializerMethodField()
+    
+    # New fields for enhanced functionality
+    platform = serializers.CharField(read_only=True)
+    video_url = serializers.URLField(read_only=True)
+    embed_url = serializers.SerializerMethodField()
+    vimeo_video_id = serializers.CharField(read_only=True)
     
     class Meta:
         model = VideoLesson
         fields = [
+            # Legacy fields (for Flutter compatibility)
             'id', 'title', 'youtube_video_id', 'youtube_url', 
             'thumbnail_url', 'duration', 'duration_display', 
-            'description', 'order', 'is_preview', 'can_access'
+            'description', 'order', 'is_preview', 'can_access',
+            'resource_file_url',
+            # New fields (optional for Flutter)
+            'platform', 'video_url', 'embed_url', 'vimeo_video_id'
         ]
     
     @extend_schema_field(serializers.CharField)
@@ -48,18 +59,33 @@ class VideoLessonSerializer(serializers.ModelSerializer):
     def get_can_access(self, obj):
         """Check if current user can access this video"""
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return obj.is_preview
         
-        # Check if user is enrolled in the course
-        from apps.payments.models import Enrollment
-        is_enrolled = Enrollment.objects.filter(
-            user=request.user,
-            course=obj.module.course,
-            active=True
-        ).exists()
+        # Check if user is enrolled in the course using centralized service
+        from apps.payments.services import EnrollmentService
+        is_enrolled = EnrollmentService.is_user_enrolled(request.user, obj.module.course)
         
         return is_enrolled or obj.is_preview
+    
+    @extend_schema_field(serializers.CharField)
+    def get_resource_file_url(self, obj):
+        """Get full URL for resource file"""
+        if obj.resource_file:
+            request = self.context.get('request')
+            if request:
+                try:
+                    return request.build_absolute_uri(obj.resource_file.url)
+                except:
+                    # Fallback if build_absolute_uri fails
+                    return obj.resource_file.url
+            return obj.resource_file.url
+        return None
+    
+    @extend_schema_field(serializers.CharField)
+    def get_embed_url(self, obj):
+        """Get embeddable URL for the video"""
+        return obj.embed_url
 
 class ModuleSerializer(serializers.ModelSerializer):
     """
@@ -96,7 +122,7 @@ class ModuleSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.DictField)
     def get_progress(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return None
         
         try:
@@ -131,28 +157,29 @@ class CourseListSerializer(serializers.ModelSerializer):
     total_lessons = serializers.SerializerMethodField()
     thumbnail_url = serializers.SerializerMethodField()
     preview_video_url = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
+    enrolled_count = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'category_name', 'price', 'tax_rate',
-            'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
-            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_enrolled', 
-            'module_count', 'total_lessons', 'allow_public_enrollment', 'created_at'
+            'id', 'title', 'description', 'curriculum', 'what_you_will_learn', 
+            'category_name', 'price', 'tax_rate', 'price_display', 'total_price_display', 
+            'is_free_course', 'thumbnail', 'thumbnail_url', 'preview_video', 
+            'preview_video_url', 'is_enrolled', 'module_count', 'total_lessons', 
+            'allow_public_enrollment', 'rating', 'enrolled_count', 'level', 'duration', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
     def get_is_enrolled(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return False
         
-        from apps.payments.models import Enrollment
-        return Enrollment.objects.filter(
-            user=request.user,
-            course=obj,
-            active=True
-        ).exists()
+        from apps.payments.services import EnrollmentService
+        return EnrollmentService.is_user_enrolled(request.user, obj)
     
     @extend_schema_field(serializers.IntegerField)
     def get_module_count(self, obj):
@@ -176,6 +203,66 @@ class CourseListSerializer(serializers.ModelSerializer):
     def get_preview_video_url(self, obj):
         """Get preview video URL"""
         return obj.preview_video if obj.preview_video else None
+    
+    @extend_schema_field(serializers.FloatField)
+    def get_rating(self, obj):
+        """Get average rating for this course"""
+        from apps.ratings.models import CourseRating
+        ratings = CourseRating.objects.filter(course=obj, is_approved=True)
+        if ratings.exists():
+            from django.db.models import Avg
+            avg_rating = ratings.aggregate(avg=Avg('rating'))['avg']
+            return round(float(avg_rating), 1) if avg_rating else 0.0
+        return 0.0
+    
+    @extend_schema_field(serializers.IntegerField)
+    def get_enrolled_count(self, obj):
+        """Get number of enrolled students"""
+        from apps.payments.models import Enrollment
+        return Enrollment.objects.filter(
+            course=obj,
+            active=True,
+            payment_status__in=['completed', 'free', 'partial']  # Count all active enrollments
+        ).count()
+    
+    @extend_schema_field(serializers.CharField)
+    def get_level(self, obj):
+        """Get course difficulty level based on modules"""
+        modules = obj.modules.all()
+        
+        if not modules:
+            return 'beginner'
+        
+        # Get the most common difficulty level from modules
+        difficulty_counts = {}
+        for module in modules:
+            level = getattr(module, 'difficulty_level', 'beginner')
+            difficulty_counts[level] = difficulty_counts.get(level, 0) + 1
+        
+        if not difficulty_counts:
+            return 'beginner'
+        
+        # Return the most common difficulty level
+        return max(difficulty_counts, key=difficulty_counts.get)
+    
+    @extend_schema_field(serializers.IntegerField)
+    def get_duration(self, obj):
+        """Get total course duration in minutes"""
+        total_duration = 0
+        modules = obj.modules.all()
+        
+        for module in modules:
+            # Add module estimated duration if available
+            if hasattr(module, 'duration_minutes') and module.duration_minutes:
+                total_duration += module.duration_minutes
+            else:
+                # Calculate from video lessons duration
+                video_lessons = module.video_lessons.all()
+                for lesson in video_lessons:
+                    if lesson.duration:  # duration in seconds
+                        total_duration += lesson.duration // 60  # convert to minutes
+        
+        return total_duration if total_duration > 0 else None
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     """
@@ -190,42 +277,39 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     enrollment_info = serializers.SerializerMethodField()
     thumbnail_url = serializers.SerializerMethodField()
     preview_video_url = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
+    enrolled_count = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'category', 'price', 'tax_rate',
-            'price_display', 'total_price_display', 'is_free_course', 'thumbnail',
-            'thumbnail_url', 'preview_video', 'preview_video_url', 'is_published',
-            'allow_public_enrollment', 'created_by_name', 'modules', 'is_enrolled', 
-            'enrollment_info', 'created_at'
+            'id', 'title', 'description', 'curriculum', 'what_you_will_learn', 
+            'category', 'price', 'tax_rate', 'price_display', 'total_price_display', 
+            'is_free_course', 'thumbnail', 'thumbnail_url', 'preview_video', 
+            'preview_video_url', 'is_published', 'allow_public_enrollment', 
+            'created_by_name', 'modules', 'is_enrolled', 'enrollment_info', 
+            'rating', 'enrolled_count', 'level', 'duration', 'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
     def get_is_enrolled(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return False
         
-        from apps.payments.models import Enrollment
-        return Enrollment.objects.filter(
-            user=request.user,
-            course=obj,
-            active=True
-        ).exists()
+        from apps.payments.services import EnrollmentService
+        return EnrollmentService.is_user_enrolled(request.user, obj)
     
     @extend_schema_field(serializers.DictField)
     def get_enrollment_info(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return None
         
-        from apps.payments.models import Enrollment
-        enrollment = Enrollment.objects.filter(
-            user=request.user,
-            course=obj,
-            active=True
-        ).first()
+        from apps.payments.services import EnrollmentService
+        enrollment = EnrollmentService.get_user_enrollment(request.user, obj)
         
         if not enrollment:
             return None
@@ -257,6 +341,66 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         """Get modules ordered by their order field"""
         modules = obj.modules.filter(is_active=True).order_by('order')
         return ModuleSerializer(modules, many=True, context=self.context).data
+    
+    @extend_schema_field(serializers.FloatField)
+    def get_rating(self, obj):
+        """Get average rating for this course"""
+        from apps.ratings.models import CourseRating
+        ratings = CourseRating.objects.filter(course=obj, is_approved=True)
+        if ratings.exists():
+            from django.db.models import Avg
+            avg_rating = ratings.aggregate(avg=Avg('rating'))['avg']
+            return round(float(avg_rating), 1) if avg_rating else 0.0
+        return 0.0
+    
+    @extend_schema_field(serializers.IntegerField)
+    def get_enrolled_count(self, obj):
+        """Get number of enrolled students"""
+        from apps.payments.models import Enrollment
+        return Enrollment.objects.filter(
+            course=obj,
+            active=True,
+            payment_status__in=['completed', 'free', 'partial']  # Count all active enrollments
+        ).count()
+    
+    @extend_schema_field(serializers.CharField)
+    def get_level(self, obj):
+        """Get course difficulty level based on modules"""
+        modules = obj.modules.all()
+        
+        if not modules:
+            return 'beginner'
+        
+        # Get the most common difficulty level from modules
+        difficulty_counts = {}
+        for module in modules:
+            level = getattr(module, 'difficulty_level', 'beginner')
+            difficulty_counts[level] = difficulty_counts.get(level, 0) + 1
+        
+        if not difficulty_counts:
+            return 'beginner'
+        
+        # Return the most common difficulty level
+        return max(difficulty_counts, key=difficulty_counts.get)
+    
+    @extend_schema_field(serializers.IntegerField)
+    def get_duration(self, obj):
+        """Get total course duration in minutes"""
+        total_duration = 0
+        modules = obj.modules.all()
+        
+        for module in modules:
+            # Add module estimated duration if available
+            if hasattr(module, 'duration_minutes') and module.duration_minutes:
+                total_duration += module.duration_minutes
+            else:
+                # Calculate from video lessons duration
+                video_lessons = module.video_lessons.all()
+                for lesson in video_lessons:
+                    if lesson.duration:  # duration in seconds
+                        total_duration += lesson.duration // 60  # convert to minutes
+        
+        return total_duration if total_duration > 0 else None
 
 class StudentProgressSerializer(serializers.ModelSerializer):
     """
@@ -298,7 +442,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.CharField)
     def get_submission_status(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return 'not_submitted'
         
         try:
@@ -310,7 +454,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.DictField)
     def get_user_submission(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return None
         
         try:
@@ -418,7 +562,7 @@ class QuizSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.IntegerField)
     def get_user_attempts(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return 0
         
         return obj.attempts.filter(student=request.user, completed=True).count()
@@ -426,7 +570,7 @@ class QuizSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.BooleanField)
     def get_can_attempt(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return False
         
         user_attempts = obj.attempts.filter(student=request.user, completed=True).count()
@@ -435,7 +579,7 @@ class QuizSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.FloatField)
     def get_best_score(self, obj):
         request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
+        if not request or not hasattr(request, 'user') or not request.user or not request.user.is_authenticated:
             return None
         
         best_attempt = obj.attempts.filter(

@@ -10,7 +10,7 @@ from django.db.models import Q, Count, Avg
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.conf import settings
-from datetime import date
+from datetime import date, timedelta
 import razorpay
 import json
 from apps.users.models import User
@@ -20,6 +20,8 @@ from apps.courses.models import (
     QuizAttempt, QuizAnswer, StudentAnalytics
 )
 from apps.payments.models import Enrollment, Payment, TaxInvoice, InstallmentPlan
+from apps.ratings.models import CourseRating
+from apps.content_management.models import News, Testimonial, Placement
 
 
 @ensure_csrf_cookie
@@ -80,42 +82,122 @@ def student_login(request):
     return render(request, 'student_portal/auth/login.html', context)
 
 
+@login_required
+def browse_courses(request):
+    """Browse all available public courses"""
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please login to access the student portal.')
+        return redirect('landing:login')
+    
+    # Get all public courses
+    courses = Course.objects.filter(
+        is_published=True,
+        allow_public_enrollment=True
+    ).select_related('category').prefetch_related('ratings').order_by('-created_at')
+    
+    # Get user's enrollments for enrollment status
+    user_enrollments = set(
+        Enrollment.objects.filter(
+            user=request.user,
+            active=True
+        ).values_list('course_id', flat=True)
+    )
+    
+    # Add enrollment status to courses
+    for course in courses:
+        course.is_enrolled = course.id in user_enrollments
+        course.user_rating = CourseRating.objects.filter(
+            course=course,
+            user=request.user
+        ).first()
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        courses = courses.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(category__name__icontains=search_query)
+        )
+    
+    # Category filter
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        courses = courses.filter(category__name=category_filter)
+    
+    # Pagination
+    paginator = Paginator(courses, 9)  # 9 courses per page
+    page_number = request.GET.get('page')
+    courses_page = paginator.get_page(page_number)
+    
+    # Get categories for filter
+    from apps.courses.models import Category
+    categories = Category.objects.all().order_by('name')
+    
+    context = {
+        'courses': courses_page,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'user_enrollments': user_enrollments,
+    }
+    return render(request, 'student_portal/browse_courses.html', context)
+
+
 def student_logout(request):
     """Student logout"""
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('student_portal:login')
+    return redirect('landing:login')
 
 
 def dashboard(request):
-    """Student dashboard"""
+    """Enhanced modern student dashboard"""
     # Check authentication and role
     if not request.user.is_authenticated:
         messages.error(request, 'Please login to access the student portal.')
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     if not hasattr(request.user, 'role') or request.user.role != 'student':
         messages.error(request, 'Access denied. Student role required.')
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     
-    # Get student's enrollments
+    # Get student's enrollments with detailed progress
     enrollments = Enrollment.objects.filter(
         user=user, 
         active=True
     ).select_related('course', 'course__category').order_by('-enrolled_on')
     
-    # Calculate statistics and add progress to each enrollment
+    # Enhanced statistics calculation
     total_courses = enrollments.count()
     completed_courses = 0
-    in_progress_courses = 0
+    
+    # Video completion stats
+    completed_videos = StudentProgress.objects.filter(
+        user=user,
+        completed=True
+    ).count()
+    
+    total_videos_in_enrolled_courses = 0
     
     for enrollment in enrollments:
-        # Calculate course progress using the same logic as course detail page
-        modules = enrollment.course.modules.all()
-        total_modules = modules.count()
+        course = enrollment.course
+        modules = course.modules.all()
         
+        # Calculate video progress
+        course_videos = VideoLesson.objects.filter(module__course=course).count()
+        completed_videos_in_course = StudentProgress.objects.filter(
+            user=user,
+            video_lesson__module__course=course,
+            completed=True
+        ).count()
+        
+        total_videos_in_enrolled_courses += course_videos
+        
+        # Calculate course progress
+        total_modules = modules.count()
         if total_modules > 0:
             total_progress = 0
             modules_with_progress = 0
@@ -126,63 +208,136 @@ def dashboard(request):
                     total_progress += module_progress.completion_percentage
                     modules_with_progress += 1
                 except ModuleProgress.DoesNotExist:
-                    # Module not started, contributes 0% to progress
                     modules_with_progress += 1
             
-            # Calculate average completion across all modules
             progress_percentage = total_progress / modules_with_progress if modules_with_progress > 0 else 0
         else:
             progress_percentage = 0
         
-        # Count truly completed modules for statistics
+        # Count completed modules
         completed_modules = ModuleProgress.objects.filter(
             student=user,
             module__course=enrollment.course,
             is_completed=True
         ).count()
         
-        # Attach progress to enrollment object for template access
+        # Attach data to enrollment
         enrollment.progress_percentage = round(progress_percentage, 1)
         enrollment.completed_modules = completed_modules
         enrollment.total_modules = total_modules
+        enrollment.total_videos = course_videos
+        enrollment.completed_videos = completed_videos_in_course
         
-        # Update overall statistics
         if total_modules > 0 and completed_modules == total_modules:
             completed_courses += 1
-        elif completed_modules > 0:
-            in_progress_courses += 1
     
-    # Recent activity
+    # Assignment statistics
+    submitted_assignments = AssignmentSubmission.objects.filter(
+        student=user
+    ).exclude(status='draft').count()
+    
+    total_assignments = Assignment.objects.filter(
+        module__course__in=[e.course for e in enrollments]
+    ).count()
+    
+    # Quiz statistics
+    quiz_attempts = QuizAttempt.objects.filter(
+        student=user,
+        completed=True
+    )
+    quiz_attempts_count = quiz_attempts.count()
+    # Calculate average quiz score manually since score_percentage is a property
+    if quiz_attempts_count > 0:
+        total_percentage = 0
+        for attempt in quiz_attempts:
+            total_percentage += attempt.score_percentage
+        average_quiz_score = total_percentage / quiz_attempts_count
+    else:
+        average_quiz_score = 0
+    
+    # Modules completed
+    modules_completed = ModuleProgress.objects.filter(
+        student=user,
+        is_completed=True
+    ).count()
+    
+    # Weekly activity
+    week_ago = timezone.now() - timedelta(days=7)
+    videos_this_week = StudentProgress.objects.filter(
+        user=user,
+        last_watched_at__gte=week_ago,
+        completed=True
+    ).count()
+    
+    assignments_this_week = AssignmentSubmission.objects.filter(
+        student=user,
+        created_at__gte=week_ago
+    ).exclude(status='draft').count()
+    
+    # Recent activity with more details
     recent_progress = StudentProgress.objects.filter(
         user=user
-    ).select_related('video_lesson', 'course').order_by('-last_watched_at')[:5]
+    ).select_related('video_lesson', 'course', 'video_lesson__module').order_by('-last_watched_at')[:15]
     
-    # Get courses available for purchase (not enrolled)
-    enrolled_course_ids = enrollments.values_list('course_id', flat=True)
-    available_courses = Course.objects.filter(
-        is_published=True,
-        id__isnull=False  # Ensure course has a valid ID
-    ).exclude(
-        id__in=enrolled_course_ids
-    ).select_related('category').order_by('-created_at')[:6]
+    # Upcoming assignments (within next 7 days)
+    upcoming_deadline = timezone.now() + timedelta(days=7)
+    upcoming_assignments = []
+    
+    for enrollment in enrollments:
+        for module in enrollment.course.modules.all():
+            for assignment in module.assignments.all():
+                try:
+                    # Check if student hasn't submitted this assignment
+                    AssignmentSubmission.objects.get(student=user, assignment=assignment)
+                except AssignmentSubmission.DoesNotExist:
+                    # Calculate days until due (rough estimate based on module start)
+                    days_until_due = 7  # Default
+                    upcoming_assignments.append({
+                        'title': assignment.title,
+                        'course': enrollment.course.title,
+                        'days_until_due': days_until_due,
+                        'assignment': assignment
+                    })
     
     context = {
         'user': user,
-        'enrollments': enrollments[:6],  # Show first 6 courses
-        'available_courses': available_courses,  # Courses to purchase
-        'total_courses': total_courses,
+        'current_time': timezone.now(),
+        
+        # Course data
+        'enrollments': enrollments[:6],
+        'enrolled_courses_count': total_courses,
         'completed_courses': completed_courses,
-        'in_progress_courses': in_progress_courses,
-        'recent_activity': recent_progress,
+        
+        # Statistics
+        'completed_videos_count': completed_videos,
+        'submitted_assignments': submitted_assignments,
+        'total_assignments': total_assignments,
+        'quiz_attempts_count': quiz_attempts_count,
+        'average_quiz_score': average_quiz_score,
+        'modules_completed': modules_completed,
+        
+        # Weekly activity
+        'videos_this_week': videos_this_week,
+        'assignments_this_week': assignments_this_week,
+        
+        # Activity feeds
+        'recent_progress': recent_progress,
+        'upcoming_assignments': upcoming_assignments[:5],
+        
+        # Content Management - Latest content for student dashboard
+        'latest_news': News.objects.filter(is_published=True, is_featured=True).order_by('-published_at')[:3],
+        'featured_testimonials': Testimonial.objects.filter(is_published=True, is_featured=True).order_by('-created_at')[:3],
+        'recent_placements': Placement.objects.filter(is_published=True, is_featured=True).order_by('-published_at')[:4],
     }
     
     return render(request, 'student_portal/dashboard.html', context)
 
 
+
 def my_courses(request):
     """List all student's enrolled courses"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     
@@ -264,7 +419,7 @@ def my_courses(request):
 def course_detail(request, course_id):
     """Course detail and learning interface"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     course = get_object_or_404(Course, id=course_id, is_published=True)
@@ -277,6 +432,14 @@ def course_detail(request, course_id):
         is_enrolled = True
     except Enrollment.DoesNotExist:
         is_enrolled = False
+    
+    # Get user's rating for this course
+    user_rating = None
+    if is_enrolled:
+        user_rating = CourseRating.objects.filter(
+            course=course,
+            user=request.user
+        ).first()
     
     if is_enrolled:
         # For enrolled users - show full course content
@@ -303,6 +466,7 @@ def course_detail(request, course_id):
             'enrollment': enrollment,
             'modules': modules,
             'is_enrolled': True,
+            'user_rating': user_rating,
         }
         return render(request, 'student_portal/courses/course_detail.html', context)
     else:
@@ -314,6 +478,7 @@ def course_detail(request, course_id):
             'modules': modules,
             'is_enrolled': False,
             'can_purchase': True,
+            'user_rating': user_rating,
         }
     
     return render(request, 'student_portal/courses/course_detail.html', context)
@@ -322,7 +487,7 @@ def course_detail(request, course_id):
 def course_checkout(request, course_id):
     """Razorpay checkout page for course purchase"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     course = get_object_or_404(Course, id=course_id, is_published=True)
@@ -436,6 +601,51 @@ def verify_payment(request):
             razorpay_signature=razorpay_signature
         )
         
+        # Create Tax Invoice for paid courses
+        if total_amount > 0:
+            from apps.payments.models import TaxInvoice
+            from datetime import datetime
+            
+            invoice_number = f"INV-{enrollment.id}-{payment.id}-{datetime.now().strftime('%Y%m%d')}"
+            tax_invoice = TaxInvoice.objects.create(
+                enrollment=enrollment,
+                payment=payment,
+                invoice_number=invoice_number,
+                subtotal=total_amount - tax_amount,  # Base price without tax
+                tax_rate=18.0,  # GST rate
+                tax_amount=tax_amount,
+                total_amount=total_amount
+            )
+            
+            # Send enrollment confirmation email with invoice
+            try:
+                from emails.invoice_generator import generate_invoice_pdf
+                from emails.utils import send_enrollment_confirmation_email
+                
+                # Generate PDF invoice
+                invoice_pdf_content = generate_invoice_pdf(tax_invoice)
+                
+                # Send enrollment confirmation email with invoice attachment
+                email_sent = send_enrollment_confirmation_email(
+                    enrollment, 
+                    include_invoice=True, 
+                    invoice_pdf_content=invoice_pdf_content
+                )
+                
+                if not email_sent:
+                    print(f"Warning: Failed to send enrollment confirmation email to {user.email}")
+                        
+            except Exception as email_error:
+                print(f"Error sending enrollment email: {str(email_error)}")
+                # Continue without failing the payment process
+        else:
+            # For free courses, still send enrollment confirmation without invoice
+            try:
+                from emails.utils import send_enrollment_confirmation_email
+                send_enrollment_confirmation_email(enrollment, include_invoice=False)
+            except Exception as email_error:
+                print(f"Error sending enrollment email: {str(email_error)}")
+        
         return JsonResponse({
             'success': True,
             'message': 'Payment successful! Course enrollment completed.',
@@ -450,7 +660,7 @@ def verify_payment(request):
 def lesson_viewer(request, lesson_id):
     """Video lesson viewer"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
@@ -516,7 +726,7 @@ def lesson_viewer(request, lesson_id):
 def profile(request):
     """Student profile page"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     
@@ -640,7 +850,7 @@ def update_lesson_progress(request, lesson_id):
 def assignment_detail(request, assignment_id):
     """Assignment detail and submission interface"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     assignment = get_object_or_404(Assignment, id=assignment_id)
@@ -782,7 +992,7 @@ def submit_assignment(request, assignment_id):
 def quiz_detail(request, quiz_id):
     """Quiz detail and taking interface"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     quiz = get_object_or_404(Quiz, id=quiz_id)
@@ -818,12 +1028,12 @@ def quiz_detail(request, quiz_id):
         completed=True
     ).order_by('-completed_at')
     
-    # Check if user can take another attempt
+    # Allow unlimited attempts - removed max_attempts restriction
     attempt_count = attempts.count()
-    can_attempt = attempt_count < quiz.max_attempts
+    can_attempt = True  # Always allow attempts
     
     # Debug logging for attempt count issues
-    print(f"DEBUG: Quiz {quiz.id} - User {user.id} - Attempts: {attempt_count}/{quiz.max_attempts} - Can attempt: {can_attempt}")
+    print(f"DEBUG: Quiz {quiz.id} - User {user.id} - Attempts: {attempt_count} - Can attempt: {can_attempt} (unlimited)")
     
     # Get current attempt (if any)
     current_attempt = QuizAttempt.objects.filter(
@@ -868,15 +1078,14 @@ def start_quiz_attempt(request, quiz_id):
     except Enrollment.DoesNotExist:
         return JsonResponse({'error': 'Not enrolled'}, status=403)
     
-    # Check attempt limit
+    # Removed max_attempts restriction - allow unlimited attempts
     user_attempts = QuizAttempt.objects.filter(
         quiz=quiz,
         student=user,
         completed=True
     ).count()
     
-    if user_attempts >= quiz.max_attempts:
-        return JsonResponse({'error': 'Maximum attempts reached'}, status=400)
+    # No longer checking attempt limit - unlimited attempts allowed
     
     # Check if there's already an active attempt
     existing_attempt = QuizAttempt.objects.filter(
@@ -1038,7 +1247,7 @@ def submit_quiz_answers(request, attempt_id):
 def my_payments(request):
     """List all student's payments and payment status"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     
@@ -1068,7 +1277,7 @@ def my_payments(request):
 def payment_detail(request, enrollment_id):
     """Detailed payment view for a specific enrollment"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     enrollment = get_object_or_404(
@@ -1098,7 +1307,7 @@ def payment_detail(request, enrollment_id):
 def my_invoices(request):
     """List all student's tax invoices"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     
@@ -1118,7 +1327,7 @@ def my_invoices(request):
 def invoice_detail(request, invoice_id):
     """Detailed view of a specific tax invoice"""
     if not request.user.is_authenticated:
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     user = request.user
     invoice = get_object_or_404(

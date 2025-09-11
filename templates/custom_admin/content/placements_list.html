@@ -1,0 +1,309 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Placements Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-trophy me-2"></i>Placements Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+            <a href="{% url 'custom_admin:placement_create' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-plus"></i> Add Placement
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_placements }}</h4>
+                <p class="mb-0 small">Total Placements</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.published_placements }}</h4>
+                <p class="mb-0 small">Published</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">₹{{ stats.average_package|floatformat:1 }}L</h4>
+                <p class="mb-0 small">Avg Package</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search" 
+                       placeholder="Student, company, job title..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Type</label>
+                <select class="form-select form-select-sm" name="placement_type">
+                  <option value="">All Types</option>
+                  {% for type_code, type_name in placement_types %}
+                    <option value="{{ type_code }}" {% if placement_type_filter == type_code %}selected{% endif %}>
+                      {{ type_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                  <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                  <option value="featured" {% if status_filter == 'featured' %}selected{% endif %}>Featured</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:placements_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Placements Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Package</th>
+                <th>Course</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for placement in placements %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if placement.student_photo %}
+                      <img src="{{ placement.student_photo.url }}" alt="{{ placement.student_name }}" 
+                           class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                    {% else %}
+                      <div class="avatar avatar-sm bg-primary-subtle rounded-circle me-2">
+                        <span class="small text-primary">{{ placement.student_name|first|upper }}</span>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="mb-0">{{ placement.student_name }}</h6>
+                      {% if placement.batch_year %}
+                        <small class="text-muted">Batch {{ placement.batch_year }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if placement.company_logo %}
+                      <img src="{{ placement.company_logo.url }}" alt="{{ placement.company_name }}" 
+                           class="me-2" style="width: 24px; height: 24px; object-fit: contain;">
+                    {% endif %}
+                    <span class="fw-medium">{{ placement.company_name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <span class="fw-medium">{{ placement.job_title }}</span>
+                    {% if placement.location %}
+                      <div class="small text-muted">
+                        <i class="ti ti-map-pin me-1"></i>{{ placement.location }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if placement.can_show_package %}
+                    <span class="badge bg-success-subtle text-success">
+                      {{ placement.package_currency }} {{ placement.package_amount|floatformat:1 }}L
+                    </span>
+                  {% else %}
+                    <span class="text-muted small">Not disclosed</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ placement.course_completed }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary">
+                    {{ placement.get_placement_type_display }}
+                  </span>
+                </td>
+                <td>
+                  <div>
+                    {% if placement.is_published %}
+                      <span class="badge bg-success">Published</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Draft</span>
+                    {% endif %}
+                    {% if placement.is_featured %}
+                      <span class="badge bg-warning ms-1">Featured</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if placement.is_published and placement.published_at %}
+                    <div class="small">
+                      {{ placement.published_at|date:"M d, Y" }}<br>
+                      <span class="text-muted">{{ placement.published_at|date:"H:i" }}</span>
+                    </div>
+                  {% else %}
+                    <div class="small">
+                      {{ placement.created_at|date:"M d, Y" }}<br>
+                      <span class="text-muted">{{ placement.created_at|date:"H:i" }}</span>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="#" 
+                       class="btn btn-outline-primary btn-sm" title="View/Edit">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    {% if placement.is_published %}
+                      <a href="/api/content/placements/{{ placement.id }}/" target="_blank"
+                         class="btn btn-outline-success btn-sm" title="View Public">
+                        <i class="ti ti-external-link"></i>
+                      </a>
+                    {% endif %}
+                    <button class="btn btn-outline-danger btn-sm" title="Delete"
+                            onclick="confirmDelete({{ placement.id }}, '{{ placement.student_name|escapejs }}')">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-trophy-off fs-2 mb-3 d-block"></i>
+                    <h6>No placements found</h6>
+                    <p class="mb-0">No placement records match your current filters.</p>
+                    <a href="{% url 'custom_admin:placement_create' %}" class="btn btn-primary btn-sm mt-3">
+                      <i class="ti ti-plus me-1"></i>Add First Placement
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if placements.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ placements.start_index }} to {{ placements.end_index }} of {{ placements.paginator.count }} placements
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if placements.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ placements.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for page_num in placements.paginator.page_range %}
+                {% if page_num == placements.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > placements.number|add:-3 and page_num < placements.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if placements.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ placements.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the placement record for "<span id="studentName"></span>"?</p>
+        <p class="text-danger small mb-0">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Placement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(placementId, studentName) {
+  document.getElementById('studentName').textContent = studentName;
+  document.getElementById('confirmDeleteBtn').onclick = function() {
+    // Here you would implement the actual delete functionality
+    alert('Delete functionality needs to be implemented in the backend');
+  };
+  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

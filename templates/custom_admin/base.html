@@ -287,6 +287,30 @@
 
             <li><span class="sidebar-divider lg"></span></li>
 
+            <!-- RATINGS & REVIEWS Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">RATINGS & REVIEWS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:ratings_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-star"></i></span>
+                  <span class="hide-menu">Course Ratings</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:reviews_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-message-circle"></i></span>
+                  <span class="hide-menu">Course Reviews</span>
+                </div>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
             <!-- USERS Section -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
@@ -337,6 +361,56 @@
                 <div class="d-flex align-items-center gap-3">
                   <span class="d-flex"><i class="ti ti-video"></i></span>
                   <span class="hide-menu">YouTube Videos</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <span class="sidebar-divider lg"></span>
+            </li>
+            
+            <!-- CONTENT MANAGEMENT Section -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">CONTENT MANAGEMENT</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:content_dashboard' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-dashboard"></i></span>
+                  <span class="hide-menu">Content Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:leads_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-user-plus"></i></span>
+                  <span class="hide-menu">Leads Management</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:news_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-news"></i></span>
+                  <span class="hide-menu">News Management</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:placements_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-briefcase"></i></span>
+                  <span class="hide-menu">Placements</span>
+                </div>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:testimonials_list' %}" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex"><i class="ti ti-message-star"></i></span>
+                  <span class="hide-menu">Testimonials</span>
                 </div>
               </a>
             </li>

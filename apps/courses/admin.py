@@ -1,10 +1,36 @@
 from django.contrib import admin
+from django import forms
 from .models import (
     Category, Course, Module, VideoLesson, StudentProgress,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
     QuizAttempt, QuizAnswer, ModuleProgress
 )
 from .admin_actions import publish_courses, unpublish_courses, export_courses_csv, duplicate_course
+
+class CourseAdminForm(forms.ModelForm):
+    curriculum = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'rich-text-editor',
+            'rows': 10,
+            'placeholder': 'Enter detailed curriculum outline using rich text formatting...'
+        }),
+        required=False,
+        help_text='Detailed curriculum outline - what topics will be covered'
+    )
+    
+    what_you_will_learn = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'rich-text-editor', 
+            'rows': 10,
+            'placeholder': 'Describe what students will learn and achieve...'
+        }),
+        required=False,
+        help_text='Learning outcomes - what students will achieve after completing the course'
+    )
+    
+    class Meta:
+        model = Course
+        fields = '__all__'
 
 class ModuleInline(admin.TabularInline):
     model = Module
@@ -39,12 +65,22 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
+    form = CourseAdminForm
     list_display = ('title', 'category', 'price_display_admin', 'total_price_display_admin', 'is_free', 'is_published', 'allow_public_enrollment', 'created_by', 'created_at')
     list_filter = ('category', 'is_free', 'is_published', 'allow_public_enrollment', 'created_at')
-    search_fields = ('title', 'description')
+    search_fields = ('title', 'description', 'curriculum', 'what_you_will_learn')
     readonly_fields = ('is_free_course_display', 'total_price_display_formatted', 'tax_amount_display', 'price_display_formatted', 'total_price_display', 'created_at', 'updated_at')
     inlines = [ModuleInline]
     actions = [publish_courses, unpublish_courses, export_courses_csv, duplicate_course]
+    
+    class Media:
+        css = {
+            'all': ('https://cdn.quilljs.com/1.3.6/quill.snow.css',)
+        }
+        js = (
+            'https://cdn.quilljs.com/1.3.6/quill.min.js',
+            'admin/js/rich_text_editor.js',
+        )
     
     def price_display_admin(self, obj):
         return obj.price_display
@@ -84,7 +120,7 @@ class CourseAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Course Information', {
-            'fields': ('title', 'description', 'category', 'created_by')
+            'fields': ('title', 'description', 'curriculum', 'what_you_will_learn', 'category', 'created_by')
         }),
         ('Pricing Configuration', {
             'fields': ('is_free', 'price', 'tax_rate'),

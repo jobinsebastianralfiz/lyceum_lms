@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -73,6 +76,28 @@ class TeamMembership(models.Model):
         db_table = 'team_memberships'
         unique_together = ['team', 'user']
         ordering = ['joined_at']
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+    
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.expires_at
+    
+    def __str__(self):
+        return f"Password reset token for {self.user.email}"
+    
+    class Meta:
+        db_table = 'password_reset_tokens'
+        ordering = ['-created_at']
 
 # Add a property to User model to get teams
 User.add_to_class('teams', property(lambda self: Team.objects.filter(memberships__user=self, memberships__is_active=True)))

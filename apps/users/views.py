@@ -15,12 +15,16 @@ from .serializers import (
     UserProfileSerializer,
     PasswordChangeSerializer,
     PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
     TeamSerializer,
     TeamCreateSerializer,
     TeamMembershipSerializer,
     UserBasicSerializer
 )
-from .models import Team, TeamMembership
+from .models import Team, TeamMembership, PasswordResetToken
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
 
 User = get_user_model()
 
@@ -42,7 +46,29 @@ User = get_user_model()
                     )
                 ]
             ),
-            401: OpenApiResponse(description="Invalid credentials")
+            400: OpenApiResponse(
+                description="Validation errors",
+                examples=[
+                    OpenApiExample(
+                        'Invalid Email',
+                        value={
+                            "email": ["No account found with this email address. Please check your email or sign up."]
+                        }
+                    ),
+                    OpenApiExample(
+                        'Incorrect Password',
+                        value={
+                            "password": ["The password you entered is incorrect. Please try again."]
+                        }
+                    ),
+                    OpenApiExample(
+                        'Account Deactivated',
+                        value={
+                            "non_field_errors": ["This account has been deactivated. Please contact support for assistance."]
+                        }
+                    )
+                ]
+            )
         },
         tags=['Authentication']
     )
@@ -201,9 +227,86 @@ class PasswordResetRequestView(APIView):
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
-            # TODO: Implement email sending logic
-            return Response({'message': 'Password reset email sent successfully'})
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+                
+                # Deactivate old tokens
+                PasswordResetToken.objects.filter(user=user, is_used=False).update(is_used=True)
+                
+                # Create new token
+                reset_token = PasswordResetToken.objects.create(user=user)
+                
+                # Send email
+                reset_url = f"{request.build_absolute_uri('/')[:-1]}/auth/password-reset-confirm/{reset_token.token}/"
+                
+                try:
+                    send_mail(
+                        subject='Password Reset Request - CodeLearn LMS',
+                        message=f'Click the following link to reset your password: {reset_url}',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[email],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                return Response({'message': 'Password reset email sent successfully'})
+            except User.DoesNotExist:
+                # Return success even if user doesn't exist for security
+                return Response({'message': 'Password reset email sent successfully'})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Password Reset Confirm",
+        description="Confirm password reset with token and set new password",
+        request=PasswordResetConfirmSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Password reset successful",
+                examples=[
+                    OpenApiExample(
+                        'Success Response',
+                        value={"message": "Password reset successful"}
+                    )
+                ]
+            ),
+            400: OpenApiResponse(description="Invalid token or validation errors")
+        },
+        tags=['Authentication']
+    )
+)
+class PasswordResetConfirmView(APIView):
+    """
+    Confirm password reset with token.
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request, token):
+        try:
+            reset_token = PasswordResetToken.objects.get(token=token)
+            
+            if not reset_token.is_valid():
+                return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer = PasswordResetConfirmSerializer(data=request.data)
+            if serializer.is_valid():
+                # Update password
+                user = reset_token.user
+                user.set_password(serializer.validated_data['new_password'])
+                user.save()
+                
+                # Mark token as used
+                reset_token.is_used = True
+                reset_token.save()
+                
+                return Response({'message': 'Password reset successful'})
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except PasswordResetToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Team Management Views
 
@@ -421,3 +524,92 @@ class MyTeamsView(generics.ListAPIView):
             memberships__user=self.request.user,
             memberships__is_active=True
         ).prefetch_related('memberships__user')
+
+@extend_schema_view(
+    delete=extend_schema(
+        summary="Delete User Account",
+        description="Delete the authenticated user's account including all enrollments and user data. Payment information is preserved.",
+        responses={
+            200: OpenApiResponse(
+                description="Account deleted successfully",
+                examples=[
+                    OpenApiExample(
+                        'Success Response',
+                        value={"message": "Account deleted successfully"}
+                    )
+                ]
+            ),
+            401: OpenApiResponse(description="Authentication required")
+        },
+        tags=['User Profile']
+    )
+)
+class DeleteAccountView(APIView):
+    """
+    Delete user account and all related data except payment information.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def delete(self, request):
+        from django.db import transaction
+        from rest_framework_simplejwt.tokens import RefreshToken
+        from apps.payments.models import Enrollment
+        from apps.courses.models import (
+            StudentProgress, ModuleProgress, QuizAttempt, 
+            AssignmentSubmission, StudentAnalytics, ProgressAlert, MentorSession
+        )
+        
+        user = request.user
+        
+        try:
+            with transaction.atomic():
+                # Delete enrollments (but preserve payments)
+                Enrollment.objects.filter(user=user).delete()
+                
+                # Delete student progress and course-related data
+                StudentProgress.objects.filter(user=user).delete()
+                ModuleProgress.objects.filter(student=user).delete()
+                QuizAttempt.objects.filter(student=user).delete()
+                AssignmentSubmission.objects.filter(student=user).delete()
+                
+                # Delete analytics and alerts
+                if hasattr(user, 'analytics'):
+                    user.analytics.delete()
+                ProgressAlert.objects.filter(student=user).delete()
+                
+                # Delete mentor session records (as student)
+                MentorSession.objects.filter(student=user).delete()
+                
+                # Delete team memberships
+                TeamMembership.objects.filter(user=user).delete()
+                
+                # Delete teams created by user (if no other members)
+                user_teams = Team.objects.filter(created_by=user)
+                for team in user_teams:
+                    if not team.memberships.filter(is_active=True).exists():
+                        team.delete()
+                    else:
+                        # Transfer ownership to another active member
+                        new_leader = team.memberships.filter(is_active=True).first()
+                        if new_leader:
+                            team.created_by = new_leader.user
+                            team.team_leader = new_leader.user
+                            team.save()
+                
+                # Delete password reset tokens
+                PasswordResetToken.objects.filter(user=user).delete()
+                
+                # Get refresh token and blacklist it
+                try:
+                    refresh = RefreshToken.for_user(user)
+                    refresh.blacklist()
+                except Exception:
+                    pass
+                
+                # Delete user account
+                user.delete()
+                
+            return Response({'message': 'Account deleted successfully'}, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({'error': 'Failed to delete account'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

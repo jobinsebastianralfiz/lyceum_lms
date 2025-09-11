@@ -848,15 +848,20 @@ class CustomInstallmentPlanForm(forms.ModelForm):
 
 
 class CustomVideoLessonForm(forms.ModelForm):
-    """Custom form for creating and editing video lessons"""
+    """Enhanced form for creating and editing video lessons with platform support"""
 
     class Meta:
         model = VideoLesson
-        fields = ('module', 'title', 'youtube_video_id', 'youtube_url', 'thumbnail_url', 
+        fields = ('module', 'title', 'platform', 'video_url', 'video_id', 'vimeo_video_id',
+                  'youtube_video_id', 'youtube_url', 'thumbnail_url', 
                   'duration', 'description', 'resource_file', 'order', 'is_preview')
         widgets = {
             'module': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter video lesson title'}),
+            'platform': forms.Select(attrs={'class': 'form-select'}),
+            'video_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Full video URL'}),
+            'video_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Platform video ID'}),
+            'vimeo_video_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Vimeo video ID'}),
             'youtube_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=...'}),
             'youtube_video_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter YouTube video ID'}),
             'thumbnail_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Thumbnail URL (auto-generated if empty)'}),

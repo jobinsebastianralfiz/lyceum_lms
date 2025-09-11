@@ -7,8 +7,12 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('terms/', views.terms_conditions, name='terms_conditions'),
+    path('contact/', views.contact, name='contact'),
+    path('refund-policy/', views.refund_policy, name='refund_policy'),
+    path('cancellation-policy/', views.cancellation_policy, name='cancellation_policy'),
     
     # Authentication URLs
+    path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     
     # Public enrollment URLs

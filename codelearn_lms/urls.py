@@ -24,6 +24,9 @@ urlpatterns = [
     # Custom Admin Interface
     path('admin/', include('apps.custom_admin.urls')),
     
+    # Ratings System
+    path('ratings/', include('apps.ratings.urls')),
+    
     # Django Default Admin (fallback)
     path('django-admin/', admin_site.urls),
     
@@ -37,7 +40,9 @@ urlpatterns = [
     path('api/courses/', include('apps.courses.urls')),
     path('api/payments/', include('apps.payments.urls')),
     path('api/notifications/', include('apps.notifications.urls')),
+    path('api/ratings/', include('apps.ratings.api_urls')),
     path('api/youtube/', include('apps.youtube_integration.urls')),
+    path('api/content/', include('apps.content_management.urls')),
 ]
 
 # Serve media files in development

@@ -16,6 +16,7 @@ urlpatterns = [
     path('mentor/alerts/<int:alert_id>/resolve/', mentor_views.resolve_alert, name='resolve_alert'),
     
     # Mentoring Sessions
+    path('mentor/sessions/', mentor_views.mentor_sessions_list, name='mentor_sessions_list'),
     path('mentor/sessions/create/', mentor_views.create_mentor_session, name='create_mentor_session'),
     
     # Debug test

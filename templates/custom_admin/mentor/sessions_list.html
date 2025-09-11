@@ -1,0 +1,269 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Mentoring Sessions - {{ request.user.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .session-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+    }
+    .session-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .session-type-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .filter-form .form-select, 
+    .filter-form .form-control {
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">My Mentoring Sessions</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'mentor:mentor_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+        <a href="{% url 'mentor:create_mentor_session' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>New Session
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <h3 class="mb-1">{{ total_sessions }}</h3>
+                <small>Total Sessions</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-info mb-2">
+                    <i class="fas fa-clock fa-2x"></i>
+                </div>
+                <h4 class="mb-1">{{ total_duration }}</h4>
+                <small class="text-muted">Total Minutes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-success mb-2">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+                <h4 class="mb-1">{{ avg_duration }}</h4>
+                <small class="text-muted">Avg Minutes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-warning mb-2">
+                    <i class="fas fa-users fa-2x"></i>
+                </div>
+                <h4 class="mb-1">{{ students.count }}</h4>
+                <small class="text-muted">Students Mentored</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4 filter-form" style="border-radius: 15px;">
+    <div class="card-body">
+        <form method="get" class="row align-items-end">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Student</label>
+                <select name="student" class="form-select">
+                    <option value="all" {% if student_id == 'all' %}selected{% endif %}>All Students</option>
+                    {% for student in students %}
+                    <option value="{{ student.id }}" {% if student_id == student.id|stringformat:"s" %}selected{% endif %}>
+                        {{ student.name|default:student.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Course</label>
+                <select name="course" class="form-select">
+                    <option value="all" {% if course_id == 'all' %}selected{% endif %}>All Courses</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}" {% if course_id == course.id|stringformat:"s" %}selected{% endif %}>
+                        {{ course.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Session Type</label>
+                <select name="session_type" class="form-select">
+                    <option value="all" {% if session_type == 'all' %}selected{% endif %}>All Types</option>
+                    {% for value, label in session_types %}
+                    <option value="{{ value }}" {% if session_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Search</label>
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search topics, actions..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sessions List -->
+<div class="row">
+    {% for session in page_obj %}
+    <div class="col-lg-6 mb-4">
+        <div class="card session-card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">{{ session.student.name|default:'No Name' }}</h6>
+                        <small class="text-muted">{{ session.student.email }}</small>
+                    </div>
+                </div>
+                <span class="badge session-type-badge bg-info">{{ session.get_session_type_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Date & Time</small>
+                        <strong>{{ session.session_date|date:"M j, Y" }}</strong><br>
+                        <small>{{ session.session_date|time:"g:i A" }}</small>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Duration</small>
+                        <strong>{{ session.duration_minutes }} minutes</strong>
+                    </div>
+                </div>
+                
+                {% if session.course %}
+                <div class="mb-3">
+                    <small class="text-muted d-block">Course</small>
+                    <span class="badge bg-light text-dark">{{ session.course.title }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Topics Discussed</small>
+                    <p class="mb-0">{{ session.topics_discussed|truncatechars:150 }}</p>
+                </div>
+                
+                {% if session.action_items %}
+                <div class="mb-3">
+                    <small class="text-muted d-block">Action Items</small>
+                    <p class="mb-0 small">{{ session.action_items|truncatechars:100 }}</p>
+                </div>
+                {% endif %}
+                
+                {% if session.follow_up_required %}
+                <div class="mb-3">
+                    <div class="alert alert-info py-2">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        <strong>Follow-up Required</strong>
+                        {% if session.follow_up_date %}
+                        <br><small>Due: {{ session.follow_up_date|date:"M j, Y" }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Session created {{ session.created_at|timesince }} ago</small>
+                    <a href="{% url 'mentor:student_detail' session.student.id %}" class="btn btn-sm btn-outline-primary">
+                        View Student Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-comments-slash fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No mentoring sessions found</h5>
+                <p class="text-muted">{% if search or student_id != 'all' or course_id != 'all' or session_type != 'all' %}Try adjusting your filters or{% else %}Start by{% endif %} creating your first mentoring session.</p>
+                <a href="{% url 'mentor:create_mentor_session' %}" class="btn btn-info">
+                    <i class="fas fa-plus me-2"></i>Create Session
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Sessions pagination">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if student_id != 'all' %}&student={{ student_id }}{% endif %}{% if course_id != 'all' %}&course={{ course_id }}{% endif %}{% if session_type != 'all' %}&session_type={{ session_type }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if student_id != 'all' %}&student={{ student_id }}{% endif %}{% if course_id != 'all' %}&course={{ course_id }}{% endif %}{% if session_type != 'all' %}&session_type={{ session_type }}{% endif %}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if student_id != 'all' %}&student={{ student_id }}{% endif %}{% if course_id != 'all' %}&course={{ course_id }}{% endif %}{% if session_type != 'all' %}&session_type={{ session_type }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-submit form when filters change (optional)
+document.querySelectorAll('select[name="student"], select[name="course"], select[name="session_type"]').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+</script>
+{% endblock %}

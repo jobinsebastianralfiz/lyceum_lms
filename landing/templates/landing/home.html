@@ -1,923 +1,318 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
+{% block title %}Uptrail - Transform Your Learning Journey{% endblock %}
+
 {% block extra_css %}
 <style>
-:root {
-  --primary-blue: #2563eb;
-  --primary-dark: #1d4ed8;
-  --secondary-orange: #ea580c;
-  --secondary-light: #fed7aa;
-  --dark-bg: #0f172a;
-  --dark-card: #1e293b;
-  --light-gray: #f8fafc;
-  --text-dark: #0f172a;
-  --text-light: #64748b;
-  --white: #ffffff;
-  --success: #10b981;
-  --warning: #f59e0b;
+/* Featured Courses Styling */
+.cs-course.cs-style1 {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.cs-course.cs-style1:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.6;
-  color: var(--text-dark);
-  overflow-x: hidden;
+.cs-course_img {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  background-color: #f8fafc;
 }
 
-/* Navigation */
-.navbar {
-  background: var(--white) !important;
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid #e2e8f0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  padding: 0.5rem 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.cs-course_info {
+  padding: 20px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
+.cs-course_price {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.cs-course_meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.5rem;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #64748b;
 }
 
-.nav-logo img {
-  height: 32px;
+.cs-course_title {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.nav-link {
-  color: var(--text-dark) !important;
+.cs-course_title a {
+  color: #0f172a;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
   transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: var(--primary-blue) !important;
-}
-
-.nav-login-btn {
-  background: var(--primary-blue) !important;
-  color: var(--white) !important;
-  padding: 0.5rem 1rem !important;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.nav-login-btn:hover {
-  background: var(--primary-dark) !important;
-  transform: translateY(-1px);
-}
-
-/* Hero Section */
-.hero {
-  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-card) 100%);
-  color: var(--white);
-  min-height: 90vh;
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding-top: 60px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(45deg, var(--primary-blue), var(--secondary-orange));
-  opacity: 0.1;
-  transform: skewX(-15deg);
-  transform-origin: top;
+.cs-course_title a:hover {
+  color: #2563eb;
 }
 
-.hero-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 3rem;
-  align-items: center;
-  position: relative;
-  z-index: 1;
+.cs-course_text {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  flex: 1;
 }
 
-.hero-content {
-  animation: fadeInUp 0.8s ease;
+.cs-course_category {
+  margin-top: auto;
 }
 
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, var(--white), var(--secondary-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: #cbd5e1;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-  max-width: 500px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-.btn {
-  padding: 0.875rem 1.75rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--white);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-}
-
-.btn-secondary {
-  background: var(--white);
-  color: var(--text-dark);
-  border: 2px solid var(--white);
-}
-
-.btn-secondary:hover {
-  background: transparent;
-  color: var(--white);
-  border-color: var(--white);
-}
-
-.hero-stats {
-  display: flex;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.hero-stat {
-  text-align: center;
-}
-
-.hero-stat-number {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--secondary-orange);
-  display: block;
-}
-
-.hero-stat-label {
-  font-size: 0.875rem;
-  color: #94a3b8;
-}
-
-.hero-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.hero-phone {
-  max-width: 300px;
-  width: 100%;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  position: relative;
-  z-index: 2;
-}
-
-/* Features Section */
-.features {
-  padding: 4rem 0;
-  background: var(--light-gray);
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin-bottom: 0.75rem;
-}
-
-.section-subtitle {
-  font-size: 1.125rem;
-  color: var(--text-light);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.feature-card {
-  background: var(--white);
-  padding: 2rem;
+.cs-course_category_name {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  padding: 4px 12px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-orange));
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.feature-card:hover::before {
-  transform: scaleX(1);
-}
-
-.feature-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-orange));
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover .feature-icon {
-  transform: scale(1.1);
-}
-
-.feature-icon i {
-  font-size: 1.5rem;
-  color: var(--white);
-}
-
-.feature-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 0.75rem;
-}
-
-.feature-description {
-  color: var(--text-light);
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-
-/* CTA Section */
-.cta {
-  padding: 4rem 0;
-  background: var(--white);
-}
-
-.cta-container {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 3rem 2rem;
-  background: linear-gradient(135deg, var(--dark-bg), var(--dark-card));
-  border-radius: 16px;
-  color: var(--white);
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-container::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(234, 88, 12, 0.1), transparent);
-  transform: rotate(45deg);
-  animation: shimmer 3s infinite;
-}
-
-.cta-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.cta-subtitle {
-  font-size: 1.125rem;
-  opacity: 0.9;
-  margin-bottom: 2rem;
-  position: relative;
-  z-index: 1;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  position: relative;
-  z-index: 1;
-}
-
-.cta-buttons .btn {
-  padding: 0.875rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  min-width: 160px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cta-buttons .btn-primary {
-  background: var(--success);
-  color: var(--white);
-  border-color: var(--success);
-}
-
-.cta-buttons .btn-primary:hover {
-  background: #059669;
-  border-color: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-}
-
-.cta-buttons .btn-secondary {
-  background: transparent;
-  color: var(--white);
-  border-color: var(--white);
-}
-
-.cta-buttons .btn-secondary:hover {
-  background: var(--white);
-  color: var(--dark-bg);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
-}
-
-/* Download Section */
-.download {
-  padding: 5rem 0;
-  background: var(--light-gray);
-  position: relative;
-  overflow: hidden;
-}
-
-.download-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-}
-
-.download-content {
-  padding: 0 1.5rem;
-}
-
-.download-title {
-  font-size: 2.75rem;
-  font-weight: 800;
-  color: var(--text-dark);
-  margin-bottom: 1.5rem;
-  line-height: 1.2;
-}
-
-.download-subtitle {
-  font-size: 1.25rem;
-  color: var(--text-light);
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
-}
-
-.download-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 300px;
-}
-
-.download-btn {
-  background: var(--white);
-  color: var(--text-dark);
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  border: 1px solid #e2e8f0;
-  position: relative;
-  overflow: hidden;
-}
-
-.download-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
-  transition: left 0.5s;
-}
-
-.download-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-  color: var(--text-dark);
-  border-color: var(--primary-blue);
-}
-
-.download-btn:hover::before {
-  left: 100%;
-}
-
-.download-icon {
-  font-size: 2rem;
-  color: var(--primary-blue);
-  min-width: 40px;
-}
-
-.download-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.download-text span {
-  font-size: 0.875rem;
-  color: var(--text-light);
+  font-size: 12px;
   font-weight: 500;
 }
 
-.download-text strong {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.download-visual {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.phone-mockup {
-  width: 280px;
-  height: 560px;
-  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-card) 100%);
-  border-radius: 30px;
-  padding: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.phone-screen {
-  width: 100%;
-  height: 100%;
-  background: var(--white);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.phone-app-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-
-.phone-app-icon i {
-  font-size: 2rem;
-  color: var(--white);
-}
-
-.phone-app-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin-bottom: 0.5rem;
-}
-
-.phone-app-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-light);
-  text-align: center;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) rotate(45deg);
-  }
-}
-
-/* Mobile Responsive */
+/* Responsive */
 @media (max-width: 768px) {
-  .nav-container {
-    padding: 0 1rem;
+  .cs-course_price {
+    padding: 4px 10px;
+    font-size: 12px;
   }
   
-  .nav-menu {
-    flex-direction: column;
-    position: fixed;
-    top: 60px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 60px);
-    background: var(--white);
-    transition: 0.3s;
-    text-align: center;
-    padding: 2rem 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  .cs-course_info {
+    padding: 15px;
   }
   
-  .nav-menu.active {
-    left: 0;
-  }
-  
-  .hero-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    text-align: center;
-  }
-  
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.125rem;
-    max-width: none;
-  }
-  
-  .hero-stats {
-    justify-content: center;
-    gap: 1.5rem;
-  }
-  
-  .features {
-    padding: 3rem 0;
-  }
-  
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .feature-card {
-    padding: 1.5rem;
-  }
-  
-  .section-title {
-    font-size: 1.875rem;
-  }
-  
-  .stats {
-    padding: 3rem 0;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-  
-  .cta {
-    padding: 3rem 0;
-  }
-  
-  .cta-container {
-    margin: 0 1rem;
-    padding: 2rem 1.5rem;
-  }
-  
-  .cta-title {
-    font-size: 1.75rem;
-  }
-  
-  .cta-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .download-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    text-align: center;
-  }
-  
-  .download-visual {
-    order: -1;
-  }
-  
-  .phone-mockup {
-    width: 240px;
-    height: 480px;
-  }
-  
-  .download-buttons {
-    margin: 0 auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .hero-stats {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .download-title {
-    font-size: 2.25rem;
-  }
-  
-  .download-subtitle {
-    font-size: 1.125rem;
-  }
-  
-  .phone-mockup {
-    width: 200px;
-    height: 400px;
-  }
-  
-  .btn {
-    width: 100%;
-    max-width: 250px;
+  .cs-course_title {
+    font-size: 16px;
   }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-container">
-    <div class="hero-content">
-      <h1 class="hero-title">Master Skills That Matter</h1>
-      <p class="hero-subtitle">Transform your career with topic-focused courses, interactive learning, and practical assignments. Quality education at prices that work for you.</p>
-      
-      <div class="hero-buttons">
-        <a href="/courses/" class="btn btn-primary">
-          <i class="fas fa-play me-2"></i>Start Learning
-        </a>
-        <a href="#features" class="btn btn-secondary">Explore Features</a>
-      </div>
-      
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <span class="hero-stat-number">1000+</span>
-          <span class="hero-stat-label">Students</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-number">100+</span>
-          <span class="hero-stat-label">Topics</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-number">₹99</span>
-          <span class="hero-stat-label">Starting Price</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="hero-image">
-      <img src="{% static 'landing/images/simulator.png' %}" alt="Uptrail Learning App" class="hero-phone">
-    </div>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section id="features" class="features">
+<!-- Start Hero -->
+<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble">
+  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
   <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">Why Choose Uptrail?</h2>
-      <p class="section-subtitle">Everything you need for effective learning in one powerful platform</p>
-    </div>
-    
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-book-open"></i>
-        </div>
-        <h3 class="feature-title">Topic-Focused Learning</h3>
-        <p class="feature-description">Master specific skills with structured, bite-sized content designed for maximum retention and practical application.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-dollar-sign"></i>
-        </div>
-        <h3 class="feature-title">Affordable Pricing</h3>
-        <p class="feature-description">Quality education without the premium price tag. Pay only for what you learn, starting from just ₹99.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-mobile-alt"></i>
-        </div>
-        <h3 class="feature-title">Mobile-First Design</h3>
-        <p class="feature-description">Learn anywhere, anytime with our intuitive mobile app designed for busy professionals and students.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-question-circle"></i>
-        </div>
-        <h3 class="feature-title">Interactive Quizzes</h3>
-        <p class="feature-description">Test your knowledge with engaging quizzes and assessments that adapt to your learning pace and style.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-tasks"></i>
-        </div>
-        <h3 class="feature-title">Hands-On Projects</h3>
-        <p class="feature-description">Apply what you learn with real-world assignments and projects that build your portfolio and confidence.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-chart-line"></i>
-        </div>
-        <h3 class="feature-title">Progress Tracking</h3>
-        <p class="feature-description">Monitor your growth with detailed analytics, completion certificates, and personalized learning insights.</p>
+    <div class="cs-hero_text wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">
+      <h3 class="cs-hero_minititle text-uppercase">Learn With Us Online</h3>
+      <h1 class="cs-hero_title">Transform Your <br>Learning Journey <br><b>with Uptrail</b></h1>
+      <div class="cs-hero_subtitle cs-primary_color">Join thousands of learners on Uptrail, the cutting-edge LMS platform <br>that personalizes your educational experience and unlocks your potential.</div>
+      <div class="cs-hero_btns">
+        <a href="{% url 'landing:courses' %}" class="cs-btn cs-style1 cs-btn_lg cs-primary_font cs-medium cs-accent_bg cs-accent_border cs-white cs-white_hover cs-primary_bg_hover cs-primary_border_hover">Explore Courses</a>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'landing:register' %}" class="cs-btn cs-style1 cs-btn_lg cs-primary_font cs-medium cs-white_bg cs-white_border cs-primary_color cs-accent_color_hover cs-accent_bg_hover cs-accent_border_hover cs-white_hover" style="margin-left: 15px;">Start Free Trial</a>
+        {% endif %}
       </div>
     </div>
   </div>
-</section>
+  <div class="cs-hero_img cs-parallax wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.2s">
+    <div class="cs-to_right"><img src="{% static 'landing/assets/img/online-education/hero-img.svg' %}" alt="Hero Image"></div>
+  </div>
+</div>
+<!-- End Hero -->
 
-
-<!-- CTA Section -->
-<section class="cta">
-  <div class="container">
-    <div class="cta-container">
-      <h2 class="cta-title">Ready to Start Learning?</h2>
-      <p class="cta-subtitle">Join thousands of students already mastering new skills with Uptrail</p>
-      <div class="cta-buttons">
-        <a href="/courses/" class="btn btn-primary">Browse Courses</a>
-        <a href="{% url 'student_portal:login' %}" class="btn btn-secondary">
-          <i class="fas fa-sign-in-alt me-2"></i>Student Login
-        </a>
-      </div>
+<!-- Start Courses Section -->
+<div class="cs-height_135 cs-height_lg_75"></div>
+<div class="container wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+  <div class="cs-section_heading cs-style4 cs-size3">
+    <div class="cs-section_heading_left">
+      <div class="cs-section_subtitle">Choose your subject</div>
+      <h2 class="cs-section_title">Our featured <b class="cs-accent_color">courses</b>.</h2>
+    </div>
+    <div class="cs-section_heading_right">
+      <a href="{% url 'landing:courses' %}" class="cs-btn cs-style3 cs-btn_lg cs-accent_color cs-accent_color_2_hover cs-primary_font ">
+        <span class="cs-btn_text">View all courses</span>
+        <span class="cs-btn_icon cs-center"><i class="fas fa-arrow-right"></i></span>
+      </a>
     </div>
   </div>
-</section>
+  <div class="cs-height_80 cs-height_lg_60"></div>
+</div>
 
-<!-- Download Section -->
-<section class="download">
-  <div class="container">
-    <div class="download-container">
-      <div class="download-content">
-        <h2 class="download-title">Learn Anywhere, Anytime</h2>
-        <p class="download-subtitle">Take your learning journey with you. Download the Uptrail mobile app and access your courses offline, get push notifications, and learn on the go.</p>
-        <div class="download-buttons">
-          <a href="#" class="download-btn">
-            <i class="fab fa-apple download-icon"></i>
-            <div class="download-text">
-              <span>Download on the</span>
-              <strong>App Store</strong>
-            </div>
-          </a>
-          <a href="#" class="download-btn">
-            <i class="fab fa-google-play download-icon"></i>
-            <div class="download-text">
-              <span>Get it on</span>
-              <strong>Google Play</strong>
-            </div>
-          </a>
+<div class="container wow fadeIn" data-wow-duration="1s" data-wow-delay="0.3s">
+  <div class="row">
+    {% for course in courses %}
+    <div class="col-lg-4 col-md-6">
+      <div class="cs-course cs-style1 cs-white_bg">
+        <!-- Course Image -->
+        <div class="cs-course_img cs-bg" 
+             {% if course.thumbnail %}
+             data-src="{{ course.thumbnail.url }}"
+             {% else %}
+             data-src="{% static 'landing/assets/img/online-education/course1.jpg' %}"
+             {% endif %}>
+        </div>
+        
+        <!-- Course Info -->
+        <div class="cs-course_info">
+          <!-- Course Price Badge -->
+          <div class="cs-course_price cs-accent_bg cs-white">
+            {% if course.is_free_course %}
+              Free
+            {% else %}
+              <span>₹</span> {{ course.total_price|floatformat:0 }}
+            {% endif %}
+          </div>
+          
+          <!-- Course Meta -->
+          <div class="cs-course_meta">
+            <span class="cs-course_duration">
+              <i class="far fa-clock"></i> 
+              {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
+            </span>
+            <span class="cs-course_posted_by">{{ course.created_at|date:"d M, Y" }}</span>
+          </div>
+          
+          <!-- Course Title -->
+          <h2 class="cs-course_title">
+            <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
+          </h2>
+          
+          <!-- Course Description -->
+          <div class="cs-course_text">
+            {{ course.description|truncatechars:100 }}
+          </div>
+          
+          <!-- Course Category -->
+          {% if course.category %}
+          <div class="cs-course_category">
+            <span class="cs-course_category_name">{{ course.category.name }}</span>
+          </div>
+          {% endif %}
         </div>
       </div>
-      <div class="download-visual">
-        <div class="phone-mockup">
-          <div class="phone-screen">
-            <div class="phone-app-icon">
-              <i class="fas fa-graduation-cap"></i>
+      <div class="cs-height_40 cs-height_lg_30"></div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="cs-text_box text-center">
+        <h3>No courses available at the moment</h3>
+        <p>Check back later for new courses!</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<div class="cs-height_110 cs-height_lg_50"></div>
+<!-- End Courses Section -->
+
+<!-- Start About Section -->
+<div class="cs-shape_bg cs-style6" id="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.2s">
+        <div class="cs-left_full_width text-end">
+          <div class="cs-height_50 cs-height_lg_80"></div>
+          <div class="cs-image_box cs-style3 cs-type1 cs-parallax cs-align_right">
+            <div class="cs-image_box_img"><img src="{% static 'landing/assets/img/online-education/about.png' %}" alt="About Uptrail"></div>
+            <div class="cs-image_box_text cs-to_up cs-accent_color">
+              <div class="cs-image_box_text_in">
+                <div class="cs-image_box_title cs-bold">{{ courses|length|add:50 }}<span>+</span></div>
+                <h2 class="cs-image_box_subtitle cs-medium">Courses</h2>
+              </div>
             </div>
-            <h3 class="phone-app-title">Uptrail</h3>
-            <p class="phone-app-subtitle">Learn coding skills<br>on the go</p>
+            <div class="cs-image_box_pattern cs-to_left cs-accent_color"></div>
+          </div>
+          <div class="cs-height_0 cs-height_lg_50"></div>
+        </div>
+      </div>
+      <div class="col-lg-5 offset-lg-1 wow fadeIn" data-wow-duration="1s" data-wow-delay="0.3s">
+        <div class="cs-vertical_middle">
+          <div class="cs-vertical_middle_in">
+            <div class="cs-text_box cs-style1 cs-size2">
+              <div class="cs-text_box_subtitle">About us</div>
+              <h2 class="cs-text_box_title">We provide the <br/>best <b class="cs-accent_color">online learning</b></h2>
+              <div class="cs-height_25 cs-height_lg_25"></div>
+              <div class="cs-text_box_text">
+                Uptrail is a cutting-edge learning management system designed to transform how you learn and grow. 
+                Our platform combines innovative technology with personalized learning experiences to help students 
+                achieve their educational goals.<br/><br/>
+                With expert instructors, interactive content, and flexible scheduling, we make quality education 
+                accessible to everyone, anywhere, anytime.
+              </div>
+              <div class="cs-height_30 cs-height_lg_30"></div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="cs-list cs-style1">
+                    <ul>
+                      <li><i class="fas fa-check cs-accent_color"></i> Expert Instructors</li>
+                      <li><i class="fas fa-check cs-accent_color"></i> Interactive Learning</li>
+                      <li><i class="fas fa-check cs-accent_color"></i> Flexible Scheduling</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="cs-list cs-style1">
+                    <ul>
+                      <li><i class="fas fa-check cs-accent_color"></i> Progress Tracking</li>
+                      <li><i class="fas fa-check cs-accent_color"></i> Certificates</li>
+                      <li><i class="fas fa-check cs-accent_color"></i> 24/7 Support</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="cs-height_40 cs-height_lg_30"></div>
+              <a href="{% url 'landing:courses' %}" class="cs-btn cs-style1 cs-btn_lg cs-primary_font cs-medium cs-accent_bg cs-accent_border cs-white cs-white_hover cs-primary_bg_hover cs-primary_border_hover">Get Started</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
+<!-- End About Section -->
+
+<!-- Start CTA Section -->
+<div class="cs-height_135 cs-height_lg_80"></div>
+<div class="cs-cta cs-style1 cs-accent_8_bg_2" id="contact">
+  <div class="container">
+    <div class="cs-cta_content">
+      <div class="cs-cta_left">
+        <h2 class="cs-cta_title">Ready to start your learning journey?</h2>
+        <div class="cs-cta_subtitle">Join thousands of students who are already transforming their careers with Uptrail.</div>
+      </div>
+      <div class="cs-cta_right">
+        {% if not user.is_authenticated %}
+          <a href="{% url 'landing:register' %}" class="cs-btn cs-style1 cs-btn_lg cs-accent_color cs-accent_8_color cs-accent_8_bg cs-accent_5_bg_h cs-medium cs-primary_font">
+            <span>Get Started Free</span>
+          </a>
+        {% else %}
+          <a href="{% url 'landing:courses' %}" class="cs-btn cs-style1 cs-btn_lg cs-accent_color cs-accent_8_color cs-accent_8_bg cs-accent_5_bg_h cs-medium cs-primary_font">
+            <span>Browse Courses</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cs-height_135 cs-height_lg_80"></div>
+<!-- End CTA Section -->
 {% endblock %}

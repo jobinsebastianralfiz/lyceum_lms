@@ -1,0 +1,176 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}Sign In - Uptrail{% endblock %}
+
+{% block content %}
+<div class="cs-height_90 cs-height_lg_80"></div>
+
+<!-- Start Form -->
+<div class="cs-bg2" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+  <div class="cs-height_140 cs-height_lg_80"></div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-xl-5">
+        <form class="cs-form cs-style1" method="post">
+          <div class="cs-height_50 cs-height_lg_50"></div>
+          
+          <!-- Messages -->
+          {% if messages %}
+          <div class="cs-messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert" style="margin-bottom: 30px; padding: 15px; border-radius: 8px; border: none;">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="cs-form_body" style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);">
+            <h2 class="cs-form_title text-center"><b class="cs-accent_color">Welcome</b> Back</h2>
+            <p class="text-center cs-primary_color" style="margin-top: 10px;">Sign in to your Uptrail account</p>
+            <div class="cs-height_40 cs-height_lg_30"></div>
+            
+            {% csrf_token %}
+            {% if request.GET.next %}
+              <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+            
+            <label class="cs-primary_color cs-medium">Email or Username*</label>
+            <input type="text" name="email" placeholder="Enter your email or username" 
+                   class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" 
+                   value="{{ request.POST.email|default:'' }}" required>
+            <div class="cs-height_25 cs-height_lg_25"></div>
+            
+            <label class="cs-primary_color cs-medium">Password*</label>
+            <input type="password" name="password" placeholder="Enter your password" 
+                   class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
+            <div class="cs-height_15 cs-height_lg_15"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+              <label class="cs-checkbox cs-style1" style="margin: 0;">
+                <input type="checkbox" name="remember_me">
+                <span class="cs-checkbox_indicator cs-accent_bg"></span>
+                <span class="cs-checkbox_text cs-primary_color">Remember me</span>
+              </label>
+              <a href="mailto:support@uptrail.com" class="cs-accent_color" style="text-decoration: none; font-size: 14px;">
+                Need Help?
+              </a>
+            </div>
+            
+            <button type="submit" class="cs-btn cs-style1 cs-medium cs-primary_font cs-accent_bg cs-accent_border cs-white cs-accent_bg_2_hover cs-primary_color_hover cs-accent_border_2_hover" style="width: 100%; padding: 15px;">
+              <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>Sign In
+            </button>
+            <div class="cs-height_30 cs-height_lg_30"></div>
+          </div>
+          
+          <hr class="cs-accent_30_bg">
+          <div class="cs-height_20 cs-height_lg_20"></div>
+          <div class="cs-form_footer text-center cs-medium cs-primary_color">
+            Don't have an account? 
+            <a href="{% url 'landing:register' %}" class="cs-accent_color" style="text-decoration: none; font-weight: 600;">
+              Create Free Account
+            </a>
+          </div>
+          <div class="cs-height_50 cs-height_lg_40"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="cs-height_140 cs-height_lg_80"></div>
+</div>
+<!-- End Form -->
+
+<!-- Start Features Section -->
+<div class="cs-height_100 cs-height_lg_60"></div>
+<div class="container">
+  <div class="cs-section_heading cs-style4 text-center">
+    <div class="cs-section_subtitle">Welcome back to</div>
+    <h2 class="cs-section_title">Your learning <b class="cs-accent_color">journey</b></h2>
+  </div>
+  <div class="cs-height_60 cs-height_lg_40"></div>
+  <div class="row">
+    <div class="col-lg-4 col-md-6">
+      <div class="cs-iconbox cs-style8 text-center">
+        <div class="cs-iconbox_icon cs-accent_color">
+          <i class="fas fa-play-circle" style="font-size: 3rem;"></i>
+        </div>
+        <div class="cs-iconbox_content">
+          <h3 class="cs-iconbox_title cs-font_18">Resume Learning</h3>
+          <div class="cs-iconbox_text">Pick up right where you left off with your personalized dashboard.</div>
+        </div>
+      </div>
+      <div class="cs-height_40 cs-height_lg_40"></div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="cs-iconbox cs-style8 text-center">
+        <div class="cs-iconbox_icon cs-accent_color">
+          <i class="fas fa-chart-line" style="font-size: 3rem;"></i>
+        </div>
+        <div class="cs-iconbox_content">
+          <h3 class="cs-iconbox_title cs-font_18">Track Progress</h3>
+          <div class="cs-iconbox_text">Monitor your learning progress and achievements in real-time.</div>
+        </div>
+      </div>
+      <div class="cs-height_40 cs-height_lg_40"></div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="cs-iconbox cs-style8 text-center">
+        <div class="cs-iconbox_icon cs-accent_color">
+          <i class="fas fa-users" style="font-size: 3rem;"></i>
+        </div>
+        <div class="cs-iconbox_content">
+          <h3 class="cs-iconbox_title cs-font_18">Community</h3>
+          <div class="cs-iconbox_text">Connect with fellow learners and instructors in our community.</div>
+        </div>
+      </div>
+      <div class="cs-height_40 cs-height_lg_40"></div>
+    </div>
+  </div>
+</div>
+<div class="cs-height_100 cs-height_lg_60"></div>
+<!-- End Features Section -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  // Auto-hide messages after 5 seconds
+  setTimeout(function() {
+    $('.alert').fadeOut();
+  }, 5000);
+  
+  // CSRF protection check
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  // Check CSRF protection on form submission
+  const form = document.querySelector('form[method="post"]');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const csrfCookie = getCookie('csrftoken');
+      const csrfInput = this.querySelector('[name=csrfmiddlewaretoken]');
+      
+      if (!csrfCookie || !csrfInput || !csrfInput.value) {
+        e.preventDefault();
+        alert('Security error. Please reload the page and try again.');
+        location.reload();
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

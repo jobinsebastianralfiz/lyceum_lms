@@ -1,0 +1,9 @@
+This is a test resource file for testing resource display in the Flutter app.
+        
+Contents:
+- Course materials
+- Practice exercises  
+- Additional resources
+- Download links
+
+This file should appear in the Flutter app when viewing this video lesson.

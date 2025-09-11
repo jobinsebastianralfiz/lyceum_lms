@@ -1,521 +1,1093 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Dashboard - CodeLearn Student Portal{% endblock %}
+{% block title %}Dashboard - {{ request.user.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-  .dashboard-container {
-    padding: 1rem;
-  }
-  
-  .welcome-header {
-    background: linear-gradient(135deg, #5d87ff 0%, #4570ea 100%);
-    color: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .stats-row {
-    margin-bottom: 1.5rem;
-  }
-  
-  .stat-card {
-    background: white;
-    border: 1px solid #e3e6ef;
-    border-radius: 10px;
-    padding: 1rem;
-    text-align: center;
-    transition: transform 0.2s ease;
-    height: 100%;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  .stat-number {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-  }
-  
-  .stat-label {
-    color: #6c757d;
-    font-size: 0.875rem;
-  }
-  
-  .section-card {
-    background: white;
-    border: 1px solid #e3e6ef;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-  }
-  
-  .section-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f1f3f4;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .section-body {
-    padding: 1.25rem;
-  }
-  
-  .course-card {
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    height: 100%;
-  }
-  
-  .course-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    border-color: #5d87ff;
-  }
-  
-  .course-image {
-    height: 140px;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .course-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .course-placeholder {
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-  
-  .course-badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-  }
-  
-  .course-price {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-  }
-  
-  .course-content {
-    padding: 1rem;
-  }
-  
-  .course-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-  
-  .progress-section {
-    margin: 0.75rem 0;
-  }
-  
-  .progress-bar {
-    height: 6px;
-    border-radius: 3px;
-  }
-  
-  .activity-item {
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f8f9fa;
-  }
-  
-  .activity-item:last-child {
-    border-bottom: none;
-  }
-  
-  .activity-icon {
-    width: 35px;
-    height: 35px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-  }
-  
-  .quick-action {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition: background-color 0.2s ease;
-    margin-bottom: 0.5rem;
-  }
-  
-  .quick-action:hover {
-    background-color: #f8f9fa;
-    color: inherit;
-  }
-  
-  .quick-action-icon {
-    width: 35px;
-    height: 35px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.75rem;
-    font-size: 16px;
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: #6c757d;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .dashboard-container {
-      padding: 0.75rem;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    
-    .welcome-header {
-      padding: 1rem;
-      text-align: center;
+
+    body {
+        background: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        color: #2c3e50;
+        line-height: 1.6;
     }
-    
-    .welcome-header .row {
-      text-align: center;
+
+    .dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 15px;
     }
-    
-    .stats-row .col-4 {
-      margin-bottom: 0.75rem;
+
+    /* Header Section */
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
     }
-    
-    .course-image {
-      height: 120px;
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+        transform: rotate(45deg);
     }
-    
-    .section-header {
-      padding: 0.75rem 1rem;
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
     }
-    
-    .section-body {
-      padding: 1rem;
+
+    .welcome-info h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
-  }
-  
-  @media (max-width: 576px) {
-    .course-card {
-      margin-bottom: 1rem;
+
+    .welcome-info p {
+        opacity: 0.9;
+        font-size: 16px;
     }
-    
+
+    .header-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .header-stat {
+        text-align: center;
+        min-width: 70px;
+    }
+
+    .header-stat-number {
+        display: block;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .header-stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Main Grid */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        background: white;
+        padding: 18px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .stat-card.videos::before { background: #3498db; }
+    .stat-card.assignments::before { background: #2ecc71; }
+    .stat-card.quizzes::before { background: #e74c3c; }
+    .stat-card.modules::before { background: #9b59b6; }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+    }
+
+    .stat-card.videos .stat-icon { background: #3498db; }
+    .stat-card.assignments .stat-icon { background: #2ecc71; }
+    .stat-card.quizzes .stat-icon { background: #e74c3c; }
+    .stat-card.modules .stat-icon { background: #9b59b6; }
+
     .stat-number {
-      font-size: 1.5rem;
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 6px;
     }
-  }
+
+    .stat-label {
+        font-size: 13px;
+        color: #7f8c8d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: #27ae60;
+        font-weight: 500;
+    }
+
+    /* Content Sections */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 15px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .section-icon {
+        color: #667eea;
+    }
+
+    .section-body {
+        padding: 15px;
+    }
+
+    /* Course Progress */
+    .course-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f4;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .course-item:last-child {
+        border-bottom: none;
+    }
+
+    .course-icon {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .course-details {
+        flex: 1;
+    }
+
+    .course-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 6px;
+    }
+
+    .course-progress {
+        margin-bottom: 5px;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 3px;
+        transition: width 0.8s ease;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+
+    .course-badge {
+        background: #667eea;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* Activity Feed */
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 28px;
+        height: 28px;
+        background: #f8f9fa;
+        color: #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .activity-content h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .activity-content p {
+        font-size: 11px;
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    /* Quick Actions */
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    /* News Section Styles */
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .news-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .news-image img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .news-content {
+        padding: 15px;
+    }
+
+    .news-category {
+        font-size: 12px;
+        color: #667eea;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .news-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    .news-excerpt {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .news-meta {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .news-meta i {
+        margin-right: 5px;
+    }
+
+    /* Placements Section Styles */
+    .placements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .placement-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .placement-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .placement-student {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .student-avatar, .testimonial-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+    }
+
+    .student-avatar-placeholder, .testimonial-avatar-placeholder {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        color: #999;
+        font-size: 20px;
+    }
+
+    .student-info h4, .testimonial-info h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #2c3e50;
+    }
+
+    .student-info p, .testimonial-info p {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .company-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .company-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        margin-right: 12px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    .placement-type {
+        font-size: 11px;
+        background: #e8f4fd;
+        color: #1976d2;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    /* Testimonials Section Styles */
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .testimonial-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .testimonial-info p {
+        margin-bottom: 6px;
+    }
+
+    .rating {
+        display: flex;
+        gap: 2px;
+    }
+
+    .rating i {
+        font-size: 12px;
+        color: #ffc107;
+    }
+
+    .testimonial-content {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.6;
+        font-style: italic;
+    }
+
+    .video-thumbnail {
+        background: #f8f9fa;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .video-thumbnail:hover {
+        background: #e9ecef;
+        border-color: #667eea;
+    }
+
+    .video-thumbnail i {
+        font-size: 24px;
+        color: #667eea;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .video-thumbnail span {
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .action-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        text-decoration: none;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        display: block;
+    }
+
+    .action-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: #667eea;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .action-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        margin: 0 auto 10px;
+    }
+
+    .action-label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* Upcoming Assignments */
+    .assignment-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .assignment-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .assignment-priority {
+        width: 8px;
+        height: 40px;
+        background: #f39c12;
+        border-radius: 4px;
+    }
+
+    .assignment-content {
+        flex: 1;
+    }
+
+    .assignment-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+    }
+
+    .assignment-meta {
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+
+    .empty-state h4 {
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #95a5a6;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard {
+            padding: 15px;
+        }
+
+        .main-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .header-stats {
+            gap: 20px;
+        }
+
+        .dashboard-header {
+            padding: 20px;
+        }
+
+        .welcome-info h1 {
+            font-size: 24px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-  <!-- Welcome Section -->
-  <div class="welcome-header">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h4 class="fw-bold mb-1">Welcome back, {{ user.name }}! 👋</h4>
-        <p class="mb-0 opacity-90">Ready to continue your learning journey?</p>
-      </div>
-      <div class="col-md-4 text-md-end mt-2 mt-md-0">
-        <small class="opacity-75">{{ user.email }}</small>
-      </div>
+<div class="dashboard">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="welcome-info">
+                <h1>Welcome back, {{ request.user.name|default:request.user.username }}!</h1>
+                <p>{{ current_time|date:"l, F j, Y" }} - Ready to continue your learning journey?</p>
+            </div>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <span class="header-stat-number">{{ enrolled_courses_count|default:0 }}</span>
+                    <span class="header-stat-label">Courses</span>
+                </div>
+                <div class="header-stat">
+                    <span class="header-stat-number">{{ completed_videos_count|default:0 }}</span>
+                    <span class="header-stat-label">Videos</span>
+                </div>
+                <div class="header-stat">
+                    <span class="header-stat-number">{{ submitted_assignments|default:0 }}</span>
+                    <span class="header-stat-label">Tasks</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Statistics -->
-  <div class="row stats-row g-3">
-    <div class="col-4">
-      <div class="stat-card">
-        <div class="stat-number text-primary">{{ total_courses }}</div>
-        <div class="stat-label">Total Courses</div>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="stat-card">
-        <div class="stat-number text-success">{{ completed_courses }}</div>
-        <div class="stat-label">Completed</div>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="stat-card">
-        <div class="stat-number text-warning">{{ in_progress_courses }}</div>
-        <div class="stat-label">In Progress</div>
-      </div>
-    </div>
-  </div>
+    <!-- Statistics Grid -->
+    <div class="main-grid">
+        <div class="stat-card videos">
+            <div class="stat-icon">
+                <i class="ti ti-player-play"></i>
+            </div>
+            <div class="stat-number">{{ completed_videos_count|default:0 }}</div>
+            <div class="stat-label">Videos Completed</div>
+            <div class="stat-change">+{{ videos_this_week|default:0 }} this week</div>
+        </div>
 
-  <div class="row">
-    <!-- Main Content -->
-    <div class="col-lg-8">
-      <!-- My Courses -->
-      <div class="section-card">
+        <div class="stat-card assignments">
+            <div class="stat-icon">
+                <i class="ti ti-clipboard-check"></i>
+            </div>
+            <div class="stat-number">{{ submitted_assignments|default:0 }}</div>
+            <div class="stat-label">Assignments Done</div>
+            <div class="stat-change">+{{ assignments_this_week|default:0 }} this week</div>
+        </div>
+
+        <div class="stat-card quizzes">
+            <div class="stat-icon">
+                <i class="ti ti-clipboard-list"></i>
+            </div>
+            <div class="stat-number">{{ quiz_attempts_count|default:0 }}</div>
+            <div class="stat-label">Quiz Attempts</div>
+            <div class="stat-change">{{ average_quiz_score|floatformat:0|default:0 }}% average</div>
+        </div>
+
+        <div class="stat-card modules">
+            <div class="stat-icon">
+                <i class="ti ti-school"></i>
+            </div>
+            <div class="stat-number">{{ modules_completed|default:0 }}</div>
+            <div class="stat-label">Modules Done</div>
+            <div class="stat-change">Great progress!</div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Course Progress -->
+        <div class="section">
+            <div class="section-header">
+                <i class="ti ti-chart-line section-icon"></i>
+                <h2 class="section-title">Course Progress</h2>
+            </div>
+            <div class="section-body">
+                {% for enrollment in enrollments %}
+                {% if enrollment.active %}
+                <div class="course-item">
+                    <div class="course-icon">
+                        <i class="ti ti-book"></i>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-title">{{ enrollment.course.title }}</div>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ enrollment.progress_percentage|default:0 }}%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>{{ enrollment.progress_percentage|floatformat:0|default:0 }}% Complete</span>
+                                <span>{{ enrollment.completed_videos|default:0 }}/{{ enrollment.total_videos|default:0 }} videos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-badge">Active</div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="empty-state">
+                    <i class="ti ti-book-2"></i>
+                    <h4>No courses enrolled</h4>
+                    <p>Start your learning journey by enrolling in a course</p>
+                    <a href="{% url 'student_portal:my_courses' %}" class="btn-primary">Browse Courses</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Activity & Upcoming Assignments -->
+        <div>
+            <!-- Recent Activity -->
+            <div class="section" style="margin-bottom: 15px;">
+                <div class="section-header">
+                    <i class="ti ti-clock section-icon"></i>
+                    <h2 class="section-title">Recent Activity</h2>
+                </div>
+                <div class="section-body">
+                    {% for progress in recent_progress|slice:":5" %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="ti ti-player-play"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>{{ progress.video_lesson.title|truncatechars:30 }}</h4>
+                            <p>{{ progress.course.title }} - {{ progress.last_watched_at|timesince }} ago</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <i class="ti ti-history"></i>
+                        <h4>No recent activity</h4>
+                        <p>Start learning to see your activity</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Upcoming Assignments -->
+            {% if upcoming_assignments %}
+            <div class="section">
+                <div class="section-header">
+                    <i class="ti ti-alert-triangle section-icon"></i>
+                    <h2 class="section-title">Upcoming Deadlines</h2>
+                </div>
+                <div class="section-body">
+                    {% for assignment in upcoming_assignments|slice:":3" %}
+                    <div class="assignment-item">
+                        <div class="assignment-priority"></div>
+                        <div class="assignment-content">
+                            <div class="assignment-title">{{ assignment.title|truncatechars:25 }}</div>
+                            <div class="assignment-meta">{{ assignment.course }} - Due in {{ assignment.days_until_due }} days</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Latest News -->
+    {% if latest_news %}
+    <div class="section">
         <div class="section-header">
-          <h5 class="fw-semibold mb-0"><i class="ti ti-book me-2"></i>My Courses</h5>
-          <a href="{% url 'student_portal:my_courses' %}" class="btn btn-primary btn-sm">View All</a>
+            <i class="ti ti-news section-icon"></i>
+            <h2 class="section-title">Latest News & Updates</h2>
         </div>
         <div class="section-body">
-          {% if enrollments %}
-            <div class="row g-3">
-              {% for enrollment in enrollments %}
-              <div class="col-md-6 col-lg-4">
-                <div class="course-card">
-                  <div class="course-image">
-                    {% if enrollment.course.thumbnail %}
-                      <img src="{{ enrollment.course.thumbnail.url }}" alt="{{ enrollment.course.title }}">
-                    {% else %}
-                      <div class="course-placeholder">
-                        <i class="ti ti-book" style="font-size: 2rem;"></i>
-                      </div>
+            <div class="news-grid">
+                {% for news in latest_news %}
+                <div class="news-card">
+                    {% if news.featured_image %}
+                    <div class="news-image">
+                        <img src="{{ news.featured_image.url }}" alt="{{ news.title }}">
+                    </div>
                     {% endif %}
-                    <div class="course-badge">
-                      <span class="badge bg-primary">{{ enrollment.course.category.name }}</span>
+                    <div class="news-content">
+                        <div class="news-category">{{ news.get_category_display }}</div>
+                        <h4 class="news-title">{{ news.title|truncatechars:50 }}</h4>
+                        <p class="news-excerpt">{{ news.excerpt|truncatechars:80 }}</p>
+                        <div class="news-meta">
+                            <i class="ti ti-calendar"></i>
+                            <span>{{ news.published_at|date:"M d, Y" }}</span>
+                        </div>
                     </div>
-                  </div>
-                  <div class="course-content">
-                    <h6 class="course-title">{{ enrollment.course.title|truncatechars:35 }}</h6>
-                    <div class="progress-section">
-                      <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted">Progress</small>
-                        <small class="fw-semibold text-primary">{{ enrollment.progress_percentage|default:0 }}%</small>
-                      </div>
-                      <div class="progress">
-                        <div class="progress-bar bg-primary" style="width: {{ enrollment.progress_percentage|default:0 }}%"></div>
-                      </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Placements -->
+    {% if recent_placements %}
+    <div class="section">
+        <div class="section-header">
+            <i class="ti ti-trophy section-icon"></i>
+            <h2 class="section-title">Recent Placements</h2>
+        </div>
+        <div class="section-body">
+            <div class="placements-grid">
+                {% for placement in recent_placements %}
+                <div class="placement-card">
+                    <div class="placement-student">
+                        {% if placement.student_photo %}
+                        <img src="{{ placement.student_photo.url }}" alt="{{ placement.student_name }}" class="student-avatar">
+                        {% else %}
+                        <div class="student-avatar-placeholder">
+                            <i class="ti ti-user"></i>
+                        </div>
+                        {% endif %}
+                        <div class="student-info">
+                            <h4>{{ placement.student_name }}</h4>
+                            <p>{{ placement.course_completed }}</p>
+                        </div>
                     </div>
-                    {% if enrollment.course.id %}
-                    <a href="{% url 'student_portal:course_detail' enrollment.course.id %}" class="btn btn-primary btn-sm w-100">
-                      <i class="ti ti-play me-1"></i>Continue
-                    </a>
+                    <div class="placement-details">
+                        <div class="company-info">
+                            {% if placement.company_logo %}
+                            <img src="{{ placement.company_logo.url }}" alt="{{ placement.company_name }}" class="company-logo">
+                            {% endif %}
+                            <div>
+                                <h5>{{ placement.company_name }}</h5>
+                                <p>{{ placement.job_title }}</p>
+                                <span class="placement-type">{{ placement.get_placement_type_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Featured Testimonials -->
+    {% if featured_testimonials %}
+    <div class="section">
+        <div class="section-header">
+            <i class="ti ti-message-circle section-icon"></i>
+            <h2 class="section-title">Student Success Stories</h2>
+        </div>
+        <div class="section-body">
+            <div class="testimonials-grid">
+                {% for testimonial in featured_testimonials %}
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        {% if testimonial.student_photo %}
+                        <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}" class="testimonial-avatar">
+                        {% else %}
+                        <div class="testimonial-avatar-placeholder">
+                            <i class="ti ti-user"></i>
+                        </div>
+                        {% endif %}
+                        <div class="testimonial-info">
+                            <h4>{{ testimonial.student_name }}</h4>
+                            <p>{{ testimonial.course_name }}</p>
+                            <div class="rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= testimonial.rating %}
+                                        <i class="ti ti-star-filled"></i>
+                                    {% else %}
+                                        <i class="ti ti-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if testimonial.testimonial_type == 'video_youtube' and testimonial.youtube_url %}
+                    <div class="testimonial-video">
+                        <div class="video-thumbnail" onclick="openYouTubeVideo('{{ testimonial.youtube_url }}')">
+                            <i class="ti ti-player-play"></i>
+                            <span>Watch Video Testimonial</span>
+                        </div>
+                    </div>
                     {% else %}
-                    <button class="btn btn-secondary btn-sm w-100" disabled>
-                      <i class="ti ti-alert-triangle me-1"></i>Unavailable
-                    </button>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="empty-state">
-              <i class="ti ti-book-off mb-2" style="font-size: 2.5rem;"></i>
-              <h6 class="fw-semibold">No courses enrolled</h6>
-              <p class="mb-3">Start learning today!</p>
-              <a href="{% url 'landing:courses' %}" class="btn btn-primary">Browse Courses</a>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Available Courses -->
-      {% if available_courses %}
-      <div class="section-card">
-        <div class="section-header">
-          <h5 class="fw-semibold mb-0"><i class="ti ti-search me-2"></i>Available Courses</h5>
-          <a href="{% url 'landing:courses' %}" class="btn btn-outline-primary btn-sm">View All</a>
-        </div>
-        <div class="section-body">
-          <div class="row g-3">
-            {% for course in available_courses %}
-            <div class="col-md-6 col-lg-4">
-              <div class="course-card">
-                <div class="course-image">
-                  {% if course.thumbnail %}
-                    <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
-                  {% else %}
-                    <div class="course-placeholder">
-                      <i class="ti ti-book" style="font-size: 2rem;"></i>
+                    <div class="testimonial-content">
+                        <p>{{ testimonial.testimonial_text|truncatechars:150 }}</p>
                     </div>
-                  {% endif %}
-                  <div class="course-badge">
-                    <span class="badge bg-success">{{ course.category.name|default:"General" }}</span>
-                  </div>
-                  <div class="course-price">
-                    <span class="badge bg-dark">₹{{ course.price }}</span>
-                  </div>
+                    {% endif %}
                 </div>
-                <div class="course-content">
-                  <h6 class="course-title">{{ course.title|truncatechars:35 }}</h6>
-                  <p class="text-muted small mb-3">{{ course.description|truncatechars:60 }}</p>
-                  {% if course.id %}
-                  <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-success btn-sm w-100">
-                    <i class="ti ti-eye me-1"></i>View Details
-                  </a>
-                  {% else %}
-                  <button class="btn btn-secondary btn-sm w-100" disabled>
-                    <i class="ti ti-alert-triangle me-1"></i>Unavailable
-                  </button>
-                  {% endif %}
-                </div>
-              </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-          </div>
         </div>
-      </div>
-      {% endif %}
     </div>
+    {% endif %}
 
-    <!-- Sidebar -->
-    <div class="col-lg-4">
-      <!-- Recent Activity -->
-      <div class="section-card">
+    <!-- Quick Actions -->
+    <div class="section">
         <div class="section-header">
-          <h6 class="fw-semibold mb-0"><i class="ti ti-clock me-2"></i>Recent Activity</h6>
+            <i class="ti ti-bolt section-icon"></i>
+            <h2 class="section-title">Quick Actions</h2>
         </div>
         <div class="section-body">
-          {% if recent_activity %}
-            {% for activity in recent_activity %}
-            <div class="activity-item">
-              <div class="d-flex align-items-center">
-                <div class="activity-icon bg-primary-subtle text-primary me-3">
-                  <i class="ti ti-play"></i>
-                </div>
-                <div class="flex-grow-1">
-                  <h6 class="fw-semibold mb-0" style="font-size: 0.875rem;">{{ activity.video_lesson.title|truncatechars:20 }}</h6>
-                  <small class="text-muted">{{ activity.course.title|truncatechars:25 }}</small>
-                  <div class="mt-1">
-                    <span class="badge bg-success-subtle text-success" style="font-size: 0.75rem;">{{ activity.completed_percentage|floatformat:0 }}%</span>
-                  </div>
-                </div>
-              </div>
+            <div class="actions-grid">
+                <a href="{% url 'student_portal:my_courses' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-book-2"></i>
+                    </div>
+                    <div class="action-label">My Courses</div>
+                </a>
+                <a href="{% url 'student_portal:my_courses' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-list-check"></i>
+                    </div>
+                    <div class="action-label">Assignments</div>
+                </a>
+                <a href="{% url 'student_portal:mentoring_dashboard' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-user-heart"></i>
+                    </div>
+                    <div class="action-label">Mentoring</div>
+                </a>
+                <a href="{% url 'student_portal:profile' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-user"></i>
+                    </div>
+                    <div class="action-label">Profile</div>
+                </a>
+                <a href="{% url 'student_portal:my_payments' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-credit-card"></i>
+                    </div>
+                    <div class="action-label">Payments</div>
+                </a>
+                <a href="{% url 'student_portal:my_invoices' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="ti ti-file-text"></i>
+                    </div>
+                    <div class="action-label">Invoices</div>
+                </a>
             </div>
-            {% endfor %}
-          {% else %}
-            <div class="empty-state">
-              <i class="ti ti-clock mb-2" style="font-size: 2rem;"></i>
-              <p class="mb-0 small">No recent activity</p>
-            </div>
-          {% endif %}
         </div>
-      </div>
-
-      <!-- Mentoring Preview -->
-      <div class="section-card">
-        <div class="section-header">
-          <h6 class="fw-semibold mb-0"><i class="ti ti-user-heart me-2"></i>My Mentoring</h6>
-          <a href="{% url 'student_portal:mentoring_dashboard' %}" class="btn btn-outline-primary btn-sm">View All</a>
-        </div>
-        <div class="section-body">
-          <div class="row text-center mb-3">
-            <div class="col-4">
-              <div class="fw-bold text-primary">{{ user.analytics.total_videos_watched|default:0 }}</div>
-              <small class="text-muted">Videos</small>
-            </div>
-            <div class="col-4">
-              <div class="fw-bold text-success">{{ user.analytics.total_quizzes_attempted|default:0 }}</div>
-              <small class="text-muted">Quizzes</small>
-            </div>
-            <div class="col-4">
-              <div class="fw-bold text-warning">{{ user.analytics.modules_completed|default:0 }}</div>
-              <small class="text-muted">Modules</small>
-            </div>
-          </div>
-          
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <small class="text-muted">Quiz Average</small>
-            <span class="badge {% if user.analytics.avg_quiz_score >= 80 %}bg-success{% elif user.analytics.avg_quiz_score >= 70 %}bg-warning{% else %}bg-danger{% endif %}">
-              {{ user.analytics.avg_quiz_score|default:0|floatformat:0 }}%
-            </span>
-          </div>
-          
-          <div class="progress mb-3">
-            <div class="progress-bar {% if user.analytics.avg_quiz_score >= 80 %}bg-success{% elif user.analytics.avg_quiz_score >= 70 %}bg-warning{% else %}bg-danger{% endif %}" 
-                 style="width: {{ user.analytics.avg_quiz_score|default:0 }}%"></div>
-          </div>
-          
-          <div class="row">
-            <div class="col-6">
-              <a href="{% url 'student_portal:mentoring_sessions' %}" class="btn btn-outline-primary btn-sm w-100">
-                <i class="ti ti-history me-1"></i>Sessions
-              </a>
-            </div>
-            <div class="col-6">
-              <a href="{% url 'student_portal:mentoring_insights' %}" class="btn btn-primary btn-sm w-100">
-                <i class="ti ti-chart-line me-1"></i>Insights
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="section-card">
-        <div class="section-header">
-          <h6 class="fw-semibold mb-0"><i class="ti ti-zap me-2"></i>Quick Actions</h6>
-        </div>
-        <div class="section-body">
-          <a href="{% url 'student_portal:my_courses' %}" class="quick-action">
-            <div class="quick-action-icon bg-primary-subtle text-primary">
-              <i class="ti ti-book"></i>
-            </div>
-            <div>
-              <h6 class="fw-semibold mb-0" style="font-size: 0.875rem;">My Courses</h6>
-              <small class="text-muted">Continue learning</small>
-            </div>
-          </a>
-
-          <a href="{% url 'landing:courses' %}" class="quick-action">
-            <div class="quick-action-icon bg-success-subtle text-success">
-              <i class="ti ti-search"></i>
-            </div>
-            <div>
-              <h6 class="fw-semibold mb-0" style="font-size: 0.875rem;">Browse Courses</h6>
-              <small class="text-muted">Discover skills</small>
-            </div>
-          </a>
-
-          <a href="{% url 'student_portal:my_payments' %}" class="quick-action">
-            <div class="quick-action-icon bg-warning-subtle text-warning">
-              <i class="ti ti-credit-card"></i>
-            </div>
-            <div>
-              <h6 class="fw-semibold mb-0" style="font-size: 0.875rem;">Payments</h6>
-              <small class="text-muted">View transactions</small>
-            </div>
-          </a>
-
-          <a href="{% url 'student_portal:profile' %}" class="quick-action" style="margin-bottom: 0;">
-            <div class="quick-action-icon bg-info-subtle text-info">
-              <i class="ti ti-user"></i>
-            </div>
-            <div>
-              <h6 class="fw-semibold mb-0" style="font-size: 0.875rem;">Profile</h6>
-              <small class="text-muted">Update settings</small>
-            </div>
-          </a>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Dashboard loaded for user: {{ user.name }}');
+    // Animate progress bars
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+
+    // Add hover effects to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Smooth scroll for any internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+});
+
+// Function to open YouTube video in a modal or new tab
+function openYouTubeVideo(url) {
+    if (url) {
+        window.open(url, '_blank');
+    }
 });
 </script>
 {% endblock %}

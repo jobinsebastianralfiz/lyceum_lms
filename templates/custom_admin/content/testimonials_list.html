@@ -1,0 +1,340 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Testimonials Management - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-message-circle me-2"></i>Testimonials Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+            <a href="{% url 'custom_admin:testimonial_create' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-plus"></i> Add Testimonial
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_testimonials }}</h4>
+                <p class="mb-0 small">Total Testimonials</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.published_testimonials }}</h4>
+                <p class="mb-0 small">Published</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.video_testimonials }}</h4>
+                <p class="mb-0 small">Video Testimonials</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.average_rating|floatformat:1 }}/5</h4>
+                <p class="mb-0 small">Avg Rating</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search" 
+                       placeholder="Student, course, content..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Type</label>
+                <select class="form-select form-select-sm" name="testimonial_type">
+                  <option value="">All Types</option>
+                  {% for type_code, type_name in testimonial_types %}
+                    <option value="{{ type_code }}" {% if testimonial_type_filter == type_code %}selected{% endif %}>
+                      {{ type_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                  <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                  <option value="featured" {% if status_filter == 'featured' %}selected{% endif %}>Featured</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Testimonials Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Type</th>
+                <th>Rating</th>
+                <th>Current Role</th>
+                <th>Status</th>
+                <th>Likes</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for testimonial in testimonials %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if testimonial.student_photo %}
+                      <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}" 
+                           class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                    {% else %}
+                      <div class="avatar avatar-sm bg-primary-subtle rounded-circle me-2">
+                        <span class="small text-primary">{{ testimonial.student_name|first|upper }}</span>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="mb-0">{{ testimonial.student_name }}</h6>
+                      {% if testimonial.batch_year %}
+                        <small class="text-muted">Batch {{ testimonial.batch_year }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ testimonial.course_name }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if testimonial.testimonial_type == 'video_youtube' %}
+                      <i class="ti ti-brand-youtube text-danger me-1"></i>
+                      <span class="badge bg-danger-subtle text-danger">YouTube</span>
+                    {% elif testimonial.testimonial_type == 'video_upload' %}
+                      <i class="ti ti-video text-primary me-1"></i>
+                      <span class="badge bg-primary-subtle text-primary">Video</span>
+                    {% elif testimonial.testimonial_type == 'audio' %}
+                      <i class="ti ti-microphone text-warning me-1"></i>
+                      <span class="badge bg-warning-subtle text-warning">Audio</span>
+                    {% else %}
+                      <i class="ti ti-message text-info me-1"></i>
+                      <span class="badge bg-info-subtle text-info">Text</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="text-warning me-1">
+                      {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= testimonial.overall_rating %}
+                          <i class="ti ti-star-filled"></i>
+                        {% else %}
+                          <i class="ti ti-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    <span class="small text-muted">({{ testimonial.overall_rating }}/5)</span>
+                  </div>
+                </td>
+                <td>
+                  {% if testimonial.current_position and testimonial.current_company %}
+                    <div>
+                      <span class="fw-medium">{{ testimonial.current_position }}</span><br>
+                      <small class="text-muted">{{ testimonial.current_company }}</small>
+                    </div>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div>
+                    {% if testimonial.is_published %}
+                      <span class="badge bg-success">Published</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Draft</span>
+                    {% endif %}
+                    {% if testimonial.is_featured %}
+                      <span class="badge bg-warning ms-1">Featured</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if testimonial.likes_count > 0 %}
+                    <span class="badge bg-primary">
+                      <i class="ti ti-heart me-1"></i>{{ testimonial.likes_count }}
+                    </span>
+                  {% else %}
+                    <span class="text-muted">0</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if testimonial.is_published and testimonial.published_at %}
+                    <div class="small">
+                      {{ testimonial.published_at|date:"M d, Y" }}<br>
+                      <span class="text-muted">{{ testimonial.published_at|date:"H:i" }}</span>
+                    </div>
+                  {% else %}
+                    <div class="small">
+                      {{ testimonial.created_at|date:"M d, Y" }}<br>
+                      <span class="text-muted">{{ testimonial.created_at|date:"H:i" }}</span>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:testimonial_detail' testimonial.id %}" 
+                       class="btn btn-outline-primary btn-sm" title="View/Edit">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    {% if testimonial.is_published %}
+                      <a href="/api/content/testimonials/{{ testimonial.id }}/" target="_blank"
+                         class="btn btn-outline-success btn-sm" title="View Public">
+                        <i class="ti ti-external-link"></i>
+                      </a>
+                    {% endif %}
+                    {% if testimonial.testimonial_type == 'video_youtube' and testimonial.youtube_video_id %}
+                      <a href="https://youtube.com/watch?v={{ testimonial.youtube_video_id }}" target="_blank"
+                         class="btn btn-outline-danger btn-sm" title="View on YouTube">
+                        <i class="ti ti-brand-youtube"></i>
+                      </a>
+                    {% endif %}
+                    <button class="btn btn-outline-danger btn-sm" title="Delete"
+                            onclick="confirmDelete({{ testimonial.id }}, '{{ testimonial.student_name|escapejs }}')">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-message-circle-off fs-2 mb-3 d-block"></i>
+                    <h6>No testimonials found</h6>
+                    <p class="mb-0">No testimonials match your current filters.</p>
+                    <a href="{% url 'custom_admin:testimonial_create' %}" class="btn btn-primary btn-sm mt-3">
+                      <i class="ti ti-plus me-1"></i>Add First Testimonial
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if testimonials.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ testimonials.start_index }} to {{ testimonials.end_index }} of {{ testimonials.paginator.count }} testimonials
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if testimonials.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ testimonials.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for page_num in testimonials.paginator.page_range %}
+                {% if page_num == testimonials.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > testimonials.number|add:-3 and page_num < testimonials.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if testimonials.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ testimonials.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the testimonial by "<span id="studentName"></span>"?</p>
+        <p class="text-danger small mb-0">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Testimonial</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(testimonialId, studentName) {
+  document.getElementById('studentName').textContent = studentName;
+  document.getElementById('confirmDeleteBtn').onclick = function() {
+    // Redirect to delete confirmation page
+    window.location.href = '/custom-admin/content/testimonials/' + testimonialId + '/delete/';
+  };
+  new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

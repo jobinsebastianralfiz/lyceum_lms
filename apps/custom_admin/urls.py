@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from . import rating_views
+from apps.content_management import admin_views
 
 app_name = 'custom_admin'
 
@@ -35,6 +37,10 @@ urlpatterns = [
     path('video-lessons/add/', views.video_lesson_create_view, name='video_lesson_create'),
     path('video-lessons/<int:lesson_id>/edit/', views.video_lesson_edit_view, name='video_lesson_edit'),
     path('video-lessons/<int:lesson_id>/delete/', views.video_lesson_delete_view, name='video_lesson_delete'),
+    
+    # Enhanced Video Management AJAX endpoints
+    path('video-fetch-metadata/', views.video_fetch_metadata_view, name='video_fetch_metadata'),
+    path('video-lessons/<int:lesson_id>/sync/', views.video_sync_metadata_view, name='video_sync_metadata'),
     
     # ASSIGNMENTS
     path('assignments/', views.assignments_list_view, name='assignments_list'),
@@ -137,6 +143,44 @@ urlpatterns = [
     path('youtube-videos/<int:video_id>/edit/', views.youtube_video_edit_view, name='youtube_video_edit'),
     path('youtube-videos/<int:video_id>/delete/', views.youtube_video_delete_view, name='youtube_video_delete'),
     
+    # RATINGS & REVIEWS
+    path('ratings/', rating_views.ratings_list_view, name='ratings_list'),
+    path('ratings/<int:rating_id>/delete/', rating_views.rating_delete_view, name='rating_delete'),
+    path('ratings/bulk-delete/', rating_views.ratings_bulk_delete_view, name='ratings_bulk_delete'),
+    
+    path('reviews/', rating_views.reviews_list_view, name='reviews_list'),
+    path('reviews/<int:review_id>/', rating_views.review_detail_view, name='review_detail'),
+    path('reviews/<int:review_id>/approve/', rating_views.review_approve_view, name='review_approve'),
+    path('reviews/<int:review_id>/reject/', rating_views.review_reject_view, name='review_reject'),
+    path('reviews/<int:review_id>/delete/', rating_views.review_delete_view, name='review_delete'),
+    path('reviews/bulk-moderate/', rating_views.reviews_bulk_moderate_view, name='reviews_bulk_moderate'),
+    
+    path('review-votes/', rating_views.review_votes_list_view, name='review_votes_list'),
+
+    # CONTENT MANAGEMENT
+    path('content/', admin_views.content_dashboard_view, name='content_dashboard'),
+    
+    # LEADS MANAGEMENT
+    path('content/leads/', admin_views.leads_list_view, name='leads_list'),
+    path('content/leads/<int:lead_id>/', admin_views.lead_detail_view, name='lead_detail'),
+    path('content/leads/<int:lead_id>/delete/', admin_views.lead_delete_view, name='lead_delete'),
+    
+    # NEWS MANAGEMENT
+    path('content/news/', admin_views.news_list_view, name='news_list'),
+    path('content/news/<int:news_id>/', admin_views.news_detail_view, name='news_detail'),
+    path('content/news/add/', admin_views.news_create_view, name='news_create'),
+    
+    # PLACEMENTS MANAGEMENT
+    path('content/placements/', admin_views.placements_list_view, name='placements_list'),
+    path('content/placements/add/', admin_views.placement_create_view, name='placement_create'),
+    
+    # TESTIMONIALS MANAGEMENT
+    path('content/testimonials/', admin_views.testimonials_list_view, name='testimonials_list'),
+    path('content/testimonials/<int:testimonial_id>/', admin_views.testimonial_detail_view, name='testimonial_detail'),
+    path('content/testimonials/<int:testimonial_id>/edit/', admin_views.testimonial_edit_view, name='testimonial_edit'),
+    path('content/testimonials/<int:testimonial_id>/delete/', admin_views.testimonial_delete_view, name='testimonial_delete'),
+    path('content/testimonials/add/', admin_views.testimonial_create_view, name='testimonial_create'),
+
     # AJAX ENDPOINTS
     path('get-course-info/<int:course_id>/', views.get_course_info, name='get_course_info'),
     path('get-enrollment-info/<int:enrollment_id>/', views.get_enrollment_info, name='get_enrollment_info'),

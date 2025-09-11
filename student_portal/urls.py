@@ -5,14 +5,14 @@ from . import student_mentoring_views
 app_name = 'student_portal'
 
 urlpatterns = [
-    # Authentication
-    path('login/', views.student_login, name='login'),
+    # Authentication  
     path('logout/', views.student_logout, name='logout'),
     
     # Dashboard
     path('', views.dashboard, name='dashboard'),
     
     # Courses
+    path('browse-courses/', views.browse_courses, name='browse_courses'),
     path('my-courses/', views.my_courses, name='my_courses'),
     path('course/<int:course_id>/', views.course_detail, name='course_detail'),
     path('course/<int:course_id>/checkout/', views.course_checkout, name='course_checkout'),

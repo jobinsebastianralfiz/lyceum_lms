@@ -1,0 +1,251 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if news %}Edit News{% else %}Create News{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-news me-2"></i>
+            {% if news %}Edit News Article{% else %}Create New News Article{% endif %}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:news_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to News
+            </a>
+          </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col-lg-8">
+              <!-- Article Content -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Article Content</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="title" 
+                           value="{% if news %}{{ news.title }}{% endif %}" 
+                           placeholder="Enter article title..." required>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Excerpt</label>
+                    <textarea class="form-control" name="excerpt" rows="3" 
+                              placeholder="Brief summary of the article...">{% if news %}{{ news.excerpt }}{% endif %}</textarea>
+                    <div class="form-text">Short description that appears in listings (optional)</div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="content" rows="12" 
+                              placeholder="Write your article content here..." required>{% if news %}{{ news.content }}{% endif %}</textarea>
+                    <div class="form-text">Full article content (supports basic HTML)</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- SEO Settings -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">SEO Settings</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Meta Title</label>
+                    <input type="text" class="form-control" name="meta_title" 
+                           value="{% if news %}{{ news.meta_title }}{% endif %}" 
+                           placeholder="SEO title (leave empty to use article title)">
+                    <div class="form-text">Recommended: 50-60 characters</div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Meta Description</label>
+                    <textarea class="form-control" name="meta_description" rows="2" 
+                              placeholder="SEO meta description...">{% if news %}{{ news.meta_description }}{% endif %}</textarea>
+                    <div class="form-text">Recommended: 150-160 characters</div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Tags</label>
+                    <input type="text" class="form-control" name="tags" 
+                           value="{% if news %}{{ news.tags }}{% endif %}" 
+                           placeholder="programming, web development, tutorial">
+                    <div class="form-text">Comma-separated tags for categorization</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <!-- Publishing Options -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Publishing</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Category <span class="text-danger">*</span></label>
+                    <select class="form-select" name="category" required>
+                      <option value="">Select Category</option>
+                      {% for category_code, category_name in news_categories %}
+                        <option value="{{ category_code }}" 
+                                {% if news and news.category == category_code %}selected{% endif %}>
+                          {{ category_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_published" id="isPublished"
+                           {% if news.is_published %}checked{% endif %}>
+                    <label class="form-check-label" for="isPublished">
+                      Publish immediately
+                    </label>
+                    <div class="form-text">Make this article visible to users</div>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
+                           {% if news.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                      Feature this article
+                    </label>
+                    <div class="form-text">Show in featured content sections</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Featured Image -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Images</h6>
+                  
+                  {% if news.featured_image %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Featured Image</label>
+                    <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" 
+                         class="img-fluid rounded mb-2" style="max-height: 150px;">
+                  </div>
+                  {% endif %}
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" class="form-control" name="featured_image" accept="image/*">
+                    <div class="form-text">Main image for the article (recommended: 1200x630px)</div>
+                  </div>
+                  
+                  {% if news.thumbnail %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Thumbnail</label>
+                    <img src="{{ news.thumbnail.url }}" alt="{{ news.title }}" 
+                         class="img-fluid rounded mb-2" style="max-height: 100px;">
+                  </div>
+                  {% endif %}
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Thumbnail</label>
+                    <input type="file" class="form-control" name="thumbnail" accept="image/*">
+                    <div class="form-text">Small image for listings (recommended: 300x200px)</div>
+                  </div>
+                </div>
+              </div>
+              
+              {% if news %}
+              <!-- Article Stats -->
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Article Statistics</h6>
+                  <div class="small">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Views:</span>
+                      <span class="fw-medium">{{ news.view_count|default:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Created:</span>
+                      <span class="fw-medium">{{ news.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Updated:</span>
+                      <span class="fw-medium">{{ news.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% if news.published_at %}
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Published:</span>
+                      <span class="fw-medium">{{ news.published_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between py-2">
+                      <span class="text-muted">Author:</span>
+                      <span class="fw-medium">{{ news.created_by.name }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Submit Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'custom_admin:news_list' %}" class="btn btn-outline-secondary">
+                      Cancel
+                    </a>
+                    <button type="submit" class="btn btn-outline-primary">
+                      <i class="ti ti-device-floppy me-1"></i>Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-primary" name="publish" value="true">
+                      <i class="ti ti-upload me-1"></i>
+                      {% if news %}Update Article{% else %}Publish Article{% endif %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-generate slug from title (you could implement this if needed)
+document.querySelector('input[name="title"]').addEventListener('input', function(e) {
+  // Auto-generate meta title if empty
+  const metaTitleInput = document.querySelector('input[name="meta_title"]');
+  if (!metaTitleInput.value.trim()) {
+    metaTitleInput.value = e.target.value;
+  }
+});
+
+// Character count for meta description
+const metaDescTextarea = document.querySelector('textarea[name="meta_description"]');
+if (metaDescTextarea) {
+  const charCountDiv = document.createElement('div');
+  charCountDiv.className = 'form-text';
+  metaDescTextarea.parentNode.appendChild(charCountDiv);
+  
+  function updateCharCount() {
+    const count = metaDescTextarea.value.length;
+    charCountDiv.textContent = `${count}/160 characters`;
+    charCountDiv.className = count > 160 ? 'form-text text-danger' : 'form-text text-muted';
+  }
+  
+  metaDescTextarea.addEventListener('input', updateCharCount);
+  updateCharCount();
+}
+</script>
+{% endblock %}

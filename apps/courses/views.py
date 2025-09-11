@@ -97,7 +97,7 @@ class CourseListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category', 'is_free']
-    search_fields = ['title', 'description']
+    search_fields = ['title', 'description', 'curriculum', 'what_you_will_learn']
     
     def get_queryset(self):
         return Course.objects.filter(is_published=True, allow_public_enrollment=True).select_related('category')
@@ -327,6 +327,8 @@ def search_courses(request):
     courses = Course.objects.filter(
         Q(title__icontains=query) | 
         Q(description__icontains=query) |
+        Q(curriculum__icontains=query) |
+        Q(what_you_will_learn__icontains=query) |
         Q(category__name__icontains=query),
         is_published=True,
         allow_public_enrollment=True
@@ -575,20 +577,13 @@ class StartQuizAttemptView(generics.CreateAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check attempt limit
+        # Count all previous attempts (completed and incomplete) for attempt numbering
         user_attempts = QuizAttempt.objects.filter(
             quiz=quiz,
-            student=request.user,
-            completed=True
+            student=request.user
         ).count()
         
-        if user_attempts >= quiz.max_attempts:
-            return Response(
-                {'error': 'Maximum attempts reached'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Create new attempt
+        # Create new attempt (no limit restrictions)
         attempt = QuizAttempt.objects.create(
             quiz=quiz,
             student=request.user,

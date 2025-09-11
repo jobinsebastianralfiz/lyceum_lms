@@ -9252,3 +9252,743 @@ INFO 2025-08-27 16:17:29,644 autoreload 37826 8620859584 /Users/jobinsebastian/d
 INFO 2025-08-27 16:17:29,916 autoreload 37874 8620859584 Watching for file changes with StatReloader
 INFO 2025-08-27 16:17:36,315 autoreload 37874 8620859584 /Users/jobinsebastian/djangoprojects/lms/apps/courses/mentor_views.py changed, reloading.
 INFO 2025-08-27 16:17:36,573 autoreload 37924 8620859584 Watching for file changes with StatReloader
+INFO 2025-08-29 09:13:11,929 autoreload 1947 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:13:15,265 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:13:15,292 basehttp 1947 6134853632 "GET /static/landing/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:13:15,292 basehttp 1947 6151680000 "GET /static/landing/js/script.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:13:15,292 basehttp 1947 6168506368 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 09:13:49,738 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 28559
+INFO 2025-08-29 09:15:39,309 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:15:39,442 basehttp 1947 6134853632 "GET /static/landing/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:15:39,444 basehttp 1947 6134853632 "GET /static/landing/js/script.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:15:39,444 basehttp 1947 6151680000 "GET /static/landing/images/logo.svg HTTP/1.1" 304 0
+WARNING 2025-08-29 09:15:40,070 log 1947 6151680000 Not Found: /favicon.ico
+WARNING 2025-08-29 09:15:40,070 basehttp 1947 6151680000 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 09:16:11,292 basehttp 1947 6151680000 "GET /courses/ HTTP/1.1" 200 28811
+INFO 2025-08-29 09:16:40,953 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:16:46,117 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:18:07,520 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:18:09,453 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:18:18,654 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:18:20,750 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:18:26,791 basehttp 1947 6134853632 "GET / HTTP/1.1" 200 32843
+INFO 2025-08-29 09:18:28,196 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:19:59,364 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:23:06,967 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:23:36,982 basehttp 1947 6134853632 "GET /courses/ HTTP/1.1" 200 29033
+INFO 2025-08-29 09:49:12,891 autoreload 1947 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:49:13,328 autoreload 6998 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:49:19,774 autoreload 6998 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:49:20,007 autoreload 7038 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:49:33,617 autoreload 7038 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:49:33,874 autoreload 7078 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:49:42,317 autoreload 7078 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:49:42,572 autoreload 7140 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:51:00,622 basehttp 7140 6157807616 "GET /courses/ HTTP/1.1" 200 37982
+INFO 2025-08-29 09:51:00,637 basehttp 7140 12935360512 "GET /static/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 09:51:00,639 basehttp 7140 12918534144 "GET /static/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 09:51:00,641 basehttp 7140 12952186880 "GET /static/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 09:51:00,641 basehttp 7140 6157807616 "GET /static/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 09:51:00,642 basehttp 7140 12935360512 "GET /static/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 09:51:00,645 basehttp 7140 12935360512 "GET /static/assets/img/online-education/course1.jpg HTTP/1.1" 200 3020
+INFO 2025-08-29 09:51:00,645 basehttp 7140 12952186880 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 09:51:00,646 basehttp 7140 6157807616 "GET /static/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 09:51:00,647 basehttp 7140 12901707776 "GET /static/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 09:51:00,648 basehttp 7140 12935360512 "GET /static/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 09:51:00,648 basehttp 7140 12918534144 "GET /static/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 09:51:00,650 basehttp 7140 12901707776 "GET /static/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 09:51:00,650 basehttp 7140 12952186880 "GET /static/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 09:51:00,651 basehttp 7140 6157807616 "GET /static/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 09:51:00,651 basehttp 7140 12935360512 "GET /static/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 09:51:00,651 basehttp 7140 12969013248 "GET /static/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 09:51:00,666 basehttp 7140 12901707776 "GET /static/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 09:51:00,668 basehttp 7140 12952186880 "GET /static/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 09:51:00,671 basehttp 7140 12935360512 "GET /static/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 09:51:00,672 basehttp 7140 12918534144 "GET /static/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 09:51:00,672 basehttp 7140 6157807616 "GET /static/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 09:51:00,673 basehttp 7140 12969013248 "GET /static/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+WARNING 2025-08-29 09:51:00,677 basehttp 7140 12952186880 "GET /static/assets/img/icons/star_fill.svg HTTP/1.1" 404 1950
+WARNING 2025-08-29 09:51:00,678 basehttp 7140 12901707776 "GET /static/assets/img/icons/star_outline.svg HTTP/1.1" 404 1959
+INFO 2025-08-29 09:51:03,663 basehttp 7140 12969013248 "GET / HTTP/1.1" 200 31985
+INFO 2025-08-29 09:51:03,676 basehttp 7140 12969013248 "GET /static/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 09:51:03,677 basehttp 7140 12969013248 "GET /static/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 09:51:03,702 basehttp 7140 6157807616 "GET /static/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 09:51:03,703 basehttp 7140 12969013248 "GET /static/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+WARNING 2025-08-29 09:51:03,703 basehttp 7140 12935360512 "GET /static/assets/img/icons/star_fill.svg HTTP/1.1" 404 1950
+WARNING 2025-08-29 09:51:03,703 basehttp 7140 12918534144 "GET /static/assets/img/icons/star_outline.svg HTTP/1.1" 404 1959
+INFO 2025-08-29 09:51:21,595 basehttp 7140 12969013248 "GET / HTTP/1.1" 200 31985
+INFO 2025-08-29 09:51:21,610 basehttp 7140 12935360512 "GET /static/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 09:51:21,611 basehttp 7140 12918534144 "GET /static/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 09:51:21,612 basehttp 7140 12969013248 "GET /static/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 09:51:21,612 basehttp 7140 12901707776 "GET /static/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 09:51:21,614 basehttp 7140 12918534144 "GET /static/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 09:51:21,614 basehttp 7140 12969013248 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 09:51:21,615 basehttp 7140 12935360512 "GET /static/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 09:51:21,615 basehttp 7140 12952186880 "GET /static/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 09:51:21,618 basehttp 7140 12901707776 "GET /static/assets/img/online-education/course1.jpg HTTP/1.1" 200 3020
+INFO 2025-08-29 09:51:21,618 basehttp 7140 12918534144 "GET /static/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 09:51:21,619 basehttp 7140 12969013248 "GET /static/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 09:51:21,619 basehttp 7140 12935360512 "GET /static/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 09:51:21,619 basehttp 7140 12952186880 "GET /static/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 09:51:21,622 basehttp 7140 12969013248 "GET /static/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 09:51:21,622 basehttp 7140 12918534144 "GET /static/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 09:51:21,623 basehttp 7140 6157807616 "GET /static/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 09:51:21,623 basehttp 7140 12952186880 "GET /static/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 09:51:21,624 basehttp 7140 12935360512 "GET /static/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 09:51:21,633 basehttp 7140 6157807616 "GET /static/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 09:51:21,634 basehttp 7140 12969013248 "GET /static/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 09:51:21,635 basehttp 7140 12935360512 "GET /static/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 09:51:21,635 basehttp 7140 12952186880 "GET /static/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 09:51:21,643 basehttp 7140 6157807616 "GET /static/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 09:51:21,644 basehttp 7140 12935360512 "GET /static/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 09:51:21,645 basehttp 7140 12952186880 "GET /static/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+WARNING 2025-08-29 09:51:21,646 basehttp 7140 12918534144 "GET /static/assets/img/icons/star_fill.svg HTTP/1.1" 404 1950
+WARNING 2025-08-29 09:51:21,647 basehttp 7140 12969013248 "GET /static/assets/img/icons/star_outline.svg HTTP/1.1" 404 1959
+INFO 2025-08-29 09:51:21,659 basehttp 7140 12952186880 "GET /static/landing/images/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 09:55:35,838 autoreload 7140 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:55:36,232 autoreload 8179 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:56:22,857 autoreload 8179 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:56:23,113 autoreload 8284 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:56:40,185 basehttp 8284 6132150272 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 09:56:40,193 basehttp 8284 6148976640 "GET /static/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,193 basehttp 8284 6132150272 "GET /static/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,196 basehttp 8284 6165803008 "GET /static/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,196 basehttp 8284 6182629376 "GET /static/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,196 basehttp 8284 6148976640 "GET /static/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,196 basehttp 8284 6132150272 "GET /static/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,197 basehttp 8284 6199455744 "GET /static/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,197 basehttp 8284 6216282112 "GET /static/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,199 basehttp 8284 6148976640 "GET /static/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,199 basehttp 8284 6182629376 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,200 basehttp 8284 6132150272 "GET /static/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,200 basehttp 8284 6165803008 "GET /static/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,201 basehttp 8284 6216282112 "GET /static/assets/img/online-education/hero-icons.png HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,201 basehttp 8284 6182629376 "GET /static/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,201 basehttp 8284 6148976640 "GET /static/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,202 basehttp 8284 6199455744 "GET /static/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,202 basehttp 8284 6165803008 "GET /static/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,212 basehttp 8284 6199455744 "GET /static/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,212 basehttp 8284 6182629376 "GET /static/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,212 basehttp 8284 6148976640 "GET /static/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,214 basehttp 8284 6199455744 "GET /static/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,214 basehttp 8284 6165803008 "GET /static/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,229 basehttp 8284 6199455744 "GET /static/assets/img/online-education/funfact-pattern.png HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,229 basehttp 8284 6148976640 "GET /static/assets/img/online-education/cta-pattern.png HTTP/1.1" 304 0
+INFO 2025-08-29 09:56:40,229 basehttp 8284 6165803008 "GET /static/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+WARNING 2025-08-29 09:56:40,257 log 8284 6165803008 Not Found: /favicon.ico
+WARNING 2025-08-29 09:56:40,257 basehttp 8284 6165803008 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 09:56:42,936 basehttp 8284 6165803008 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 09:56:42,958 basehttp 8284 6182629376 "GET /static/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 09:56:42,960 basehttp 8284 6199455744 "GET /static/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 09:56:42,962 basehttp 8284 6165803008 "GET /static/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 09:56:42,963 basehttp 8284 6182629376 "GET /static/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 09:56:42,965 basehttp 8284 6216282112 "GET /static/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 09:56:42,967 basehttp 8284 6148976640 "GET /static/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 09:56:42,967 basehttp 8284 6182629376 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 09:56:42,969 basehttp 8284 6199455744 "GET /static/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 09:56:42,969 basehttp 8284 6165803008 "GET /static/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 09:56:42,969 basehttp 8284 6216282112 "GET /static/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 09:56:42,972 basehttp 8284 6165803008 "GET /static/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 09:56:42,973 basehttp 8284 6182629376 "GET /static/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 09:56:42,974 basehttp 8284 6148976640 "GET /static/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 09:56:42,974 basehttp 8284 6199455744 "GET /static/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 09:56:42,975 basehttp 8284 6165803008 "GET /static/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 09:56:42,976 basehttp 8284 6216282112 "GET /static/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 09:56:42,977 basehttp 8284 6132150272 "GET /static/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 09:56:42,989 basehttp 8284 6165803008 "GET /static/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 09:56:42,990 basehttp 8284 6148976640 "GET /static/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 09:56:42,991 basehttp 8284 6199455744 "GET /static/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 09:56:42,993 basehttp 8284 6216282112 "GET /static/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 09:56:42,993 basehttp 8284 6132150272 "GET /static/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 09:56:43,001 basehttp 8284 6199455744 "GET /static/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 09:56:43,001 basehttp 8284 6216282112 "GET /static/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 09:56:43,002 basehttp 8284 6132150272 "GET /static/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+WARNING 2025-08-29 09:56:43,009 log 8284 6132150272 Not Found: /favicon.ico
+WARNING 2025-08-29 09:56:43,010 basehttp 8284 6132150272 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 09:57:01,758 basehttp 8284 6132150272 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 09:57:03,127 basehttp 8284 6132150272 "GET /courses/ HTTP/1.1" 200 21827
+INFO 2025-08-29 09:57:04,532 basehttp 8284 6132150272 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 09:57:05,880 basehttp 8284 6132150272 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-29 09:57:05,892 basehttp 8284 6132150272 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css HTTP/1.1" 200 353831
+INFO 2025-08-29 09:57:27,364 autoreload 8284 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:57:27,615 autoreload 8482 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:57:33,836 basehttp 8482 6166573056 "GET /register/ HTTP/1.1" 200 13711
+INFO 2025-08-29 09:57:33,851 basehttp 8482 6166573056 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 09:57:35,054 autoreload 8482 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:57:35,318 autoreload 8515 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 09:57:43,753 autoreload 8515 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 09:57:44,004 autoreload 8561 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 10:01:19,497 basehttp 8561 6196326400 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 10:01:19,513 basehttp 8561 6229979136 "GET /static/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:01:19,514 basehttp 8561 6213152768 "GET /static/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:01:19,517 basehttp 8561 6246805504 "GET /static/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:01:19,518 basehttp 8561 6229979136 "GET /static/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:01:19,521 basehttp 8561 6263631872 "GET /static/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:01:19,522 basehttp 8561 6196326400 "GET /static/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:01:19,524 basehttp 8561 6229979136 "GET /static/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 10:01:19,524 basehttp 8561 6246805504 "GET /static/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 10:01:19,525 basehttp 8561 6263631872 "GET /static/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:01:19,526 basehttp 8561 6213152768 "GET /static/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:01:19,528 basehttp 8561 6246805504 "GET /static/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:01:19,528 basehttp 8561 6196326400 "GET /static/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:01:19,529 basehttp 8561 6263631872 "GET /static/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:01:19,530 basehttp 8561 6246805504 "GET /static/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:01:19,531 basehttp 8561 6229979136 "GET /static/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:01:19,531 basehttp 8561 6213152768 "GET /static/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:01:19,532 basehttp 8561 6280458240 "GET /static/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:01:19,541 basehttp 8561 6246805504 "GET /static/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:01:19,542 basehttp 8561 6263631872 "GET /static/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:01:19,544 basehttp 8561 6280458240 "GET /static/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:01:19,545 basehttp 8561 6229979136 "GET /static/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:01:19,545 basehttp 8561 6213152768 "GET /static/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 10:01:19,555 basehttp 8561 6280458240 "GET /static/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 10:01:19,556 basehttp 8561 6229979136 "GET /static/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 10:01:19,556 basehttp 8561 6213152768 "GET /static/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+WARNING 2025-08-29 10:01:19,586 log 8561 6213152768 Not Found: /favicon.ico
+WARNING 2025-08-29 10:01:19,586 basehttp 8561 6213152768 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 10:01:26,001 basehttp 8561 6213152768 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-29 10:01:27,929 basehttp 8561 6213152768 "GET / HTTP/1.1" 200 17863
+INFO 2025-08-29 10:01:29,686 basehttp 8561 6213152768 "GET / HTTP/1.1" 200 17863
+ERROR 2025-08-29 10:07:32,310 log 8561 6196326400 Internal Server Error: /
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/landing/views.py", line 95, in home
+    return render(request, 'landing/fixed_home.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: landing/fixed_home.html
+ERROR 2025-08-29 10:07:32,311 basehttp 8561 6196326400 "GET / HTTP/1.1" 500 92304
+INFO 2025-08-29 10:08:40,626 autoreload 8561 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 10:08:41,037 autoreload 10511 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 10:09:01,869 basehttp 10511 6155415552 "GET / HTTP/1.1" 200 18047
+INFO 2025-08-29 10:09:01,885 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:09:01,886 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:09:01,890 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:09:01,892 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:09:01,894 basehttp 10511 6341865472 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:09:01,894 basehttp 10511 6155415552 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 10:09:01,896 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:09:01,898 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:09:01,899 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:09:01,900 basehttp 10511 6358691840 "GET /static/landing/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 10:09:01,901 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:09:01,902 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:09:01,903 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:09:01,903 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:09:01,904 basehttp 10511 6155415552 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:09:01,904 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:09:01,905 basehttp 10511 6375518208 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:09:01,918 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:09:01,919 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:09:01,919 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 10:09:01,920 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:09:01,920 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:09:01,930 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 10:09:01,930 basehttp 10511 6155415552 "GET /static/landing/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 10:09:01,931 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 10:09:08,282 basehttp 10511 6325039104 "GET / HTTP/1.1" 200 18047
+INFO 2025-08-29 10:09:08,294 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:09:08,299 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:09:08,300 basehttp 10511 6325039104 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:09:08,300 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:09:08,301 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:09:08,303 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:09:08,303 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 10:09:08,303 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:09:08,304 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/hero-icons.png HTTP/1.1" 200 21687
+INFO 2025-08-29 10:09:08,305 basehttp 10511 6358691840 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:09:08,305 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:09:08,308 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:09:08,308 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:09:08,309 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:09:08,309 basehttp 10511 6375518208 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:09:08,310 basehttp 10511 6172241920 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:09:08,310 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:09:08,321 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:09:08,322 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:09:08,322 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:09:08,322 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:09:08,322 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 10:09:08,332 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/funfact-pattern.png HTTP/1.1" 200 16992
+INFO 2025-08-29 10:09:08,332 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 10:09:08,333 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+WARNING 2025-08-29 10:09:08,353 log 10511 6325039104 Not Found: /favicon.ico
+WARNING 2025-08-29 10:09:08,353 basehttp 10511 6325039104 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 10:33:41,169 basehttp 10511 6155415552 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:33:41,185 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,185 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,187 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,187 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,187 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,187 basehttp 10511 6375518208 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,188 basehttp 10511 6172241920 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,188 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,188 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,191 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,191 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,191 basehttp 10511 6358691840 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,192 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,192 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,192 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,194 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,194 basehttp 10511 6172241920 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,202 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,202 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,202 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,202 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 10:33:41,203 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:34:06,331 basehttp 10511 6172241920 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-29 10:34:10,228 basehttp 10511 6172241920 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:34:14,148 basehttp 10511 6172241920 "GET /student/login/ HTTP/1.1" 200 14852
+INFO 2025-08-29 10:34:19,446 basehttp 10511 6172241920 "GET /courses/ HTTP/1.1" 200 24787
+INFO 2025-08-29 10:34:19,464 basehttp 10511 6172241920 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 200 3020
+INFO 2025-08-29 10:34:19,465 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 200 13548
+INFO 2025-08-29 10:34:27,520 basehttp 10511 6172241920 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:38:50,492 basehttp 10511 6172241920 "GET /student/login/ HTTP/1.1" 200 13212
+INFO 2025-08-29 10:38:50,504 basehttp 10511 6172241920 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,093 basehttp 10511 6172241920 "GET /register/ HTTP/1.1" 200 13714
+INFO 2025-08-29 10:38:55,106 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,110 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,111 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,114 basehttp 10511 6341865472 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,114 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,114 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,114 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,115 basehttp 10511 6358691840 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,115 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,117 basehttp 10511 6325039104 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,117 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,117 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,117 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:38:55,118 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:39:05,402 basehttp 10511 6341865472 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:39:05,415 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:39:05,417 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,457 basehttp 10511 6155415552 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:44:59,467 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,470 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,470 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,471 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,472 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,472 basehttp 10511 6358691840 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,472 basehttp 10511 6375518208 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,472 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,473 basehttp 10511 6172241920 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,473 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,473 basehttp 10511 6358691840 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6341865472 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,475 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,486 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,487 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,487 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,487 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 10:44:59,487 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 10:45:02,443 basehttp 10511 6375518208 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:45:02,456 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:45:02,460 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:45:02,460 basehttp 10511 6325039104 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:45:02,460 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:45:02,463 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:45:02,465 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 3335
+INFO 2025-08-29 10:45:02,465 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:45:02,465 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:45:02,466 basehttp 10511 6155415552 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:45:02,466 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 10:45:02,467 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:45:02,469 basehttp 10511 6341865472 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:45:02,470 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:45:02,470 basehttp 10511 6375518208 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:45:02,470 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:45:02,471 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:45:02,471 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:45:02,479 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:45:02,480 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:45:02,481 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:45:02,482 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:45:02,482 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+WARNING 2025-08-29 10:45:02,500 log 10511 6375518208 Not Found: /favicon.ico
+WARNING 2025-08-29 10:45:02,501 basehttp 10511 6375518208 "GET /favicon.ico HTTP/1.1" 404 7110
+WARNING 2025-08-29 10:45:08,336 log 10511 6375518208 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-29 10:45:08,336 basehttp 10511 6375518208 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7221
+INFO 2025-08-29 10:45:08,400 basehttp 10511 6375518208 "GET /static/landing/assets/css/theme_8.css.map HTTP/1.1" 200 4281
+WARNING 2025-08-29 10:45:08,402 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css.map HTTP/1.1" 404 2004
+INFO 2025-08-29 10:45:08,403 basehttp 10511 6155415552 "GET /static/landing/assets/css/style.css.map HTTP/1.1" 200 156075
+INFO 2025-08-29 10:46:23,432 basehttp 10511 6155415552 "GET / HTTP/1.1" 200 18914
+WARNING 2025-08-29 10:46:23,454 log 10511 6155415552 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-29 10:46:23,454 basehttp 10511 6155415552 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7221
+WARNING 2025-08-29 10:46:23,479 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/bootstrap.min.css.map HTTP/1.1" 404 2004
+INFO 2025-08-29 10:46:25,908 basehttp 10511 6375518208 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:46:25,929 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+WARNING 2025-08-29 10:46:25,933 log 10511 6375518208 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+INFO 2025-08-29 10:46:25,933 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+WARNING 2025-08-29 10:46:25,935 basehttp 10511 6375518208 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7221
+INFO 2025-08-29 10:46:25,938 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:46:25,939 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:46:25,941 basehttp 10511 6341865472 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:46:25,943 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:46:25,944 basehttp 10511 6358691840 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 15050
+INFO 2025-08-29 10:46:25,946 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:46:25,950 basehttp 10511 6172241920 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 10:46:25,952 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:46:25,955 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:46:25,955 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:46:25,956 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:46:25,957 basehttp 10511 6341865472 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:46:25,957 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:46:25,957 basehttp 10511 6375518208 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:46:25,959 basehttp 10511 6155415552 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:46:25,970 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:46:25,971 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:46:25,972 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:46:25,973 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:46:25,973 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+WARNING 2025-08-29 10:46:25,988 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/bootstrap.min.css.map HTTP/1.1" 404 2004
+WARNING 2025-08-29 10:46:26,061 log 10511 6341865472 Not Found: /favicon.ico
+WARNING 2025-08-29 10:46:26,061 basehttp 10511 6341865472 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 10:47:29,358 basehttp 10511 6341865472 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:47:29,375 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:47:29,376 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:47:29,377 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:47:29,379 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:47:29,383 basehttp 10511 6172241920 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:47:29,386 basehttp 10511 6155415552 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 15105
+INFO 2025-08-29 10:47:29,386 basehttp 10511 6341865472 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+WARNING 2025-08-29 10:47:29,390 log 10511 6375518208 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-29 10:47:29,391 basehttp 10511 6375518208 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7221
+INFO 2025-08-29 10:47:29,392 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:47:29,393 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 10:47:29,393 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:47:29,409 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:47:29,410 basehttp 10511 6155415552 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 10:47:29,416 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:47:29,416 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:47:29,419 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:47:29,422 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 10:47:29,426 basehttp 10511 6358691840 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:47:29,427 basehttp 10511 6325039104 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+WARNING 2025-08-29 10:47:29,427 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/bootstrap.min.css.map HTTP/1.1" 404 2004
+INFO 2025-08-29 10:47:29,427 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:47:29,428 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:47:29,429 basehttp 10511 6358691840 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:47:29,430 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+WARNING 2025-08-29 10:47:29,525 log 10511 6155415552 Not Found: /favicon.ico
+WARNING 2025-08-29 10:47:29,525 basehttp 10511 6155415552 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 10:59:33,462 basehttp 10511 6155415552 "GET / HTTP/1.1" 200 18914
+INFO 2025-08-29 10:59:33,477 basehttp 10511 6358691840 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 10:59:33,477 basehttp 10511 6325039104 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 10:59:33,479 basehttp 10511 6375518208 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 10:59:33,480 basehttp 10511 6155415552 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 10:59:33,481 basehttp 10511 6325039104 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 10:59:33,481 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 10:59:33,484 basehttp 10511 6172241920 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 10:59:33,484 basehttp 10511 6155415552 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 15124
+INFO 2025-08-29 10:59:33,485 basehttp 10511 6341865472 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 10:59:33,486 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 10:59:33,487 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 10:59:33,490 basehttp 10511 6155415552 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 10:59:33,491 basehttp 10511 6325039104 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 10:59:33,491 basehttp 10511 6341865472 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 10:59:33,492 basehttp 10511 6375518208 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 10:59:33,493 basehttp 10511 6172241920 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 10:59:33,493 basehttp 10511 6358691840 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 10:59:33,507 basehttp 10511 6358691840 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 10:59:33,509 basehttp 10511 6341865472 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 10:59:33,510 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 10:59:33,510 basehttp 10511 6172241920 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 10:59:33,511 basehttp 10511 6325039104 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+WARNING 2025-08-29 10:59:33,546 log 10511 6325039104 Not Found: /favicon.ico
+WARNING 2025-08-29 10:59:33,547 basehttp 10511 6325039104 "GET /favicon.ico HTTP/1.1" 404 7110
+INFO 2025-08-29 10:59:47,247 basehttp 10511 6325039104 "GET /student/login/ HTTP/1.1" 200 13212
+INFO 2025-08-29 10:59:47,263 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:59:54,312 basehttp 10511 6325039104 "GET /courses/ HTTP/1.1" 200 24787
+INFO 2025-08-29 10:59:54,318 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 10:59:54,321 basehttp 10511 6325039104 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+INFO 2025-08-29 10:59:54,322 basehttp 10511 6375518208 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 200 13548
+INFO 2025-08-29 10:59:56,864 basehttp 10511 6375518208 "GET /student/login/ HTTP/1.1" 200 13212
+INFO 2025-08-29 11:00:00,450 basehttp 10511 6375518208 "GET /student/login/ HTTP/1.1" 200 13212
+INFO 2025-08-29 11:00:04,620 basehttp 10511 6375518208 "GET /student/login/ HTTP/1.1" 200 13212
+INFO 2025-08-29 11:00:04,638 basehttp 10511 6375518208 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 11:01:50,502 autoreload 10511 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/urls.py changed, reloading.
+INFO 2025-08-29 11:01:51,348 autoreload 13604 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:02:04,050 autoreload 13604 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 11:02:04,304 autoreload 13705 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:07:26,418 autoreload 13705 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 11:07:26,797 autoreload 13918 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:08:38,221 autoreload 13918 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 11:08:38,474 autoreload 14316 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:08:44,844 autoreload 14316 8405639360 /Users/jobinsebastian/djangoprojects/lms/student_portal/urls.py changed, reloading.
+INFO 2025-08-29 11:08:45,072 autoreload 14369 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:09:11,058 autoreload 14369 8405639360 /Users/jobinsebastian/djangoprojects/lms/student_portal/views.py changed, reloading.
+INFO 2025-08-29 11:09:11,306 autoreload 14526 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:09:19,318 basehttp 14526 6201454592 "GET /register/ HTTP/1.1" 200 13698
+INFO 2025-08-29 11:09:19,338 basehttp 14526 6218280960 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,339 basehttp 14526 6201454592 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,339 basehttp 14526 6235107328 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,341 basehttp 14526 6251933696 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,341 basehttp 14526 6201454592 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,342 basehttp 14526 6218280960 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,342 basehttp 14526 6235107328 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,342 basehttp 14526 6268760064 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,343 basehttp 14526 6285586432 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,344 basehttp 14526 6251933696 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,345 basehttp 14526 6218280960 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,345 basehttp 14526 6285586432 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,345 basehttp 14526 6201454592 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,345 basehttp 14526 6235107328 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,346 basehttp 14526 6268760064 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,359 basehttp 14526 6285586432 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,359 basehttp 14526 6218280960 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,359 basehttp 14526 6268760064 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,359 basehttp 14526 6235107328 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:19,360 basehttp 14526 6201454592 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:22,879 autoreload 14526 8405639360 /Users/jobinsebastian/djangoprojects/lms/student_portal/student_mentoring_views.py changed, reloading.
+INFO 2025-08-29 11:09:23,137 autoreload 14623 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:09:23,306 basehttp 14623 6204370944 "GET / HTTP/1.1" 200 18906
+INFO 2025-08-29 11:09:23,320 basehttp 14623 6204370944 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:23,320 basehttp 14623 6221197312 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 11:09:36,737 autoreload 14623 8405639360 /Users/jobinsebastian/djangoprojects/lms/emails/views.py changed, reloading.
+INFO 2025-08-29 11:09:36,981 autoreload 14685 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 11:10:03,909 basehttp 14685 6160642048 "GET / HTTP/1.1" 200 18906
+INFO 2025-08-29 11:10:06,143 basehttp 14685 6160642048 "GET /login/ HTTP/1.1" 200 13175
+INFO 2025-08-29 11:10:08,900 basehttp 14685 6160642048 "GET /login/ HTTP/1.1" 200 13175
+INFO 2025-08-29 11:10:11,111 basehttp 14685 6160642048 "GET /login/ HTTP/1.1" 200 13175
+INFO 2025-08-29 11:10:14,181 basehttp 14685 6160642048 "GET / HTTP/1.1" 200 18906
+INFO 2025-08-29 11:10:15,260 basehttp 14685 6160642048 "GET /courses/ HTTP/1.1" 200 24779
+INFO 2025-08-29 11:10:15,277 basehttp 14685 6160642048 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+INFO 2025-08-29 11:10:15,277 basehttp 14685 6177468416 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 11:12:08,556 basehttp 14685 6177468416 "GET / HTTP/1.1" 200 18908
+INFO 2025-08-29 11:12:08,567 basehttp 14685 6177468416 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+WARNING 2025-08-29 11:12:20,078 log 14685 6177468416 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-29 11:12:20,078 basehttp 14685 6177468416 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7388
+INFO 2025-08-29 11:12:20,132 basehttp 14685 6160642048 "GET /static/landing/assets/css/theme_8.css.map HTTP/1.1" 304 0
+INFO 2025-08-29 11:12:20,132 basehttp 14685 6194294784 "GET /static/landing/assets/css/style.css.map HTTP/1.1" 304 0
+WARNING 2025-08-29 11:12:20,134 basehttp 14685 6177468416 "GET /static/landing/assets/css/plugins/bootstrap.min.css.map HTTP/1.1" 404 2004
+INFO 2025-08-29 12:14:49,219 basehttp 14685 6160642048 "GET /admin/login/ HTTP/1.1" 200 3495
+INFO 2025-08-29 12:15:01,157 basehttp 14685 6160642048 "POST /admin/login/ HTTP/1.1" 302 0
+INFO 2025-08-29 12:15:01,172 basehttp 14685 6160642048 "GET /admin/ HTTP/1.1" 200 42177
+INFO 2025-08-29 12:15:01,208 basehttp 14685 6160642048 "GET /static/admin/flexy-bootstrap-lite-1.0.0/assets/css/icons/tabler-icons/fonts/tabler-icons.woff2 HTTP/1.1" 200 552144
+INFO 2025-08-29 12:15:10,613 basehttp 14685 6160642048 "GET /admin/assignment-submissions/ HTTP/1.1" 200 23237
+INFO 2025-08-29 12:15:11,897 basehttp 14685 6160642048 "GET /admin/assignments/ HTTP/1.1" 200 21588
+INFO 2025-08-29 13:46:27,764 basehttp 14685 6160642048 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 13:46:27,808 basehttp 14685 6211121152 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 200 1652
+INFO 2025-08-29 13:46:27,808 basehttp 14685 6194294784 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 200 24240
+INFO 2025-08-29 13:46:27,809 basehttp 14685 6227947520 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 200 77773
+INFO 2025-08-29 13:46:27,809 basehttp 14685 6160642048 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 200 71841
+INFO 2025-08-29 13:46:27,810 basehttp 14685 6211121152 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 200 17512
+INFO 2025-08-29 13:46:27,812 basehttp 14685 6211121152 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 200 11729
+INFO 2025-08-29 13:46:27,812 basehttp 14685 6160642048 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 200 35445
+INFO 2025-08-29 13:46:27,812 basehttp 14685 6194294784 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 200 89500
+INFO 2025-08-29 13:46:27,813 basehttp 14685 6177468416 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 200 155631
+INFO 2025-08-29 13:46:27,813 basehttp 14685 6227947520 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 200 42663
+INFO 2025-08-29 13:46:27,814 basehttp 14685 6211121152 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 200 8428
+INFO 2025-08-29 13:46:27,815 basehttp 14685 6160642048 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 200 88431
+INFO 2025-08-29 13:46:27,815 basehttp 14685 6244773888 "GET /static/landing/assets/css/style.css HTTP/1.1" 200 405429
+INFO 2025-08-29 13:46:27,815 basehttp 14685 6194294784 "GET /static/landing/assets/js/main.js HTTP/1.1" 200 24238
+INFO 2025-08-29 13:46:27,816 basehttp 14685 6227947520 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 200 15124
+INFO 2025-08-29 13:46:27,817 basehttp 14685 6177468416 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 200 49879
+INFO 2025-08-29 13:46:27,818 basehttp 14685 6211121152 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 200 4256
+INFO 2025-08-29 13:46:27,839 basehttp 14685 6227947520 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 200 80300
+INFO 2025-08-29 13:46:27,839 basehttp 14685 6177468416 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 200 78460
+INFO 2025-08-29 13:46:27,839 basehttp 14685 6194294784 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 200 118072
+INFO 2025-08-29 13:46:27,839 basehttp 14685 6244773888 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 200 112916
+INFO 2025-08-29 13:46:27,839 basehttp 14685 6160642048 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 200 129072
+INFO 2025-08-29 13:46:27,849 basehttp 14685 6211121152 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 200 13548
+WARNING 2025-08-29 13:46:27,861 log 14685 6227947520 Not Found: /favicon.ico
+WARNING 2025-08-29 13:46:27,861 basehttp 14685 6227947520 "GET /favicon.ico HTTP/1.1" 404 7277
+INFO 2025-08-29 13:46:38,757 basehttp 14685 6244773888 "GET /login/ HTTP/1.1" 200 14552
+INFO 2025-08-29 13:46:39,867 basehttp 14685 6211121152 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 13:46:45,964 basehttp 14685 6227947520 "GET /courses/ HTTP/1.1" 200 26156
+INFO 2025-08-29 13:46:45,989 basehttp 14685 6177468416 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 200 3020
+INFO 2025-08-29 13:46:46,950 basehttp 14685 6244773888 "GET /login/ HTTP/1.1" 200 14552
+INFO 2025-08-29 13:46:47,937 basehttp 14685 6211121152 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 13:46:49,642 basehttp 14685 6177468416 "GET /courses/ HTTP/1.1" 200 26156
+INFO 2025-08-29 14:04:26,757 basehttp 14685 6160642048 "GET /courses/ HTTP/1.1" 200 31017
+INFO 2025-08-29 14:04:26,782 basehttp 14685 6160642048 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 14:04:35,761 basehttp 14685 6160642048 "GET /courses/ HTTP/1.1" 200 31017
+INFO 2025-08-29 14:09:49,999 autoreload 14685 8405639360 /Users/jobinsebastian/djangoprojects/lms/landing/views.py changed, reloading.
+INFO 2025-08-29 14:09:50,409 autoreload 17756 8405639360 Watching for file changes with StatReloader
+INFO 2025-08-29 14:26:10,031 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 14:26:10,065 basehttp 17756 6125187072 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,069 basehttp 17756 6158839808 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,069 basehttp 17756 6142013440 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,069 basehttp 17756 13035925504 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,069 basehttp 17756 13069578240 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,070 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,070 basehttp 17756 6125187072 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,070 basehttp 17756 13052751872 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,071 basehttp 17756 13035925504 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,071 basehttp 17756 13069578240 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,071 basehttp 17756 6142013440 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,071 basehttp 17756 6125187072 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,071 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,072 basehttp 17756 13052751872 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,072 basehttp 17756 13069578240 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,072 basehttp 17756 13035925504 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,072 basehttp 17756 6158839808 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,093 basehttp 17756 6142013440 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,093 basehttp 17756 6125187072 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,093 basehttp 17756 13052751872 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,094 basehttp 17756 13035925504 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,094 basehttp 17756 13069578240 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:10,102 basehttp 17756 6158839808 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:26:12,298 basehttp 17756 13052751872 "GET /courses/ HTTP/1.1" 200 29869
+INFO 2025-08-29 14:26:12,317 basehttp 17756 6125187072 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+INFO 2025-08-29 14:28:59,642 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 29869
+INFO 2025-08-29 14:33:14,442 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33208
+INFO 2025-08-29 14:35:33,399 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33761
+INFO 2025-08-29 14:39:36,868 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33430
+INFO 2025-08-29 14:39:36,881 basehttp 17756 6125187072 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 13052751872 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 6142013440 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 6158839808 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 13069578240 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 6125187072 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,888 basehttp 17756 13035925504 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,891 basehttp 17756 13052751872 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,891 basehttp 17756 13069578240 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,891 basehttp 17756 6142013440 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,892 basehttp 17756 13052751872 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,892 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,893 basehttp 17756 6125187072 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,893 basehttp 17756 6142013440 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,893 basehttp 17756 13035925504 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,923 basehttp 17756 13069578240 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,923 basehttp 17756 6158839808 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,924 basehttp 17756 6125187072 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,924 basehttp 17756 6142013440 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,924 basehttp 17756 13052751872 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,924 basehttp 17756 13035925504 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+INFO 2025-08-29 14:39:36,927 basehttp 17756 13069578240 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 14:41:42,329 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33718
+INFO 2025-08-29 14:42:34,289 basehttp 17756 6125187072 "GET /login/ HTTP/1.1" 200 14552
+INFO 2025-08-29 14:43:03,969 basehttp 17756 6125187072 "GET /privacy/ HTTP/1.1" 200 10413
+INFO 2025-08-29 14:43:23,535 basehttp 17756 6125187072 "GET /terms/ HTTP/1.1" 200 10611
+INFO 2025-08-29 14:43:39,052 basehttp 17756 6125187072 "GET /login/ HTTP/1.1" 200 14552
+INFO 2025-08-29 14:43:42,355 basehttp 17756 6125187072 "GET /register/ HTTP/1.1" 200 15075
+INFO 2025-08-29 14:43:52,503 basehttp 17756 6125187072 "GET /login/ HTTP/1.1" 200 14552
+INFO 2025-08-29 14:43:53,425 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 14:46:00,928 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 14:46:19,040 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 14:46:23,247 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 35746
+INFO 2025-08-29 14:46:23,265 basehttp 17756 6125187072 "GET /static/landing/assets/img/online-education/icons/icon1.svg HTTP/1.1" 200 1195
+INFO 2025-08-29 14:46:23,265 basehttp 17756 6142013440 "GET /static/landing/assets/img/online-education/icons/icon3.svg HTTP/1.1" 200 2028
+INFO 2025-08-29 14:46:23,266 basehttp 17756 6125187072 "GET /static/landing/assets/img/online-education/icons/icon5.svg HTTP/1.1" 200 3176
+INFO 2025-08-29 14:46:23,271 basehttp 17756 6142013440 "GET /static/landing/assets/img/online-education/cta-pattern.png HTTP/1.1" 200 16204
+INFO 2025-08-29 14:46:33,554 basehttp 17756 6142013440 "GET /courses/ HTTP/1.1" 200 35746
+INFO 2025-08-29 14:47:42,147 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33699
+INFO 2025-08-29 14:48:26,338 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33768
+INFO 2025-08-29 14:50:04,472 basehttp 17756 6125187072 "GET /courses/ HTTP/1.1" 200 33962
+INFO 2025-08-29 14:50:11,575 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20283
+INFO 2025-08-29 14:51:17,591 basehttp 17756 6125187072 "GET / HTTP/1.1" 200 20282
+ERROR 2025-08-29 14:53:03,951 log 17756 6125187072 Internal Server Error: /courses/7/
+Traceback (most recent call last):
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/jobinsebastian/djangoprojects/lms/landing/views.py", line 255, in course_detail
+    return render(request, 'landing/course_detail.html', context)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/jobinsebastian/djangoprojects/lms/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: landing/course_detail.html
+ERROR 2025-08-29 14:53:03,952 basehttp 17756 6125187072 "GET /courses/7/ HTTP/1.1" 500 90104
+INFO 2025-08-29 15:05:22,885 basehttp 17756 6142013440 "GET / HTTP/1.1" 200 20282
+INFO 2025-08-29 15:05:22,916 basehttp 17756 6142013440 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 15:05:22,917 basehttp 17756 6158839808 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 15:05:22,918 basehttp 17756 13035925504 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 15:05:24,012 basehttp 17756 6158839808 "GET / HTTP/1.1" 200 20282
+INFO 2025-08-29 15:07:33,588 basehttp 17756 6142013440 "GET / HTTP/1.1" 200 20034
+INFO 2025-08-29 15:08:47,073 basehttp 17756 6142013440 "GET /courses/10/ HTTP/1.1" 200 17481
+INFO 2025-08-29 15:09:02,306 basehttp 17756 6142013440 "GET /courses/9/ HTTP/1.1" 200 17485
+INFO 2025-08-29 15:14:18,801 basehttp 17756 6142013440 "GET /courses/9/ HTTP/1.1" 200 17485
+INFO 2025-08-29 15:14:18,813 basehttp 17756 6142013440 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,819 basehttp 17756 6158839808 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,820 basehttp 17756 13035925504 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,820 basehttp 17756 13069578240 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,820 basehttp 17756 6142013440 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,820 basehttp 17756 13052751872 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,820 basehttp 17756 13086404608 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,822 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,823 basehttp 17756 13035925504 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,823 basehttp 17756 13069578240 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,823 basehttp 17756 6142013440 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,824 basehttp 17756 13086404608 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,824 basehttp 17756 13052751872 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,824 basehttp 17756 13035925504 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,824 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,838 basehttp 17756 13069578240 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,839 basehttp 17756 6142013440 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,839 basehttp 17756 13052751872 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,839 basehttp 17756 13086404608 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,839 basehttp 17756 6158839808 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:18,840 basehttp 17756 13035925504 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 15:14:21,182 basehttp 17756 6142013440 "GET / HTTP/1.1" 200 25466
+INFO 2025-08-29 16:45:48,564 basehttp 17756 6142013440 "GET / HTTP/1.1" 200 25345
+INFO 2025-08-29 16:45:48,573 basehttp 17756 6142013440 "GET /static/landing/assets/css/plugins/fontawesome.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 13086404608 "GET /static/landing/assets/css/plugins/slick.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 6142013440 "GET /static/landing/assets/css/theme_8.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 6158839808 "GET /static/landing/assets/css/plugins/animate.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 13035925504 "GET /static/landing/assets/css/plugins/bootstrap.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 13069578240 "GET /static/landing/assets/css/plugins/lightgallery.min.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,578 basehttp 17756 13052751872 "GET /static/landing/assets/css/style.css HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,580 basehttp 17756 13086404608 "GET /static/landing/assets/js/plugins/jquery-3.6.0.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,580 basehttp 17756 6142013440 "GET /static/landing/assets/js/plugins/isotope.pkg.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,581 basehttp 17756 13035925504 "GET /static/landing/assets/js/main.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,581 basehttp 17756 6158839808 "GET /static/landing/assets/js/plugins/jquery.counter.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,581 basehttp 17756 13069578240 "GET /static/landing/assets/js/plugins/lightgallery.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,582 basehttp 17756 13052751872 "GET /static/landing/assets/js/plugins/jquery.slick.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,582 basehttp 17756 13086404608 "GET /static/landing/assets/js/plugins/wow.min.js HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,582 basehttp 17756 6142013440 "GET /static/landing/assets/img/online-education/logo.svg HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,582 basehttp 17756 13035925504 "GET /static/landing/assets/img/online-education/hero-img.svg HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,582 basehttp 17756 6158839808 "GET /static/landing/assets/img/online-education/about.png HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 13069578240 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBook.otf HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 13052751872 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTBold.otf HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 6142013440 "GET /static/landing/assets/fonts/FuturaPT/FuturaPTMedium.otf HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 13086404608 "GET /static/landing/assets/fonts/fa-regular-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 13035925504 "GET /static/landing/assets/fonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,592 basehttp 17756 6158839808 "GET /static/landing/assets/fonts/fa-brands-400.woff2 HTTP/1.1" 304 0
+INFO 2025-08-29 16:45:48,594 basehttp 17756 13069578240 "GET /static/landing/assets/img/online-education/course1.jpg HTTP/1.1" 304 0
+ERROR 2025-08-31 12:22:35,008 log 5566 8410751168 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/http/request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+INFO 2025-09-06 09:34:48,367 autoreload 8073 8826036416 Watching for file changes with StatReloader
+WARNING 2025-09-06 09:34:54,813 log 8073 6124072960 Unauthorized: /api/users/auth/login/
+WARNING 2025-09-06 09:34:54,814 basehttp 8073 6124072960 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+INFO 2025-09-06 09:36:16,723 basehttp 8073 6124072960 "POST /api/users/auth/login/ HTTP/1.1" 200 582
+INFO 2025-09-06 09:36:23,416 basehttp 8073 6124072960 "DELETE /api/users/profile/delete-account/ HTTP/1.1" 200 42
+WARNING 2025-09-06 09:36:27,583 log 8073 6124072960 Unauthorized: /api/users/auth/login/
+WARNING 2025-09-06 09:36:27,583 basehttp 8073 6124072960 "POST /api/users/auth/login/ HTTP/1.1" 401 63
+INFO 2025-09-06 14:10:28,009 autoreload 42916 8826036416 Watching for file changes with StatReloader
+WARNING 2025-09-06 14:38:51,260 log 42916 6170767360 Not Found: /student/login/
+WARNING 2025-09-06 14:38:51,260 basehttp 42916 6170767360 "POST /student/login/ HTTP/1.1" 404 16394
+INFO 2025-09-06 14:38:55,860 basehttp 42916 6170767360 "GET /login/ HTTP/1.1" 200 14303
+INFO 2025-09-06 14:39:04,195 basehttp 42916 6170767360 "POST /login/ HTTP/1.1" 302 0
+WARNING 2025-09-06 14:39:04,196 log 42916 6170767360 Forbidden (CSRF token missing.): /student/
+WARNING 2025-09-06 14:39:04,196 basehttp 42916 6170767360 "POST /student/ HTTP/1.1" 403 2491
+INFO 2025-09-06 14:39:09,720 basehttp 42916 12901707776 "GET /student/profile/ HTTP/1.1" 200 27348
+INFO 2025-09-06 14:39:17,567 basehttp 42916 6170767360 "DELETE /api/users/profile/delete-account/ HTTP/1.1" 200 42
+INFO 2025-09-06 14:39:22,035 basehttp 42916 6170767360 "GET /student/profile/ HTTP/1.1" 302 0
+INFO 2025-09-06 14:39:26,185 basehttp 42916 6170767360 "GET /student/profile/ HTTP/1.1" 302 0

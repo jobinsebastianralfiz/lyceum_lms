@@ -55,12 +55,12 @@
         <thead class="table-light">
           <tr>
             <th>Video</th>
+            <th>Platform</th>
             <th>Course</th>
             <th>Module</th>
             <th>Duration</th>
             <th>Order</th>
             <th>Status</th>
-            <th>Views</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -70,21 +70,50 @@
             <td>
               <div class="d-flex align-items-center">
                 <div class="flex-shrink-0 me-3">
-                  <div class="bg-primary-subtle rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 40px;">
-                    <i class="ti ti-video text-primary"></i>
-                  </div>
-                </div>
-                <div>
-                  <h6 class="mb-0">{{ video.title }}</h6>
-                  <small class="text-muted">{{ video.description|truncatewords:10 }}</small>
-                  {% if video.video_url %}
-                    <div class="mt-1">
-                      <a href="{{ video.video_url }}" target="_blank" class="btn btn-outline-dark btn-sm">
-                        <i class="ti ti-external-link me-1"></i>Watch
-                      </a>
+                  {% if video.thumbnail_url %}
+                    <img src="{{ video.thumbnail_url }}" class="rounded" style="width: 60px; height: 40px; object-fit: cover;" 
+                         alt="{{ video.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="bg-primary-subtle rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 40px; display: none;">
+                      <i class="ti ti-video text-primary"></i>
+                    </div>
+                  {% else %}
+                    <div class="bg-primary-subtle rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 40px;">
+                      <i class="ti ti-video text-primary"></i>
                     </div>
                   {% endif %}
                 </div>
+                <div>
+                  <h6 class="mb-1">{{ video.title }}</h6>
+                  <small class="text-muted d-block">{{ video.description|truncatewords:8 }}</small>
+                  {% if video.auto_fetched %}
+                    <span class="badge bg-success-subtle text-success mt-1">
+                      <i class="ti ti-api"></i> API Synced
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex flex-column gap-1">
+                {% if video.platform == 'youtube' %}
+                  <span class="badge bg-danger-subtle text-danger">
+                    <i class="ti ti-brand-youtube me-1"></i>YouTube
+                  </span>
+                {% elif video.platform == 'vimeo' %}
+                  <span class="badge bg-info-subtle text-info">
+                    <i class="ti ti-brand-vimeo me-1"></i>Vimeo
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">
+                    <i class="ti ti-link me-1"></i>Direct
+                  </span>
+                {% endif %}
+                {% if video.effective_video_url %}
+                  <a href="{{ video.effective_video_url }}" target="_blank" 
+                     class="btn btn-outline-primary btn-xs">
+                    <i class="ti ti-external-link me-1"></i>Watch
+                  </a>
+                {% endif %}
               </div>
             </td>
             <td>
@@ -115,25 +144,25 @@
               {% endif %}
             </td>
             <td>
-              <div class="text-center">
-                <h6 class="mb-0">{{ video.view_count|default:"0" }}</h6>
-                <small class="text-muted">views</small>
-              </div>
-            </td>
-            <td>
               <div class="btn-group" role="group">
                 <a href="{% url 'custom_admin:video_lesson_edit' video.id %}" 
-                   class="btn btn-outline-primary btn-sm">
+                   class="btn btn-outline-primary btn-sm" title="Edit Video">
                   <i class="ti ti-edit"></i>
                 </a>
-                {% if video.video_url %}
-                <a href="{{ video.video_url }}" target="_blank" 
-                   class="btn btn-outline-success btn-sm">
+                {% if video.effective_video_url and video.platform != 'direct' %}
+                  <button type="button" class="btn btn-outline-info btn-sm" 
+                          title="Sync from API" onclick="syncVideo({{ video.id }})">
+                    <i class="ti ti-refresh"></i>
+                  </button>
+                {% endif %}
+                {% if video.effective_video_url %}
+                <a href="{{ video.effective_video_url }}" target="_blank" 
+                   class="btn btn-outline-success btn-sm" title="Watch Video">
                   <i class="ti ti-play"></i>
                 </a>
                 {% endif %}
                 <a href="{% url 'custom_admin:video_lesson_delete' video.id %}" 
-                   class="btn btn-outline-danger btn-sm">
+                   class="btn btn-outline-danger btn-sm" title="Delete Video">
                   <i class="ti ti-trash"></i>
                 </a>
               </div>
@@ -245,4 +274,72 @@
     </div>
   </div>
 </div>
+
+<script>
+// Video sync functionality
+async function syncVideo(videoId) {
+  const btn = event.target.closest('button');
+  const originalContent = btn.innerHTML;
+  
+  // Show loading state
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+  
+  try {
+    const response = await fetch(`/admin/video-lessons/${videoId}/sync/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || 
+                       document.querySelector('meta[name=csrf-token]').getAttribute('content')
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Show success message
+      showAlert('✓ Video synced successfully!', 'success');
+      // Refresh the page to show updated data
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showAlert(data.error || 'Failed to sync video', 'error');
+    }
+  } catch (error) {
+    console.error('Sync error:', error);
+    showAlert('Failed to sync video', 'error');
+  }
+  
+  // Restore button
+  btn.disabled = false;
+  btn.innerHTML = originalContent;
+}
+
+function showAlert(message, type) {
+  // Create or update alert
+  let alertContainer = document.getElementById('alertContainer');
+  if (!alertContainer) {
+    alertContainer = document.createElement('div');
+    alertContainer.id = 'alertContainer';
+    alertContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1050; max-width: 300px;';
+    document.body.appendChild(alertContainer);
+  }
+  
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+  alertContainer.innerHTML = `
+    <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    const alert = alertContainer.querySelector('.alert');
+    if (alert) {
+      alert.classList.remove('show');
+      setTimeout(() => alertContainer.innerHTML = '', 150);
+    }
+  }, 5000);
+}
+</script>
 {% endblock %}

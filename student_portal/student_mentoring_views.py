@@ -18,7 +18,7 @@ def student_mentoring_dashboard(request):
     # Check if user is a student
     if not hasattr(request.user, 'role') or request.user.role != 'student':
         messages.error(request, 'Access denied. Student role required.')
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     student = request.user
     
@@ -134,7 +134,7 @@ def student_session_history(request):
     """Student's complete mentoring session history"""
     if not hasattr(request.user, 'role') or request.user.role != 'student':
         messages.error(request, 'Access denied. Student role required.')
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     student = request.user
     
@@ -174,7 +174,7 @@ def student_progress_insights(request):
     """Detailed progress insights for students"""
     if not hasattr(request.user, 'role') or request.user.role != 'student':
         messages.error(request, 'Access denied. Student role required.')
-        return redirect('student_portal:login')
+        return redirect('landing:login')
     
     student = request.user
     analytics, created = StudentAnalytics.objects.get_or_create(student=student)

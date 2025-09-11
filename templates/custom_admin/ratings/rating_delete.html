@@ -1,0 +1,85 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Rating - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'custom_admin:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'custom_admin:ratings_list' %}">Ratings</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Delete Rating</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="ti ti-alert-triangle text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title fw-semibold mb-2">Confirm Deletion</h5>
+                        <p class="text-muted">Are you sure you want to delete this rating? This action cannot be undone.</p>
+                    </div>
+
+                    <!-- Rating Details -->
+                    <div class="border rounded p-4 mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold mb-2">Course</h6>
+                                <p class="mb-1">{{ rating.course.title }}</p>
+                                <small class="text-muted">{{ rating.course.category.name }}</small>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold mb-2">User</h6>
+                                <p class="mb-1">{{ rating.user.first_name }} {{ rating.user.last_name }}</p>
+                                <small class="text-muted">{{ rating.user.email }}</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold mb-2">Rating</h6>
+                                <div class="d-flex align-items-center">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= rating.rating %}
+                                            <i class="ti ti-star-filled text-warning"></i>
+                                        {% else %}
+                                            <i class="ti ti-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2">{{ rating.rating }}/5</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-semibold mb-2">Date Created</h6>
+                                <p class="mb-0">{{ rating.created_at|date:"F d, Y" }} at {{ rating.created_at|time:"H:i" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'custom_admin:ratings_list' %}" class="btn btn-secondary">
+                            <i class="ti ti-arrow-left"></i> Cancel
+                        </a>
+                        <form method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="ti ti-trash"></i> Delete Rating
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

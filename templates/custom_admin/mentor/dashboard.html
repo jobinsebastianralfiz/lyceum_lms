@@ -54,6 +54,9 @@
         <a href="{% url 'mentor:alerts_list' %}" class="btn btn-warning">
             <i class="fas fa-exclamation-triangle me-2"></i>Alerts
         </a>
+        <a href="{% url 'mentor:mentor_sessions_list' %}" class="btn btn-info">
+            <i class="fas fa-comments me-2"></i>Sessions
+        </a>
         <a href="{% url 'mentor:create_mentor_session' %}" class="btn btn-success">
             <i class="fas fa-plus me-2"></i>New Session
         </a>
@@ -103,6 +106,45 @@
                 </div>
                 <h3 class="mb-0">{{ inactive_percentage }}%</h3>
                 <small class="text-muted">Inactive Rate</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Session Stats Row -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-info mb-2">
+                    <i class="fas fa-comments fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ total_sessions }}</h3>
+                <small class="text-muted">Total Sessions</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-success mb-2">
+                    <i class="fas fa-calendar-week fa-2x"></i>
+                </div>
+                <h3 class="mb-0">{{ sessions_this_week }}</h3>
+                <small class="text-muted">This Week</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-primary mb-2">
+                    <i class="fas fa-plus-circle fa-2x"></i>
+                </div>
+                <a href="{% url 'mentor:create_mentor_session' %}" class="btn btn-primary btn-sm mt-2">
+                    Create Session
+                </a>
+                <small class="text-muted d-block">Quick Action</small>
             </div>
         </div>
     </div>
@@ -371,6 +413,93 @@
                 {% if recent_alerts.has_next %}
                     <li class="page-item">
                         <a class="page-link" href="?alerts_page={{ recent_alerts.next_page_number }}{% if request.GET.critical_page %}&critical_page={{ request.GET.critical_page }}{% endif %}">›</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recent Mentoring Sessions -->
+<div class="card border-0 shadow-sm mt-4" style="border-radius: 15px;">
+    <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Mentoring Sessions</h5>
+            <div class="d-flex gap-2">
+                <small class="text-muted align-self-center">{{ recent_sessions.paginator.count }} total</small>
+                <a href="{% url 'mentor:mentor_sessions_list' %}" class="btn btn-sm btn-outline-info">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% for session in recent_sessions %}
+        <div class="p-3 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="row align-items-center">
+                <div class="col-1">
+                    <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                        <i class="fas fa-comments" style="font-size: 14px;"></i>
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="badge bg-info me-2">{{ session.get_session_type_display }}</span>
+                        <span class="fw-semibold small">{{ session.student.name|default:'No Name' }}</span>
+                    </div>
+                    <div class="text-muted small mb-1">
+                        <i class="fas fa-clock me-1"></i>{{ session.duration_minutes }} minutes
+                        {% if session.course %}
+                        <i class="fas fa-book ms-2 me-1"></i>{{ session.course.title }}
+                        {% else %}
+                        <i class="fas fa-book ms-2 me-1"></i>General Session
+                        {% endif %}
+                    </div>
+                    <p class="mb-0 small text-muted">{{ session.topics_discussed|truncatechars:80 }}</p>
+                </div>
+                <div class="col-3 text-end">
+                    <small class="text-muted d-block">{{ session.session_date|date:"M j, Y" }}</small>
+                    <small class="text-muted d-block">{{ session.session_date|time:"g:i A" }}</small>
+                    <div class="mt-1">
+                        <a href="{% url 'mentor:student_detail' session.student.id %}" class="btn btn-xs btn-outline-primary">View Student</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-comments-slash fa-2x mb-2"></i>
+            <p>No mentoring sessions yet</p>
+            <a href="{% url 'mentor:create_mentor_session' %}" class="btn btn-sm btn-info">Create Your First Session</a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination for Recent Sessions -->
+    {% if recent_sessions.has_other_pages %}
+    <div class="card-footer bg-white border-0">
+        <nav aria-label="Recent sessions pagination">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% if recent_sessions.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?sessions_page={{ recent_sessions.previous_page_number }}{% if request.GET.alerts_page %}&alerts_page={{ request.GET.alerts_page }}{% endif %}{% if request.GET.critical_page %}&critical_page={{ request.GET.critical_page }}{% endif %}">‹</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in recent_sessions.paginator.page_range %}
+                    {% if recent_sessions.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > recent_sessions.number|add:'-2' and num < recent_sessions.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?sessions_page={{ num }}{% if request.GET.alerts_page %}&alerts_page={{ request.GET.alerts_page }}{% endif %}{% if request.GET.critical_page %}&critical_page={{ request.GET.critical_page }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if recent_sessions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?sessions_page={{ recent_sessions.next_page_number }}{% if request.GET.alerts_page %}&alerts_page={{ request.GET.alerts_page }}{% endif %}{% if request.GET.critical_page %}&critical_page={{ request.GET.critical_page }}{% endif %}">›</a>
                     </li>
                 {% endif %}
             </ul>

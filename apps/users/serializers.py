@@ -1,13 +1,68 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 from drf_spectacular.utils import extend_schema_field
 from .models import User, Team, TeamMembership
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Custom JWT token serializer that includes user role and name in the token payload.
+    Custom JWT token serializer that includes user role and name in the token payload
+    and provides specific error messages for failed authentication.
     """
+    
+    def validate(self, attrs):
+        # Get email and password from the input
+        email = attrs.get('email') or attrs.get('username')
+        password = attrs.get('password')
+        
+        # Basic validation
+        if not email:
+            raise serializers.ValidationError({
+                'email': ['Email address is required.']
+            })
+        
+        if not password:
+            raise serializers.ValidationError({
+                'password': ['Password is required.']
+            })
+        
+        # Normalize email
+        email = email.lower().strip()
+        
+        # Check if user exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({
+                'email': ['No account found with this email address. Please check your email or sign up.']
+            })
+        
+        # Check if user is active
+        if not user.is_active:
+            raise serializers.ValidationError({
+                'non_field_errors': ['This account has been deactivated. Please contact support for assistance.']
+            })
+        
+        # Check password
+        if not check_password(password, user.password):
+            raise serializers.ValidationError({
+                'password': ['The password you entered is incorrect. Please try again.']
+            })
+        
+        # If we get here, authentication should succeed
+        # Ensure the parent class gets the right field
+        attrs['username'] = email
+        
+        # Call parent validation (this will generate the tokens)
+        try:
+            data = super().validate(attrs)
+            return data
+        except Exception as e:
+            # If something still goes wrong, provide a generic error
+            raise serializers.ValidationError({
+                'non_field_errors': ['Authentication failed. Please try again.']
+            })
     
     @classmethod
     def get_token(cls, user):
@@ -162,6 +217,18 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     
     def validate_email(self, value):
-        if not User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("User with this email does not exist")
+        # We don't validate if user exists for security reasons
+        # The view will handle this logic
         return value
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """
+    Serializer for password reset confirmation.
+    """
+    new_password = serializers.CharField(required=True, min_length=8)
+    new_password_confirm = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError("Passwords don't match")
+        return attrs

@@ -1,0 +1,358 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Lead Details: {{ lead.name }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-user me-2"></i>Lead Details: {{ lead.name }}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:leads_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to Leads
+            </a>
+            <button type="button" class="btn btn-outline-danger btn-sm" 
+                    onclick="confirmDelete({{ lead.id }}, '{{ lead.name|escapejs }}')">
+              <i class="ti ti-trash"></i> Delete Lead
+            </button>
+          </div>
+        </div>
+
+        <!-- Lead Status Card -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="alert alert-light border d-flex align-items-center">
+              <div class="me-3">
+                {% if lead.status == 'new' %}
+                  <span class="badge bg-warning fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% elif lead.status == 'contacted' %}
+                  <span class="badge bg-info fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% elif lead.status == 'qualified' %}
+                  <span class="badge bg-primary fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% elif lead.status == 'converted' %}
+                  <span class="badge bg-success fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% elif lead.status == 'lost' %}
+                  <span class="badge bg-danger fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% else %}
+                  <span class="badge bg-secondary fs-6 px-3 py-2">{{ lead.get_status_display }}</span>
+                {% endif %}
+              </div>
+              <div class="flex-fill">
+                <h6 class="mb-1">Lead submitted on {{ lead.created_at|date:"F d, Y \a\\t H:i" }}</h6>
+                <p class="mb-0 text-muted">
+                  {% if lead.assigned_to %}
+                    Assigned to: <strong>{{ lead.assigned_to.name }}</strong>
+                  {% else %}
+                    <strong class="text-warning">Not assigned to anyone yet</strong>
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-8">
+            <!-- Lead Information -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-info-circle me-2"></i>Lead Information
+                </h6>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Full Name</label>
+                    <div class="fw-medium">{{ lead.name }}</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Email</label>
+                    <div class="fw-medium">
+                      <a href="mailto:{{ lead.email }}" class="text-decoration-none">
+                        <i class="ti ti-mail me-1"></i>{{ lead.email }}
+                      </a>
+                    </div>
+                  </div>
+                  {% if lead.phone %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Phone</label>
+                    <div class="fw-medium">
+                      <a href="tel:{{ lead.phone }}" class="text-decoration-none">
+                        <i class="ti ti-phone me-1"></i>{{ lead.phone }}
+                      </a>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Area of Interest</label>
+                    <div>
+                      <span class="badge bg-info-subtle text-info">{{ lead.get_area_of_interest_display }}</span>
+                    </div>
+                    {% if lead.other_interest %}
+                      <div class="small text-muted mt-1">{{ lead.other_interest }}</div>
+                    {% endif %}
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Current Experience</label>
+                    <div>
+                      <span class="badge bg-secondary-subtle text-secondary">{{ lead.get_current_experience_display }}</span>
+                    </div>
+                  </div>
+                  {% if lead.learning_timeline %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Learning Timeline</label>
+                    <div>
+                      <span class="badge bg-primary-subtle text-primary">{{ lead.get_learning_timeline_display }}</span>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if lead.budget_range %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Budget Range</label>
+                    <div>
+                      <span class="badge bg-success-subtle text-success">{{ lead.get_budget_range_display }}</span>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if lead.preferred_time %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label small text-muted">Preferred Time</label>
+                    <div>
+                      <span class="badge bg-warning-subtle text-warning">{{ lead.get_preferred_time_display }}</span>
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+
+                {% if lead.career_goals %}
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Career Goals</label>
+                  <div class="p-3 bg-light rounded">{{ lead.career_goals }}</div>
+                </div>
+                {% endif %}
+
+                {% if lead.specific_topics %}
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Specific Topics of Interest</label>
+                  <div class="p-3 bg-light rounded">{{ lead.specific_topics }}</div>
+                </div>
+                {% endif %}
+
+                {% if lead.notes %}
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Internal Notes</label>
+                  <div class="p-3 bg-warning-subtle rounded">{{ lead.notes }}</div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Follow-up History -->
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-message-circle me-2"></i>Follow-up History
+                  <span class="badge bg-primary ms-2">{{ follow_ups.count }}</span>
+                </h6>
+                
+                {% if follow_ups %}
+                  <div class="timeline">
+                    {% for follow_up in follow_ups %}
+                    <div class="timeline-item d-flex mb-3">
+                      <div class="timeline-marker bg-primary rounded-circle me-3 mt-1" style="width: 12px; height: 12px;"></div>
+                      <div class="timeline-content flex-fill">
+                        <div class="card border-light">
+                          <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                              <div>
+                                <span class="badge bg-{{ follow_up.follow_up_type }}-subtle text-{{ follow_up.follow_up_type }}">
+                                  {{ follow_up.get_follow_up_type_display }}
+                                </span>
+                              </div>
+                              <div class="small text-muted">
+                                {{ follow_up.scheduled_at|date:"M d, Y H:i" }}
+                              </div>
+                            </div>
+                            {% if follow_up.notes %}
+                            <p class="mb-2">{{ follow_up.notes }}</p>
+                            {% endif %}
+                            {% if follow_up.outcome %}
+                            <div class="small">
+                              <strong>Outcome:</strong> 
+                              <span class="badge bg-{{ follow_up.outcome }}-subtle text-{{ follow_up.outcome }}">
+                                {{ follow_up.get_outcome_display }}
+                              </span>
+                            </div>
+                            {% endif %}
+                            <div class="small text-muted mt-2">
+                              by {{ follow_up.created_by.name }} • {{ follow_up.created_at|date:"M d, Y H:i" }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="text-center py-4 text-muted">
+                    <i class="ti ti-message-off fs-2 mb-3 d-block"></i>
+                    <p>No follow-ups recorded yet</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Update Lead Status -->
+            <div class="card mb-4">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-edit me-2"></i>Update Lead
+                </h6>
+                <form method="POST">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                      {% for status_code, status_name in lead_statuses %}
+                        <option value="{{ status_code }}" {% if lead.status == status_code %}selected{% endif %}>
+                          {{ status_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Assign To</label>
+                    <select class="form-select" name="assigned_to">
+                      <option value="">Unassigned</option>
+                      {% for staff in staff_users %}
+                        <option value="{{ staff.id }}" {% if lead.assigned_to_id == staff.id %}selected{% endif %}>
+                          {{ staff.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Internal Notes</label>
+                    <textarea class="form-control" name="notes" rows="4" placeholder="Add internal notes about this lead...">{{ lead.notes }}</textarea>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="ti ti-check me-1"></i>Update Lead
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Lead Metadata -->
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title fw-semibold mb-3">
+                  <i class="ti ti-info-circle me-2"></i>Metadata
+                </h6>
+                <div class="small">
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Source:</span>
+                    <span class="fw-medium">{{ lead.source|default:"Website" }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Created:</span>
+                    <span class="fw-medium">{{ lead.created_at|date:"M d, Y H:i" }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Last Updated:</span>
+                    <span class="fw-medium">{{ lead.updated_at|date:"M d, Y H:i" }}</span>
+                  </div>
+                  {% if lead.ip_address %}
+                  <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">IP Address:</span>
+                    <span class="fw-medium">{{ lead.ip_address }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="d-flex justify-content-between py-2">
+                    <span class="text-muted">Lead ID:</span>
+                    <span class="fw-medium">#{{ lead.id }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.timeline-marker {
+  min-width: 12px;
+  min-height: 12px;
+}
+
+.timeline-content {
+  position: relative;
+}
+
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  left: -21px;
+  top: 20px;
+  bottom: -20px;
+  width: 2px;
+  background-color: #dee2e6;
+}
+
+.timeline-item:last-child .timeline-content::before {
+  display: none;
+}
+</style>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="ti ti-alert-triangle text-danger me-2"></i>Delete Lead
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger d-flex align-items-center">
+          <i class="ti ti-alert-triangle me-2"></i>
+          <div>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+        </div>
+        <p>Are you sure you want to delete the lead for <strong id="leadName"></strong>?</p>
+        <p class="text-muted small">This will also delete all associated follow-up records and you will be redirected to the leads list.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="ti ti-trash me-1"></i>Delete Lead
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(leadId, leadName) {
+    document.getElementById('leadName').textContent = leadName;
+    document.getElementById('deleteForm').action = '{% url "custom_admin:lead_delete" 0 %}'.replace('0', leadId);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

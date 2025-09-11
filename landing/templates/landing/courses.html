@@ -1,251 +1,486 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Courses - CodeLearn LMS{% endblock %}
+{% block title %}Courses - Uptrail{% endblock %}
 
 {% block extra_css %}
 <style>
-.courses-hero {
-    background: linear-gradient(135deg, #f8fffe 0%, #f0f7f5 100%);
-    padding: 120px 0 80px;
-    text-align: center;
+/* Course Filter Styling */
+.cs-isotope_filter {
+  margin-bottom: 0;
 }
 
-.courses-hero h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 1rem;
+.cs-isotope_filter_menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.courses-hero p {
-    font-size: 1.2rem;
-    color: var(--text-light);
-    max-width: 600px;
-    margin: 0 auto;
+.cs-isotope_filter_menu li {
+  margin: 0;
 }
 
-.courses-section {
-    padding: 80px 0;
-    background: var(--white);
+.cs-isotope_filter_btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid transparent;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
 }
 
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+.cs-isotope_filter_btn:hover {
+  background: #e2e8f0;
+  color: #2563eb;
+  text-decoration: none;
 }
 
-.course-card {
-    background: var(--white);
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(189, 208, 202, 0.1);
-    border: 1px solid rgba(189, 208, 202, 0.2);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    position: relative;
+.cs-isotope_filter_btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.course-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(189, 208, 202, 0.2);
+.cs-isotope_filter_btn.active:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: white;
 }
 
-.course-thumbnail {
-    height: 200px;
-    background: var(--gradient);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+/* Course Card Improvements */
+.cs-course {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+  background: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.course-thumbnail i {
-    font-size: 3rem;
-    color: var(--white);
+.cs-course:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-.course-content {
-    padding: 1.5rem;
+.cs-course_img {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px 15px 0 0;
 }
 
-.course-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
+.cs-course_img::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #2563eb, #1d4ed8);
+  opacity: 0.1;
+  z-index: 1;
 }
 
-.course-description {
-    color: var(--text-light);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.cs-course_img .placeholder-content {
+  z-index: 2;
+  text-align: center;
+  color: #64748b;
 }
 
-.course-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--text-light);
+.cs-course_img .placeholder-content i {
+  font-size: 48px;
+  margin-bottom: 10px;
+  display: block;
+  color: #2563eb;
 }
 
-.course-price {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+.cs-course_info {
+  padding: 20px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.price-display {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.cs-course_price {
+  position: absolute;
+  top: -40px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.current-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
+.cs-course_meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #64748b;
 }
 
-.free-badge {
-    background: var(--accent-color);
-    color: var(--white);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+.cs-course_title {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  min-height: 50px;
 }
 
-.course-btn {
-    width: 100%;
-    padding: 0.875rem 1.5rem;
-    background: var(--gradient);
-    color: var(--white);
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
+.cs-course_title a {
+  color: #0f172a;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.course-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(189, 208, 202, 0.4);
-    color: var(--white);
-    text-decoration: none;
+.cs-course_title a:hover {
+  color: #2563eb;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-light);
+.cs-course_description {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  flex: 1;
 }
 
-.empty-state i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color);
+.cs-course_category {
+  margin-bottom: 15px;
 }
 
+.cs-course_category span {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cs-course_action {
+  margin-top: auto;
+}
+
+.cs-course_action .cs-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Equal height course cards */
+.cs-isotope_item {
+  display: flex;
+  align-items: stretch;
+}
+
+.cs-isotope_item .cs-course {
+  width: 100%;
+}
+
+/* Section heading improvements */
+.cs-section_heading.cs-style4 {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.cs-section_heading.cs-style4 .cs-section_subtitle {
+  display: block !important;
+  margin-bottom: 15px !important;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #2563eb;
+  width: 100%;
+  float: none !important;
+}
+
+.cs-section_heading.cs-style4 .cs-section_title {
+  display: block !important;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #0f172a;
+  margin: 0;
+  width: 100%;
+  clear: both;
+  float: none !important;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .courses-hero {
-        padding: 100px 0 60px;
-    }
+  .cs-isotope_filter_menu {
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .cs-isotope_filter_btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .cs-section_heading.cs-style4 .cs-section_title {
+    font-size: 24px;
+  }
+  
+  .cs-course_price {
+    top: -30px;
+    right: 15px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .cs-course_info {
+    padding: 15px;
+  }
+  
+  .cs-course_title {
+    font-size: 16px;
+    min-height: auto;
+  }
+}
 
-    .courses-hero h1 {
-        font-size: 2.2rem;
-    }
+@media (max-width: 480px) {
+  .cs-isotope_filter_btn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  
+  .cs-section_heading.cs-style4 .cs-section_title {
+    font-size: 20px;
+  }
+}
 
-    .courses-section {
-        padding: 60px 0;
-    }
+/* Loading animation for isotope */
+.cs-isotope {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
 
-    .courses-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .course-card {
-        margin: 0 1rem;
-    }
+.cs-isotope_item {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="courses-hero">
-    <div class="container">
-        <h1>Available Courses</h1>
-        <p>Discover our range of programming and technology courses designed to help you build practical skills and advance your career.</p>
+<!-- Start Hero -->
+<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 400px;">
+  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+  <div class="container">
+    <div class="cs-hero_text">
+      <h1 class="cs-hero_title">Our Awesome <b>Courses</b></h1>
+      <ol class="cs-breadcrumb cs-style2 cs-type1">
+        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
+        <li class="cs-breadcrumb_item">Courses</li>
+      </ol>
     </div>
-</section>
+  </div>
+</div>
+<!-- End Hero -->
 
-<!-- Courses Section -->
-<section class="courses-section">
-    <div class="container">
-        {% if courses %}
-            <div class="courses-grid">
-                {% for course in courses %}
-                <div class="course-card">
-                    <div class="course-thumbnail">
-                        <i class="fas fa-laptop-code"></i>
-                    </div>
-                    <div class="course-content">
-                        <h3 class="course-title">{{ course.title }}</h3>
-                        <p class="course-description">{{ course.description|truncatewords:25 }}</p>
-                        
-                        <div class="course-meta">
-                            <span><i class="fas fa-tag"></i> {{ course.category.name }}</span>
-                            <span><i class="fas fa-clock"></i> Self-paced</span>
-                        </div>
-                        
-                        <div class="course-price">
-                            <div class="price-display">
-                                {% if course.is_free_course %}
-                                    <span class="free-badge">FREE</span>
-                                {% else %}
-                                    <span class="current-price">₹{{ course.total_price|floatformat:0 }}</span>
-                                    {% if course.tax_amount > 0 %}
-                                        <small class="text-muted">(incl. taxes)</small>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <a href="{% url 'landing:course_detail' course.id %}" class="course-btn">
-                            {% if course.is_free_course %}
-                                Enroll for Free
-                            {% else %}
-                                View Details
-                            {% endif %}
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <i class="fas fa-book-open"></i>
-                <h3>No Courses Available</h3>
-                <p>We're working hard to bring you amazing courses. Check back soon!</p>
-                <a href="{% url 'landing:home' %}" class="btn btn-primary mt-3">Back to Home</a>
-            </div>
-        {% endif %}
+<!-- Start Courses -->
+<div class="cs-height_140 cs-height_lg_80"></div>
+<div class="container">
+  <!-- Course Section Heading -->
+  <div class="text-center mb-5">
+    <div class="cs-section_heading cs-style4">
+      <div class="cs-section_subtitle cs-accent_color">Explore Our Courses</div>
+      <h2 class="cs-section_title">Choose from <b class="cs-accent_color">{{ courses|length }}+</b> courses</h2>
     </div>
-</section>
+  </div>
+
+  <!-- Course Filter -->
+  {% if categories %}
+  <div class="text-center mb-5">
+    <div class="cs-isotope_filter cs-style1">
+      <ul class="cs-isotope_filter_menu cs-mp0 cs-medium cs-primary_font">
+        <li><a href="#" class="cs-isotope_filter_btn active" data-filter="*">All Courses</a></li>
+        {% for category in categories %}
+        <li><a href="#" class="cs-isotope_filter_btn" data-filter=".{{ category.name|slugify }}">{{ category.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row cs-isotope cs-isotope_gutter_30">
+    <!-- Debug: Show course count -->
+    {% if courses %}
+      <!-- Courses found: {{ courses|length }} -->
+    {% else %}
+      <!-- No courses found -->
+    {% endif %}
+    
+    {% for course in courses %}
+    <div class="col-lg-4 col-md-6 cs-isotope_item {% if course.category %}{{ course.category.name|slugify }}{% endif %}" style="margin-bottom: 30px;">
+      <div class="cs-course cs-style1">
+        <!-- Course Image -->
+        <div class="cs-course_img" {% if course.thumbnail %}style="background-image: url('{{ course.thumbnail.url }}');"{% else %}style="background-image: url('{% static 'landing/assets/img/online-education/course1.jpg' %}');"{% endif %}>
+          {% if not course.thumbnail %}
+          <div class="placeholder-content">
+            <i class="fas fa-graduation-cap"></i>
+            <div style="font-size: 14px; font-weight: 500;">{{ course.category.name|default:"Course" }}</div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Course Info -->
+        <div class="cs-course_info">
+          <!-- Price Badge -->
+          <div class="cs-course_price cs-accent_bg cs-white">
+            {% if course.is_free_course %}
+              Free
+            {% else %}
+              ₹{{ course.total_price|floatformat:0 }}
+            {% endif %}
+          </div>
+          
+          <!-- Course Meta -->
+          <div class="cs-course_meta">
+            <span class="cs-course_duration">
+              <i class="far fa-clock"></i> 
+              {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
+            </span>
+            <span class="cs-course_posted_by">{{ course.created_at|date:"M d, Y" }}</span>
+          </div>
+          
+          <!-- Course Title -->
+          <h2 class="cs-course_title">
+            <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
+          </h2>
+          
+          <!-- Course Description -->
+          <div class="cs-course_description">
+            {{ course.description|truncatechars:120 }}
+          </div>
+          
+          <!-- Course Category -->
+          {% if course.category %}
+          <div class="cs-course_category">
+            <span>{{ course.category.name }}</span>
+          </div>
+          {% endif %}
+          
+          <!-- Course Action -->
+          <div class="cs-course_action">
+            <a href="{% url 'landing:course_detail' course.id %}" class="cs-btn cs-style1 cs-btn_sm cs-accent_bg cs-white cs-accent_bg_2_hover">
+              <span class="cs-btn_text">Learn More</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="cs-text_box text-center" style="padding: 50px 0;">
+        <h3>No courses available at the moment</h3>
+        <p>Check back later for new courses!</p>
+        <a href="{% url 'landing:home' %}" class="cs-btn cs-style1 cs-btn_lg cs-primary_font cs-medium cs-accent_bg cs-accent_border cs-white cs-white_hover cs-primary_bg_hover cs-primary_border_hover">
+          Go Home
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<div class="cs-height_140 cs-height_lg_80"></div>
+<!-- End Courses -->
+
+<!-- Start CTA Section -->
+<div class="cs-height_140 cs-height_lg_80"></div>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="cs-parallax">
+        <div class="cs-cta cs-style1 cs-type2 cs-accent_bg_2 text-center cs-bg_parallax" data-src="{% static 'landing/assets/img/online-education/cta-pattern.png' %}">
+          <h2 class="cs-cta_title cs-bold">Can't find the course you're looking for?</h2>
+          <div class="cs-cta_subtitle">Let us know what you'd like to learn and we'll create it for you.</div>
+          <div class="cs-cta_btn">
+            <a href="{% url 'landing:home' %}#contact" class="cs-btn cs-style1 cs-btn_lg cs-medium cs-primary_font cs-accent_bg cs-accent_border cs-white cs-white_bg_hover cs-white_border_hover">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cs-height_140 cs-height_lg_80"></div>
+<!-- End CTA Section -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize Isotope filtering
+$(document).ready(function() {
+  // Initialize Isotope
+  var $grid = $('.cs-isotope').isotope({
+    itemSelector: '.cs-isotope_item',
+    layoutMode: 'fitRows',
+    transitionDuration: '0.4s'
+  });
+
+  // Filter items on button click
+  $('.cs-isotope_filter_menu').on('click', 'a', function(e) {
+    e.preventDefault();
+    var filterValue = $(this).attr('data-filter');
+    
+    // Filter items
+    $grid.isotope({ 
+      filter: filterValue,
+      transitionDuration: '0.4s'
+    });
+    
+    // Update active class
+    $('.cs-isotope_filter_btn').removeClass('active');
+    $(this).addClass('active');
+  });
+
+  // Hover effects for course cards
+  $('.cs-course').hover(
+    function() {
+      $(this).find('.cs-course_img').css('transform', 'scale(1.05)');
+    },
+    function() {
+      $(this).find('.cs-course_img').css('transform', 'scale(1)');
+    }
+  );
+});
+</script>
 {% endblock %}

@@ -24,6 +24,8 @@ class Course(models.Model):
     is_free = models.BooleanField(default=False, help_text="Mark as true for free courses")
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
     preview_video = models.URLField(blank=True, null=True, help_text="YouTube video URL for preview")
+    curriculum = models.TextField(blank=True, null=True, help_text="Detailed curriculum outline - what topics will be covered")
+    what_you_will_learn = models.TextField(blank=True, null=True, help_text="Learning outcomes - what students will achieve after completing the course")
     is_published = models.BooleanField(default=False)
     allow_public_enrollment = models.BooleanField(default=True, help_text="Allow students to enroll via app/API. If False, only admin can enroll students.")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_courses')
@@ -106,13 +108,35 @@ class Module(models.Model):
         ordering = ['order']
 
 class VideoLesson(models.Model):
+    PLATFORM_CHOICES = [
+        ('youtube', 'YouTube'),
+        ('vimeo', 'Vimeo'),
+        ('direct', 'Direct URL'),
+    ]
+    
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='video_lessons')
     title = models.CharField(max_length=200)
-    youtube_video_id = models.CharField(max_length=20, blank=True, null=True, help_text="YouTube video ID (optional)")
-    youtube_url = models.URLField(blank=True, null=True, help_text="Full YouTube URL (optional)")
+    
+    # Legacy fields (kept for backward compatibility)
+    youtube_video_id = models.CharField(max_length=20, blank=True, null=True, help_text="YouTube video ID (legacy)")
+    youtube_url = models.URLField(blank=True, null=True, help_text="Full YouTube URL (legacy)")
+    
+    # New platform-agnostic fields
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES, default='youtube', help_text="Video platform")
+    video_url = models.URLField(blank=True, null=True, help_text="Original video URL")
+    video_id = models.CharField(max_length=50, blank=True, null=True, help_text="Platform-specific video ID")
+    vimeo_video_id = models.CharField(max_length=20, blank=True, null=True, help_text="Vimeo video ID")
+    
+    # Metadata (can be auto-fetched or manual)
     thumbnail_url = models.URLField(blank=True, null=True)
     duration = models.PositiveIntegerField(default=0, help_text="Duration in seconds")
     description = models.TextField(blank=True, null=True)
+    
+    # API integration tracking
+    auto_fetched = models.BooleanField(default=False, help_text="Was metadata fetched from API?")
+    last_api_sync = models.DateTimeField(blank=True, null=True, help_text="Last time metadata was synced")
+    
+    # Other fields
     resource_file = models.FileField(upload_to='lesson_resources/', blank=True, null=True)
     order = models.PositiveIntegerField(default=1, help_text="Order of lesson in the module")
     is_preview = models.BooleanField(default=False, help_text="Free preview for non-enrolled students")
@@ -121,6 +145,74 @@ class VideoLesson(models.Model):
     
     def __str__(self):
         return f"{self.module.title} - {self.title}"
+    
+    @property
+    def effective_video_id(self):
+        """Return the appropriate video ID based on platform"""
+        if self.platform == 'youtube':
+            return self.video_id or self.youtube_video_id
+        elif self.platform == 'vimeo':
+            return self.video_id or self.vimeo_video_id
+        return self.video_id
+    
+    @property
+    def effective_video_url(self):
+        """Return the appropriate video URL based on platform"""
+        if self.video_url:
+            return self.video_url
+        elif self.platform == 'youtube' and self.effective_video_id:
+            return f"https://www.youtube.com/watch?v={self.effective_video_id}"
+        elif self.platform == 'vimeo' and self.effective_video_id:
+            return f"https://vimeo.com/{self.effective_video_id}"
+        return self.youtube_url  # Fallback to legacy field
+    
+    @property
+    def embed_url(self):
+        """Return embeddable URL for the video"""
+        video_id = self.effective_video_id
+        if not video_id:
+            return None
+        
+        if self.platform == 'youtube':
+            return f"https://www.youtube.com/embed/{video_id}"
+        elif self.platform == 'vimeo':
+            return f"https://player.vimeo.com/video/{video_id}"
+        
+        return self.effective_video_url
+    
+    def sync_from_api(self):
+        """Fetch and update metadata from video platform API"""
+        from .services import VideoIntegrationService
+        from django.utils import timezone
+        
+        url = self.video_url or self.youtube_url
+        if not url:
+            return False, "No video URL provided"
+        
+        metadata = VideoIntegrationService.fetch_video_metadata(url)
+        
+        if 'error' in metadata:
+            return False, metadata['error']
+        
+        # Update fields with fetched metadata
+        self.title = self.title or metadata.get('title', self.title)
+        self.description = self.description or metadata.get('description', self.description)
+        self.thumbnail_url = self.thumbnail_url or metadata.get('thumbnail_url', self.thumbnail_url)
+        self.duration = self.duration or metadata.get('duration', self.duration)
+        
+        # Update platform-specific fields
+        self.platform = metadata.get('platform', self.platform)
+        self.video_id = metadata.get('video_id', self.video_id)
+        if self.platform == 'youtube':
+            self.youtube_video_id = self.youtube_video_id or self.video_id
+        elif self.platform == 'vimeo':
+            self.vimeo_video_id = self.vimeo_video_id or self.video_id
+        
+        # Update tracking fields
+        self.auto_fetched = True
+        self.last_api_sync = timezone.now()
+        
+        return True, "Metadata synced successfully"
     
     class Meta:
         db_table = 'video_lessons'

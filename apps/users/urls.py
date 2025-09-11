@@ -10,10 +10,12 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/register/', views.UserRegistrationView.as_view(), name='register'),
     path('auth/password-reset/', views.PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('auth/password-reset-confirm/<uuid:token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     
     # User profile endpoints
     path('profile/', views.UserProfileView.as_view(), name='profile'),
     path('profile/change-password/', views.PasswordChangeView.as_view(), name='change_password'),
+    path('profile/delete-account/', views.DeleteAccountView.as_view(), name='delete_account'),
     
     # Team management endpoints
     path('teams/', views.TeamListCreateView.as_view(), name='team-list-create'),

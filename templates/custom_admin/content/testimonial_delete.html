@@ -1,0 +1,164 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Testimonial - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-trash me-2 text-danger"></i>Delete Testimonial
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to Testimonials
+            </a>
+            <a href="{% url 'custom_admin:testimonial_detail' testimonial.id %}" class="btn btn-outline-secondary btn-sm">
+              <i class="ti ti-eye"></i> View Details
+            </a>
+          </div>
+        </div>
+
+        <div class="alert alert-danger border-danger">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <i class="ti ti-alert-triangle fs-4"></i>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="alert-heading">Confirm Deletion</h6>
+              <p class="mb-0">
+                You are about to permanently delete this testimonial. This action cannot be undone.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial Preview -->
+        <div class="card border-danger mb-4">
+          <div class="card-header bg-danger-subtle">
+            <h6 class="card-title text-danger mb-0">
+              <i class="ti ti-message-circle me-2"></i>Testimonial to be deleted
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-2 text-center mb-3">
+                {% if testimonial.student_photo %}
+                  <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}" 
+                       class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                {% else %}
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                       style="width: 60px; height: 60px; margin: 0 auto;">
+                    <i class="ti ti-user fs-3 text-muted"></i>
+                  </div>
+                {% endif %}
+              </div>
+              <div class="col-md-10">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Student Name:</strong> {{ testimonial.student_name }}</p>
+                    <p class="mb-1"><strong>Course:</strong> {{ testimonial.course_name }}</p>
+                    <p class="mb-1"><strong>Batch Year:</strong> {{ testimonial.batch_year }}</p>
+                    <p class="mb-1"><strong>Type:</strong> 
+                      <span class="badge bg-secondary">{{ testimonial.get_testimonial_type_display }}</span>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Overall Rating:</strong> 
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= testimonial.overall_rating %}
+                          <i class="ti ti-star-filled text-warning"></i>
+                        {% else %}
+                          <i class="ti ti-star text-muted"></i>
+                        {% endif %}
+                      {% endfor %}
+                      ({{ testimonial.overall_rating }}/5)
+                    </p>
+                    <p class="mb-1"><strong>Status:</strong> 
+                      {% if testimonial.is_published %}
+                        <span class="badge bg-success">Published</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Draft</span>
+                      {% endif %}
+                      {% if testimonial.is_featured %}
+                        <span class="badge bg-warning ms-1">Featured</span>
+                      {% endif %}
+                    </p>
+                    <p class="mb-1"><strong>Created:</strong> {{ testimonial.created_at|date:"M d, Y" }}</p>
+                    <p class="mb-1"><strong>Engagement:</strong> 
+                      <i class="ti ti-heart text-danger"></i> {{ testimonial.likes_count }}
+                      <i class="ti ti-share text-primary ms-2"></i> {{ testimonial.shares_count }}
+                    </p>
+                  </div>
+                </div>
+                
+                {% if testimonial.testimonial_text %}
+                <div class="mt-3">
+                  <strong>Content Preview:</strong>
+                  <div class="bg-light p-3 rounded mt-2">
+                    {{ testimonial.testimonial_text|truncatewords:25 }}
+                  </div>
+                </div>
+                {% elif testimonial.youtube_url %}
+                <div class="mt-3">
+                  <strong>YouTube URL:</strong>
+                  <div class="bg-light p-3 rounded mt-2">
+                    <a href="{{ testimonial.youtube_url }}" target="_blank">{{ testimonial.youtube_url }}</a>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="row">
+          <div class="col-md-6 offset-md-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="ti ti-trash fs-1 text-danger mb-3"></i>
+                <h5 class="card-title text-danger">Are you absolutely sure?</h5>
+                <p class="card-text text-muted mb-4">
+                  This testimonial will be permanently deleted from the system. 
+                  All associated data will be lost and cannot be recovered.
+                </p>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <a href="{% url 'custom_admin:testimonial_detail' testimonial.id %}" 
+                     class="btn btn-outline-secondary me-md-2">
+                    <i class="ti ti-arrow-left"></i> Cancel
+                  </a>
+                  <form method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" id="confirmDelete">
+                      <i class="ti ti-trash"></i> Delete Testimonial
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('confirmDelete').addEventListener('click', function(e) {
+  // Double confirmation for extra safety
+  if (!confirm('Are you absolutely sure you want to delete this testimonial? This action cannot be undone.')) {
+    e.preventDefault();
+    return false;
+  }
+  
+  // Change button text to show processing
+  this.innerHTML = '<i class="ti ti-loader"></i> Deleting...';
+  this.disabled = true;
+});
+</script>
+{% endblock %}

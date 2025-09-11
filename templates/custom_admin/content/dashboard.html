@@ -1,0 +1,428 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Content Management Dashboard - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <h5 class="card-title fw-semibold mb-0">Content Management Dashboard</h5>
+          <div class="ms-auto">
+            <div class="btn-group" role="group">
+              <a href="{% url 'custom_admin:leads_list' %}" class="btn btn-primary btn-sm">
+                <i class="ti ti-users"></i> Leads
+              </a>
+              <a href="{% url 'custom_admin:news_list' %}" class="btn btn-info btn-sm">
+                <i class="ti ti-news"></i> News
+              </a>
+              <a href="{% url 'custom_admin:placements_list' %}" class="btn btn-success btn-sm">
+                <i class="ti ti-trophy"></i> Placements
+              </a>
+              <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-warning btn-sm">
+                <i class="ti ti-message-circle"></i> Testimonials
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lead Statistics -->
+<div class="row mt-4">
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-users fs-4 text-primary"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ lead_stats.total_leads }}</h4>
+            <p class="text-muted mb-0">Total Leads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-warning-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-user-plus fs-4 text-warning"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ lead_stats.new_leads }}</h4>
+            <p class="text-muted mb-0">New Leads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-info-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-calendar fs-4 text-info"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ lead_stats.leads_this_month }}</h4>
+            <p class="text-muted mb-0">This Month</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-success-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-check fs-4 text-success"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ lead_stats.converted_leads }}</h4>
+            <p class="text-muted mb-0">Converted</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Content Statistics -->
+<div class="row mt-4">
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-news fs-4 text-primary"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ content_stats.published_news }}</h4>
+            <p class="text-muted mb-0">Published News</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-secondary-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-file-text fs-4 text-secondary"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ content_stats.draft_news }}</h4>
+            <p class="text-muted mb-0">Draft News</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-success-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-trophy fs-4 text-success"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ content_stats.published_placements }}</h4>
+            <p class="text-muted mb-0">Placements</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <div class="avatar-sm bg-warning-subtle rounded-circle d-flex align-items-center justify-content-center">
+              <i class="ti ti-message-circle fs-4 text-warning"></i>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">{{ content_stats.published_testimonials }}</h4>
+            <p class="text-muted mb-0">Testimonials</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Testimonial Statistics -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-message-circle me-2"></i>Testimonial Analytics
+          </h5>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-eye"></i> View All
+            </a>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-primary-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-primary">{{ testimonial_stats.total_testimonials }}</h4>
+                <small class="text-muted">Total</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-success-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-success">{{ testimonial_stats.published_testimonials }}</h4>
+                <small class="text-muted">Published</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-warning-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-warning">{{ testimonial_stats.featured_testimonials }}</h4>
+                <small class="text-muted">Featured</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-danger-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-danger">{{ testimonial_stats.video_testimonials }}</h4>
+                <small class="text-muted">Videos</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-info-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-info">{{ testimonial_stats.average_rating|floatformat:1 }}/5</h4>
+                <small class="text-muted">Avg Rating</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <div class="card bg-secondary-subtle border-0">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1 text-secondary">{{ testimonial_stats.testimonials_this_month }}</h4>
+                <small class="text-muted">This Month</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row mt-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title fw-semibold">Recent Leads</h5>
+        <div class="table-responsive">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Interest</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lead in recent_leads %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:lead_detail' lead.id %}" class="text-decoration-none">
+                    {{ lead.name }}
+                  </a>
+                </td>
+                <td>{{ lead.email }}</td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">{{ lead.get_area_of_interest_display }}</span>
+                </td>
+                <td>
+                  {% if lead.status == 'new' %}
+                    <span class="badge bg-warning">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'contacted' %}
+                    <span class="badge bg-info">{{ lead.get_status_display }}</span>
+                  {% elif lead.status == 'converted' %}
+                    <span class="badge bg-success">{{ lead.get_status_display }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ lead.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ lead.created_at|date:"M d, Y" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-3">No recent leads found</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title fw-semibold">Recent News</h5>
+        <div class="table-responsive">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for news in recent_news %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:news_detail' news.id %}" class="text-decoration-none">
+                    {{ news.title|truncatechars:30 }}
+                  </a>
+                </td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary">{{ news.get_category_display }}</span>
+                </td>
+                <td>
+                  {% if news.is_published %}
+                    <span class="badge bg-success">Published</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Draft</span>
+                  {% endif %}
+                  {% if news.is_featured %}
+                    <span class="badge bg-warning ms-1">Featured</span>
+                  {% endif %}
+                </td>
+                <td>{{ news.created_at|date:"M d, Y" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No recent news found</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title fw-semibold">Recent Testimonials</h5>
+        <div class="table-responsive">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Type</th>
+                <th>Rating</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for testimonial in recent_testimonials %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:testimonial_detail' testimonial.id %}" class="text-decoration-none">
+                    {{ testimonial.student_name|truncatechars:20 }}
+                  </a>
+                </td>
+                <td>
+                  {% if testimonial.testimonial_type == 'video_youtube' %}
+                    <span class="badge bg-danger-subtle text-danger">YouTube</span>
+                  {% elif testimonial.testimonial_type == 'video_upload' %}
+                    <span class="badge bg-primary-subtle text-primary">Video</span>
+                  {% elif testimonial.testimonial_type == 'audio' %}
+                    <span class="badge bg-warning-subtle text-warning">Audio</span>
+                  {% else %}
+                    <span class="badge bg-info-subtle text-info">Text</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="text-warning me-1">
+                      {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= testimonial.overall_rating %}
+                          <i class="ti ti-star-filled"></i>
+                        {% else %}
+                          <i class="ti ti-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  {% if testimonial.is_published %}
+                    <span class="badge bg-success">Published</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Draft</span>
+                  {% endif %}
+                  {% if testimonial.is_featured %}
+                    <span class="badge bg-warning">Featured</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No recent testimonials found</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,151 +1,217 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html class="no-js" lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Uptrail - Your Learning Journey Starts Here{% endblock %}</title>
-    <meta name="description" content="{% block description %}Uptrail is a cutting-edge learning management platform that transforms how you learn and grow. Download our app and start your journey today.{% endblock %}">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="{% static 'landing/css/style.css' %}">
-    
-    {% block extra_css %}{% endblock %}
+  <!-- Meta Tags -->
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Uptrail">
+  
+  <!-- Site Title -->
+  <title>{% block title %}Uptrail - Your Learning Journey Starts Here{% endblock %}</title>
+  <meta name="description" content="{% block description %}Uptrail is a cutting-edge learning management platform that transforms how you learn and grow.{% endblock %}">
+  
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/fontawesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/lightgallery.min.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/slick.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/animate.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/assets/css/style.css' %}">
+  <!-- Theme Style -->
+  <link rel="stylesheet" href="{% static 'landing/assets/css/theme_8.css' %}">
+  
+  {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="{% static 'landing/images/logo.svg' %}" alt="Uptrail Logo" class="logo-svg">
-                
-            </div>
-            <div class="nav-menu" id="nav-menu">
-                <a href="{% url 'landing:home' %}" class="nav-link">Home</a>
-                <a href="{% url 'landing:courses' %}" class="nav-link">Courses</a>
-                <a href="{% url 'landing:home' %}#features" class="nav-link">Features</a>
-                <a href="{% url 'landing:home' %}#about" class="nav-link">About</a>
+  <!-- Start Preloader -->
+  <div class="cs-preloader cs-accent_color cs-white_bg">
+    <div class="cs-preloader_bg cs-center cs-accent_8_bg_2">
+      <div class="cs-preloader_in cs-accent_15_border">
+        <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Logo">
+      </div>
+    </div>
+  </div>
+  <!-- End Preloader -->
+
+  <!-- Start Header Section -->
+  <header class="cs-site_header cs-style1 cs-type4 cs-sticky-header cs-primary_font">
+    <div class="cs-main_header">
+      <div class="container">
+        <div class="cs-main_header_in">
+          <div class="cs-main_header_left">
+            <div class="cs-nav">
+              <ul class="cs-nav_list">
+                <li><a href="{% url 'landing:home' %}">Home</a></li>
+                <li><a href="{% url 'landing:courses' %}">Courses</a></li>
+                <li><a href="{% url 'landing:home' %}#about">About</a></li>
+                <li><a href="{% url 'landing:contact' %}">Contact</a></li>
                 {% if user.is_authenticated %}
-                    {% if user.is_staff %}
-                        <a href="{% url 'custom_admin:dashboard' %}" class="nav-link nav-login-btn">
-                            <i class="fas fa-cog me-1"></i>Admin Panel
-                        </a>
-                    {% else %}
-                        <a href="{% url 'student_portal:dashboard' %}" class="nav-link nav-login-btn">
-                            <i class="fas fa-user me-1"></i>My Dashboard
-                        </a>
-                    {% endif %}
+                  {% if user.is_staff %}
+                    <li><a href="{% url 'custom_admin:dashboard' %}">Admin Panel</a></li>
+                  {% else %}
+                    <li><a href="{% url 'student_portal:dashboard' %}">Dashboard</a></li>
+                  {% endif %}
                 {% else %}
-                    <a href="{% url 'student_portal:login' %}" class="nav-link">Login</a>
-                    <a href="{% url 'landing:register' %}" class="nav-link nav-login-btn">
-                        <i class="fas fa-user-plus me-1"></i>Sign Up
-                    </a>
+                  <li><a href="{% url 'landing:login' %}">Sign In</a></li>
                 {% endif %}
+              </ul>
             </div>
-            <div class="nav-toggle" id="nav-toggle" onclick="toggleMobileMenu()">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+          </div>
+          <div class="cs-main_header_center">
+            <a class="cs-site_branding" href="{% url 'landing:home' %}">
+              <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Uptrail">
+            </a>
+          </div>
+          <div class="cs-main_header_right">
+            {% if not user.is_authenticated %}
+              <div class="cs-toolbox">
+                <a href="{% url 'landing:register' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
+                  <span class="cs-btn_text">Get Started</span>
+                </a>
+              </div>
+            {% endif %}
+          </div>
         </div>
-    </nav>
+      </div>
+    </div>
+  </header>
+  <!-- End Header Section -->
 
-    <!-- Main Content -->
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+  {% block content %}
+  {% endblock %}
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                <img src="{% static 'landing/images/logo.svg' %}" alt="Uptrail Logo" class="logo-svg">
-                      
-                    </div>
-                    <p>Empowering learners worldwide with innovative educational technology.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    </div>
+  <!-- Start Footer -->
+  <footer class="cs-footer cs-style1 cs-accent_5_bg">
+    <div class="cs-height_135 cs-height_lg_80"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3 col-sm-6">
+          <div class="cs-footer_item">
+            <div class="cs-text_widget">
+              <div class="cs-logo cs-accent_color cs-mb_25">
+                <div class="cs-logo_in">
+                  <div class="cs-logo_img">
+                    <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Logo">
+                  </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Platform</h4>
-                    <ul>
-                        <li><a href="{% url 'landing:home' %}#features">Features</a></li>
-                        <li><a href="{% url 'landing:home' %}#about">About Us</a></li>
-                        <li><a href="{% url 'landing:home' %}#download">Download App</a></li>
-                        <li><a href="mailto:support@uptrail.com">Support</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="{% url 'landing:privacy_policy' %}">Privacy Policy</a></li>
-                        <li><a href="{% url 'landing:terms_conditions' %}">Terms & Conditions</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                        <li><a href="#">Disclaimer</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <ul>
-                        <li><i class="fas fa-envelope"></i> info@ralfiz.com</li>
-                        <li><i class="fas fa-phone"></i> +91 9847543117</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Kerala,India</li>
-                    </ul>
-                </div>
+              </div>
+              <div class="cs-m0">
+                <p>Empowering learners worldwide with innovative educational technology and personalized learning experiences.</p>
+              </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Uptrail. All rights reserved.</p>
-            </div>
+          </div>
         </div>
-    </footer>
+        <div class="col-lg-3 col-sm-6">
+          <div class="cs-footer_item">
+            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Platform</h2>
+            <ul class="cs-menu_widget cs-style1 cs-accent_color cs-mp0">
+              <li><a href="{% url 'landing:home' %}">Home</a></li>
+              <li><a href="{% url 'landing:courses' %}">Courses</a></li>
+              <li><a href="{% url 'landing:home' %}#about">About</a></li>
+              <li><a href="{% url 'landing:contact' %}">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="cs-footer_item">
+            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Legal</h2>
+            <ul class="cs-menu_widget cs-style1 cs-accent_color cs-mp0">
+              <li><a href="{% url 'landing:privacy_policy' %}">Privacy Policy</a></li>
+              <li><a href="{% url 'landing:terms_conditions' %}">Terms & Conditions</a></li>
+              <li><a href="{% url 'landing:refund_policy' %}">Refund Policy</a></li>
+              <li><a href="{% url 'landing:cancellation_policy' %}">Cancellation Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="cs-footer_item">
+            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Connect</h2>
+            <div class="cs-social_btns cs-style1">
+              <a href="#" class="cs-center">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="cs-center">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="cs-center">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="cs-center">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cs-height_135 cs-height_lg_80"></div>
+    <div class="container">
+      <div class="cs-bottom_footer">
+        <div class="cs-bottom_footer_left">
+          <div class="cs-copyright">© 2024 Uptrail. All rights reserved.</div>
+        </div>
+       
+      </div>
+    </div>
+  </footer>
+  <!-- End Footer -->
 
-    <!-- Scripts -->
-    <script src="{% static 'landing/js/script.js' %}"></script>
-    
-    <!-- Mobile Menu Script -->
-    <script>
-    function toggleMobileMenu() {
-        alert('Function called!'); // Debug
-        const menu = document.getElementById('nav-menu');
-        const toggle = document.getElementById('nav-toggle');
-        console.log('Menu element:', menu);
-        console.log('Toggle element:', toggle);
-        if (menu && toggle) {
-            menu.classList.toggle('active');
-            toggle.classList.toggle('active');
-            console.log('Menu classes after toggle:', menu.className);
-        } else {
-            alert('Elements not found!');
+  <!-- Scripts -->
+  <script src="{% static 'landing/assets/js/plugins/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/plugins/isotope.pkg.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/plugins/jquery.slick.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/plugins/jquery.counter.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/plugins/lightgallery.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/plugins/wow.min.js' %}"></script>
+  <script src="{% static 'landing/assets/js/main.js' %}"></script>
+  
+  <!-- Handle anchor links from other pages -->
+  <script>
+  $(document).ready(function() {
+    // Check if there's a hash in the URL when page loads
+    if (window.location.hash) {
+      var hash = window.location.hash;
+      
+      // If we're on a page that doesn't have the target section, redirect to home page with hash
+      if ((hash === '#about' || hash === '#contact') && window.location.pathname !== '/') {
+        // If we're not on the home page, go to home page with the hash
+        window.location.href = '/' + hash;
+        return;
+      }
+      
+      // If we're on the home page and have a valid hash, scroll to it
+      setTimeout(function() {
+        if ($(hash).length > 0) {
+          $('html, body').animate({
+            scrollTop: $(hash).offset().top - 100
+          }, 800);
         }
+      }, 500);
     }
     
-    document.addEventListener('DOMContentLoaded', function() {
-        const menu = document.getElementById('nav-menu');
-        const toggle = document.getElementById('nav-toggle');
-        
-        if (menu && toggle) {
-            // Close menu when clicking nav links
-            const navLinks = menu.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    menu.classList.remove('active');
-                    toggle.classList.remove('active');
-                });
-            });
-        }
+    // Handle clicks on anchor links
+    $('a[href^="#"]').on('click', function(e) {
+      var target = $(this).attr('href');
+      
+      // If the target section doesn't exist on current page
+      if ($(target).length === 0) {
+        // Don't prevent default - let it navigate normally
+        return true;
+      }
+      
+      // If target exists on current page, smooth scroll
+      e.preventDefault();
+      $('html, body').animate({
+        scrollTop: $(target).offset().top - 100
+      }, 800);
     });
-    </script>
-    {% block extra_js %}{% endblock %}
+  });
+  </script>
+  
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

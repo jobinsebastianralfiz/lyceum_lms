@@ -108,6 +108,9 @@
           <button class="btn btn-light-warning text-warning" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
             <i class="ti ti-key me-2"></i>Change Password
           </button>
+          <button class="btn btn-light-danger text-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+            <i class="ti ti-trash me-2"></i>Delete Account
+          </button>
         </div>
       </div>
     </div>
@@ -143,6 +146,58 @@
                     <button type="submit" class="btn btn-primary">Change Password</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-danger">
+                    <i class="ti ti-alert-triangle me-2"></i>Delete Account
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="ti ti-alert-triangle fs-6"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <h6 class="alert-heading">Warning: This action cannot be undone!</h6>
+                            <p class="mb-0">Deleting your account will permanently remove:</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0"><i class="ti ti-check text-danger me-2"></i>Your profile and personal information</li>
+                    <li class="list-group-item px-0"><i class="ti ti-check text-danger me-2"></i>All course enrollments and progress</li>
+                    <li class="list-group-item px-0"><i class="ti ti-check text-danger me-2"></i>Quiz attempts and assignment submissions</li>
+                    <li class="list-group-item px-0"><i class="ti ti-check text-danger me-2"></i>Team memberships and created teams</li>
+                    <li class="list-group-item px-0"><i class="ti ti-check text-danger me-2"></i>All learning analytics and progress data</li>
+                </ul>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>Note:</strong> Your payment records will be preserved for legal and accounting purposes.
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirmEmail" class="form-label">To confirm deletion, please type your email address:</label>
+                    <input type="email" class="form-control" id="confirmEmail" placeholder="{{ user.email }}">
+                    <div class="form-text">Type: <strong>{{ user.email }}</strong></div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    <i class="ti ti-trash me-2"></i>Delete My Account
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -207,6 +262,73 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
+            });
+        });
+    }
+    
+    // Delete account functionality
+    const confirmEmailInput = document.getElementById('confirmEmail');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const userEmail = '{{ user.email }}';
+    
+    if (confirmEmailInput && confirmDeleteBtn) {
+        confirmEmailInput.addEventListener('input', function() {
+            const enteredEmail = this.value.trim();
+            const isMatch = enteredEmail === userEmail;
+            confirmDeleteBtn.disabled = !isMatch;
+            
+            if (enteredEmail && !isMatch) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        confirmDeleteBtn.addEventListener('click', function() {
+            // Final confirmation
+            const confirmed = confirm('This is your final warning. Are you absolutely sure you want to delete your account? This action cannot be undone.');
+            if (!confirmed) {
+                return;
+            }
+            
+            const originalText = this.textContent;
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting Account...';
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Make API call to delete account
+            fetch('/api/users/profile/delete-account/', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'same-origin'  // Include session cookies
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 401) {
+                    throw new Error('Authentication failed. Please log in again.');
+                } else {
+                    throw new Error('Failed to delete account. Please try again.');
+                }
+            })
+            .then(data => {
+                alert('Your account has been successfully deleted. You will be redirected to the homepage.');
+                
+                // Redirect to homepage (session will be cleared by the API)
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error deleting account:', error);
+                alert('Error deleting account: ' + error.message);
+                
+                // Reset button
+                this.disabled = false;
+                this.innerHTML = originalText;
             });
         });
     }

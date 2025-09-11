@@ -1,0 +1,402 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if testimonial %}Edit Testimonial{% else %}Create Testimonial{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-message-circle me-2"></i>
+            {% if testimonial %}Edit Testimonial{% else %}Create New Testimonial{% endif %}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to Testimonials
+            </a>
+          </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="testimonialForm">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col-lg-8">
+              <!-- Student Information -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Student Information</h6>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Student Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" name="student_name" 
+                             value="{% if testimonial %}{{ testimonial.student_name }}{% endif %}" 
+                             placeholder="Full name of the student..." required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Course Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" name="course_name" 
+                             value="{% if testimonial %}{{ testimonial.course_name }}{% endif %}" 
+                             placeholder="Course completed..." required>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Batch Year</label>
+                      <input type="number" class="form-control" name="batch_year" 
+                             value="{% if testimonial %}{{ testimonial.batch_year }}{% endif %}" 
+                             placeholder="2024" min="2020" max="2030">
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Student Photo</label>
+                      <input type="file" class="form-control" name="student_photo" accept="image/*">
+                      {% if testimonial.student_photo %}
+                        <div class="mt-2">
+                          <small class="text-muted">Current photo:</small>
+                          <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}" 
+                               class="d-block mt-1 rounded" style="max-height: 60px;">
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Testimonial Content -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Testimonial Content</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Testimonial Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="testimonial_type" id="testimonialType" required>
+                      <option value="">Select Type</option>
+                      {% for type_code, type_name in testimonial_types %}
+                        <option value="{{ type_code }}" 
+                                {% if testimonial and testimonial.testimonial_type == type_code %}selected{% endif %}>
+                          {{ type_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <!-- Text Content (shown for text_image type) -->
+                  <div class="mb-3" id="textContent" style="display: none;">
+                    <label class="form-label">Testimonial Text <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="testimonial_text" rows="5" 
+                              placeholder="Write the testimonial content...">{% if testimonial %}{{ testimonial.testimonial_text }}{% endif %}</textarea>
+                  </div>
+                  
+                  <!-- YouTube URL (shown for video_youtube type) -->
+                  <div class="mb-3" id="youtubeUrl" style="display: none;">
+                    <label class="form-label">YouTube URL <span class="text-danger">*</span></label>
+                    <input type="url" class="form-control" name="youtube_url" 
+                           value="{% if testimonial %}{{ testimonial.youtube_url }}{% endif %}" 
+                           placeholder="https://youtube.com/watch?v=...">
+                    <div class="form-text">Full YouTube video URL</div>
+                  </div>
+                  
+                  <!-- Video Upload (shown for video_upload type) -->
+                  <div class="mb-3" id="videoUpload" style="display: none;">
+                    <label class="form-label">Upload Video <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control" name="uploaded_video" accept="video/*">
+                    {% if testimonial.uploaded_video %}
+                      <div class="mt-2">
+                        <small class="text-muted">Current video: {{ testimonial.uploaded_video.name }}</small>
+                      </div>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Audio Upload (shown for audio type) -->
+                  <div class="mb-3" id="audioUpload" style="display: none;">
+                    <label class="form-label">Upload Audio <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control" name="audio_file" accept="audio/*">
+                    {% if testimonial.audio_file %}
+                      <div class="mt-2">
+                        <small class="text-muted">Current audio: {{ testimonial.audio_file.name }}</small>
+                      </div>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Video Thumbnail (shown for video types) -->
+                  <div class="mb-3" id="videoThumbnail" style="display: none;">
+                    <label class="form-label">Video Thumbnail</label>
+                    <input type="file" class="form-control" name="video_thumbnail" accept="image/*">
+                    <div class="form-text">Custom thumbnail for the video (optional)</div>
+                    {% if testimonial.video_thumbnail %}
+                      <div class="mt-2">
+                        <img src="{{ testimonial.video_thumbnail.url }}" alt="Thumbnail" 
+                             class="rounded" style="max-height: 80px;">
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Ratings -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Ratings & Reviews</h6>
+                  
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Overall Rating <span class="text-danger">*</span></label>
+                      <select class="form-select" name="overall_rating" required>
+                        {% for rating_code, rating_name in rating_choices %}
+                          <option value="{{ rating_code }}" 
+                                  {% if testimonial and testimonial.overall_rating == rating_code %}selected{% endif %}>
+                            {{ rating_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Course Rating</label>
+                      <select class="form-select" name="course_rating">
+                        {% for rating_code, rating_name in rating_choices %}
+                          <option value="{{ rating_code }}" 
+                                  {% if testimonial and testimonial.course_rating == rating_code %}selected{% endif %}>
+                            {{ rating_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Instructor Rating</label>
+                      <select class="form-select" name="instructor_rating">
+                        {% for rating_code, rating_name in rating_choices %}
+                          <option value="{{ rating_code }}" 
+                                  {% if testimonial and testimonial.instructor_rating == rating_code %}selected{% endif %}>
+                            {{ rating_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Additional Information -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Additional Information</h6>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Key Learnings</label>
+                    <textarea class="form-control" name="key_learnings" rows="3" 
+                              placeholder="What were the key takeaways from the course?">{% if testimonial %}{{ testimonial.key_learnings }}{% endif %}</textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Career Impact</label>
+                    <textarea class="form-control" name="career_impact" rows="3" 
+                              placeholder="How did the course impact your career?">{% if testimonial %}{{ testimonial.career_impact }}{% endif %}</textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Recommendation</label>
+                    <textarea class="form-control" name="recommendation" rows="3" 
+                              placeholder="Would you recommend this course to others?">{% if testimonial %}{{ testimonial.recommendation }}{% endif %}</textarea>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Current Position</label>
+                      <input type="text" class="form-control" name="current_position" 
+                             value="{% if testimonial %}{{ testimonial.current_position }}{% endif %}" 
+                             placeholder="Software Engineer, Product Manager...">
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Current Company</label>
+                      <input type="text" class="form-control" name="current_company" 
+                             value="{% if testimonial %}{{ testimonial.current_company }}{% endif %}" 
+                             placeholder="Company name...">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <!-- Publishing Options -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Publishing</h6>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_published" id="isPublished"
+                           {% if testimonial.is_published %}checked{% endif %}>
+                    <label class="form-check-label" for="isPublished">
+                      Publish immediately
+                    </label>
+                    <div class="form-text">Make this testimonial visible to users</div>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
+                           {% if testimonial.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                      Feature this testimonial
+                    </label>
+                    <div class="form-text">Show in featured content sections</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Privacy & Consent -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Privacy & Consent</h6>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="consent_given" id="consentGiven"
+                           {% if testimonial.consent_given %}checked{% endif %} required>
+                    <label class="form-check-label" for="consentGiven">
+                      Student consent obtained <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-text">Required to publish testimonial</div>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="can_show_details" id="canShowDetails"
+                           {% if testimonial.can_show_details %}checked{% endif %}>
+                    <label class="form-check-label" for="canShowDetails">
+                      Can show personal details
+                    </label>
+                    <div class="form-text">Name, photo, company info</div>
+                  </div>
+                </div>
+              </div>
+              
+              {% if testimonial %}
+              <!-- Testimonial Stats -->
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Statistics</h6>
+                  <div class="small">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Likes:</span>
+                      <span class="fw-medium">{{ testimonial.likes_count|default:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Created:</span>
+                      <span class="fw-medium">{{ testimonial.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Updated:</span>
+                      <span class="fw-medium">{{ testimonial.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% if testimonial.published_at %}
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Published:</span>
+                      <span class="fw-medium">{{ testimonial.published_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between py-2">
+                      <span class="text-muted">Created by:</span>
+                      <span class="fw-medium">{{ testimonial.created_by.name }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Submit Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'custom_admin:testimonials_list' %}" class="btn btn-outline-secondary">
+                      Cancel
+                    </a>
+                    <button type="submit" class="btn btn-outline-primary">
+                      <i class="ti ti-device-floppy me-1"></i>Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-primary" name="publish" value="true">
+                      <i class="ti ti-upload me-1"></i>
+                      {% if testimonial %}Update Testimonial{% else %}Publish Testimonial{% endif %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const testimonialType = document.getElementById('testimonialType');
+  const textContent = document.getElementById('textContent');
+  const youtubeUrl = document.getElementById('youtubeUrl');
+  const videoUpload = document.getElementById('videoUpload');
+  const audioUpload = document.getElementById('audioUpload');
+  const videoThumbnail = document.getElementById('videoThumbnail');
+  
+  function toggleContentFields() {
+    const selectedType = testimonialType.value;
+    
+    // Hide all content fields
+    textContent.style.display = 'none';
+    youtubeUrl.style.display = 'none';
+    videoUpload.style.display = 'none';
+    audioUpload.style.display = 'none';
+    videoThumbnail.style.display = 'none';
+    
+    // Remove required attributes
+    textContent.querySelector('textarea').removeAttribute('required');
+    youtubeUrl.querySelector('input').removeAttribute('required');
+    videoUpload.querySelector('input').removeAttribute('required');
+    audioUpload.querySelector('input').removeAttribute('required');
+    
+    // Show relevant fields based on type
+    switch(selectedType) {
+      case 'text_image':
+        textContent.style.display = 'block';
+        textContent.querySelector('textarea').setAttribute('required', 'required');
+        break;
+      case 'video_youtube':
+        youtubeUrl.style.display = 'block';
+        videoThumbnail.style.display = 'block';
+        youtubeUrl.querySelector('input').setAttribute('required', 'required');
+        break;
+      case 'video_upload':
+        videoUpload.style.display = 'block';
+        videoThumbnail.style.display = 'block';
+        {% if not testimonial.uploaded_video %}
+        videoUpload.querySelector('input').setAttribute('required', 'required');
+        {% endif %}
+        break;
+      case 'audio':
+        audioUpload.style.display = 'block';
+        {% if not testimonial.audio_file %}
+        audioUpload.querySelector('input').setAttribute('required', 'required');
+        {% endif %}
+        break;
+    }
+  }
+  
+  testimonialType.addEventListener('change', toggleContentFields);
+  
+  // Initialize on page load
+  toggleContentFields();
+});
+</script>
+{% endblock %}

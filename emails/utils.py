@@ -292,6 +292,88 @@ def send_invoice_email(enrollment, invoice_pdf_content: bytes) -> bool:
     return email_service.send_invoice_email(enrollment, invoice_pdf_content)
 
 
+def send_enrollment_confirmation_email(enrollment, include_invoice: bool = True, invoice_pdf_content: bytes = None) -> bool:
+    """Send enrollment confirmation email with optional invoice attachment"""
+    email_service = EmailService()
+    
+    context = {
+        'user': enrollment.user,
+        'enrollment': enrollment,
+        'course': enrollment.course,
+        'site_name': 'CodeLearn',
+        'support_email': 'support@codelearn.com',
+        'student_portal_url': '/student/'
+    }
+    
+    attachments = []
+    if include_invoice and invoice_pdf_content:
+        attachments.append({
+            'content': base64.b64encode(invoice_pdf_content).decode(),
+            'filename': f'invoice_{enrollment.id}.pdf',
+            'type': 'application/pdf'
+        })
+    
+    try:
+        subject, html_content, text_content = email_service.render_template('enrollment_confirmation', context)
+        return email_service.send_email(
+            to_email=enrollment.user.email,
+            subject=subject,
+            html_content=html_content,
+            text_content=text_content,
+            to_name=enrollment.user.name,
+            template_type='enrollment_confirmation',
+            user=enrollment.user,
+            enrollment=enrollment,
+            attachments=attachments if attachments else None
+        )
+    except ValueError as e:
+        logger.error(f"Template error: {e}")
+        # Fallback email if template doesn't exist
+        return _send_enrollment_confirmation_fallback(enrollment, attachments)
+
+
+def _send_enrollment_confirmation_fallback(enrollment, attachments: list = None) -> bool:
+    """Fallback enrollment confirmation email if template doesn't exist"""
+    email_service = EmailService()
+    subject = f"Welcome to {enrollment.course.title} - CodeLearn"
+    html_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #28a745;">🎉 Enrollment Confirmed!</h2>
+            <p>Hi {enrollment.user.name},</p>
+            <p>Congratulations! You have successfully enrolled in <strong>{enrollment.course.title}</strong>.</p>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3>Course Details:</h3>
+                <p><strong>Course:</strong> {enrollment.course.title}</p>
+                <p><strong>Enrolled On:</strong> {enrollment.enrolled_on.strftime('%B %d, %Y')}</p>
+                <p><strong>Payment Status:</strong> {enrollment.payment_status.title()}</p>
+                <p><strong>Total Amount:</strong> ₹{enrollment.total_amount}</p>
+            </div>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="/student/" style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">
+                    Start Learning Now
+                </a>
+            </div>
+            <p>Welcome to your learning journey! You can now access your course materials.</p>
+            <p>Best regards,<br>The CodeLearn Team</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return email_service.send_email(
+        to_email=enrollment.user.email,
+        subject=subject,
+        html_content=html_content,
+        to_name=enrollment.user.name,
+        template_type='enrollment_confirmation',
+        user=enrollment.user,
+        enrollment=enrollment,
+        attachments=attachments
+    )
+
+
 def verify_email_token(token: str) -> tuple[bool, str]:
     """Verify email token and activate user"""
     try:
