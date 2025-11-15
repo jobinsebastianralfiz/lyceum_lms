@@ -1,169 +1,604 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Sign Up - Uptrail{% endblock %}
+{% block title %}Sign Up - Lyceum Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Professional Signup Layout */
+  .signup-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    padding: 20px;
+  }
+
+  .signup-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 650px;
+  }
+
+  /* Left Column - Info */
+  .signup-info-column {
+    background: linear-gradient(135deg, #2AB673 0%, #1e8e5c 100%);
+    padding: 60px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .signup-info-column::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.5;
+    animation: dots-move 20s linear infinite;
+  }
+
+  @keyframes dots-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  .signup-info-column::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
+  }
+
+  .info-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-branding {
+    margin-bottom: 50px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .info-logo {
+    display: inline-block;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+
+  .info-logo img {
+    height: 40px;
+    display: block;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-text .brand-name {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .brand-text .brand-tagline {
+    font-size: 14px;
+    opacity: 0.85;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  .info-title {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .info-subtitle {
+    font-size: 17px;
+    opacity: 0.95;
+    margin-bottom: 50px;
+    line-height: 1.7;
+  }
+
+  .info-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-features li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    font-size: 15px;
+    opacity: 0.95;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .info-features li:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+  }
+
+  .info-features li .feature-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    color: #2AB673;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .feature-content {
+    flex: 1;
+    padding-top: 4px;
+  }
+
+  .feature-content strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .feature-content span {
+    display: block;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  /* Right Column - Form */
+  .signup-form-column {
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .form-header {
+    margin-bottom: 32px;
+  }
+
+  .form-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a202c !important;
+    margin-bottom: 8px;
+  }
+
+  .form-header p {
+    font-size: 15px;
+    color: #718096 !important;
+    margin: 0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151 !important;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .form-label .required {
+    color: #ef4444;
+    margin-left: 2px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    font-family: inherit;
+  }
+
+  .form-control:hover {
+    border-color: #9ca3af;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #2AB673;
+    box-shadow: 0 0 0 3px rgba(42, 182, 115, 0.1);
+  }
+
+  .form-hint {
+    font-size: 13px;
+    color: #6b7280 !important;
+    margin-top: 6px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2AB673;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .submit-btn:hover {
+    background: #229959;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(42, 182, 115, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .form-footer {
+    margin-top: 24px;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .form-footer p {
+    font-size: 14px;
+    color: #6b7280 !important;
+    margin: 0;
+  }
+
+  .form-footer a {
+    color: #2AB673;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .form-footer a:hover {
+    color: #229959;
+  }
+
+  /* Alert Messages */
+  .alert-messages {
+    margin-bottom: 24px;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
+  .alert-success {
+    background: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+  }
+
+  .alert-error {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+  }
+
+  .alert-info {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    color: #1e40af;
+  }
+
+  .alert .btn-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+    color: inherit;
+  }
+
+  .alert .btn-close:hover {
+    opacity: 1;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .signup-card {
+      grid-template-columns: 1fr;
+    }
+
+    .signup-info-column {
+      display: none;
+    }
+
+    .signup-form-column {
+      padding: 40px 30px;
+      max-height: none;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .signup-form-column {
+      padding: 30px 20px;
+    }
+
+    .form-header h1 {
+      font-size: 28px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="cs-height_90 cs-height_lg_80"></div>
+<div class="signup-container">
+  <div class="signup-card">
+    <!-- Left Column: Info -->
+    <div class="signup-info-column">
+      <div class="info-content">
+        <div class="info-branding">
+          <div class="info-logo">
+            <img src="{% static 'images/logos/logo.svg' %}" alt="Lyceum Logo">
+          </div>
+          <div class="brand-text">
+            <div class="brand-name">Lyceum</div>
+            <div class="brand-tagline">Academy of Learning</div>
+          </div>
+        </div>
 
-<!-- Start Form -->
-<div class="cs-bg2" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
-  <div class="cs-height_140 cs-height_lg_80"></div>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 col-xl-6">
-        <form class="cs-form cs-style1" method="post">
-          <div class="cs-height_50 cs-height_lg_50"></div>
-          
-          <!-- Messages -->
-          {% if messages %}
-          <div class="cs-messages">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert" style="margin-bottom: 30px; padding: 15px; border-radius: 8px; border: none;">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <h2 class="info-title">Start Your Learning Journey</h2>
+        <p class="info-subtitle">
+          Join our community of learners and gain access to expert-led courses, personalized mentoring, and recognized certifications.
+        </p>
+
+        <ul class="info-features">
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-graduation-cap"></i>
             </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <div class="cs-form_body" style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);">
-            <h2 class="cs-form_title text-center"><b class="cs-accent_color">Create</b> Your Account</h2>
-            <p class="text-center cs-primary_color" style="margin-top: 10px;">Join thousands of students learning with Uptrail</p>
-            <div class="cs-height_40 cs-height_lg_30"></div>
-            
-            {% csrf_token %}
-            
-            <label class="cs-primary_color cs-medium">First Name*</label>
-            <input type="text" name="first_name" placeholder="Enter your first name" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
-            <div class="cs-height_20 cs-height_lg_20"></div>
-            
-            <label class="cs-primary_color cs-medium">Last Name*</label>
-            <input type="text" name="last_name" placeholder="Enter your last name" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
-            <div class="cs-height_20 cs-height_lg_20"></div>
-            
-            <label class="cs-primary_color cs-medium">Email Address*</label>
-            <input type="email" name="email" placeholder="Enter your email address" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
-            <div class="cs-height_20 cs-height_lg_20"></div>
-            
-            <label class="cs-primary_color cs-medium">Phone Number</label>
-            <input type="tel" name="phone" placeholder="Enter your phone number (optional)" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color">
-            <div class="cs-height_20 cs-height_lg_20"></div>
-            
-            <label class="cs-primary_color cs-medium">Password*</label>
-            <input type="password" name="password1" placeholder="Create a strong password" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
-            <div class="cs-height_20 cs-height_lg_20"></div>
-            
-            <label class="cs-primary_color cs-medium">Confirm Password*</label>
-            <input type="password" name="password2" placeholder="Confirm your password" class="cs-form_field cs-accent_7_bg cs-accent_10_border cs-primary_color" required>
-            
-            <div style="margin: 20px 0; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #2563eb;">
-              <small class="cs-primary_color">
-                <i class="fas fa-info-circle cs-accent_color"></i>
-                Password must be at least 8 characters long and contain letters and numbers.
-              </small>
+            <div class="feature-content">
+              <strong>Premium Content</strong>
+              <span>Access expert courses and learning materials</span>
             </div>
-            
-            <div class="cs-height_35 cs-height_lg_35"></div>
-            <button type="submit" class="cs-btn cs-style1 cs-medium cs-primary_font cs-accent_bg cs-accent_border cs-white cs-accent_bg_2_hover cs-primary_color_hover cs-accent_border_2_hover" style="width: 100%; padding: 15px;">
-              <i class="fas fa-user-plus" style="margin-right: 8px;"></i>Create Account
-            </button>
-            <div class="cs-height_30 cs-height_lg_30"></div>
-          </div>
-          
-          <hr class="cs-accent_30_bg">
-          <div class="cs-height_20 cs-height_lg_20"></div>
-          <div class="cs-form_footer text-center cs-medium cs-primary_color">
-            Already have an account? 
-            <a href="{% url 'landing:login' %}" class="cs-accent_color" style="text-decoration: none; font-weight: 600;">
-              Sign In
-            </a>
-          </div>
-          <div class="cs-height_50 cs-height_lg_40"></div>
-        </form>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="feature-content">
+              <strong>Progress Tracking</strong>
+              <span>Monitor achievements and milestones</span>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="feature-content">
+              <strong>Expert Mentorship</strong>
+              <span>Connect with industry professionals</span>
+            </div>
+          </li>
+          <li>
+            <div class="feature-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <div class="feature-content">
+              <strong>Certifications</strong>
+              <span>Earn industry-recognized credentials</span>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
-  </div>
-  <div class="cs-height_140 cs-height_lg_80"></div>
-</div>
-<!-- End Form -->
 
-<!-- Start Benefits Section -->
-<div class="cs-height_100 cs-height_lg_60"></div>
-<div class="container">
-  <div class="cs-section_heading cs-style4 text-center">
-    <div class="cs-section_subtitle">Why choose Uptrail?</div>
-    <h2 class="cs-section_title">Benefits of joining our <b class="cs-accent_color">platform</b></h2>
-  </div>
-  <div class="cs-height_60 cs-height_lg_40"></div>
-  <div class="row">
-    <div class="col-lg-4 col-md-6">
-      <div class="cs-iconbox cs-style8 text-center">
-        <div class="cs-iconbox_icon cs-accent_color">
-          <i class="fas fa-graduation-cap" style="font-size: 3rem;"></i>
-        </div>
-        <div class="cs-iconbox_content">
-          <h3 class="cs-iconbox_title cs-font_18">Expert Instructors</h3>
-          <div class="cs-iconbox_text">Learn from industry experts with years of experience in their respective fields.</div>
-        </div>
+    <!-- Right Column: Signup Form -->
+    <div class="signup-form-column">
+      <div class="form-header">
+        <h1>Create Account</h1>
+        <p>Sign up to get started with your learning journey</p>
       </div>
-      <div class="cs-height_40 cs-height_lg_40"></div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="cs-iconbox cs-style8 text-center">
-        <div class="cs-iconbox_icon cs-accent_color">
-          <i class="fas fa-clock" style="font-size: 3rem;"></i>
+
+      <!-- Alert Messages -->
+      {% if messages %}
+      <div class="alert-messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">
+          {{ message }}
+          <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
         </div>
-        <div class="cs-iconbox_content">
-          <h3 class="cs-iconbox_title cs-font_18">Flexible Learning</h3>
-          <div class="cs-iconbox_text">Study at your own pace with 24/7 access to course materials and resources.</div>
-        </div>
+        {% endfor %}
       </div>
-      <div class="cs-height_40 cs-height_lg_40"></div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="cs-iconbox cs-style8 text-center">
-        <div class="cs-iconbox_icon cs-accent_color">
-          <i class="fas fa-certificate" style="font-size: 3rem;"></i>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name<span class="required">*</span></label>
+            <input type="text" name="first_name" class="form-control"
+                   placeholder="Enter first name"
+                   value="{{ request.POST.first_name|default:'' }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control"
+                   placeholder="Enter last name"
+                   value="{{ request.POST.last_name|default:'' }}">
+          </div>
         </div>
-        <div class="cs-iconbox_content">
-          <h3 class="cs-iconbox_title cs-font_18">Certificates</h3>
-          <div class="cs-iconbox_text">Earn recognized certificates upon completion to boost your career prospects.</div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address<span class="required">*</span></label>
+          <input type="email" name="email" class="form-control"
+                 placeholder="Enter your email address"
+                 value="{{ request.POST.email|default:'' }}" required>
         </div>
-      </div>
-      <div class="cs-height_40 cs-height_lg_40"></div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control"
+                 placeholder="Enter phone number (optional)"
+                 value="{{ request.POST.phone|default:'' }}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password<span class="required">*</span></label>
+          <input type="password" name="password1" id="password1" class="form-control"
+                 placeholder="Create a strong password" required>
+          <div class="form-hint">
+            Must be at least 8 characters long
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password<span class="required">*</span></label>
+          <input type="password" name="password2" id="password2" class="form-control"
+                 placeholder="Confirm your password" required>
+        </div>
+
+        <!-- Cloudflare Turnstile Widget -->
+        <div class="form-group" style="display: flex; justify-content: center; margin-bottom: 24px;">
+          <div class="cf-turnstile" data-sitekey="{{ CLOUDFLARE_TURNSTILE_SITE_KEY }}" data-theme="light"></div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          Create Account
+        </button>
+
+        <div class="form-footer">
+          <p>
+            Already have an account?
+            <a href="{% url 'landing:login' %}">Sign in here</a>
+          </p>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-<div class="cs-height_100 cs-height_lg_60"></div>
-<!-- End Benefits Section -->
+
 {% endblock %}
 
 {% block extra_js %}
+<!-- Cloudflare Turnstile Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <script>
 $(document).ready(function() {
-  // Form validation
-  $('form').on('submit', function(e) {
-    var password1 = $('input[name="password1"]').val();
-    var password2 = $('input[name="password2"]').val();
-    
-    if (password1 !== password2) {
-      e.preventDefault();
-      alert('Passwords do not match. Please check and try again.');
-      return false;
-    }
-    
-    if (password1.length < 8) {
-      e.preventDefault();
-      alert('Password must be at least 8 characters long.');
-      return false;
-    }
-  });
-  
   // Auto-hide messages after 5 seconds
   setTimeout(function() {
     $('.alert').fadeOut();
   }, 5000);
+
+  // Password validation
+  const password1 = document.getElementById('password1');
+  const password2 = document.getElementById('password2');
+
+  password2.addEventListener('input', function() {
+    if (password1.value !== password2.value) {
+      password2.setCustomValidity('Passwords do not match');
+    } else {
+      password2.setCustomValidity('');
+    }
+  });
+
+  // CSRF protection check
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Check CSRF protection on form submission
+  const form = document.querySelector('form[method="post"]');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const csrfCookie = getCookie('csrftoken');
+      const csrfInput = this.querySelector('[name=csrfmiddlewaretoken]');
+
+      if (!csrfCookie || !csrfInput || !csrfInput.value) {
+        e.preventDefault();
+        alert('Security error. Please reload the page and try again.');
+        location.reload();
+      }
+    });
+  }
 });
 </script>
 {% endblock %}

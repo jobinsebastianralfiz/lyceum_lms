@@ -3,736 +3,763 @@
 {% load rich_text_filters %}
 {% load rating_filters %}
 
-{% block title %}{{ course.title }} - Uptrail{% endblock %}
+{% block title %}{{ course.title }} - Lyceum Academy{% endblock %}
 
 {% block extra_css %}
 <style>
-/* Course Details Specific Styling */
-.cs-course_details_meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 10px;
+/* Color Variables - Lyceum Green */
+:root {
+  --lyceum-green: #2AB673;
+  --lyceum-green-dark: #229959;
+  --lyceum-green-light: #3DD186;
+  --dark-navy: #1F2937;
+  --light-gray: #F9FAFB;
+  --text-gray: #6B7280;
+  --border-gray: #E5E7EB;
 }
 
-.cs-course_details_meta span {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.cs-course_details_meta a {
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.cs-enrolled_number {
-  padding: 4px 12px;
-  border: 1px solid rgba(37, 99, 235, 0.3);
-  border-radius: 4px;
-  font-size: 12px;
-  background: rgba(37, 99, 235, 0.05);
-}
-
-.cs-seller_review {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.cs-seller_badge {
-  background: #2563eb;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* Star Rating System - Fixed to match online template */
-.cs-review {
+/* Hero Section */
+.course-hero {
+  background: linear-gradient(135deg, var(--lyceum-green) 0%, var(--lyceum-green-light) 100%);
+  padding: 150px 0 80px;
   position: relative;
-  display: inline-block;
-  color: #e5e7eb;
-  font-size: 14px;
-  line-height: 1;
+  overflow: hidden;
 }
 
-.cs-review::before {
-  content: "★★★★★";
-  color: #e5e7eb;
-}
-
-.cs-review .cs-review_in {
+.course-hero::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  color: #fbbf24;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
 }
 
-.cs-review .cs-review_in::before {
-  content: "★★★★★";
-  color: #fbbf24;
+.course-hero .hero-content {
+  position: relative;
+  z-index: 2;
 }
 
-.cs-course_image {
-  width: 100%;
-  max-width: 600px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 30px;
-}
-
-.cs-enroll_card {
-  background: #f8fafc;
-  padding: 30px;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.cs-enroll_title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #0f172a;
-}
-
-.cs-enroll_price {
+.course-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
   margin-bottom: 20px;
 }
 
-.cs-enroll_price .cs-bold {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f172a;
+.course-hero .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 20px;
 }
 
-.cs-previous_price {
+.course-hero .breadcrumb-item {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.course-hero .breadcrumb-item a {
+  color: white;
+  text-decoration: none;
+}
+
+.course-hero .breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.course-meta-hero {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.course-meta-hero span {
+  color: white;
+  font-size: 0.95rem;
+}
+
+.course-meta-hero i {
+  margin-right: 8px;
+}
+
+/* Main Content Area */
+.course-content-area {
+  padding: 60px 0;
+  background: #F9FAFB;
+}
+
+/* Sidebar */
+.course-sidebar {
+  position: sticky;
+  top: 140px;
+}
+
+.sidebar-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-gray);
+  margin-bottom: 30px;
+}
+
+.course-image-wrapper {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.course-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-price-section {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.course-price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--lyceum-green);
+  margin-bottom: 10px;
+}
+
+.course-price-old {
+  font-size: 1.2rem;
+  color: var(--text-gray);
   text-decoration: line-through;
-  color: #64748b;
   margin-left: 10px;
 }
 
-.cs-list {
-  background: #f8fafc;
-  padding: 25px;
+.enroll-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--lyceum-green);
+  color: white;
+  border: none;
   border-radius: 8px;
-}
-
-.cs-list_title {
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 20px;
-  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.cs-list ul {
+.enroll-btn:hover {
+  background: var(--lyceum-green-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(42, 182, 115, 0.3);
+}
+
+.course-features-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.cs-list li {
+.course-features-list li {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-gray);
 }
 
-.cs-list li:last-child {
+.course-features-list li:last-child {
   border-bottom: none;
 }
 
-.cs-list li span:first-child {
-  color: #64748b;
-  font-size: 14px;
+.course-features-list li span:first-child {
+  color: var(--text-gray);
+  font-size: 0.95rem;
 }
 
-.cs-list li span:last-child {
-  color: #0f172a;
-  font-weight: 500;
-}
-
-.cs-list li i {
-  margin-right: 8px;
-  color: #2563eb;
-  width: 16px;
-}
-
-/* Tabs Styling - Fixed to match online template */
-.cs-tabs {
-  margin-top: 40px;
-}
-
-.cs-tab_links.cs-style3 {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0 0 30px 0;
-  border-bottom: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-}
-
-.cs-tab_links.cs-style3 li {
-  margin-right: 0;
-}
-
-.cs-tab_links.cs-style3 a {
-  position: relative;
-  display: block;
-  padding: 15px 25px;
-  color: #64748b;
-  text-decoration: none;
-  font-weight: 500;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-bottom: none;
-  margin-right: 5px;
-  border-radius: 8px 8px 0 0;
-  transition: all 0.3s ease;
-}
-
-.cs-tab_links.cs-style3 li.active a,
-.cs-tab_links.cs-style3 a.active {
-  color: #2563eb;
-  background: white;
-  border-color: #2563eb;
-  position: relative;
-  z-index: 2;
-}
-
-.cs-tab_links.cs-style3 li.active a::after,
-.cs-tab_links.cs-style3 a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: white;
-  z-index: 3;
-}
-
-.cs-tab_links.cs-style3 a:hover {
-  color: #2563eb;
-  background: #f1f5f9;
-}
-
-.cs-tab_content {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0 8px 8px 8px;
-  padding: 30px;
-  min-height: 250px;
-}
-
-.cs-tab {
-  display: none;
-}
-
-.cs-tab.active {
-  display: block;
-}
-
-.cs-tab h4 {
-  color: #0f172a;
+.course-features-list li span:last-child {
+  color: var(--dark-navy);
   font-weight: 600;
-  margin: 0 0 15px 0;
 }
 
-.cs-tab p {
-  color: #64748b;
-  line-height: 1.6;
+.course-features-list li i {
+  color: var(--lyceum-green);
+  margin-right: 8px;
+  width: 20px;
+}
+
+/* Course Rating Display */
+.course-rating-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.rating-stars {
+  color: #FBBF24;
+  font-size: 1.2rem;
+}
+
+.rating-count {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+/* Main Content Cards */
+.content-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.content-card h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-navy);
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--light-gray);
+}
+
+.content-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-navy);
+  margin-bottom: 15px;
+  margin-top: 30px;
+}
+
+.content-card p {
+  color: var(--text-gray);
+  line-height: 1.8;
   margin-bottom: 15px;
 }
 
-.cs-tab ul.cs-list.cs-style3 {
-  list-style: none;
-  padding: 0;
-  margin: 25px 0 0 0;
+/* Course Highlights Grid */
+.highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin: 30px 0;
 }
 
-.cs-tab ul.cs-list.cs-style3 li {
-  padding: 8px 0;
-  color: #64748b;
+.highlight-item {
   display: flex;
   align-items: flex-start;
+  gap: 12px;
 }
 
-.cs-tab ul.cs-list.cs-style3 li i {
-  color: #2563eb;
-  margin-right: 8px;
-  margin-top: 3px;
-  font-size: 12px;
+.highlight-icon {
+  width: 24px;
+  height: 24px;
+  background: var(--lyceum-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-/* Content Formatting */
-.course-content-formatted {
-  line-height: 1.8;
-  color: #374151;
-  font-size: 15px;
-  min-height: 60px;
+.highlight-icon i {
+  color: white;
+  font-size: 0.75rem;
 }
 
-.course-content-formatted p {
+.highlight-text {
+  color: var(--dark-navy);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Curriculum/Modules Section */
+.curriculum-section {
+  margin: 30px 0;
+}
+
+.module-item {
+  background: var(--light-gray);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.module-item:hover {
+  border-color: var(--lyceum-green);
+  box-shadow: 0 4px 12px rgba(42, 182, 115, 0.1);
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.module-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark-navy);
+}
+
+.module-meta {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+.module-description {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Learning Outcomes */
+.learning-outcomes {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.learning-outcomes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--text-gray);
+}
+
+.learning-outcomes li i {
+  color: var(--lyceum-green);
+  margin-top: 4px;
+}
+
+/* Reviews Section */
+.review-item {
+  background: var(--light-gray);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
   margin-bottom: 12px;
 }
 
-.course-content-formatted ul,
-.course-content-formatted ol {
-  margin: 15px 0;
-  padding-left: 20px;
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--lyceum-green);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 
-.course-content-formatted ul li,
-.course-content-formatted ol li {
+.review-meta {
+  flex: 1;
+}
+
+.review-author {
+  font-weight: 600;
+  color: var(--dark-navy);
+  margin-bottom: 4px;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+.review-rating {
+  color: #FBBF24;
+  font-size: 0.9rem;
+}
+
+.review-text {
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+/* Instructor Info */
+.instructor-card {
+  background: var(--light-gray);
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.instructor-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--lyceum-green);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.instructor-info h4 {
+  color: var(--dark-navy);
+  font-weight: 600;
   margin-bottom: 8px;
-  color: #374151;
 }
 
-.course-content-formatted ul li::marker {
-  color: #2563eb;
-}
-
-.course-content-formatted h1,
-.course-content-formatted h2,
-.course-content-formatted h3,
-.course-content-formatted h4,
-.course-content-formatted h5,
-.course-content-formatted h6 {
-  color: #1f2937;
-  font-weight: 600;
-  margin: 20px 0 10px 0;
-}
-
-.course-content-formatted strong,
-.course-content-formatted b {
-  color: #1f2937;
-  font-weight: 600;
-}
-
-.course-content-formatted em,
-.course-content-formatted i {
-  font-style: italic;
-  color: #4b5563;
-}
-
-/* Fix for Quill editor content */
-.course-content-formatted .ql-editor {
-  padding: 0;
-  border: none;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.course-content-formatted .ql-editor p:last-child {
+.instructor-info p {
+  color: var(--text-gray);
   margin-bottom: 0;
-}
-
-/* Prevent tab content from causing layout shifts */
-.cs-tabs .cs-tab {
-  min-height: 200px;
-  padding: 20px 0;
-}
-
-.cs-tabs .cs-tab.active {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  font-size: 0.9rem;
 }
 
 /* Responsive */
+@media (max-width: 991px) {
+  .course-sidebar {
+    position: static;
+    top: 0;
+    margin-top: 40px;
+  }
+}
+
 @media (max-width: 768px) {
-  .cs-course_details_meta {
+  .course-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .highlights-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .content-card {
+    padding: 25px;
+  }
+
+  .course-price {
+    font-size: 2rem;
+  }
+
+  .instructor-card {
     flex-direction: column;
-    gap: 8px;
-  }
-  
-  .cs-seller_review {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .cs-enroll_card {
-    margin-top: 30px;
-    padding: 20px;
-  }
-  
-  .cs-tab_links.cs-style3 {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .cs-tab_links.cs-style3 a {
-    margin-right: 0;
-    margin-bottom: 5px;
     text-align: center;
-    padding: 12px 20px;
-  }
-  
-  .cs-tab_content {
-    padding: 20px;
-    border-radius: 8px;
-  }
-  
-  .cs-course_image {
-    height: 200px;
   }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Start Hero -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 400px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<!-- Hero Section -->
+<section class="course-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">{{ course.title }}</h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:courses' %}" class="cs-primary_color">Courses</a></li>
-        <li class="cs-breadcrumb_item">{{ course.title|truncatechars:30 }}</li>
-      </ol>
+    <div class="hero-content">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'landing:courses' %}">Courses</a></li>
+          <li class="breadcrumb-item active">{{ course.title|truncatechars:40 }}</li>
+        </ol>
+      </nav>
+      <h1>{{ course.title }}</h1>
+      <div class="course-meta-hero">
+        {% if course.instructor %}
+        <span><i class="fas fa-user-tie"></i> {{ course.instructor.get_full_name|default:course.instructor.username }}</span>
+        {% endif %}
+        <span><i class="fas fa-users"></i> {{ course.enrollments.count }} students</span>
+        {% if course.duration %}
+        <span><i class="far fa-clock"></i> {{ course.duration }} hours</span>
+        {% endif %}
+        <span><i class="fas fa-signal"></i> {{ course.difficulty_level|default:"All Levels" }}</span>
+      </div>
     </div>
   </div>
-</div>
-<!-- End Hero -->
+</section>
 
-<!-- Start Course Details -->
-<div class="cs-height_140 cs-height_lg_80"></div>
-<div class="container">
-  <div class="row">
-    <div class="col-lg-8">
-      <!-- Course Meta Info -->
-      <div class="cs-course_details_meta">
-        {% if course.instructor %}
-        <span>Instructor: <a href="#" class="cs-accent_color">{{ course.instructor.get_full_name|default:course.instructor.username }}</a></span>
-        {% endif %}
-        <span class="cs-enrolled_number cs-accent_40_border_2">{{ course.enrollments.count }} students enrolled</span>
-      </div>
-      
-      <div class="cs-height_10 cs-height_lg_10"></div>
-      <h2>{{ course.title }}</h2>
-      
-      <!-- Course Rating and Badge -->
-      <div class="cs-seller_review">
-        {% if course.is_featured %}
-        <span class="cs-seller_badge cs-medium cs-primary_color cs-accent_bg_2">Featured Course</span>
-        {% endif %}
-        <div class="cs-review cs-accent_color_2 cs-accent_color_hover" data-review="4.5">
-          <div class="cs-review_in"></div>
+<!-- Main Content -->
+<section class="course-content-area">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content Column -->
+      <div class="col-lg-8">
+        <!-- Course Overview -->
+        <div class="content-card">
+          <h2>Course Overview</h2>
+          <p>{{ course.description|default:"This comprehensive course is designed to provide you with practical knowledge and hands-on experience. Whether you're a beginner or looking to advance your skills, this course offers structured learning with real-world applications." }}</p>
+
+          {% if course.instructor %}
+          <div class="instructor-card mt-4">
+            <div class="instructor-avatar">{{ course.instructor.name|default:course.instructor.username|first|upper }}</div>
+            <div class="instructor-info">
+              <h4>Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</h4>
+              <p>Expert instructor with years of industry experience</p>
+            </div>
+          </div>
+          {% endif %}
         </div>
-      </div>
-      
-      <div class="cs-height_40 cs-height_lg_30"></div>
-      
-      <!-- Course Image -->
-      {% if course.thumbnail %}
-      <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="cs-course_image">
-      {% else %}
-      <img src="{% static 'landing/assets/img/online-education/course1.jpg' %}" alt="{{ course.title }}" class="cs-course_image">
-      {% endif %}
-      
-      <div class="cs-height_40 cs-height_lg_30"></div>
-      
-      <!-- Course Description -->
-      <div>
-        {{ course.description|default:"This course will provide you with comprehensive knowledge and practical skills to excel in your learning journey." }}
-      </div>
-      
-      <div class="cs-height_70 cs-height_lg_50"></div>
-      
-      <!-- Course Details Tabs -->
-      <div class="cs-tabs cs-fade_tabs cs-style1">
-        <div class="cs-medium">
-          <ul class="cs-tab_links cs-style3 cs-mp0 cs-primary_font">
-            <li class="active"><a href="#tab_one">Overview</a></li>
-            <li><a href="#tab_two">Curriculam</a></li>
-            <li><a href="#tab_three">What you'll learn</a></li>
-            <li><a href="#tab_four">Reviews</a></li>
-          </ul>
+
+        <!-- Course Highlights -->
+        <div class="content-card">
+          <h2>What Makes This Course Special</h2>
+          <div class="highlights-grid">
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Expert-led instruction</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Hands-on projects</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Self-paced learning</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Lifetime access</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Industry-relevant skills</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Certificate of completion</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Community support</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="fas fa-check"></i></div>
+              <div class="highlight-text">Regular updates</div>
+            </div>
+          </div>
         </div>
-        <div class="cs-height_40 cs-height_lg_30"></div>
-        
-        <!-- Tab Content -->
-        <div class="cs-tab_content">
-          <div id="tab_one" class="cs-tab active">
-            <h4 class="m-0">Overview</h4>
-            <div class="cs-height_10 cs-height_lg_10"></div>
-            <div>{{ course.description|default:"This comprehensive course is designed to provide you with practical knowledge and hands-on experience. Whether you're a beginner or looking to advance your skills, this course offers structured learning with real-world applications." }}</div>
-            <div class="cs-height_25 cs-height_lg_25"></div>
-            <ul class="cs-list cs-style3 cs-medium cs-mp0">
-              <li><i class="fas fa-angle-right"></i> Comprehensive learning materials and resources</li>
-              <li><i class="fas fa-angle-right"></i> Practical exercises and real-world projects</li>
-              <li><i class="fas fa-angle-right"></i> Expert guidance and support</li>
-              <li><i class="fas fa-angle-right"></i> Flexible self-paced learning</li>
-              <li><i class="fas fa-angle-right"></i> Industry-relevant skills and knowledge</li>
-              <li><i class="fas fa-angle-right"></i> Certificate upon successful completion</li>
-            </ul>
-          </div><!-- .cs-tab -->
-          
-          <div id="tab_two" class="cs-tab">
-            <h4 class="m-0">Curriculam</h4>
-            <div class="cs-height_10 cs-height_lg_10"></div>
-            {% if course.curriculum %}
-              <div class="course-content-formatted">{{ course.curriculum|safe_rich_text }}</div>
-            {% elif course.modules.exists %}
+
+        <!-- Curriculum -->
+        <div class="content-card">
+          <h2>Course Curriculum</h2>
+          {% if course.curriculum %}
+            <div>{{ course.curriculum|safe_rich_text }}</div>
+          {% elif course.modules.exists %}
+            <div class="curriculum-section">
               {% for module in course.modules.all %}
-              <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <h5 style="color: #2563eb; margin-bottom: 10px;">{{ module.title }}</h5>
+              <div class="module-item">
+                <div class="module-header">
+                  <div class="module-title">{{ forloop.counter }}. {{ module.title }}</div>
+                  <div class="module-meta">
+                    {% if module.duration %}{{ module.duration }}h • {% endif %}
+                    {{ module.lessons.count }} lesson{{ module.lessons.count|pluralize }}
+                  </div>
+                </div>
                 {% if module.description %}
-                <p style="color: #64748b; margin-bottom: 10px;">{{ module.description }}</p>
+                <div class="module-description">{{ module.description }}</div>
                 {% endif %}
-                <small style="color: #64748b;">
-                  {% if module.duration %}{{ module.duration }} hours • {% endif %}
-                  {{ module.lessons.count }} lessons
-                </small>
               </div>
               {% endfor %}
-            {% else %}
-            <div>Detailed curriculum will be available soon. This course covers all essential topics with hands-on practical exercises and comprehensive learning modules designed to build your expertise step by step. <br><br>Our structured approach ensures you master each concept before moving to the next level, providing you with solid foundation and advanced skills needed in today's competitive environment.</div>
-            {% endif %}
-          </div><!-- .cs-tab -->
-          
-          <div id="tab_three" class="cs-tab">
-            <h4 class="m-0">What you'll learn</h4>
-            <div class="cs-height_10 cs-height_lg_10"></div>
-            {% if course.what_you_will_learn %}
-              <div class="course-content-formatted">{{ course.what_you_will_learn|safe_rich_text }}</div>
-            {% else %}
-            <div>By the end of this course, you will have gained comprehensive knowledge and practical skills. <br><br>Our carefully designed curriculum ensures you develop both theoretical understanding and hands-on experience needed to excel in your field.</div>
-            <div class="cs-height_25 cs-height_lg_25"></div>
-            <ul class="cs-list cs-style3 cs-medium cs-mp0">
-              <li><i class="fas fa-angle-right"></i> Master the fundamentals and advanced concepts</li>
-              <li><i class="fas fa-angle-right"></i> Apply knowledge through practical projects</li>
-              <li><i class="fas fa-angle-right"></i> Build real-world applications and solutions</li>
-              <li><i class="fas fa-angle-right"></i> Develop professional skills and best practices</li>
-              <li><i class="fas fa-angle-right"></i> Gain confidence in your technical abilities</li>
-              <li><i class="fas fa-angle-right"></i> Prepare for career advancement opportunities</li>
+            </div>
+          {% else %}
+            <p>This course offers comprehensive coverage of all essential topics with structured learning modules. Our curriculum is designed to build your skills progressively, ensuring you master each concept before advancing.</p>
+            <div class="highlights-grid mt-4">
+              <div class="highlight-item">
+                <div class="highlight-icon"><i class="fas fa-check"></i></div>
+                <div class="highlight-text">Structured learning path</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-icon"><i class="fas fa-check"></i></div>
+                <div class="highlight-text">Progressive skill building</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-icon"><i class="fas fa-check"></i></div>
+                <div class="highlight-text">Comprehensive coverage</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-icon"><i class="fas fa-check"></i></div>
+                <div class="highlight-text">Practical exercises</div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- What You'll Learn -->
+        <div class="content-card">
+          <h2>What You'll Learn</h2>
+          {% if course.what_you_will_learn %}
+            <div>{{ course.what_you_will_learn|safe_rich_text }}</div>
+          {% else %}
+            <p>By completing this course, you will gain comprehensive knowledge and practical skills that are directly applicable to real-world scenarios.</p>
+            <ul class="learning-outcomes">
+              <li><i class="fas fa-check-circle"></i> Master fundamental and advanced concepts</li>
+              <li><i class="fas fa-check-circle"></i> Apply knowledge through hands-on projects</li>
+              <li><i class="fas fa-check-circle"></i> Build real-world applications</li>
+              <li><i class="fas fa-check-circle"></i> Develop professional best practices</li>
+              <li><i class="fas fa-check-circle"></i> Gain industry-relevant expertise</li>
+              <li><i class="fas fa-check-circle"></i> Prepare for career advancement</li>
             </ul>
-            {% endif %}
-          </div><!-- .cs-tab -->
-          
-          <div id="tab_four" class="cs-tab">
-            <h4 class="m-0">Student Reviews</h4>
-            <div class="cs-height_10 cs-height_lg_10"></div>
-            
-            {% if user.is_authenticated and is_enrolled %}
-            <div class="rating-actions mb-4 p-3" style="background: #f8fafc; border-radius: 8px; border-left: 4px solid #2563eb;">
-              {% if not user_rating %}
-              <p class="mb-2"><strong>Share your experience!</strong> Help other students by rating this course.</p>
-              <a href="{% url 'ratings:add_rating' course.id %}" class="btn btn-primary btn-sm">
-                <i class="fas fa-star me-1"></i>Rate This Course
-              </a>
-              {% else %}
-              <div class="d-flex align-items-center justify-content-between">
-                <div>
-                  <p class="mb-1"><strong>Your Rating:</strong> 
-                    <span class="text-warning">{{ user_rating.star_display }}</span> 
-                    ({{ user_rating.rating }}/5)
-                  </p>
-                  {% if user_rating.review_text %}
-                  <p class="mb-0 text-muted"><em>"{{ user_rating.review_text|truncatechars:80 }}"</em></p>
-                  {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- Student Reviews -->
+        <div class="content-card">
+          <h2>Student Reviews</h2>
+
+          {% if user.is_authenticated and is_enrolled and not user_rating %}
+          <div class="alert alert-info">
+            <strong>Share your experience!</strong> Help other students by rating this course.
+            <a href="{% url 'ratings:add_rating' course.id %}" class="btn btn-sm" style="background: var(--lyceum-green); color: white; margin-left: 10px;">
+              <i class="fas fa-star"></i> Rate Course
+            </a>
+          </div>
+          {% endif %}
+
+          {% if course.ratings.exists %}
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-3 mb-4">
+                <div style="font-size: 3rem; font-weight: 700; color: var(--lyceum-green);">
+                  {{ course|avg_rating|floatformat:1 }}
                 </div>
-                <a href="{% url 'ratings:add_rating' course.id %}" class="btn btn-outline-primary btn-sm">
-                  <i class="fas fa-edit me-1"></i>Update
-                </a>
+                <div>
+                  <div class="rating-stars">★★★★★</div>
+                  <div class="rating-count">{{ course.ratings.count }} review{{ course.ratings.count|pluralize }}</div>
+                </div>
+              </div>
+
+              {% for rating in course.ratings.all|slice:":3" %}
+              <div class="review-item">
+                <div class="review-header">
+                  <div class="review-avatar">{{ rating.user.name|default:rating.user.username|first|upper }}</div>
+                  <div class="review-meta">
+                    <div class="review-author">{{ rating.user.get_full_name|default:rating.user.username }}</div>
+                    <div class="review-date">{{ rating.created_at|date:"M d, Y" }}</div>
+                  </div>
+                  <div class="review-rating">{{ rating.star_display }}</div>
+                </div>
+                {% if rating.review_text %}
+                <div class="review-text">{{ rating.review_text }}</div>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-star" style="font-size: 3rem; color: var(--text-gray); opacity: 0.3;"></i>
+              <h5 class="mt-3 mb-2" style="color: var(--text-gray);">No reviews yet</h5>
+              <p style="color: var(--text-gray);">Be the first to share your experience!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="course-sidebar">
+          <div class="sidebar-card">
+            <!-- Course Image -->
+            <div class="course-image-wrapper">
+              {% if course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+              {% else %}
+              <img src="{% static 'landing/assets/img/online-education/course1.jpg' %}" alt="{{ course.title }}">
+              {% endif %}
+            </div>
+
+            <!-- Rating -->
+            {% if course.ratings.exists %}
+            <div class="course-rating-display">
+              <div class="rating-stars">★★★★★</div>
+              <span class="rating-count">({{ course.ratings.count }} reviews)</span>
+            </div>
+            {% endif %}
+
+            <!-- Price -->
+            <div class="course-price-section">
+              {% if course.is_free_course %}
+              <div class="course-price">FREE</div>
+              {% else %}
+              <div>
+                <span class="course-price">₹{{ course.total_price|floatformat:0 }}</span>
+                {% if course.original_price and course.original_price > course.total_price %}
+                <span class="course-price-old">₹{{ course.original_price|floatformat:0 }}</span>
+                {% endif %}
               </div>
               {% endif %}
             </div>
-            {% endif %}
-            
-            <!-- Rating Summary -->
-            {% if course.ratings.exists %}
-            <div class="rating-summary mb-4">
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="text-center">
-                    <div class="display-4 fw-bold text-primary mb-1">{{ course|avg_rating|floatformat:1 }}</div>
-                    <div class="cs-review" data-review="{{ course|avg_rating|floatformat:1 }}">
-                      <div class="cs-review_in"></div>
-                    </div>
-                    <p class="text-muted mt-1">{{ course.ratings.count }} rating{{ course.ratings.count|pluralize }}</p>
-                  </div>
-                </div>
-                <div class="col-md-8">
-                  {% for rating in course.ratings.all|slice:":3" %}
-                  <div class="d-flex align-items-start mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
-                    <img src="{% static 'landing/assets/img/online-education/avatar1.jpg' %}" 
-                         alt="{{ rating.user.get_full_name|default:rating.user.username }}" 
-                         class="rounded-circle me-3" width="40" height="40">
-                    <div class="flex-grow-1">
-                      <div class="d-flex align-items-center mb-1">
-                        <h6 class="mb-0 me-2">{{ rating.user.get_full_name|default:rating.user.username }}</h6>
-                        <small class="text-warning">{{ rating.star_display }}</small>
-                      </div>
-                      <small class="text-muted">{{ rating.created_at|date:"M d, Y" }}</small>
-                      {% if rating.review_text %}
-                      <p class="mt-2 mb-0">{{ rating.review_text|truncatechars:150 }}</p>
-                      {% endif %}
-                    </div>
-                  </div>
-                  {% endfor %}
-                  
-                  {% if course.ratings.count > 3 %}
-                  <div class="text-center">
-                    <a href="{% url 'ratings:course_reviews' course.id %}" class="btn btn-outline-primary">
-                      View All {{ course.ratings.count }} Reviews
-                    </a>
-                  </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
+
+            <!-- Enroll Button -->
+            {% if is_enrolled %}
+            <a href="{% url 'student_portal:dashboard' %}" class="enroll-btn" style="display: block; text-align: center; text-decoration: none;">
+              Go to Course
+            </a>
             {% else %}
-            <div class="text-center py-4">
-              <i class="fas fa-star-half-alt display-1 text-muted mb-3"></i>
-              <h5 class="mb-2">No reviews yet</h5>
-              <p class="text-muted">Be the first to share your experience with this course!</p>
-            </div>
+            <form method="post" action="{% url 'landing:enroll_course' course.id %}">
+              {% csrf_token %}
+              <button type="submit" class="enroll-btn">Enroll Now</button>
+            </form>
             {% endif %}
-          </div><!-- .cs-tab -->
+
+            <hr style="margin: 25px 0; border-color: var(--border-gray);">
+
+            <!-- Course Features -->
+            <ul class="course-features-list">
+              <li>
+                <span><i class="fas fa-signal"></i> Level</span>
+                <span>{{ course.difficulty_level|default:"All Levels" }}</span>
+              </li>
+              <li>
+                <span><i class="far fa-clock"></i> Duration</span>
+                <span>{% if course.duration %}{{ course.duration }} hours{% else %}Self-paced{% endif %}</span>
+              </li>
+              <li>
+                <span><i class="far fa-list-alt"></i> Modules</span>
+                <span>{{ course.modules.count|default:"Multiple" }}</span>
+              </li>
+              <li>
+                <span><i class="fas fa-users"></i> Students</span>
+                <span>{{ course.enrollments.count }}</span>
+              </li>
+              <li>
+                <span><i class="far fa-calendar-alt"></i> Updated</span>
+                <span>{{ course.updated_at|date:"M Y" }}</span>
+              </li>
+              <li>
+                <span><i class="fas fa-language"></i> Language</span>
+                <span>{{ course.language|default:"English" }}</span>
+              </li>
+              {% if course.certificate_available %}
+              <li>
+                <span><i class="fas fa-certificate"></i> Certificate</span>
+                <span>Available</span>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="col-lg-4">
-      <div class="cs-height_0 cs-height_lg_40"></div>
-      
-      <!-- Enrollment Card -->
-      <div class="cs-enroll_card cs-accent_5_bg">
-        <h3 class="cs-enroll_title">Course Cost</h3>
-        <div class="cs-enroll_price">
-          {% if course.is_free_course %}
-          <span class="cs-bold cs-primary_color">Free</span>
-          {% else %}
-          <span class="cs-bold cs-primary_color">₹{{ course.total_price|floatformat:0 }}</span>
-          {% if course.original_price and course.original_price > course.total_price %}
-          <span class="cs-previous_price cs-medium">₹{{ course.original_price|floatformat:0 }}</span>
-          {% endif %}
-          {% endif %}
-        </div>
-        <div class="cs-height_10 cs-height_lg_10"></div>
-        
-        {% if is_enrolled %}
-        <a href="{% url 'student_portal:dashboard' %}" class="cs-btn cs-style1 cs-btn_lg cs-medium cs-primary_font cs-accent_bg cs-white">
-          Go to Course
-        </a>
-        {% else %}
-        <form method="post" action="{% url 'landing:enroll_course' course.id %}">
-          {% csrf_token %}
-          <button type="submit" class="cs-btn cs-style1 cs-btn_lg cs-medium cs-primary_font cs-accent_bg_2 cs-accent_border_2 cs-primary_color cs-accent_bg_hover cs-white_hover cs-accent_border_hover">
-            Enroll Now
-          </button>
-        </form>
-        {% endif %}
-      </div>
-      
-      <!-- Course Features -->
-      <div class="cs-list cs-style2 cs-accent_5_bg">
-        <h3 class="cs-list_title">Course Features</h3>
-        <ul class="cs-mp0">
-          <li>
-            <span><i class="far fa-chart-bar"></i> Course level: </span>
-            <span>{{ course.difficulty_level|default:"All Levels" }}</span>
-          </li>
-          <li>
-            <span><i class="far fa-clock"></i> Duration: </span>
-            <span>{% if course.duration %}{{ course.duration }} hours{% else %}Self-paced{% endif %}</span>
-          </li>
-          <li>
-            <span><i class="far fa-list-alt"></i> Modules: </span>
-            <span>{{ course.modules.count|default:"Multiple" }}</span>
-          </li>
-          <li>
-            <span><i class="far fa-calendar-alt"></i> Last Update: </span>
-            <span>{{ course.updated_at|date:"M d, Y" }}</span>
-          </li>
-          <li>
-            <span><i class="fas fa-language"></i> Language: </span>
-            <span>{{ course.language|default:"English" }}</span>
-          </li>
-          {% if course.certificate_available %}
-          <li>
-            <span><i class="fas fa-certificate"></i> Certificate: </span>
-            <span>Available</span>
-          </li>
-          {% endif %}
-        </ul>
       </div>
     </div>
   </div>
-</div>
-<div class="cs-height_140 cs-height_lg_80"></div>
-<!-- End Course Details -->
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Course detail page functionality
 $(document).ready(function() {
   console.log('Course detail page loaded');
-  
-  // Initialize star ratings using the main.js review function
-  $('.cs-review').each(function() {
-    var review = $(this).data('review');
-    var reviewVal = review * 20 + '%';
-    $(this).find('.cs-review_in').css('width', reviewVal);
-  });
-  
-  // Tab functionality using main.js structure
-  $('.cs-tabs.cs-fade_tabs .cs-tab_links a').on('click', function(e) {
-    var currentAttrValue = $(this).attr('href');
-    $('.cs-tabs ' + currentAttrValue)
-      .fadeIn(400)
-      .siblings()
-      .hide();
-    $(this).parents('li').addClass('active').siblings().removeClass('active');
-    e.preventDefault();
-  });
-  
-  // Ensure first tab is active on load
-  setTimeout(function() {
-    if ($('.cs-tab_links li.active').length === 0) {
-      $('.cs-tab_links li:first-child').addClass('active');
-      $('.cs-tab:first-child').addClass('active').show();
-    }
-  }, 100);
-  
-  // Clean up rich text content
-  $('.course-content-formatted').each(function() {
-    // Remove empty paragraphs
-    $(this).find('p:empty').remove();
-    $(this).find('p').filter(function() {
-      return $.trim($(this).text()) === '';
-    }).remove();
-    
-    // Clean up HTML
-    var html = $(this).html();
-    if (html) {
-      html = html.replace(/<p><br><\/p>/g, '');
-      html = html.replace(/<p>&nbsp;<\/p>/g, '');
-      html = html.replace(/<p>\s*<\/p>/g, '');
-      $(this).html(html);
-    }
-  });
-  
-  // Debug logging
-  console.log('Tabs initialized:', $('.cs-tab_links a').length);
-  console.log('Tab contents:', $('.cs-tab').length);
-  console.log('Active tab:', $('.cs-tab.active').attr('id'));
 });
 </script>
 {% endblock %}

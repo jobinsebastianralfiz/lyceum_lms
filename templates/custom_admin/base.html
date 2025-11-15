@@ -4,53 +4,749 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}CodeLearn LMS Admin{% endblock %}</title>
-  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png' %}" />
+  <title>{% block title %}Lyceum Academy Admin{% endblock %}</title>
+  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'images/logos/LOGO.svg' %}" />
   <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
   <style>
+    /* Lyceum Dark Theme Variables */
+    :root {
+      --lyceum-green: #2AB673;
+      --lyceum-green-dark: #229959;
+      --lyceum-green-light: #3DD186;
+      --dark-bg: #0F172A;
+      --dark-bg-secondary: #1E293B;
+      --dark-bg-tertiary: #334155;
+      --dark-border: #374151;
+      --text-white: #F9FAFB;
+      --text-gray: #CBD5E1;
+      --text-gray-dark: #94A3B8;
+    }
+
+    /* Global Dark Theme */
     body {
       margin: 0;
       padding: 0;
+      background: var(--dark-bg) !important;
+      color: var(--text-gray) !important;
     }
+
     #main-wrapper {
       margin-top: 0 !important;
       padding-top: 0 !important;
+      background: var(--dark-bg) !important;
     }
+
     .page-wrapper {
       margin-top: 0 !important;
       padding-top: 0 !important;
+      background: var(--dark-bg) !important;
     }
+
+    .body-wrapper {
+      background: var(--dark-bg) !important;
+    }
+
     .body-wrapper .container-fluid {
       padding-top: 2rem;
       padding-bottom: 2rem;
+      background: var(--dark-bg) !important;
     }
-    .app-header {
-      margin-top: 0 !important;
-      top: 0 !important;
-    }
+
+    /* Sidebar Dark Theme */
     .left-sidebar {
       top: 0 !important;
       height: 100vh !important;
       overflow-y: auto !important;
+      background: var(--dark-bg-secondary) !important;
+      border-right: 1px solid var(--dark-border) !important;
     }
+
+    .brand-logo {
+      background: var(--dark-bg-secondary) !important;
+      border-bottom: 1px solid var(--dark-border) !important;
+      padding: 1.5rem !important;
+    }
+
+    .brand-logo img {
+      max-height: 50px !important;
+      width: auto !important;
+    }
+
     .sidebar-nav {
       height: calc(100vh - 80px) !important;
       overflow-y: auto !important;
       padding-bottom: 2rem;
+      background: var(--dark-bg-secondary) !important;
     }
+
     .sidebar-nav ul {
       height: auto !important;
       max-height: none !important;
     }
-    /* Fix sidebar scrolling */
+
     .left-sidebar > div {
       height: 100% !important;
       display: flex !important;
       flex-direction: column !important;
+      background: var(--dark-bg-secondary) !important;
     }
+
     .sidebar-nav.scroll-sidebar {
       flex: 1 !important;
       overflow-y: auto !important;
+    }
+
+    /* Sidebar Navigation Items */
+    .sidebar-item .sidebar-link {
+      color: var(--text-gray) !important;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-item .sidebar-link:hover {
+      background: var(--dark-bg-tertiary) !important;
+      color: var(--lyceum-green) !important;
+    }
+
+    .sidebar-item .sidebar-link.active {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    .sidebar-item .sidebar-link i {
+      color: var(--text-gray) !important;
+    }
+
+    .sidebar-item .sidebar-link:hover i,
+    .sidebar-item .sidebar-link.active i {
+      color: white !important;
+    }
+
+    .nav-small-cap {
+      color: var(--lyceum-green) !important;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .sidebar-divider {
+      background: var(--dark-border) !important;
+    }
+
+    /* Header Dark Theme */
+    .app-header {
+      margin-top: 0 !important;
+      top: 0 !important;
+      background: var(--dark-bg-secondary) !important;
+      border-bottom: 1px solid var(--dark-border) !important;
+    }
+
+    .app-header .navbar {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .app-header .nav-link {
+      color: var(--text-gray) !important;
+    }
+
+    .app-header .nav-link:hover {
+      color: var(--lyceum-green) !important;
+    }
+
+    /* Cards Dark Theme - Aggressive Overrides */
+    .card,
+    div[class*="card"]:not(.card-body):not(.card-header):not(.card-footer) {
+      background: var(--dark-bg-secondary) !important;
+      border: 1px solid var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .card-body,
+    .card-header,
+    .card-footer {
+      background: var(--dark-bg-secondary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .card-title,
+    .card-title * {
+      color: var(--text-white) !important;
+    }
+
+    .card-subtitle {
+      color: var(--text-gray-dark) !important;
+    }
+
+    .card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
+      color: var(--text-white) !important;
+    }
+
+    .card p:not(.btn):not(.badge),
+    .card span:not(.btn):not(.badge):not(.round-8):not(.round-40):not(.round-48),
+    .card label {
+      color: var(--text-gray) !important;
+    }
+
+    /* Keep buttons inside cards visible */
+    .card .btn {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    .card .btn-outline-primary {
+      background: transparent !important;
+      color: var(--lyceum-green) !important;
+    }
+
+    /* Tables Dark Theme - Comprehensive */
+    .table,
+    table,
+    .table-responsive table {
+      color: var(--text-gray) !important;
+      border-color: var(--dark-border) !important;
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .table thead,
+    .table thead th,
+    table thead,
+    table thead th {
+      background: var(--dark-bg-tertiary) !important;
+      background-color: var(--dark-bg-tertiary) !important;
+      color: var(--text-white) !important;
+      border-color: var(--dark-border) !important;
+      padding: 12px 15px !important;
+    }
+
+    .table tbody,
+    .table tbody tr,
+    .table tbody td,
+    table tbody,
+    table tbody tr,
+    table tbody td {
+      background: var(--dark-bg-secondary) !important;
+      background-color: var(--dark-bg-secondary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+      padding: 12px 15px !important;
+    }
+
+    .table th,
+    .table td,
+    table th,
+    table td {
+      background: transparent !important;
+      background-color: transparent !important;
+      padding: 12px 15px !important;
+    }
+
+    /* Fix text and elements inside table cells */
+    .table td *,
+    .table th *,
+    table td *,
+    table th * {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    .table td span,
+    .table td p,
+    .table td div:not(.btn):not(.badge),
+    table td span,
+    table td p,
+    table td div:not(.btn):not(.badge) {
+      background: transparent !important;
+      background-color: transparent !important;
+      color: var(--text-gray) !important;
+    }
+
+    .table th span,
+    .table th p,
+    .table th div,
+    table th span,
+    table th p,
+    table th div {
+      background: transparent !important;
+      background-color: transparent !important;
+      color: var(--text-white) !important;
+    }
+
+    .table tbody tr:hover,
+    .table tbody tr:hover td,
+    .table tbody tr:hover th,
+    table tbody tr:hover,
+    table tbody tr:hover td,
+    table tbody tr:hover th,
+    .table-hover tbody tr:hover,
+    .table-hover tbody tr:hover td,
+    .table-hover tbody tr:hover th,
+    .table > tbody > tr:hover,
+    .table > tbody > tr:hover > td,
+    .table > tbody > tr:hover > th {
+      background-color: rgba(42, 182, 115, 0.2) !important;
+      background: rgba(42, 182, 115, 0.2) !important;
+      color: var(--text-white) !important;
+    }
+
+    .table th,
+    .table td,
+    table th,
+    table td {
+      border-color: var(--dark-border) !important;
+    }
+
+    /* Table striped rows */
+    .table-striped tbody tr:nth-of-type(odd),
+    .table-striped > tbody > tr:nth-of-type(odd) {
+      background: var(--dark-bg-secondary) !important;
+      background-color: var(--dark-bg-secondary) !important;
+    }
+
+    .table-striped tbody tr:nth-of-type(even),
+    .table-striped > tbody > tr:nth-of-type(even) {
+      background: rgba(15, 23, 42, 0.5) !important;
+      background-color: rgba(15, 23, 42, 0.5) !important;
+    }
+
+    /* Force table hover to use green - super aggressive */
+    .table-striped tbody tr:nth-of-type(odd):hover,
+    .table-striped tbody tr:nth-of-type(even):hover,
+    .table-striped > tbody > tr:hover,
+    tbody tr:hover {
+      background: rgba(42, 182, 115, 0.2) !important;
+      background-color: rgba(42, 182, 115, 0.2) !important;
+    }
+
+    /* Override any potential white background on hover */
+    tr:hover,
+    tr:hover *:not(a):not(button):not(input):not(select),
+    .table tr:hover,
+    table tr:hover,
+    tbody > tr:hover {
+      background: rgba(42, 182, 115, 0.25) !important;
+      background-color: rgba(42, 182, 115, 0.25) !important;
+    }
+
+    tr:hover td,
+    tr:hover th,
+    .table tr:hover td,
+    .table tr:hover th {
+      background-color: transparent !important;
+      background: transparent !important;
+      color: var(--text-white) !important;
+    }
+
+    /* Additional specificity for any Bootstrap table variants */
+    .table-bordered tr:hover,
+    .table-borderless tr:hover,
+    .table-sm tr:hover,
+    .table-responsive tr:hover,
+    .table-responsive table tr:hover,
+    div[class*="table"] tr:hover {
+      background: rgba(42, 182, 115, 0.25) !important;
+      background-color: rgba(42, 182, 115, 0.25) !important;
+    }
+
+    /* Kill any white hover effects from Bootstrap */
+    .table > :not(caption) > * > *,
+    .table tbody tr,
+    .table tbody tr td {
+      --bs-table-hover-bg: rgba(42, 182, 115, 0.25) !important;
+      --bs-table-bg: transparent !important;
+    }
+
+    /* Force the hover state with higher specificity */
+    body .table tbody tr:hover,
+    body table tbody tr:hover,
+    body .table-hover tbody tr:hover {
+      background: rgba(42, 182, 115, 0.25) !important;
+      background-color: rgba(42, 182, 115, 0.25) !important;
+    }
+
+    /* Buttons with Lyceum Green */
+    .btn-primary {
+      background: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    .btn-primary:hover {
+      background: var(--lyceum-green-dark) !important;
+      border-color: var(--lyceum-green-dark) !important;
+    }
+
+    .btn-outline-primary {
+      color: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    .btn-outline-primary:hover {
+      background: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    /* Badges */
+    .badge,
+    .badge.bg-primary,
+    .badge.text-bg-primary {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+      padding: 4px 10px !important;
+    }
+
+    .badge.bg-primary-subtle {
+      background: rgba(42, 182, 115, 0.1) !important;
+      color: var(--lyceum-green) !important;
+    }
+
+    .badge.bg-success,
+    .badge.text-bg-success {
+      background: #10b981 !important;
+      color: white !important;
+    }
+
+    .badge.bg-warning,
+    .badge.text-bg-warning {
+      background: #f59e0b !important;
+      color: white !important;
+    }
+
+    .badge.bg-danger,
+    .badge.text-bg-danger {
+      background: #ef4444 !important;
+      color: white !important;
+    }
+
+    .badge.bg-info,
+    .badge.text-bg-info {
+      background: #3b82f6 !important;
+      color: white !important;
+    }
+
+    .badge.bg-secondary,
+    .badge.text-bg-secondary {
+      background: var(--dark-bg-tertiary) !important;
+      color: var(--text-gray) !important;
+    }
+
+    /* Buttons inside tables */
+    .table .btn,
+    table .btn {
+      padding: 6px 12px !important;
+      margin: 2px !important;
+    }
+
+    .table .btn-sm,
+    table .btn-sm {
+      padding: 4px 8px !important;
+      font-size: 0.875rem !important;
+    }
+
+    /* Forms Dark Theme */
+    .form-control,
+    .form-select {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-white) !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--lyceum-green) !important;
+      color: var(--text-white) !important;
+      box-shadow: 0 0 0 0.2rem rgba(42, 182, 115, 0.25) !important;
+    }
+
+    .form-label {
+      color: var(--text-white) !important;
+    }
+
+    /* Dropdown Menu Dark Theme */
+    .dropdown-menu {
+      background: var(--dark-bg-secondary) !important;
+      border: 1px solid var(--dark-border) !important;
+    }
+
+    .dropdown-item {
+      color: var(--text-gray) !important;
+    }
+
+    .dropdown-item:hover {
+      background: var(--dark-bg-tertiary) !important;
+      color: var(--lyceum-green) !important;
+    }
+
+    /* Alert Messages */
+    .alert {
+      border: 1px solid var(--dark-border) !important;
+    }
+
+    .alert-success {
+      background: rgba(42, 182, 115, 0.1) !important;
+      color: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    .alert-error,
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      border-color: #ef4444 !important;
+    }
+
+    .alert-warning {
+      background: rgba(251, 191, 36, 0.1) !important;
+      color: #fbbf24 !important;
+      border-color: #fbbf24 !important;
+    }
+
+    .alert-info {
+      background: rgba(59, 130, 246, 0.1) !important;
+      color: #3b82f6 !important;
+      border-color: #3b82f6 !important;
+    }
+
+    /* Text Colors - Comprehensive */
+    h1, h2, h3, h4, h5, h6,
+    .h1, .h2, .h3, .h4, .h5, .h6 {
+      color: var(--text-white) !important;
+    }
+
+    p, span, label, div, td, th, li {
+      color: var(--text-gray) !important;
+    }
+
+    a {
+      color: var(--lyceum-green) !important;
+    }
+
+    a:hover {
+      color: var(--lyceum-green-light) !important;
+    }
+
+    /* Force white text on dark elements */
+    .text-dark,
+    .text-black,
+    .text-muted {
+      color: var(--text-gray) !important;
+    }
+
+    .fw-bold,
+    .fw-bolder,
+    strong,
+    b {
+      color: var(--text-white) !important;
+    }
+
+    /* List groups */
+    .list-group,
+    .list-group-item {
+      background: var(--dark-bg-secondary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .list-group-item:hover {
+      background: var(--dark-bg-tertiary) !important;
+      color: var(--text-white) !important;
+    }
+
+    /* Override any white backgrounds */
+    .bg-white,
+    .bg-light {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    /* Override text colors */
+    .text-body,
+    .text-body-emphasis {
+      color: var(--text-gray) !important;
+    }
+
+    .text-white {
+      color: var(--text-white) !important;
+    }
+
+    /* Small text */
+    small,
+    .small {
+      color: var(--text-gray-dark) !important;
+    }
+
+    /* Stats and metrics */
+    .fs-1, .fs-2, .fs-3, .fs-4, .fs-5, .fs-6 {
+      color: var(--text-white) !important;
+    }
+
+    /* Round badges/icons */
+    .round-48,
+    .round-40,
+    .round-8 {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    /* Hover effects for buttons */
+    .btn {
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .btn-secondary:hover {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--lyceum-green) !important;
+      color: var(--text-white) !important;
+    }
+
+    /* Notification Badge */
+    .notification.bg-primary {
+      background: var(--lyceum-green) !important;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background: transparent !important;
+    }
+
+    .breadcrumb-item {
+      color: var(--text-gray) !important;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-white) !important;
+    }
+
+    /* Pagination */
+    .pagination .page-link {
+      background: var(--dark-bg-secondary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .pagination .page-link:hover {
+      background: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+      color: white !important;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    /* Modal Dark Theme */
+    .modal-content {
+      background: var(--dark-bg-secondary) !important;
+      border: 1px solid var(--dark-border) !important;
+    }
+
+    .modal-header {
+      border-bottom-color: var(--dark-border) !important;
+    }
+
+    .modal-footer {
+      border-top-color: var(--dark-border) !important;
+    }
+
+    /* Close Button */
+    .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    /* Canvas for charts - keep transparent */
+    canvas {
+      background: transparent !important;
+    }
+
+    /* Icons and SVG - keep visible */
+    .ti,
+    iconify-icon,
+    i[class*="ti-"],
+    svg {
+      color: inherit !important;
+    }
+
+    /* Progress bars */
+    .progress {
+      background: var(--dark-bg-tertiary) !important;
+    }
+
+    .progress-bar {
+      background: var(--lyceum-green) !important;
+    }
+
+    /* Nav tabs */
+    .nav-tabs {
+      border-bottom-color: var(--dark-border) !important;
+    }
+
+    .nav-tabs .nav-link {
+      color: var(--text-gray) !important;
+      border-color: transparent !important;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--lyceum-green) !important;
+      border-color: transparent transparent var(--lyceum-green) !important;
+    }
+
+    .nav-tabs .nav-link.active {
+      background: var(--dark-bg-secondary) !important;
+      color: var(--lyceum-green) !important;
+      border-color: var(--dark-border) var(--dark-border) transparent !important;
+    }
+
+    /* Input groups */
+    .input-group-text {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    /* Tooltips */
+    .tooltip-inner {
+      background: var(--dark-bg-tertiary) !important;
+      color: var(--text-white) !important;
+    }
+
+    /* Popovers */
+    .popover {
+      background: var(--dark-bg-secondary) !important;
+      border-color: var(--dark-border) !important;
+    }
+
+    .popover-header {
+      background: var(--dark-bg-tertiary) !important;
+      border-bottom-color: var(--dark-border) !important;
+      color: var(--text-white) !important;
+    }
+
+    .popover-body {
+      color: var(--text-gray) !important;
+    }
+
+    /* Fix specific Bootstrap utility classes that might override */
+    [class*="bg-"]:not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info) {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    /* Ensure text in stats cards is visible */
+    .hstack,
+    .vstack {
+      color: var(--text-gray) !important;
+    }
+
+    .hstack h5,
+    .vstack h5 {
+      color: var(--text-white) !important;
     }
   </style>
   {% block extra_css %}{% endblock %}
@@ -67,7 +763,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img">
-            <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg' %}" alt="CodeLearn" />
+            <img src="{% load static %}{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>
@@ -76,9 +772,10 @@
         <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
+            <!-- DASHBOARD -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Home</span>
+              <span class="hide-menu">DASHBOARD</span>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="{% url 'custom_admin:dashboard' %}" aria-expanded="false">
@@ -87,350 +784,273 @@
               </a>
             </li>
 
-            <li>
-              <span class="sidebar-divider lg"></span>
-            </li>
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Management</span>
-            </li>
-            
-            <!-- COURSES Section -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">COURSES</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:categories_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-category"></i></span>
-                  <span class="hide-menu">Categories</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:courses_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-book"></i></span>
-                  <span class="hide-menu">Courses</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:modules_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-layout-grid"></i></span>
-                  <span class="hide-menu">Modules</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:student_progress_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-progress"></i></span>
-                  <span class="hide-menu">Student Progress</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:video_lessons_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-video"></i></span>
-                  <span class="hide-menu">Video Lessons</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:assignments_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-clipboard-text"></i></span>
-                  <span class="hide-menu">Assignments</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:assignment_submissions_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-clipboard-check"></i></span>
-                  <span class="hide-menu">Assignment Submissions</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:quizzes_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-clipboard-list"></i></span>
-                  <span class="hide-menu">Quizzes</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:quiz_attempts_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-clipboard-data"></i></span>
-                  <span class="hide-menu">Quiz Attempts</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:module_progress_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-progress-check"></i></span>
-                  <span class="hide-menu">Module Progress</span>
-                </div>
-              </a>
-            </li>
-
             <li><span class="sidebar-divider lg"></span></li>
-            
-            <!-- MENTORING & ANALYTICS Section -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">MENTORING & ANALYTICS</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="/mentor/" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-chart-pie"></i></span>
-                  <span class="hide-menu">Mentor Dashboard</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="/mentor/students/" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-users"></i></span>
-                  <span class="hide-menu">Student Analytics</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="/mentor/alerts/" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-alert-triangle"></i></span>
-                  <span class="hide-menu">Progress Alerts</span>
-                </div>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="/mentor/sessions/create/" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-user-plus"></i></span>
-                  <span class="hide-menu">Create Session</span>
-                </div>
-              </a>
-            </li>
 
-            <li><span class="sidebar-divider lg"></span></li>
-            
-            <!-- NOTIFICATIONS Section -->
+            <!-- COURSES & CONTENT -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">NOTIFICATIONS</span>
+              <span class="hide-menu">COURSES & CONTENT</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:email_templates_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-mail"></i></span>
-                  <span class="hide-menu">Email Templates</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:categories_list' %}" aria-expanded="false">
+                <i class="ti ti-category"></i>
+                <span class="hide-menu">Categories</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:notifications_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-bell"></i></span>
-                  <span class="hide-menu">Notifications</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:courses_list' %}" aria-expanded="false">
+                <i class="ti ti-book"></i>
+                <span class="hide-menu">Courses</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:modules_list' %}" aria-expanded="false">
+                <i class="ti ti-layout-grid"></i>
+                <span class="hide-menu">Modules</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:video_lessons_list' %}" aria-expanded="false">
+                <i class="ti ti-video"></i>
+                <span class="hide-menu">Video Lessons</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:assignments_list' %}" aria-expanded="false">
+                <i class="ti ti-clipboard-text"></i>
+                <span class="hide-menu">Assignments</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:quizzes_list' %}" aria-expanded="false">
+                <i class="ti ti-clipboard-list"></i>
+                <span class="hide-menu">Quizzes</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:pdf_notes_list' %}" aria-expanded="false">
+                <i class="ti ti-file-text"></i>
+                <span class="hide-menu">PDF Notes</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:live_sessions_list' %}" aria-expanded="false">
+                <i class="ti ti-video-plus"></i>
+                <span class="hide-menu">Live Sessions</span>
               </a>
             </li>
 
             <li><span class="sidebar-divider lg"></span></li>
 
-            <!-- PAYMENTS Section -->
+            <!-- STUDENTS & ENROLLMENT -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">PAYMENTS</span>
+              <span class="hide-menu">STUDENTS & ENROLLMENT</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:enrollments_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-user-check"></i></span>
-                  <span class="hide-menu">Enrollments</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:users_list' %}" aria-expanded="false">
+                <i class="ti ti-users"></i>
+                <span class="hide-menu">All Users</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:installment_plans_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-calendar-time"></i></span>
-                  <span class="hide-menu">Installment Plans</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:teams_list' %}" aria-expanded="false">
+                <i class="ti ti-user-circle"></i>
+                <span class="hide-menu">Teams</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:payments_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-currency-rupee"></i></span>
-                  <span class="hide-menu">Payments</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:enrollments_list' %}" aria-expanded="false">
+                <i class="ti ti-user-check"></i>
+                <span class="hide-menu">Enrollments</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:tax_invoices_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-file-invoice"></i></span>
-                  <span class="hide-menu">Tax Invoices</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:module_progress_list' %}" aria-expanded="false">
+                <i class="ti ti-chart-line"></i>
+                <span class="hide-menu">Student Progress</span>
               </a>
             </li>
 
             <li><span class="sidebar-divider lg"></span></li>
 
-            <!-- RATINGS & REVIEWS Section -->
+            <!-- ASSESSMENTS & SUBMISSIONS -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">RATINGS & REVIEWS</span>
+              <span class="hide-menu">ASSESSMENTS & FEEDBACK</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:ratings_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-star"></i></span>
-                  <span class="hide-menu">Course Ratings</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:assignment_submissions_list' %}" aria-expanded="false">
+                <i class="ti ti-clipboard-check"></i>
+                <span class="hide-menu">Assignment Submissions</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:reviews_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-message-circle"></i></span>
-                  <span class="hide-menu">Course Reviews</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:quiz_attempts_list' %}" aria-expanded="false">
+                <i class="ti ti-clipboard-data"></i>
+                <span class="hide-menu">Quiz Attempts</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:ratings_list' %}" aria-expanded="false">
+                <i class="ti ti-star"></i>
+                <span class="hide-menu">Course Ratings</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:reviews_list' %}" aria-expanded="false">
+                <i class="ti ti-message-circle"></i>
+                <span class="hide-menu">Course Reviews</span>
               </a>
             </li>
 
             <li><span class="sidebar-divider lg"></span></li>
 
-            <!-- USERS Section -->
+            <!-- PAYMENTS & BILLING -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">USERS</span>
+              <span class="hide-menu">PAYMENTS & BILLING</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:team_memberships_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-user-plus"></i></span>
-                  <span class="hide-menu">Team Memberships</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:payments_list' %}" aria-expanded="false">
+                <i class="ti ti-currency-rupee"></i>
+                <span class="hide-menu">Payments</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:teams_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-users-group"></i></span>
-                  <span class="hide-menu">Teams</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:installment_plans_list' %}" aria-expanded="false">
+                <i class="ti ti-calendar-time"></i>
+                <span class="hide-menu">Installment Plans</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:users_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-users"></i></span>
-                  <span class="hide-menu">Users</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:tax_invoices_list' %}" aria-expanded="false">
+                <i class="ti ti-file-invoice"></i>
+                <span class="hide-menu">Tax Invoices</span>
               </a>
             </li>
 
             <li><span class="sidebar-divider lg"></span></li>
 
-            <!-- YOUTUBE INTEGRATION Section -->
+            <!-- COMMUNICATIONS -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">YOUTUBE INTEGRATION</span>
+              <span class="hide-menu">COMMUNICATIONS</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:youtube_channel_configs_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-brand-youtube"></i></span>
-                  <span class="hide-menu">YouTube Channel Configs</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:notifications_list' %}" aria-expanded="false">
+                <i class="ti ti-bell"></i>
+                <span class="hide-menu">Notifications</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:youtube_videos_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-video"></i></span>
-                  <span class="hide-menu">YouTube Videos</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:email_templates_list' %}" aria-expanded="false">
+                <i class="ti ti-mail"></i>
+                <span class="hide-menu">Email Templates</span>
               </a>
             </li>
 
-            <li>
-              <span class="sidebar-divider lg"></span>
-            </li>
-            
-            <!-- CONTENT MANAGEMENT Section -->
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- WEBSITE CONTENT -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">CONTENT MANAGEMENT</span>
+              <span class="hide-menu">WEBSITE CONTENT</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:content_dashboard' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-dashboard"></i></span>
-                  <span class="hide-menu">Content Dashboard</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:content_dashboard' %}" aria-expanded="false">
+                <i class="ti ti-dashboard"></i>
+                <span class="hide-menu">Content Dashboard</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:leads_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-user-plus"></i></span>
-                  <span class="hide-menu">Leads Management</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:leads_list' %}" aria-expanded="false">
+                <i class="ti ti-user-plus"></i>
+                <span class="hide-menu">Leads Management</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:news_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-news"></i></span>
-                  <span class="hide-menu">News Management</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:news_list' %}" aria-expanded="false">
+                <i class="ti ti-news"></i>
+                <span class="hide-menu">News</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:placements_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-briefcase"></i></span>
-                  <span class="hide-menu">Placements</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:placements_list' %}" aria-expanded="false">
+                <i class="ti ti-briefcase"></i>
+                <span class="hide-menu">Placements</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="{% url 'custom_admin:testimonials_list' %}" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex"><i class="ti ti-message-star"></i></span>
-                  <span class="hide-menu">Testimonials</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:testimonials_list' %}" aria-expanded="false">
+                <i class="ti ti-message"></i>
+                <span class="hide-menu">Testimonials</span>
               </a>
             </li>
 
-            <li>
-              <span class="sidebar-divider lg"></span>
-            </li>
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- INTEGRATIONS -->
             <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">System</span>
+              <span class="hide-menu">INTEGRATIONS</span>
             </li>
-            
             <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between" href="/django-admin/" aria-expanded="false">
-                <div class="d-flex align-items-center gap-3">
-                  <span class="d-flex">
-                    <i class="ti ti-settings"></i>
-                  </span>
-                  <span class="hide-menu">Django Admin</span>
-                </div>
+              <a class="sidebar-link" href="{% url 'custom_admin:youtube_channel_configs_list' %}" aria-expanded="false">
+                <i class="ti ti-brand-youtube"></i>
+                <span class="hide-menu">YouTube Channels</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:youtube_videos_list' %}" aria-expanded="false">
+                <i class="ti ti-video"></i>
+                <span class="hide-menu">YouTube Videos</span>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- ANALYTICS & MENTORING -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">ANALYTICS & MENTORING</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/mentor/" aria-expanded="false">
+                <i class="ti ti-chart-pie"></i>
+                <span class="hide-menu">Mentor Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/mentor/students/" aria-expanded="false">
+                <i class="ti ti-chart-dots"></i>
+                <span class="hide-menu">Student Analytics</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/mentor/alerts/" aria-expanded="false">
+                <i class="ti ti-alert-triangle"></i>
+                <span class="hide-menu">Progress Alerts</span>
+              </a>
+            </li>
+
+            <li><span class="sidebar-divider lg"></span></li>
+
+            <!-- SYSTEM SETTINGS -->
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">SYSTEM SETTINGS</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'custom_admin:settings_list' %}" aria-expanded="false">
+                <i class="ti ti-settings"></i>
+                <span class="hide-menu">System Settings</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/django-admin/" aria-expanded="false">
+                <i class="ti ti-shield-lock"></i>
+                <span class="hide-menu">Django Admin</span>
               </a>
             </li>
           </ul>
@@ -485,8 +1105,29 @@
         </nav>
       </header>
       <!--  Header End -->
-      
+
       <div class="container-fluid">
+        <!-- Django Messages Display -->
+        {% if messages %}
+          <div class="messages-container mt-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {% if message.tags == 'error' %}
+                  <i class="ti ti-alert-circle me-2"></i>
+                {% elif message.tags == 'success' %}
+                  <i class="ti ti-check me-2"></i>
+                {% elif message.tags == 'warning' %}
+                  <i class="ti ti-alert-triangle me-2"></i>
+                {% elif message.tags == 'info' %}
+                  <i class="ti ti-info-circle me-2"></i>
+                {% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
       </div>
@@ -500,6 +1141,20 @@
   <script src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/libs/simplebar/dist/simplebar.js' %}"></script>
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+  <!-- Auto-dismiss messages after 5 seconds -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const alerts = document.querySelectorAll('.messages-container .alert');
+      alerts.forEach(function(alert) {
+        setTimeout(function() {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 5000); // 5 seconds
+      });
+    });
+  </script>
+
   {% block extra_js %}{% endblock %}
 </body>
 

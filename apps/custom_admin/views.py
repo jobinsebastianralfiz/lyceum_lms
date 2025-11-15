@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Count, Sum
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.urls import reverse
 from django.http import JsonResponse
@@ -21,7 +21,10 @@ from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoic
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
 from apps.notifications.models import Notification
 from apps.ratings.models import CourseRating, CourseReview, ReviewHelpful
-from .forms import CustomVideoLessonForm, CustomAssignmentForm, CustomQuizQuestionForm, CustomQuizChoiceForm, CustomQuizQuestionWithChoicesForm
+from apps.live_sessions.models import LiveSession, SessionParticipant, SessionResource, SessionAnnouncement
+from .forms import (CustomVideoLessonForm, CustomAssignmentForm, CustomQuizQuestionForm,
+                   CustomQuizChoiceForm, CustomQuizQuestionWithChoicesForm, CustomLiveSessionForm,
+                   SessionParticipantForm, BulkAssignParticipantsForm, SessionAnnouncementForm)
 from .quiz_reset_views import quiz_attempt_reset_view, quiz_attempt_delete_view
 
 
@@ -263,24 +266,77 @@ def courses_list_view(request):
 
 @user_passes_test(is_staff_user)
 def course_detail_view(request, course_id):
-    """View course details"""
+    """View course details with module management"""
+    from apps.courses.models import CourseModule
+
     course = get_object_or_404(Course, id=course_id)
-    modules = Module.objects.filter(course=course).prefetch_related(
-        'video_lessons', 'assignments', 'quizzes'
+
+    # Get modules through CourseModule for proper ordering
+    course_modules = CourseModule.objects.filter(
+        course=course
+    ).select_related('module').prefetch_related(
+        'module__video_links__video_lesson',
+        'module__assignment_links__assignment',
+        'module__quiz_links__quiz'
     ).order_by('order')
+
+    # Extract modules and attach metadata
+    modules = []
+    for cm in course_modules:
+        module = cm.module
+        module.course_order = cm.order
+        module.course_module_id = cm.id  # For editing/deleting
+
+        # Count content through the many-to-many relationships
+        module.videos_count = module.video_links.count()
+        module.assignments_count = module.assignment_links.count()
+        module.quizzes_count = module.quiz_links.count()
+
+        modules.append(module)
+
+    # Get all modules not yet assigned to this course
+    assigned_module_ids = [m.id for m in modules]
+    available_modules = Module.objects.exclude(id__in=assigned_module_ids).order_by('title')
+
     enrollments = Enrollment.objects.filter(course=course).select_related('user', 'team')
-    
-    # Add assignments and quizzes count for each module
-    for module in modules:
-        module.assignments_count = module.assignments.count()
-        module.quizzes_count = module.quizzes.count()
-    
+
+    # Get course-level assignments, quizzes, and PDFs
+    from apps.courses.models import CourseAssignment, CourseQuiz, CoursePDF, Assignment, Quiz, PDFNote
+
+    course_assignments = CourseAssignment.objects.filter(
+        course=course
+    ).select_related('assignment').order_by('order')
+
+    course_quizzes = CourseQuiz.objects.filter(
+        course=course
+    ).select_related('quiz').order_by('order')
+
+    course_pdfs = CoursePDF.objects.filter(
+        course=course
+    ).select_related('pdf_note').order_by('order')
+
+    # Get available content to add
+    assigned_assignment_ids = [ca.assignment.id for ca in course_assignments]
+    assigned_quiz_ids = [cq.quiz.id for cq in course_quizzes]
+    assigned_pdf_ids = [cp.pdf_note.id for cp in course_pdfs]
+
+    available_assignments = Assignment.objects.exclude(id__in=assigned_assignment_ids).order_by('title')
+    available_quizzes = Quiz.objects.exclude(id__in=assigned_quiz_ids).order_by('title')
+    available_pdfs = PDFNote.objects.exclude(id__in=assigned_pdf_ids).order_by('title')
+
     context = {
         'course': course,
         'modules': modules,
+        'available_modules': available_modules,
         'enrollments': enrollments,
+        'course_assignments': course_assignments,
+        'course_quizzes': course_quizzes,
+        'course_pdfs': course_pdfs,
+        'available_assignments': available_assignments,
+        'available_quizzes': available_quizzes,
+        'available_pdfs': available_pdfs,
     }
-    
+
     return render(request, 'custom_admin/courses/detail.html', context)
 
 
@@ -635,6 +691,241 @@ def course_delete_view(request, course_id):
     return render(request, 'custom_admin/courses/delete.html', {'course': course})
 
 
+@user_passes_test(is_staff_user)
+def course_add_module_view(request, course_id):
+    """Add a module to a course"""
+    from apps.courses.models import CourseModule
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        module_id = request.POST.get('module_id')
+        order = request.POST.get('order', 1)
+
+        if not module_id:
+            messages.error(request, 'Please select a module.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        module = get_object_or_404(Module, id=module_id)
+
+        # Check if already linked
+        if CourseModule.objects.filter(course=course, module=module).exists():
+            messages.warning(request, f'Module "{module.title}" is already in this course.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        # Create the link
+        CourseModule.objects.create(
+            course=course,
+            module=module,
+            order=int(order)
+        )
+
+        messages.success(request, f'Module "{module.title}" added to course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_remove_module_view(request, course_id, course_module_id):
+    """Remove a module from a course"""
+    from apps.courses.models import CourseModule
+
+    course = get_object_or_404(Course, id=course_id)
+    course_module = get_object_or_404(CourseModule, id=course_module_id, course=course)
+
+    if request.method == 'POST':
+        module_title = course_module.module.title
+        course_module.delete()
+        messages.success(request, f'Module "{module_title}" removed from course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return render(request, 'custom_admin/courses/remove_module.html', {
+        'course': course,
+        'course_module': course_module
+    })
+
+
+@user_passes_test(is_staff_user)
+def course_add_assignment_view(request, course_id):
+    """Add an assignment to a course"""
+    from apps.courses.models import CourseAssignment, Assignment
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        assignment_id = request.POST.get('assignment_id')
+        order = request.POST.get('order', 1)
+
+        if not assignment_id:
+            messages.error(request, 'Please select an assignment.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        assignment = get_object_or_404(Assignment, id=assignment_id)
+
+        # Check if already linked
+        if CourseAssignment.objects.filter(course=course, assignment=assignment).exists():
+            messages.warning(request, f'Assignment "{assignment.title}" is already in this course.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        # Create the link
+        CourseAssignment.objects.create(
+            course=course,
+            assignment=assignment,
+            order=int(order)
+        )
+
+        messages.success(request, f'Assignment "{assignment.title}" added to course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_remove_assignment_view(request, course_id, course_assignment_id):
+    """Remove an assignment from a course"""
+    from apps.courses.models import CourseAssignment
+
+    course = get_object_or_404(Course, id=course_id)
+    course_assignment = get_object_or_404(CourseAssignment, id=course_assignment_id, course=course)
+
+    if request.method == 'POST':
+        assignment_title = course_assignment.assignment.title
+        course_assignment.delete()
+        messages.success(request, f'Assignment "{assignment_title}" removed from course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_add_quiz_view(request, course_id):
+    """Add a quiz to a course"""
+    from apps.courses.models import CourseQuiz, Quiz
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        quiz_id = request.POST.get('quiz_id')
+        order = request.POST.get('order', 1)
+
+        if not quiz_id:
+            messages.error(request, 'Please select a quiz.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        quiz = get_object_or_404(Quiz, id=quiz_id)
+
+        # Check if already linked
+        if CourseQuiz.objects.filter(course=course, quiz=quiz).exists():
+            messages.warning(request, f'Quiz "{quiz.title}" is already in this course.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        # Create the link
+        CourseQuiz.objects.create(
+            course=course,
+            quiz=quiz,
+            order=int(order)
+        )
+
+        messages.success(request, f'Quiz "{quiz.title}" added to course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_remove_quiz_view(request, course_id, course_quiz_id):
+    """Remove a quiz from a course"""
+    from apps.courses.models import CourseQuiz
+
+    course = get_object_or_404(Course, id=course_id)
+    course_quiz = get_object_or_404(CourseQuiz, id=course_quiz_id, course=course)
+
+    if request.method == 'POST':
+        quiz_title = course_quiz.quiz.title
+        course_quiz.delete()
+        messages.success(request, f'Quiz "{quiz_title}" removed from course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_add_pdf_view(request, course_id):
+    """Add a PDF to a course"""
+    from apps.courses.models import CoursePDF, PDFNote
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        pdf_id = request.POST.get('pdf_id')
+        order = request.POST.get('order', 1)
+
+        if not pdf_id:
+            messages.error(request, 'Please select a PDF.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        pdf_note = get_object_or_404(PDFNote, id=pdf_id)
+
+        # Check if already linked
+        if CoursePDF.objects.filter(course=course, pdf_note=pdf_note).exists():
+            messages.warning(request, f'PDF "{pdf_note.title}" is already in this course.')
+            return redirect('custom_admin:course_detail', course_id=course.id)
+
+        # Create the link
+        CoursePDF.objects.create(
+            course=course,
+            pdf_note=pdf_note,
+            order=int(order)
+        )
+
+        messages.success(request, f'PDF "{pdf_note.title}" added to course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_remove_pdf_view(request, course_id, course_pdf_id):
+    """Remove a PDF from a course"""
+    from apps.courses.models import CoursePDF
+
+    course = get_object_or_404(Course, id=course_id)
+    course_pdf = get_object_or_404(CoursePDF, id=course_pdf_id, course=course)
+
+    if request.method == 'POST':
+        pdf_title = course_pdf.pdf_note.title
+        course_pdf.delete()
+        messages.success(request, f'PDF "{pdf_title}" removed from course successfully.')
+        return redirect('custom_admin:course_detail', course_id=course.id)
+
+    return redirect('custom_admin:course_detail', course_id=course.id)
+
+
+@user_passes_test(is_staff_user)
+def course_reorder_modules_view(request, course_id):
+    """Reorder modules in a course"""
+    from apps.courses.models import CourseModule
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        # Get the new order from JSON
+        new_order = json.loads(request.POST.get('module_order', '[]'))
+
+        # Update order for each module
+        for item in new_order:
+            CourseModule.objects.filter(
+                course=course,
+                id=item['course_module_id']
+            ).update(order=item['order'])
+
+        messages.success(request, 'Module order updated successfully.')
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 # ==============================================================================
 # MODULES VIEWS
 # ==============================================================================
@@ -643,64 +934,86 @@ def course_delete_view(request, course_id):
 def modules_list_view(request):
     """List all modules"""
     search_query = request.GET.get('search', '')
-    modules = Module.objects.select_related('course').order_by('title')
-    
+    modules = Module.objects.prefetch_related('courses').order_by('title')
+
     if search_query:
         modules = modules.filter(
             Q(title__icontains=search_query) |
-            Q(course__title__icontains=search_query)
-        )
-    
+            Q(courses__title__icontains=search_query)
+        ).distinct()
+
     paginator = Paginator(modules, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
     }
-    
+
     return render(request, 'custom_admin/modules/list.html', context)
 
 @user_passes_test(is_staff_user)
 def module_detail_view(request, module_id):
     """View module details"""
     module = get_object_or_404(Module, id=module_id)
-    
-    # Get related content counts
-    video_lessons = module.video_lessons.all()
-    assignments = module.assignments.all()
-    quizzes = module.quizzes.all()
-    
-    # Get module statistics
-    enrollments_count = module.course.enrollments.count()
+
+    # Get related content with ordering
+    video_links = module.video_links.select_related('video_lesson').order_by('order')
+    assignment_links = module.assignment_links.select_related('assignment').order_by('order')
+    quiz_links = module.quiz_links.select_related('quiz').order_by('order')
+
+    # Get courses this module belongs to
+    course_links = module.course_links.select_related('course').order_by('order')
+
+    # Get available (not yet assigned) content
+    assigned_video_ids = [vl.video_lesson.id for vl in video_links]
+    assigned_assignment_ids = [al.assignment.id for al in assignment_links]
+    assigned_quiz_ids = [ql.quiz.id for ql in quiz_links]
+
+    available_videos = VideoLesson.objects.exclude(id__in=assigned_video_ids).order_by('title')
+    available_assignments = Assignment.objects.exclude(id__in=assigned_assignment_ids).order_by('title')
+    available_quizzes = Quiz.objects.exclude(id__in=assigned_quiz_ids).order_by('title')
+
+    # Get module statistics (use first course for stats)
+    enrollments_count = 0
+    if course_links.exists():
+        first_course = course_links.first().course
+        enrollments_count = first_course.enrollments.count()
+
     progress_records = ModuleProgress.objects.filter(module=module)
     completions_count = progress_records.filter(is_completed=True).count()
-    
+
     context = {
         'module': module,
-        'video_lessons': video_lessons,
-        'assignments': assignments,
-        'quizzes': quizzes,
+        'video_links': video_links,
+        'assignment_links': assignment_links,
+        'quiz_links': quiz_links,
+        'course_links': course_links,
+        'available_videos': available_videos,
+        'available_assignments': available_assignments,
+        'available_quizzes': available_quizzes,
         'enrollments_count': enrollments_count,
         'completions_count': completions_count,
         'progress_records': progress_records,
     }
-    
+
     return render(request, 'custom_admin/modules/detail.html', context)
 
 @user_passes_test(is_staff_user)
 def module_create_view(request):
     """Create a new module"""
-    courses = Course.objects.prefetch_related('modules').all()
-    
+    from apps.courses.models import CourseModule
+
+    courses = Course.objects.all()
+
     if request.method == 'POST':
         try:
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
-            course_id = request.POST.get('course')
-            order = request.POST.get('order')
+            course_ids = request.POST.getlist('courses')  # Multiple courses
+            order = request.POST.get('order', 1)
             learning_objectives = request.POST.get('learning_objectives')
             duration_minutes = request.POST.get('duration_minutes')
             difficulty_level = request.POST.get('difficulty_level', 'beginner')
@@ -711,25 +1024,20 @@ def module_create_view(request):
             requires_completion = request.POST.get('requires_completion') == 'on'
             resources = request.POST.get('resources')
             tags = request.POST.get('tags')
-            
+
             # Validate required fields
-            if not all([title, description, course_id, order]):
+            if not all([title, description]):
                 messages.error(request, 'Please fill in all required fields.')
                 return render(request, 'custom_admin/modules/form.html', {
                     'title': 'Add Module',
                     'is_edit': False,
                     'courses': courses
                 })
-            
-            # Get course
-            course = get_object_or_404(Course, id=course_id)
-            
-            # Create module
+
+            # Create module (without course relationship)
             module = Module.objects.create(
                 title=title,
                 description=description,
-                course=course,
-                order=int(order),
                 learning_objectives=learning_objectives,
                 duration_minutes=int(duration_minutes) if duration_minutes else None,
                 difficulty_level=difficulty_level,
@@ -741,13 +1049,23 @@ def module_create_view(request):
                 resources=resources,
                 tags=tags
             )
-            
-            messages.success(request, f'Module "{module.title}" created successfully.')
+
+            # Add module to selected courses
+            if course_ids:
+                for idx, course_id in enumerate(course_ids):
+                    course = get_object_or_404(Course, id=course_id)
+                    CourseModule.objects.create(
+                        course=course,
+                        module=module,
+                        order=int(order) + idx  # Auto-increment order for multiple courses
+                    )
+
+            messages.success(request, f'Module "{module.title}" created successfully and added to {len(course_ids)} course(s).')
             return redirect('custom_admin:module_detail', module_id=module.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error creating module: {str(e)}')
-    
+
     return render(request, 'custom_admin/modules/form.html', {
         'title': 'Add Module',
         'is_edit': False,
@@ -757,16 +1075,18 @@ def module_create_view(request):
 @user_passes_test(is_staff_user)
 def module_edit_view(request, module_id):
     """Edit a module"""
+    from apps.courses.models import CourseModule
+
     module = get_object_or_404(Module, id=module_id)
-    courses = Course.objects.prefetch_related('modules').all()
-    
+    courses = Course.objects.all()
+    current_courses = module.courses.all()
+
     if request.method == 'POST':
         try:
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
-            course_id = request.POST.get('course')
-            order = request.POST.get('order')
+            course_ids = request.POST.getlist('courses')  # Multiple courses
             learning_objectives = request.POST.get('learning_objectives')
             duration_minutes = request.POST.get('duration_minutes')
             difficulty_level = request.POST.get('difficulty_level', 'beginner')
@@ -777,25 +1097,21 @@ def module_edit_view(request, module_id):
             requires_completion = request.POST.get('requires_completion') == 'on'
             resources = request.POST.get('resources')
             tags = request.POST.get('tags')
-            
+
             # Validate required fields
-            if not all([title, description, course_id, order]):
+            if not all([title, description]):
                 messages.error(request, 'Please fill in all required fields.')
                 return render(request, 'custom_admin/modules/form.html', {
                     'module': module,
                     'title': 'Edit Module',
                     'is_edit': True,
-                    'courses': courses
+                    'courses': courses,
+                    'current_courses': current_courses
                 })
-            
-            # Get course
-            course = get_object_or_404(Course, id=course_id)
-            
+
             # Update module
             module.title = title
             module.description = description
-            module.course = course
-            module.order = int(order)
             module.learning_objectives = learning_objectives
             module.duration_minutes = int(duration_minutes) if duration_minutes else None
             module.difficulty_level = difficulty_level
@@ -807,18 +1123,37 @@ def module_edit_view(request, module_id):
             module.resources = resources
             module.tags = tags
             module.save()
-            
+
+            # Update course relationships
+            # Remove old course links
+            module.course_links.all().delete()
+
+            # Add new course links
+            if course_ids:
+                for idx, course_id in enumerate(course_ids):
+                    course = get_object_or_404(Course, id=course_id)
+                    # Get next order for this course
+                    max_order = CourseModule.objects.filter(course=course).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    CourseModule.objects.create(
+                        course=course,
+                        module=module,
+                        order=max_order + 1
+                    )
+
             messages.success(request, f'Module "{module.title}" updated successfully.')
             return redirect('custom_admin:module_detail', module_id=module.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error updating module: {str(e)}')
-    
+
     return render(request, 'custom_admin/modules/form.html', {
         'module': module,
         'title': 'Edit Module',
         'is_edit': True,
-        'courses': courses
+        'courses': courses,
+        'current_courses': current_courses
     })
 
 @user_passes_test(is_staff_user)
@@ -851,67 +1186,111 @@ def student_progress_list_view(request):
 def video_lessons_list_view(request):
     """List all video lessons"""
     search_query = request.GET.get('search', '')
-    lessons = VideoLesson.objects.select_related('module', 'module__course').order_by('title')
-    
+    lessons = VideoLesson.objects.prefetch_related('modules').order_by('title')
+
     if search_query:
         lessons = lessons.filter(
             Q(title__icontains=search_query) |
-            Q(module__title__icontains=search_query) |
-            Q(module__course__title__icontains=search_query)
-        )
-    
+            Q(modules__title__icontains=search_query) |
+            Q(modules__courses__title__icontains=search_query)
+        ).distinct()
+
     paginator = Paginator(lessons, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
     }
-    
+
     return render(request, 'custom_admin/video_lessons/list.html', context)
 
 @user_passes_test(is_staff_user)
 def video_lesson_create_view(request):
     """Create a new video lesson"""
+    from apps.courses.models import ModuleVideo
+
     if request.method == 'POST':
         form = CustomVideoLessonForm(request.POST, request.FILES)
+        module_ids = request.POST.getlist('modules')  # Get selected modules
+
         if form.is_valid():
             video_lesson = form.save()
-            messages.success(request, f'Video lesson "{video_lesson.title}" created successfully.')
+
+            # Add video to selected modules
+            if module_ids:
+                for idx, module_id in enumerate(module_ids):
+                    module = get_object_or_404(Module, id=module_id)
+                    # Get next order for this module
+                    max_order = ModuleVideo.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleVideo.objects.create(
+                        module=module,
+                        video_lesson=video_lesson,
+                        order=max_order + 1
+                    )
+
+            messages.success(request, f'Video lesson "{video_lesson.title}" created and added to {len(module_ids)} module(s).')
             return redirect('custom_admin:video_lessons_list')
     else:
         form = CustomVideoLessonForm()
-    
-    courses = Course.objects.prefetch_related('modules').all()
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/video_lessons/form.html', {
         'form': form,
         'title': 'Add Video Lesson',
         'is_edit': False,
-        'courses': courses
+        'modules': modules
     })
 
 @user_passes_test(is_staff_user)
 def video_lesson_edit_view(request, lesson_id):
     """Edit a video lesson"""
+    from apps.courses.models import ModuleVideo
+
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
-    
+    current_modules = lesson.modules.all()
+
     if request.method == 'POST':
         form = CustomVideoLessonForm(request.POST, request.FILES, instance=lesson)
+        module_ids = request.POST.getlist('modules')
+
         if form.is_valid():
             video_lesson = form.save()
+
+            # Update module relationships
+            # Remove old module links
+            lesson.module_links.all().delete()
+
+            # Add new module links
+            if module_ids:
+                for idx, module_id in enumerate(module_ids):
+                    module = get_object_or_404(Module, id=module_id)
+                    # Get next order for this module
+                    max_order = ModuleVideo.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleVideo.objects.create(
+                        module=module,
+                        video_lesson=video_lesson,
+                        order=max_order + 1
+                    )
+
             messages.success(request, f'Video lesson "{video_lesson.title}" updated successfully.')
             return redirect('custom_admin:video_lessons_list')
     else:
         form = CustomVideoLessonForm(instance=lesson)
-    
-    courses = Course.objects.prefetch_related('modules').all()
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/video_lessons/form.html', {
         'form': form,
         'lesson': lesson,
         'title': 'Edit Video Lesson',
         'is_edit': True,
-        'courses': courses
+        'modules': modules,
+        'current_modules': current_modules
     })
 
 @user_passes_test(is_staff_user)
@@ -1699,6 +2078,47 @@ def user_delete_view(request, user_id):
     return render(request, 'custom_admin/users/delete.html', {'user': user})
 
 
+@user_passes_test(is_staff_user)
+def users_bulk_delete_view(request):
+    """Bulk delete users"""
+    if request.method == 'POST':
+        user_ids = request.POST.getlist('user_ids')
+
+        if not user_ids:
+            messages.error(request, 'No users were selected for deletion.')
+            return redirect('custom_admin:users_list')
+
+        try:
+            # Get all users to be deleted
+            users_to_delete = User.objects.filter(id__in=user_ids)
+            deleted_count = users_to_delete.count()
+
+            # Prevent deleting the current user
+            if request.user.id in [int(uid) for uid in user_ids]:
+                messages.error(request, 'You cannot delete your own account.')
+                return redirect('custom_admin:users_list')
+
+            # Prevent deleting superusers (for safety)
+            superuser_count = users_to_delete.filter(is_superuser=True).count()
+            if superuser_count > 0:
+                messages.error(request, 'Cannot delete superuser accounts through bulk delete. Please delete them individually if needed.')
+                return redirect('custom_admin:users_list')
+
+            # Delete all selected users
+            # Django will handle cascade deletion of related objects (Enrollment, Payment, etc.)
+            users_to_delete.delete()
+
+            messages.success(request, f'Successfully deleted {deleted_count} user(s) and all their related data.')
+
+        except Exception as e:
+            messages.error(request, f'An error occurred while deleting users: {str(e)}')
+
+        return redirect('custom_admin:users_list')
+
+    # If GET request, redirect back to users list
+    return redirect('custom_admin:users_list')
+
+
 # ==============================================================================
 # YOUTUBE INTEGRATION VIEWS
 # ==============================================================================
@@ -1873,24 +2293,24 @@ def youtube_video_delete_view(request, video_id):
 def assignments_list_view(request):
     """List all assignments"""
     search_query = request.GET.get('search', '')
-    assignments = Assignment.objects.select_related('module', 'module__course').order_by('title')
-    
+    assignments = Assignment.objects.prefetch_related('modules').order_by('title')
+
     if search_query:
         assignments = assignments.filter(
             Q(title__icontains=search_query) |
-            Q(module__title__icontains=search_query) |
-            Q(module__course__title__icontains=search_query)
-        )
-    
+            Q(modules__title__icontains=search_query) |
+            Q(modules__courses__title__icontains=search_query)
+        ).distinct()
+
     paginator = Paginator(assignments, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
     }
-    
+
     return render(request, 'custom_admin/assignments/list.html', context)
 
 @user_passes_test(is_staff_user)
@@ -1898,55 +2318,98 @@ def assignment_detail_view(request, assignment_id):
     """View assignment details"""
     assignment = get_object_or_404(Assignment, id=assignment_id)
     submissions = AssignmentSubmission.objects.filter(assignment=assignment).select_related('student')
-    
+    module_links = assignment.module_links.select_related('module').order_by('order')
+
     context = {
         'assignment': assignment,
         'submissions': submissions,
+        'module_links': module_links,
     }
-    
+
     return render(request, 'custom_admin/assignments/detail.html', context)
 
 @user_passes_test(is_staff_user)
 def assignment_create_view(request):
     """Create assignment"""
+    from apps.courses.models import ModuleAssignment
+
     if request.method == 'POST':
         form = CustomAssignmentForm(request.POST)
+        module_ids = request.POST.getlist('modules')
+
         if form.is_valid():
             assignment = form.save()
-            messages.success(request, f'Assignment "{assignment.title}" created successfully.')
+
+            # Add assignment to selected modules
+            if module_ids:
+                for module_id in module_ids:
+                    module = get_object_or_404(Module, id=module_id)
+                    max_order = ModuleAssignment.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleAssignment.objects.create(
+                        module=module,
+                        assignment=assignment,
+                        order=max_order + 1
+                    )
+
+            messages.success(request, f'Assignment "{assignment.title}" created and added to {len(module_ids)} module(s).')
             return redirect('custom_admin:assignments_list')
     else:
         form = CustomAssignmentForm()
-    
-    courses = Course.objects.prefetch_related('modules').all()
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/assignments/form.html', {
         'form': form,
         'title': 'Add Assignment',
         'is_edit': False,
-        'courses': courses
+        'modules': modules
     })
 
 @user_passes_test(is_staff_user)
 def assignment_edit_view(request, assignment_id):
     """Edit assignment"""
+    from apps.courses.models import ModuleAssignment
+
     assignment = get_object_or_404(Assignment, id=assignment_id)
-    
+    current_modules = assignment.modules.all()
+
     if request.method == 'POST':
         form = CustomAssignmentForm(request.POST, instance=assignment)
+        module_ids = request.POST.getlist('modules')
+
         if form.is_valid():
             assignment = form.save()
+
+            # Update module relationships
+            assignment.module_links.all().delete()
+
+            # Add new module links
+            if module_ids:
+                for module_id in module_ids:
+                    module = get_object_or_404(Module, id=module_id)
+                    max_order = ModuleAssignment.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleAssignment.objects.create(
+                        module=module,
+                        assignment=assignment,
+                        order=max_order + 1
+                    )
+
             messages.success(request, f'Assignment "{assignment.title}" updated successfully.')
             return redirect('custom_admin:assignments_list')
     else:
         form = CustomAssignmentForm(instance=assignment)
-    
-    courses = Course.objects.prefetch_related('modules').all()
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/assignments/form.html', {
         'form': form,
         'assignment': assignment,
         'title': 'Edit Assignment',
         'is_edit': True,
-        'courses': courses
+        'modules': modules,
+        'current_modules': current_modules
     })
 
 @user_passes_test(is_staff_user)
@@ -1969,10 +2432,10 @@ def assignment_submissions_list_view(request):
     """List all assignment submissions"""
     search_query = request.GET.get('search', '')
     status_filter = request.GET.get('status', '')
-    
+
     submissions = AssignmentSubmission.objects.select_related(
-        'assignment', 'student', 'assignment__module', 'assignment__module__course'
-    ).order_by('-submitted_at')
+        'assignment', 'student'
+    ).prefetch_related('assignment__modules').order_by('-submitted_at')
     
     if search_query:
         submissions = submissions.filter(
@@ -2044,27 +2507,27 @@ def assignment_submission_detail_view(request, submission_id):
 def quizzes_list_view(request):
     """List all quizzes"""
     search_query = request.GET.get('search', '')
-    quizzes = Quiz.objects.select_related('module', 'module__course').annotate(
+    quizzes = Quiz.objects.prefetch_related('modules').annotate(
         questions_count=Count('questions'),
         attempts_count=Count('attempts')
     ).order_by('title')
-    
+
     if search_query:
         quizzes = quizzes.filter(
             Q(title__icontains=search_query) |
-            Q(module__title__icontains=search_query) |
-            Q(module__course__title__icontains=search_query)
-        )
-    
+            Q(modules__title__icontains=search_query) |
+            Q(modules__courses__title__icontains=search_query)
+        ).distinct()
+
     paginator = Paginator(quizzes, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
     }
-    
+
     return render(request, 'custom_admin/quizzes/list.html', context)
 
 @user_passes_test(is_staff_user)
@@ -2073,129 +2536,154 @@ def quiz_detail_view(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
     questions = QuizQuestion.objects.filter(quiz=quiz).prefetch_related('choices').order_by('order')
     attempts = QuizAttempt.objects.filter(quiz=quiz).select_related('student').order_by('-started_at')[:10]
-    
+    module_links = quiz.module_links.select_related('module').order_by('order')
+
     context = {
         'quiz': quiz,
         'questions': questions,
         'recent_attempts': attempts,
+        'module_links': module_links,
     }
-    
+
     return render(request, 'custom_admin/quizzes/detail.html', context)
 
 @user_passes_test(is_staff_user)
 def quiz_create_view(request):
     """Create quiz"""
-    courses = Course.objects.prefetch_related('modules').all()
-    
+    from apps.courses.models import ModuleQuiz
+
     if request.method == 'POST':
         try:
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
-            module_id = request.POST.get('module')
+            module_ids = request.POST.getlist('modules')
             time_limit = request.POST.get('time_limit')
             max_attempts = request.POST.get('max_attempts')
             passing_score = request.POST.get('passing_score', 70)
             is_required = request.POST.get('is_required') == 'on'
             show_results_immediately = request.POST.get('show_results_immediately') == 'on'
             randomize_questions = request.POST.get('randomize_questions') == 'on'
-            order = request.POST.get('order', 1)
-            
+
             # Validate required fields
-            if not all([title, description, module_id]):
+            if not all([title, description]):
                 messages.error(request, 'Please fill in all required fields.')
                 return render(request, 'custom_admin/quizzes/form.html', {
                     'title': 'Add Quiz',
                     'is_edit': False,
-                    'courses': courses
+                    'modules': Module.objects.all()
                 })
-            
-            # Get module
-            module = get_object_or_404(Module, id=module_id)
-            
+
             # Create quiz
             quiz = Quiz.objects.create(
                 title=title,
                 description=description,
-                module=module,
                 time_limit=int(time_limit) if time_limit else 30,
                 max_attempts=int(max_attempts) if max_attempts else 3,
                 passing_score=int(passing_score),
                 is_required=is_required,
                 show_results_immediately=show_results_immediately,
-                randomize_questions=randomize_questions,
-                order=int(order)
+                randomize_questions=randomize_questions
             )
-            
-            messages.success(request, f'Quiz "{quiz.title}" created successfully.')
+
+            # Add quiz to selected modules
+            if module_ids:
+                for module_id in module_ids:
+                    module = get_object_or_404(Module, id=module_id)
+                    max_order = ModuleQuiz.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleQuiz.objects.create(
+                        module=module,
+                        quiz=quiz,
+                        order=max_order + 1
+                    )
+
+            messages.success(request, f'Quiz "{quiz.title}" created and added to {len(module_ids)} module(s).')
             return redirect('custom_admin:quiz_detail', quiz_id=quiz.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error creating quiz: {str(e)}')
-    
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/quizzes/form.html', {
         'title': 'Add Quiz',
         'is_edit': False,
-        'courses': courses
+        'modules': modules
     })
 
 @user_passes_test(is_staff_user)
 def quiz_edit_view(request, quiz_id):
     """Edit quiz"""
+    from apps.courses.models import ModuleQuiz
+
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    courses = Course.objects.prefetch_related('modules').all()
-    
+    current_modules = quiz.modules.all()
+
     if request.method == 'POST':
         try:
             # Get form data
             title = request.POST.get('title')
             description = request.POST.get('description')
-            module_id = request.POST.get('module')
+            module_ids = request.POST.getlist('modules')
             time_limit = request.POST.get('time_limit')
             max_attempts = request.POST.get('max_attempts')
             passing_score = request.POST.get('passing_score', 70)
             is_required = request.POST.get('is_required') == 'on'
             show_results_immediately = request.POST.get('show_results_immediately') == 'on'
             randomize_questions = request.POST.get('randomize_questions') == 'on'
-            order = request.POST.get('order', 1)
-            
+
             # Validate required fields
-            if not all([title, description, module_id]):
+            if not all([title, description]):
                 messages.error(request, 'Please fill in all required fields.')
                 return render(request, 'custom_admin/quizzes/form.html', {
                     'quiz': quiz,
                     'title': 'Edit Quiz',
                     'is_edit': True,
-                    'courses': courses
+                    'modules': Module.objects.all(),
+                    'current_modules': current_modules
                 })
-            
-            # Get module
-            module = get_object_or_404(Module, id=module_id)
-            
+
             # Update quiz fields
             quiz.title = title
             quiz.description = description
-            quiz.module = module
             quiz.time_limit = int(time_limit) if time_limit else 30
             quiz.max_attempts = int(max_attempts) if max_attempts else 3
             quiz.passing_score = int(passing_score)
             quiz.is_required = is_required
             quiz.show_results_immediately = show_results_immediately
             quiz.randomize_questions = randomize_questions
-            quiz.order = int(order)
             quiz.save()
-            
+
+            # Update module relationships
+            quiz.module_links.all().delete()
+
+            # Add new module links
+            if module_ids:
+                for module_id in module_ids:
+                    module = get_object_or_404(Module, id=module_id)
+                    max_order = ModuleQuiz.objects.filter(module=module).aggregate(
+                        models.Max('order')
+                    )['order__max'] or 0
+                    ModuleQuiz.objects.create(
+                        module=module,
+                        quiz=quiz,
+                        order=max_order + 1
+                    )
+
             messages.success(request, f'Quiz "{quiz.title}" updated successfully.')
             return redirect('custom_admin:quiz_detail', quiz_id=quiz.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error updating quiz: {str(e)}')
-    
+
+    modules = Module.objects.all()
     return render(request, 'custom_admin/quizzes/form.html', {
         'quiz': quiz,
         'title': 'Edit Quiz',
         'is_edit': True,
-        'courses': courses
+        'modules': modules,
+        'current_modules': current_modules
     })
 
 @user_passes_test(is_staff_user)
@@ -2218,8 +2706,8 @@ def quiz_attempts_list_view(request):
     """List all quiz attempts"""
     search_query = request.GET.get('search', '')
     attempts = QuizAttempt.objects.select_related(
-        'quiz', 'student', 'quiz__module', 'quiz__module__course'
-    ).order_by('-started_at')
+        'quiz', 'student'
+    ).prefetch_related('quiz__modules').order_by('-started_at')
     
     if search_query:
         attempts = attempts.filter(
@@ -2278,14 +2766,14 @@ def module_progress_list_view(request):
     """List module progress"""
     search_query = request.GET.get('search', '')
     progress = ModuleProgress.objects.select_related(
-        'student', 'module', 'module__course'
-    ).order_by('-updated_at')
-    
+        'student', 'module'
+    ).prefetch_related('module__course_links').order_by('-updated_at')
+
     if search_query:
         progress = progress.filter(
             Q(student__name__icontains=search_query) |
             Q(module__title__icontains=search_query) |
-            Q(module__course__title__icontains=search_query)
+            Q(module__course_links__title__icontains=search_query)
         )
     
     paginator = Paginator(progress, 25)
@@ -2859,3 +3347,1114 @@ def video_sync_metadata_view(request, lesson_id):
             
     except Exception as e:
         return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'}, status=500)
+
+
+# =====================================
+# LIVE SESSIONS VIEWS
+# =====================================
+
+@user_passes_test(is_staff_user)
+def live_sessions_list_view(request):
+    """List all live sessions"""
+    query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '')
+    course_filter = request.GET.get('course', '')
+
+    sessions = LiveSession.objects.select_related('course', 'created_by').all()
+
+    if query:
+        sessions = sessions.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(course__title__icontains=query)
+        )
+
+    if status_filter:
+        sessions = sessions.filter(status=status_filter)
+
+    if course_filter:
+        sessions = sessions.filter(course_id=course_filter)
+
+    sessions = sessions.order_by('-scheduled_date')
+
+    # Pagination
+    paginator = Paginator(sessions, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Get filter options
+    courses = Course.objects.filter(is_published=True).order_by('title')
+
+    context = {
+        'sessions': page_obj,
+        'query': query,
+        'status_filter': status_filter,
+        'course_filter': course_filter,
+        'courses': courses,
+        'status_choices': LiveSession.SESSION_STATUS_CHOICES,
+    }
+    return render(request, 'custom_admin/live_sessions/list.html', context)
+
+
+@user_passes_test(is_staff_user)
+def live_session_detail_view(request, session_id):
+    """View live session details and participants"""
+    session = get_object_or_404(LiveSession, id=session_id)
+    participants = session.participants.select_related('student').all()
+    announcements = session.announcements.select_related('created_by').order_by('-created_at')
+
+    context = {
+        'session': session,
+        'participants': participants,
+        'announcements': announcements,
+    }
+    return render(request, 'custom_admin/live_sessions/detail.html', context)
+
+
+@user_passes_test(is_staff_user)
+def live_session_create_view(request):
+    """Create a new live session"""
+    if request.method == 'POST':
+        form = CustomLiveSessionForm(request.POST, user=request.user)
+        if form.is_valid():
+            use_google_meet = form.cleaned_data.get('use_google_meet', False)
+
+            # Create the session
+            session = form.save()
+
+            # Create Google Meet if requested
+            if use_google_meet:
+                try:
+                    from system_settings.google_meet_service import GoogleMeetService
+                    meet_service = GoogleMeetService(request.user)
+                    google_meet = meet_service.create_meet_session(session)
+
+                    if google_meet:
+                        messages.success(
+                            request,
+                            f'Live session "{session.title}" created with Google Meet link!'
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            f'Session created but Google Meet link generation failed. Please add manually.'
+                        )
+                except ValueError as e:
+                    messages.warning(request, f'Session created but: {str(e)}')
+                except Exception as e:
+                    messages.warning(
+                        request,
+                        f'Session created but Google Meet error: {str(e)}'
+                    )
+            else:
+                messages.success(request, f'Live session "{session.title}" created successfully!')
+
+            # Auto-assign participants based on assignment type
+            assignment_type = form.cleaned_data.get('assignment_type')
+            if assignment_type == 'course' and form.cleaned_data.get('course'):
+                session.assign_course_students(form.cleaned_data['course'])
+
+            return redirect('custom_admin:live_session_detail', session_id=session.id)
+    else:
+        form = CustomLiveSessionForm(user=request.user)
+
+    # Check if user has Google Workspace connected
+    from system_settings.models import GoogleWorkspaceIntegration
+    google_connected = GoogleWorkspaceIntegration.objects.filter(
+        admin_user=request.user,
+        is_active=True
+    ).exists()
+
+    context = {
+        'form': form,
+        'title': 'Create Live Session',
+        'google_connected': google_connected,
+    }
+    return render(request, 'custom_admin/live_sessions/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def live_session_edit_view(request, session_id):
+    """Edit an existing live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        form = CustomLiveSessionForm(request.POST, instance=session, user=request.user)
+        if form.is_valid():
+            use_google_meet = form.cleaned_data.get('use_google_meet', False)
+
+            # Save the session
+            session = form.save()
+
+            # Update Google Meet if session has one
+            if use_google_meet and hasattr(session, 'google_meet_info'):
+                try:
+                    from system_settings.google_meet_service import GoogleMeetService
+                    meet_service = GoogleMeetService(request.user)
+
+                    if meet_service.update_meet_session(session):
+                        messages.success(
+                            request,
+                            f'Live session and Google Meet updated successfully!'
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            f'Session updated but Google Meet update failed.'
+                        )
+                except Exception as e:
+                    messages.warning(
+                        request,
+                        f'Session updated but Google Meet error: {str(e)}'
+                    )
+            elif use_google_meet and not hasattr(session, 'google_meet_info'):
+                # Create new Google Meet if requested but doesn't exist
+                try:
+                    from system_settings.google_meet_service import GoogleMeetService
+                    meet_service = GoogleMeetService(request.user)
+                    google_meet = meet_service.create_meet_session(session)
+
+                    if google_meet:
+                        messages.success(
+                            request,
+                            f'Session updated and Google Meet link created!'
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            f'Session updated but Google Meet creation failed.'
+                        )
+                except Exception as e:
+                    messages.warning(
+                        request,
+                        f'Session updated but Google Meet error: {str(e)}'
+                    )
+            else:
+                messages.success(request, f'Live session "{session.title}" updated successfully!')
+
+            return redirect('custom_admin:live_session_detail', session_id=session.id)
+    else:
+        form = CustomLiveSessionForm(instance=session, user=request.user)
+
+    # Check if user has Google Workspace connected
+    from system_settings.models import GoogleWorkspaceIntegration
+    google_connected = GoogleWorkspaceIntegration.objects.filter(
+        admin_user=request.user,
+        is_active=True
+    ).exists()
+
+    # Check if session has Google Meet
+    has_google_meet = hasattr(session, 'google_meet_info')
+
+    context = {
+        'form': form,
+        'session': session,
+        'title': 'Edit Live Session',
+        'google_connected': google_connected,
+        'has_google_meet': has_google_meet,
+    }
+    return render(request, 'custom_admin/live_sessions/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def live_session_delete_view(request, session_id):
+    """Delete a live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        title = session.title
+        session.delete()
+        messages.success(request, f'Live session "{title}" deleted successfully!')
+        return redirect('custom_admin:live_sessions_list')
+
+    context = {
+        'session': session,
+    }
+    return render(request, 'custom_admin/live_sessions/delete.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_manage_participants_view(request, session_id):
+    """Manage participants for a live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+    participants = session.participants.select_related('student').all()
+
+    # Handle bulk assignment
+    if request.method == 'POST' and 'bulk_assign' in request.POST:
+        bulk_form = BulkAssignParticipantsForm(request.POST, session=session)
+        if bulk_form.is_valid():
+            assignment_type = bulk_form.cleaned_data['assignment_type']
+
+            if assignment_type == 'course_students':
+                course = bulk_form.cleaned_data['course']
+                session.assign_course_students(course)
+                messages.success(request, f'Assigned all students from "{course.title}" to the session.')
+
+            elif assignment_type == 'team_members':
+                team = bulk_form.cleaned_data['team']
+                session.assign_team_members(team)
+                messages.success(request, f'Assigned all members from team "{team.name}" to the session.')
+
+            elif assignment_type == 'individual_students':
+                students = bulk_form.cleaned_data['students']
+                for student in students:
+                    session.add_participant(student)
+                messages.success(request, f'Assigned {len(students)} students to the session.')
+
+            return redirect('custom_admin:session_manage_participants', session_id=session.id)
+    else:
+        bulk_form = BulkAssignParticipantsForm(session=session)
+
+    # Handle individual assignment
+    if request.method == 'POST' and (request.POST.get('action') == 'add_individual' or 'add_participant' in request.POST):
+        print(f"DEBUG: Processing add_participant POST request for session {session.id}")
+        participant_form = SessionParticipantForm(request.POST, session=session)
+        if participant_form.is_valid():
+            print("DEBUG: Form is valid, calling save()")
+            try:
+                participant = participant_form.save()
+                print(f"DEBUG: Form save returned participant {participant}")
+                messages.success(request, 'Participant added successfully!')
+                return redirect('custom_admin:session_manage_participants', session_id=session.id)
+            except Exception as e:
+                print(f"DEBUG: Error saving form: {e}")
+                messages.error(request, f'Error adding participant: {e}')
+        else:
+            print(f"DEBUG: Form is invalid: {participant_form.errors}")
+            messages.error(request, 'Please correct the form errors.')
+    else:
+        participant_form = SessionParticipantForm(session=session)
+
+    context = {
+        'session': session,
+        'participants': participants,
+        'bulk_form': bulk_form,
+        'participant_form': participant_form,
+    }
+    return render(request, 'custom_admin/live_sessions/manage_participants.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_participant_delete_view(request, session_id, participant_id):
+    """Remove a participant from a session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+    participant = get_object_or_404(SessionParticipant, id=participant_id, session=session)
+
+    if request.method == 'POST':
+        student_name = participant.student.name
+        participant.delete()
+        messages.success(request, f'Removed "{student_name}" from the session.')
+        return redirect('custom_admin:session_manage_participants', session_id=session.id)
+
+    context = {
+        'session': session,
+        'participant': participant,
+    }
+    return render(request, 'custom_admin/live_sessions/participant_delete.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_start_view(request, session_id):
+    """Start a live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        if session.status == 'scheduled':
+            session.start_session()
+            messages.success(request, f'Session "{session.title}" has been started!')
+        else:
+            messages.error(request, 'Session cannot be started from its current status.')
+        return redirect('custom_admin:live_session_detail', session_id=session.id)
+
+    context = {
+        'session': session,
+    }
+    return render(request, 'custom_admin/live_sessions/start_confirm.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_end_view(request, session_id):
+    """End a live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        if session.status == 'live':
+            session.end_session()
+            messages.success(request, f'Session "{session.title}" has been ended!')
+        else:
+            messages.error(request, 'Session cannot be ended from its current status.')
+        return redirect('custom_admin:live_session_detail', session_id=session.id)
+
+    context = {
+        'session': session,
+    }
+    return render(request, 'custom_admin/live_sessions/end_confirm.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_cancel_view(request, session_id):
+    """Cancel a live session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        if session.status in ['scheduled', 'live']:
+            session.cancel_session()
+            messages.success(request, f'Session "{session.title}" has been cancelled!')
+        else:
+            messages.error(request, 'Session cannot be cancelled from its current status.')
+        return redirect('custom_admin:live_session_detail', session_id=session.id)
+
+    context = {
+        'session': session,
+    }
+    return render(request, 'custom_admin/live_sessions/cancel_confirm.html', context)
+
+
+@user_passes_test(is_staff_user)
+def session_announcement_create_view(request, session_id):
+    """Create an announcement for a session"""
+    session = get_object_or_404(LiveSession, id=session_id)
+
+    if request.method == 'POST':
+        form = SessionAnnouncementForm(request.POST, session=session, user=request.user)
+        if form.is_valid():
+            announcement = form.save()
+            messages.success(request, 'Announcement created successfully!')
+            return redirect('custom_admin:live_session_detail', session_id=session.id)
+    else:
+        form = SessionAnnouncementForm(session=session, user=request.user)
+
+    context = {
+        'form': form,
+        'session': session,
+        'title': 'Create Announcement',
+    }
+    return render(request, 'custom_admin/live_sessions/announcement_form.html', context)
+
+
+# ==============================================================================
+# MODULE CONTENT MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def module_add_video_view(request, module_id):
+    """Add a video to a module"""
+    from apps.courses.models import ModuleVideo
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        video_id = request.POST.get('video_id')
+        order = request.POST.get('order', 1)
+
+        if not video_id:
+            messages.error(request, 'Please select a video.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        video = get_object_or_404(VideoLesson, id=video_id)
+
+        # Check if already exists
+        if ModuleVideo.objects.filter(module=module, video_lesson=video).exists():
+            messages.warning(request, f'Video "{video.title}" is already in this module.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        # Create the link
+        ModuleVideo.objects.create(
+            module=module,
+            video_lesson=video,
+            order=int(order)
+        )
+
+        messages.success(request, f'Video "{video.title}" added to module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_remove_video_view(request, module_id, module_video_id):
+    """Remove a video from a module"""
+    from apps.courses.models import ModuleVideo
+    module = get_object_or_404(Module, id=module_id)
+    module_video = get_object_or_404(ModuleVideo, id=module_video_id, module=module)
+
+    if request.method == 'POST':
+        video_title = module_video.video_lesson.title
+        module_video.delete()
+        messages.success(request, f'Video "{video_title}" removed from module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_add_assignment_view(request, module_id):
+    """Add an assignment to a module"""
+    from apps.courses.models import ModuleAssignment
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        assignment_id = request.POST.get('assignment_id')
+        order = request.POST.get('order', 1)
+
+        if not assignment_id:
+            messages.error(request, 'Please select an assignment.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        assignment = get_object_or_404(Assignment, id=assignment_id)
+
+        # Check if already exists
+        if ModuleAssignment.objects.filter(module=module, assignment=assignment).exists():
+            messages.warning(request, f'Assignment "{assignment.title}" is already in this module.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        # Create the link
+        ModuleAssignment.objects.create(
+            module=module,
+            assignment=assignment,
+            order=int(order)
+        )
+
+        messages.success(request, f'Assignment "{assignment.title}" added to module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_remove_assignment_view(request, module_id, module_assignment_id):
+    """Remove an assignment from a module"""
+    from apps.courses.models import ModuleAssignment
+    module = get_object_or_404(Module, id=module_id)
+    module_assignment = get_object_or_404(ModuleAssignment, id=module_assignment_id, module=module)
+
+    if request.method == 'POST':
+        assignment_title = module_assignment.assignment.title
+        module_assignment.delete()
+        messages.success(request, f'Assignment "{assignment_title}" removed from module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_add_quiz_view(request, module_id):
+    """Add a quiz to a module"""
+    from apps.courses.models import ModuleQuiz
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        quiz_id = request.POST.get('quiz_id')
+        order = request.POST.get('order', 1)
+
+        if not quiz_id:
+            messages.error(request, 'Please select a quiz.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        quiz = get_object_or_404(Quiz, id=quiz_id)
+
+        # Check if already exists
+        if ModuleQuiz.objects.filter(module=module, quiz=quiz).exists():
+            messages.warning(request, f'Quiz "{quiz.title}" is already in this module.')
+            return redirect('custom_admin:module_detail', module_id=module.id)
+
+        # Create the link
+        ModuleQuiz.objects.create(
+            module=module,
+            quiz=quiz,
+            order=int(order)
+        )
+
+        messages.success(request, f'Quiz "{quiz.title}" added to module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_remove_quiz_view(request, module_id, module_quiz_id):
+    """Remove a quiz from a module"""
+    from apps.courses.models import ModuleQuiz
+    module = get_object_or_404(Module, id=module_id)
+    module_quiz = get_object_or_404(ModuleQuiz, id=module_quiz_id, module=module)
+
+    if request.method == 'POST':
+        quiz_title = module_quiz.quiz.title
+        module_quiz.delete()
+        messages.success(request, f'Quiz "{quiz_title}" removed from module successfully!')
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_bulk_delete_videos_view(request, module_id):
+    """Bulk delete videos from a module"""
+    from apps.courses.models import ModuleVideo
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        ids = request.POST.get('ids', '')
+        if ids:
+            id_list = [int(id.strip()) for id in ids.split(',') if id.strip()]
+            deleted_count = ModuleVideo.objects.filter(id__in=id_list, module=module).delete()[0]
+            messages.success(request, f'Successfully removed {deleted_count} video(s) from module!')
+        else:
+            messages.error(request, 'No videos selected.')
+
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_bulk_delete_assignments_view(request, module_id):
+    """Bulk delete assignments from a module"""
+    from apps.courses.models import ModuleAssignment
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        ids = request.POST.get('ids', '')
+        if ids:
+            id_list = [int(id.strip()) for id in ids.split(',') if id.strip()]
+            deleted_count = ModuleAssignment.objects.filter(id__in=id_list, module=module).delete()[0]
+            messages.success(request, f'Successfully removed {deleted_count} assignment(s) from module!')
+        else:
+            messages.error(request, 'No assignments selected.')
+
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_bulk_delete_quizzes_view(request, module_id):
+    """Bulk delete quizzes from a module"""
+    from apps.courses.models import ModuleQuiz
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        ids = request.POST.get('ids', '')
+        if ids:
+            id_list = [int(id.strip()) for id in ids.split(',') if id.strip()]
+            deleted_count = ModuleQuiz.objects.filter(id__in=id_list, module=module).delete()[0]
+            messages.success(request, f'Successfully removed {deleted_count} quiz(zes) from module!')
+        else:
+            messages.error(request, 'No quizzes selected.')
+
+        return redirect('custom_admin:module_detail', module_id=module.id)
+
+    return redirect('custom_admin:module_detail', module_id=module.id)
+
+
+@user_passes_test(is_staff_user)
+def module_reorder_videos_view(request, module_id):
+    """Reorder videos in a module"""
+    from apps.courses.models import ModuleVideo
+
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        # Get the new order from JSON
+        new_order = json.loads(request.POST.get('video_order', '[]'))
+
+        # Update order for each video
+        for item in new_order:
+            ModuleVideo.objects.filter(
+                module=module,
+                id=item['link_id']
+            ).update(order=item['order'])
+
+        messages.success(request, 'Video order updated successfully.')
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@user_passes_test(is_staff_user)
+def module_reorder_assignments_view(request, module_id):
+    """Reorder assignments in a module"""
+    from apps.courses.models import ModuleAssignment
+
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        # Get the new order from JSON
+        new_order = json.loads(request.POST.get('assignment_order', '[]'))
+
+        # Update order for each assignment
+        for item in new_order:
+            ModuleAssignment.objects.filter(
+                module=module,
+                id=item['link_id']
+            ).update(order=item['order'])
+
+        messages.success(request, 'Assignment order updated successfully.')
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@user_passes_test(is_staff_user)
+def module_reorder_quizzes_view(request, module_id):
+    """Reorder quizzes in a module"""
+    from apps.courses.models import ModuleQuiz
+
+    module = get_object_or_404(Module, id=module_id)
+
+    if request.method == 'POST':
+        # Get the new order from JSON
+        new_order = json.loads(request.POST.get('quiz_order', '[]'))
+
+        # Update order for each quiz
+        for item in new_order:
+            ModuleQuiz.objects.filter(
+                module=module,
+                id=item['link_id']
+            ).update(order=item['order'])
+
+        messages.success(request, 'Quiz order updated successfully.')
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# ==============================================================================
+# SYSTEM SETTINGS MANAGEMENT VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def settings_list_view(request):
+    """List all system settings grouped by category"""
+    from system_settings.models import SystemSetting
+
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+
+    settings = SystemSetting.objects.select_related('updated_by').all()
+
+    if search_query:
+        settings = settings.filter(
+            Q(key__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    if category_filter:
+        settings = settings.filter(category=category_filter)
+
+    settings = settings.order_by('category', 'key')
+
+    # Group settings by category
+    from collections import defaultdict
+    settings_by_category = defaultdict(list)
+    for setting in settings:
+        settings_by_category[setting.get_category_display()].append(setting)
+
+    # Check if user has Google Workspace connected
+    from system_settings.models import GoogleWorkspaceIntegration
+    google_integration = GoogleWorkspaceIntegration.objects.filter(
+        admin_user=request.user,
+        is_active=True
+    ).first()
+
+    context = {
+        'settings_by_category': dict(settings_by_category),
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'category_choices': SystemSetting.CATEGORY_CHOICES,
+        'google_integration': google_integration,
+    }
+
+    return render(request, 'custom_admin/settings/list.html', context)
+
+
+@user_passes_test(is_staff_user)
+def setting_create_view(request):
+    """Create a new system setting"""
+    from system_settings.models import SystemSetting
+    from .forms import SystemSettingForm
+
+    if request.method == 'POST':
+        form = SystemSettingForm(request.POST)
+        if form.is_valid():
+            setting = form.save(commit=False)
+            setting.updated_by = request.user
+            setting.save()
+
+            # Clear cache for this setting
+            from django.core.cache import cache
+            cache.delete(f'system_setting_{setting.key}')
+
+            messages.success(request, f'Setting "{setting.key}" created successfully.')
+            return redirect('custom_admin:settings_list')
+    else:
+        form = SystemSettingForm()
+
+    context = {
+        'form': form,
+        'title': 'Add System Setting',
+        'is_edit': False,
+    }
+    return render(request, 'custom_admin/settings/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def setting_edit_view(request, setting_id):
+    """Edit an existing system setting"""
+    from system_settings.models import SystemSetting, SettingChangeLog
+    from .forms import SystemSettingForm
+
+    setting = get_object_or_404(SystemSetting, id=setting_id)
+    old_value = setting.value
+
+    if request.method == 'POST':
+        form = SystemSettingForm(request.POST, instance=setting)
+        if form.is_valid():
+            setting = form.save(commit=False)
+            setting.updated_by = request.user
+            setting.save()
+
+            # Log the change
+            if old_value != setting.value:
+                change_reason = request.POST.get('change_reason', '')
+                SettingChangeLog.objects.create(
+                    setting=setting,
+                    changed_by=request.user,
+                    old_value=old_value,
+                    new_value=setting.value,
+                    change_reason=change_reason,
+                    ip_address=request.META.get('REMOTE_ADDR'),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+
+            # Clear cache for this setting
+            from django.core.cache import cache
+            cache.delete(f'system_setting_{setting.key}')
+
+            messages.success(request, f'Setting "{setting.key}" updated successfully.')
+            return redirect('custom_admin:settings_list')
+    else:
+        form = SystemSettingForm(instance=setting)
+
+    context = {
+        'form': form,
+        'setting': setting,
+        'title': f'Edit Setting: {setting.key}',
+        'is_edit': True,
+    }
+    return render(request, 'custom_admin/settings/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def setting_delete_view(request, setting_id):
+    """Delete a system setting"""
+    from system_settings.models import SystemSetting
+
+    setting = get_object_or_404(SystemSetting, id=setting_id)
+
+    if request.method == 'POST':
+        key = setting.key
+
+        # Clear cache
+        from django.core.cache import cache
+        cache.delete(f'system_setting_{key}')
+
+        setting.delete()
+        messages.success(request, f'Setting "{key}" deleted successfully.')
+        return redirect('custom_admin:settings_list')
+
+    context = {
+        'setting': setting,
+    }
+    return render(request, 'custom_admin/settings/delete.html', context)
+
+
+@user_passes_test(is_staff_user)
+def setting_history_view(request, setting_id):
+    """View change history for a setting"""
+    from system_settings.models import SystemSetting, SettingChangeLog
+
+    setting = get_object_or_404(SystemSetting, id=setting_id)
+    change_logs = SettingChangeLog.objects.filter(
+        setting=setting
+    ).select_related('changed_by').order_by('-changed_at')
+
+    paginator = Paginator(change_logs, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'setting': setting,
+        'page_obj': page_obj,
+    }
+    return render(request, 'custom_admin/settings/history.html', context)
+
+
+@user_passes_test(is_staff_user)
+def setting_test_connection_view(request, setting_id):
+    """AJAX endpoint to test a setting (e.g., email, payment gateway)"""
+    from system_settings.models import SystemSetting
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    setting = get_object_or_404(SystemSetting, id=setting_id)
+
+    # Test based on category
+    try:
+        if setting.category == 'email':
+            # Test email connection
+            from django.core.mail import send_mail
+            from django.conf import settings
+
+            send_mail(
+                'Test Email from CodeLearn LMS',
+                'This is a test email to verify email settings.',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=False,
+            )
+            return JsonResponse({
+                'success': True,
+                'message': f'Test email sent successfully to {request.user.email}'
+            })
+
+        elif setting.category == 'payment':
+            # Test Razorpay connection
+            if 'RAZORPAY' in setting.key:
+                import razorpay
+                from system_settings.utils import get_setting
+
+                client = razorpay.Client(auth=(
+                    get_setting('RAZORPAY_KEY_ID'),
+                    get_setting('RAZORPAY_KEY_SECRET')
+                ))
+
+                # Try to fetch payment methods (simple API call)
+                methods = client.payment.fetch_all()
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Razorpay connection successful!'
+                })
+
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Test connection not available for this category'
+            })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Connection test failed: {str(e)}'
+        }, status=400)
+
+
+# ============================================
+# GOOGLE WORKSPACE OAUTH VIEWS
+# ============================================
+
+@user_passes_test(is_staff_user)
+def google_oauth_initiate_view(request):
+    """Initiate Google OAuth flow"""
+    from system_settings.google_oauth import GoogleOAuthService
+
+    try:
+        oauth_service = GoogleOAuthService(request)
+        authorization_url, state = oauth_service.get_authorization_url()
+
+        # Store state in session for verification
+        request.session['google_oauth_state'] = state
+
+        return redirect(authorization_url)
+
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect('custom_admin:settings_list')
+    except Exception as e:
+        messages.error(request, f'Error initiating OAuth: {str(e)}')
+        return redirect('custom_admin:settings_list')
+
+
+@user_passes_test(is_staff_user)
+def google_oauth_callback_view(request):
+    """Handle Google OAuth callback"""
+    from system_settings.google_oauth import GoogleOAuthService
+
+    # Get state from session
+    stored_state = request.session.get('google_oauth_state')
+    returned_state = request.GET.get('state')
+
+    # Verify state to prevent CSRF
+    if not stored_state or stored_state != returned_state:
+        messages.error(request, 'OAuth state mismatch. Please try again.')
+        return redirect('custom_admin:settings_list')
+
+    # Check for errors
+    error = request.GET.get('error')
+    if error:
+        messages.error(request, f'OAuth authorization failed: {error}')
+        return redirect('custom_admin:settings_list')
+
+    try:
+        oauth_service = GoogleOAuthService(request)
+
+        # Build authorization response URL
+        authorization_response = request.build_absolute_uri()
+
+        # Exchange code for credentials
+        credentials_dict = oauth_service.handle_callback(
+            authorization_response,
+            stored_state
+        )
+
+        # Save credentials for user
+        integration = oauth_service.save_credentials(request.user, credentials_dict)
+
+        messages.success(
+            request,
+            f'Successfully connected to Google Workspace as {integration.google_email}'
+        )
+
+        # Clean up session
+        del request.session['google_oauth_state']
+
+    except Exception as e:
+        messages.error(request, f'Error connecting to Google: {str(e)}')
+
+    return redirect('custom_admin:settings_list')
+
+
+@user_passes_test(is_staff_user)
+def google_oauth_disconnect_view(request):
+    """Disconnect Google Workspace integration"""
+    from system_settings.google_oauth import GoogleOAuthService
+
+    if request.method == 'POST':
+        oauth_service = GoogleOAuthService(request)
+
+        if oauth_service.disconnect(request.user):
+            messages.success(request, 'Successfully disconnected from Google Workspace')
+        else:
+            messages.warning(request, 'No Google Workspace connection found')
+
+    return redirect('custom_admin:settings_list')
+
+
+@user_passes_test(is_staff_user)
+def google_oauth_test_view(request):
+    """Test Google Calendar API connection"""
+    from system_settings.google_oauth import GoogleOAuthService
+
+    oauth_service = GoogleOAuthService(request)
+    success, message = oauth_service.test_connection(request.user)
+
+    if success:
+        messages.success(request, message)
+    else:
+        messages.error(request, message)
+
+    return redirect('custom_admin:settings_list')
+
+
+# ============================================================================
+# PDF NOTES VIEWS
+# ============================================================================
+
+@user_passes_test(is_staff_user)
+def pdf_notes_list_view(request):
+    """List all PDF notes with search and filter"""
+    from apps.courses.models import PDFNote
+
+    search_query = request.GET.get('search', '')
+    pdf_notes = PDFNote.objects.all()
+
+    if search_query:
+        pdf_notes = pdf_notes.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    pdf_notes = pdf_notes.order_by('-created_at')
+
+    # Pagination
+    paginator = Paginator(pdf_notes, 25)
+    page = request.GET.get('page')
+    try:
+        pdf_notes = paginator.page(page)
+    except PageNotAnInteger:
+        pdf_notes = paginator.page(1)
+    except EmptyPage:
+        pdf_notes = paginator.page(paginator.num_pages)
+
+    context = {
+        'pdf_notes': pdf_notes,
+        'search_query': search_query,
+        'total_count': PDFNote.objects.count()
+    }
+
+    return render(request, 'custom_admin/pdf_notes/list.html', context)
+
+
+@user_passes_test(is_staff_user)
+def pdf_note_create_view(request):
+    """Create a new PDF note"""
+    from apps.courses.models import PDFNote
+    from apps.custom_admin.forms import PDFNoteForm
+
+    if request.method == 'POST':
+        form = PDFNoteForm(request.POST, request.FILES)
+        if form.is_valid():
+            pdf_note = form.save()
+            messages.success(request, f'PDF note "{pdf_note.title}" created successfully.')
+            return redirect('custom_admin:pdf_notes_list')
+    else:
+        form = PDFNoteForm()
+
+    context = {
+        'form': form,
+        'is_edit': False
+    }
+
+    return render(request, 'custom_admin/pdf_notes/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def pdf_note_edit_view(request, pdf_id):
+    """Edit an existing PDF note"""
+    from apps.courses.models import PDFNote
+    from apps.custom_admin.forms import PDFNoteForm
+
+    pdf_note = get_object_or_404(PDFNote, id=pdf_id)
+
+    if request.method == 'POST':
+        form = PDFNoteForm(request.POST, request.FILES, instance=pdf_note)
+        if form.is_valid():
+            pdf_note = form.save()
+            messages.success(request, f'PDF note "{pdf_note.title}" updated successfully.')
+            return redirect('custom_admin:pdf_notes_list')
+    else:
+        form = PDFNoteForm(instance=pdf_note)
+
+    context = {
+        'form': form,
+        'pdf_note': pdf_note,
+        'is_edit': True
+    }
+
+    return render(request, 'custom_admin/pdf_notes/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def pdf_note_delete_view(request, pdf_id):
+    """Delete a PDF note"""
+    from apps.courses.models import PDFNote
+
+    pdf_note = get_object_or_404(PDFNote, id=pdf_id)
+
+    if request.method == 'POST':
+        title = pdf_note.title
+        pdf_note.delete()
+        messages.success(request, f'PDF note "{title}" deleted successfully.')
+        return redirect('custom_admin:pdf_notes_list')
+
+    return redirect('custom_admin:pdf_notes_list')

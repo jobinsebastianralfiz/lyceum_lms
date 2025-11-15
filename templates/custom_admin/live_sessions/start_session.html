@@ -1,0 +1,340 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Start Session - {{ session.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0 text-success">
+              <i class="ti ti-play me-2"></i>Start Live Session
+            </h4>
+            <p class="card-subtitle">
+              Ready to begin this live session?
+            </p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Session
+            </a>
+          </div>
+        </div>
+
+        <!-- Session Information -->
+        <div class="card border-success mb-4">
+          <div class="card-header bg-success-subtle">
+            <h5 class="card-title mb-0 text-success">
+              <i class="ti ti-video me-2"></i>Session Details
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Session Title:</td>
+                    <td>
+                      <div class="fw-medium">{{ session.title }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Description:</td>
+                    <td>
+                      <div class="fw-medium">{{ session.description|default:"No description" }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Meeting Link:</td>
+                    <td>
+                      <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="ti ti-external-link me-1"></i>Open Meeting
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Course:</td>
+                    <td>
+                      {% if session.course %}
+                        <div class="fw-medium">{{ session.course.title }}</div>
+                        <small class="text-muted">{{ session.course.category.name|default:"Uncategorized" }}</small>
+                      {% else %}
+                        <span class="text-muted">No course assigned</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Scheduled:</td>
+                    <td class="fw-medium">{{ session.scheduled_date|date:"M d, Y H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Duration:</td>
+                    <td class="fw-medium">{{ session.duration_minutes }} minutes</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Participants:</td>
+                    <td class="fw-medium">{{ session.participants.count }}/{{ session.max_participants }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Recording:</td>
+                    <td>
+                      {% if session.allow_recording %}
+                        <span class="text-success"><i class="ti ti-check"></i> Allowed</span>
+                      {% else %}
+                        <span class="text-muted"><i class="ti ti-x"></i> Not Allowed</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pre-Session Checklist -->
+        <div class="card border-warning mb-4">
+          <div class="card-header bg-warning-subtle">
+            <h6 class="card-title mb-0 text-warning">
+              <i class="ti ti-checklist me-2"></i>Pre-Session Checklist
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check1">
+                  <label class="form-check-label" for="check1">
+                    Meeting room is ready and accessible
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check2">
+                  <label class="form-check-label" for="check2">
+                    Audio and video equipment tested
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check3">
+                  <label class="form-check-label" for="check3">
+                    Session materials and resources prepared
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check4">
+                  <label class="form-check-label" for="check4">
+                    Participants have been notified
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check5">
+                  <label class="form-check-label" for="check5">
+                    Recording setup configured (if needed)
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="check6">
+                  <label class="form-check-label" for="check6">
+                    Backup plans ready for technical issues
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participants Summary -->
+        <div class="card border-info mb-4">
+          <div class="card-header bg-info-subtle">
+            <h6 class="card-title mb-0 text-info">
+              <i class="ti ti-users me-2"></i>Participants ({{ session.participants.count }})
+            </h6>
+          </div>
+          <div class="card-body">
+            {% if session.participants.exists %}
+            <div class="row">
+              {% for participant in session.participants.all %}
+              <div class="col-md-6 mb-2">
+                <div class="d-flex align-items-center">
+                  <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2"
+                       style="width: 24px; height: 24px;">
+                    <i class="ti ti-user text-primary"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-medium">{{ participant.student.name }}</div>
+                    <small class="text-muted">{{ participant.student.email }}</small>
+                  </div>
+                  {% if participant.status == 'assigned' %}
+                    <span class="badge bg-warning-subtle text-warning">Assigned</span>
+                  {% elif participant.status == 'joined' %}
+                    <span class="badge bg-success-subtle text-success">Joined</span>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-3 text-muted">
+              <i class="ti ti-users fs-1 mb-2"></i>
+              <p class="mb-0">No participants assigned</p>
+              <a href="{% url 'custom_admin:session_manage_participants' session.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                Add Participants
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Warning/Information -->
+        <div class="alert alert-info mb-4">
+          <h6 class="alert-heading mb-2">
+            <i class="ti ti-info-circle me-2"></i>What happens when you start the session?
+          </h6>
+          <ul class="mb-0">
+            <li>Session status will change to "Active"</li>
+            <li>Participants will be notified (if notifications are enabled)</li>
+            <li>Session start time will be recorded</li>
+            <li>Meeting room becomes officially live</li>
+            {% if session.allow_recording %}
+            <li>Recording can begin if configured</li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <!-- Confirmation Form -->
+        <form method="post" class="mb-0">
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="confirm_start" name="confirm_start" required>
+              <label class="form-check-label text-success fw-medium" for="confirm_start">
+                I confirm that everything is ready and I want to start the session "{{ session.title }}" now.
+              </label>
+            </div>
+          </div>
+
+          <!-- Additional Notes -->
+          <div class="mb-4">
+            <label for="start_notes" class="form-label">Start Notes (Optional)</label>
+            <textarea class="form-control" id="start_notes" name="start_notes" rows="3"
+                      placeholder="Add any notes about session start (e.g., technical setup, participant count, etc.)"></textarea>
+            <div class="form-text">These notes will be recorded with the session start event</div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-outline-primary">
+              <i class="ti ti-external-link me-1"></i>Open Meeting First
+            </a>
+            <button type="submit" class="btn btn-success" id="start_button" disabled>
+              <i class="ti ti-play me-1"></i>Start Session
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmCheckbox = document.getElementById('confirm_start');
+  const startButton = document.getElementById('start_button');
+
+  confirmCheckbox.addEventListener('change', function() {
+    startButton.disabled = !this.checked;
+  });
+
+  // Check if session is past due
+  const scheduledDate = new Date('{{ session.scheduled_date|date:"c" }}');
+  const now = new Date();
+  const timeDiff = now - scheduledDate;
+
+  if (timeDiff > 30 * 60 * 1000) { // More than 30 minutes late
+    const lateWarning = document.createElement('div');
+    lateWarning.className = 'alert alert-warning';
+    lateWarning.innerHTML = `
+      <i class="ti ti-clock-exclamation me-2"></i>
+      <strong>Late Start Notice:</strong> This session was scheduled to start ${Math.round(timeDiff / (60 * 1000))} minutes ago.
+    `;
+    document.querySelector('form').insertBefore(lateWarning, document.querySelector('.mb-4'));
+  }
+
+  // Auto-check checklist items based on session configuration
+  if ({{ session.send_notifications|yesno:"true,false" }}) {
+    document.getElementById('check4').checked = true;
+  }
+
+  if (!{{ session.allow_recording|yesno:"true,false" }}) {
+    document.getElementById('check5').checked = true;
+    document.getElementById('check5').parentElement.style.opacity = '0.5';
+  }
+});
+
+// Countdown timer for scheduled sessions
+document.addEventListener('DOMContentLoaded', function() {
+  const scheduledDate = new Date('{{ session.scheduled_date|date:"c" }}');
+  const now = new Date();
+
+  if (scheduledDate > now) {
+    const timeDiff = scheduledDate - now;
+    const minutes = Math.floor(timeDiff / (60 * 1000));
+
+    if (minutes <= 15) {
+      const countdownAlert = document.createElement('div');
+      countdownAlert.className = 'alert alert-success';
+      countdownAlert.innerHTML = `
+        <i class="ti ti-clock me-2"></i>
+        <strong>Perfect Timing:</strong> Session starts in ${minutes} minute${minutes !== 1 ? 's' : ''}. Good time to start!
+      `;
+      document.querySelector('.card-body').insertBefore(countdownAlert, document.querySelector('.card-body').firstChild.nextSibling);
+    }
+  }
+});
+</script>
+
+<style>
+.bg-success-subtle {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+.bg-warning-subtle {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}System Settings - Lyceum Academy Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          <i class="ti ti-settings me-2"></i>System Settings
+        </h4>
+        <p class="card-subtitle">Manage encrypted system configuration</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:setting_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add New Setting
+        </a>
+      </div>
+    </div>
+
+    <!-- Google Workspace Integration -->
+    <div class="alert alert-info d-flex align-items-center justify-content-between mb-4"
+         style="background: rgba(42, 182, 115, 0.1); border: 1px solid var(--lyceum-green); color: var(--text-white);">
+      <div class="d-flex align-items-center">
+        <i class="ti ti-brand-google me-3" style="font-size: 2rem; color: var(--lyceum-green);"></i>
+        <div>
+          <h6 class="mb-1" style="color: var(--text-white);">Google Workspace Integration</h6>
+          {% if google_integration %}
+            <p class="mb-0 small">
+              Connected as <strong>{{ google_integration.google_email }}</strong>
+              <span class="badge bg-success ms-2">Active</span>
+            </p>
+            <p class="mb-0 small text-muted mt-1">
+              Last used: {{ google_integration.last_used|date:"M d, Y g:i A"|default:"Never" }}
+            </p>
+          {% else %}
+            <p class="mb-0 small" style="color: var(--text-gray);">
+              Connect your Google Workspace account to automatically create Google Meet links for live sessions
+            </p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="btn-group">
+        {% if google_integration %}
+          <a href="{% url 'custom_admin:google_oauth_test' %}" class="btn btn-sm btn-outline-success">
+            <i class="ti ti-refresh me-1"></i>Test Connection
+          </a>
+          <form method="post" action="{% url 'custom_admin:google_oauth_disconnect' %}"
+                onsubmit="return confirm('Are you sure you want to disconnect Google Workspace?');"
+                class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="ti ti-unlink me-1"></i>Disconnect
+            </button>
+          </form>
+        {% else %}
+          <a href="{% url 'custom_admin:google_oauth_initiate' %}" class="btn btn-sm"
+             style="background: var(--lyceum-green); color: white; border: none;">
+            <i class="ti ti-plug-connected me-1"></i>Connect Google Workspace
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex">
+          <div class="input-group">
+            <input type="text" class="form-control" name="search"
+                   value="{{ search_query }}" placeholder="Search settings by key or description...">
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <form method="get">
+          <div class="input-group">
+            <span class="input-group-text">Category</span>
+            <select class="form-select" name="category" onchange="this.form.submit()">
+              <option value="">All Categories</option>
+              {% for value, label in category_choices %}
+                <option value="{{ value }}" {% if category_filter == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if settings_by_category %}
+      <!-- Settings Grouped by Category -->
+      {% for category, settings in settings_by_category.items %}
+      <div class="card mb-4" style="background: var(--dark-bg-secondary); border: 1px solid var(--dark-border);">
+        <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+          <h5 class="mb-0">
+            <i class="ti ti-folder me-2" style="color: var(--lyceum-green);"></i>
+            {{ category }}
+            <span class="badge bg-secondary ms-2">{{ settings|length }}</span>
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-gray);">
+              <thead style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+                <tr>
+                  <th style="width: 30%;">Key</th>
+                  <th style="width: 25%;">Value</th>
+                  <th style="width: 25%;">Description</th>
+                  <th style="width: 10%;">Status</th>
+                  <th style="width: 10%;" class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for setting in settings %}
+                <tr style="border-bottom: 1px solid var(--dark-border);">
+                  <td>
+                    <strong style="color: var(--text-white); font-family: monospace;">
+                      {{ setting.key }}
+                    </strong>
+                    {% if setting.is_sensitive %}
+                      <span class="badge badge-sm bg-warning text-dark ms-2">
+                        <i class="ti ti-lock fs-2"></i>
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span style="font-family: monospace; color: var(--text-gray-dark);">
+                      {{ setting.get_masked_value }}
+                    </span>
+                  </td>
+                  <td>
+                    <small style="color: var(--text-gray-dark);">
+                      {{ setting.description|truncatewords:10|default:"No description" }}
+                    </small>
+                  </td>
+                  <td>
+                    {% if setting.is_active %}
+                      <span class="badge bg-success">Active</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'custom_admin:setting_edit' setting.id %}"
+                         class="btn btn-primary" title="Edit">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                      <a href="{% url 'custom_admin:setting_history' setting.id %}"
+                         class="btn btn-info" title="History">
+                        <i class="ti ti-history"></i>
+                      </a>
+                      <button type="button" class="btn btn-danger"
+                              onclick="confirmDelete('{{ setting.key }}', '{% url 'custom_admin:setting_delete' setting.id %}')"
+                              title="Delete">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-5">
+        <i class="ti ti-settings-off fs-1 text-muted mb-3"></i>
+        {% if search_query or category_filter %}
+          <h5 class="mb-2">No settings found</h5>
+          <p class="mb-0">No settings match your search criteria</p>
+          <a href="{% url 'custom_admin:settings_list' %}" class="btn btn-sm btn-outline-primary mt-3">
+            Clear Filters
+          </a>
+        {% else %}
+          <h5 class="mb-2">No settings available</h5>
+          <p class="mb-0">Get started by creating your first system setting</p>
+          <a href="{% url 'custom_admin:setting_create' %}" class="btn btn-sm btn-primary mt-3">
+            <i class="ti ti-plus me-1"></i>Create Setting
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Info Alert -->
+    <div class="alert alert-info mt-4" style="background: var(--dark-bg-tertiary); border: 1px solid var(--lyceum-green); color: var(--text-gray);">
+      <div class="d-flex align-items-center">
+        <i class="ti ti-info-circle me-3 fs-6" style="color: var(--lyceum-green);"></i>
+        <div>
+          <strong>Security Note:</strong> All sensitive values are encrypted in the database.
+          Values marked with <i class="ti ti-lock"></i> are masked for security.
+          When a setting is inactive, the system falls back to the .env file.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background: var(--dark-bg-secondary); border: 1px solid var(--dark-border);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--dark-border);">
+        <h5 class="modal-title" style="color: var(--text-white);">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+      </div>
+      <div class="modal-body" style="color: var(--text-gray);">
+        <p>Are you sure you want to delete the setting <strong id="deleteKey" style="color: var(--lyceum-green);"></strong>?</p>
+        <p class="text-danger"><i class="ti ti-alert-triangle me-2"></i>This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--dark-border);">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDelete(key, url) {
+  document.getElementById('deleteKey').textContent = key;
+  document.getElementById('deleteForm').action = url;
+  var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  modal.show();
+}
+</script>
+
+<style>
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .table > :not(caption) > * > * {
+    padding: 0.75rem 1rem;
+  }
+</style>
+{% endblock %}

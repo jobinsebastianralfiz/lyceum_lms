@@ -2,18 +2,55 @@
 
 {% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-book-open"></i>
+  <span>{{ course.title }}</span>
+</div>
+<div class="breadcrumb-item">
+  <i class="fas fa-play-circle"></i>
+  <span>{{ lesson.title }}</span>
+</div>
+{% endblock %}
+
 {% block extra_css %}
 <style>
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --text-primary: #1a202c;
+        --text-secondary: #718096;
+        --border-color: #e2e8f0;
+        --border-radius: 12px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Video Container */
+    .video-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        margin-bottom: 20px;
+    }
+
     .video-container {
         position: relative;
         width: 100%;
         height: 0;
-        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        padding-bottom: 56.25%;
         background: #000;
-        border-radius: 15px 15px 0 0;
         overflow: hidden;
     }
-    
+
     .video-container iframe {
         position: absolute;
         top: 0;
@@ -22,229 +59,634 @@
         height: 100%;
         border: none;
     }
-    
+
+    .video-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    }
+
+    /* Lesson Info Section */
+    .lesson-info {
+        padding: 24px;
+    }
+
+    .lesson-info-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+    }
+
+    .lesson-header {
+        margin-bottom: 20px;
+    }
+
+    .lesson-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .lesson-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+    .lesson-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lesson-meta-item i {
+        font-size: 16px;
+    }
+
+    .lesson-description {
+        background: var(--bg-secondary);
+        padding: 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .lesson-description h6 {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .lesson-description p {
+        color: var(--text-primary);
+        line-height: 1.5;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    .lesson-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn-modern {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-success-modern {
+        background: linear-gradient(135deg, var(--success), #059669);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+
+    .btn-success-modern:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-outline-modern {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-outline-modern:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Navigation Buttons */
+    .lesson-navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-nav {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+
+    .btn-nav-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-nav-secondary:hover {
+        background: var(--bg-primary);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .btn-nav-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-nav-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        color: white;
+    }
+
+    /* Sidebar Cards */
+    .sidebar-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        margin-bottom: 16px;
+    }
+
+    .sidebar-card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 14px 20px;
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    .sidebar-card-body {
+        padding: 20px;
+    }
+
+    /* Progress Section */
+    .progress-section {
+        margin-bottom: 0;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    .progress-percentage {
+        font-weight: 700;
+        color: var(--success);
+        font-size: 15px;
+    }
+
+    .progress-bar-modern {
+        height: 8px;
+        background: var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success), #059669);
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-info {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    /* Progress Circle */
+    .progress-circle-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .progress-circle {
         position: relative;
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
     }
-    
+
     .progress-circle svg {
         transform: rotate(-90deg);
     }
-    
+
     .progress-ring {
         fill: none;
-        stroke: #e9ecef;
-        stroke-width: 3;
+        stroke: var(--border-color);
+        stroke-width: 4;
     }
-    
+
     .progress-ring-fill {
         fill: none;
-        stroke: #28a745;
-        stroke-width: 3;
+        stroke: var(--success);
+        stroke-width: 4;
         stroke-linecap: round;
         transition: stroke-dasharray 0.5s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* Module Overview */
+    .module-description {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    /* Lesson List */
+    .lesson-list-item {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .lesson-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .lesson-list-item:hover {
+        background: var(--bg-secondary);
+    }
+
+    .lesson-list-item.active {
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+        border-left: 4px solid var(--primary);
+    }
+
+    .lesson-list-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .lesson-list-title {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .lesson-list-item.active .lesson-list-title {
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .lesson-list-status {
+        font-size: 11px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    .lesson-list-item.active .lesson-list-status {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .lesson-list-icon {
+        font-size: 16px;
+        color: var(--text-secondary);
+    }
+
+    .lesson-list-item.active .lesson-list-icon {
+        color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .lesson-info {
+            padding: 20px;
+        }
+
+        .lesson-info-card {
+            padding: 16px;
+        }
+
+        .lesson-title {
+            font-size: 20px;
+        }
+
+        .lesson-actions {
+            flex-direction: column;
+        }
+
+        .btn-modern,
+        .btn-outline-modern {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .lesson-navigation {
+            flex-direction: row;
+        }
+
+        .btn-nav {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .progress-circle-container {
+            display: none;
+        }
+
+        .sidebar-card {
+            margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .lesson-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-card-body {
+            padding: 16px;
+        }
+
+        .lesson-info {
+            padding: 16px;
+        }
+
+        .lesson-info-card {
+            padding: 16px;
+        }
+
+        .lesson-navigation {
+            flex-direction: column;
+        }
+
+        .btn-nav {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Video Player -->
-    <div class="col-lg-8 mb-4">
-        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-            <div class="card-body p-0">
-                <!-- Video Container -->
-                <div class="video-container mb-3">
+<div class="container-fluid" style="padding: 20px 24px; max-width: 1600px; margin: 0 auto;">
+    <div class="row">
+        <!-- Left Column: Video Player and Info -->
+        <div class="col-lg-7">
+            <!-- Video Player -->
+            <div class="video-card">
+                <div class="video-container">
                     {% if lesson.youtube_video_id %}
-                    <iframe 
+                    <iframe
                         id="youtube-player"
                         src="https://www.youtube.com/embed/{{ lesson.youtube_video_id }}?enablejsapi=1&origin={{ request.get_host }}"
-                        frameborder="0" 
-                        allow="autoplay; encrypted-media" 
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
                         allowfullscreen>
                     </iframe>
                     {% elif lesson.youtube_url %}
-                    <iframe 
+                    <iframe
                         id="youtube-player"
-                        src="{{ lesson.youtube_url }}" 
-                        frameborder="0" 
-                        allow="autoplay; encrypted-media" 
+                        src="{{ lesson.youtube_url }}"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
                         allowfullscreen>
                     </iframe>
                     {% else %}
-                    <div class="bg-dark d-flex align-items-center justify-content-center text-white" style="height: 400px;">
-                        <div class="text-center">
-                            <i class="fas fa-video fa-4x mb-3"></i>
+                    <div class="video-placeholder">
+                        <div class="text-center text-white">
+                            <i class="fas fa-video" style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;"></i>
                             <h5>Video not available</h5>
-                            <p>This lesson doesn't have a video yet.</p>
+                            <p style="opacity: 0.8;">This lesson doesn't have a video yet.</p>
                         </div>
                     </div>
                     {% endif %}
                 </div>
-                
-                <!-- Lesson Info -->
-                <div class="p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h2 class="h4 mb-2">{{ lesson.title }}</h2>
-                            <div class="d-flex align-items-center gap-3 text-muted">
-                                <span>
-                                    <i class="fas fa-book me-1"></i>
-                                    {{ module.title }}
-                                </span>
-                                {% if lesson.duration %}
-                                <span>
-                                    <i class="fas fa-clock me-1"></i>
-                                    {{ lesson.duration|floatformat:0 }} seconds
-                                </span>
+            </div>
+
+            <!-- Lesson Info -->
+            <div class="lesson-info-card">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <div style="flex: 1;">
+                        <h1 class="lesson-title">{{ lesson.title }}</h1>
+                        <div class="lesson-meta">
+                            <div class="lesson-meta-item">
+                                <i class="fas fa-book"></i>
+                                <span>{{ module.title }}</span>
+                            </div>
+                            {% if lesson.duration %}
+                            <div class="lesson-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ lesson.duration|floatformat:0 }} seconds</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="progress-circle-container">
+                        <div class="progress-circle">
+                            <svg viewBox="0 0 36 36" style="width: 70px; height: 70px;">
+                                <path class="progress-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="progress-ring-fill" stroke-dasharray="{{ progress.completed_percentage }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span>{{ progress.completed_percentage|floatformat:0 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if lesson.description %}
+                <div class="lesson-description">
+                    <h6>Description</h6>
+                    <p>{{ lesson.description }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Progress Actions -->
+                <div class="lesson-actions">
+                    {% if not progress.completed %}
+                    <button id="mark-complete" class="btn-modern btn-success-modern">
+                        <i class="fas fa-check"></i>
+                        Mark as Complete
+                    </button>
+                    {% else %}
+                    <button class="btn-modern btn-success-modern" disabled>
+                        <i class="fas fa-check"></i>
+                        Completed
+                    </button>
+                    {% endif %}
+
+                    {% if lesson.resource_file %}
+                    <a href="{{ lesson.resource_file.url }}" target="_blank" class="btn-modern btn-outline-modern">
+                        <i class="fas fa-download"></i>
+                        Download Resources
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Navigation -->
+                <div class="lesson-navigation">
+                    {% if prev_lesson %}
+                    <a href="{% url 'student_portal:lesson_viewer' prev_lesson.id %}" class="btn-nav btn-nav-secondary">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </a>
+                    {% else %}
+                    <a href="{% url 'student_portal:course_detail' course.id %}" class="btn-nav btn-nav-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Course
+                    </a>
+                    {% endif %}
+
+                    {% if next_lesson %}
+                    <a href="{% url 'student_portal:lesson_viewer' next_lesson.id %}" class="btn-nav btn-nav-primary">
+                        Next Lesson
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Statistics and Next Lessons -->
+        <div class="col-lg-5">
+            <!-- Lesson Progress -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <i class="fas fa-chart-line" style="margin-right: 8px;"></i>
+                    Lesson Progress
+                </div>
+                <div class="sidebar-card-body">
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>Completion</span>
+                            <span class="progress-percentage" id="progress-percentage">{{ progress.completed_percentage|floatformat:0 }}%</span>
+                        </div>
+                        <div class="progress-bar-modern">
+                            <div id="progress-bar" class="progress-fill" style="width: {{ progress.completed_percentage }}%"></div>
+                        </div>
+                        <div class="progress-info">
+                            {% if progress.last_watched_at %}
+                            Last watched: {{ progress.last_watched_at|timesince }} ago
+                            {% else %}
+                            Not started yet
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module Overview -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <i class="fas fa-book-open" style="margin-right: 8px;"></i>
+                    {{ module.title }}
+                </div>
+                <div class="sidebar-card-body">
+                    {% if module.description %}
+                    <p class="module-description">{{ module.description|truncatechars:150 }}</p>
+                    {% endif %}
+
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>Module Progress</span>
+                            <span class="progress-percentage">{{ module_progress.completion_percentage|default:0|floatformat:0 }}%</span>
+                        </div>
+                        <div class="progress-bar-modern">
+                            <div class="progress-fill" style="width: {{ module_progress.completion_percentage|default:0 }}%"></div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'student_portal:course_detail' course.id %}" class="btn-modern btn-outline-modern" style="width: 100%; justify-content: center; margin-top: 12px;">
+                        <i class="fas fa-book"></i>
+                        Back to Course
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Lessons in Module -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <i class="fas fa-list" style="margin-right: 8px;"></i>
+                    Other Lessons
+                </div>
+                <div style="padding: 0;">
+                    {% for other_lesson in module.video_lessons.all %}
+                    <div class="lesson-list-item {% if other_lesson.id == lesson.id %}active{% endif %}">
+                        <div class="lesson-list-content">
+                            <div style="flex: 1;">
+                                {% if other_lesson.id == lesson.id %}
+                                <div class="lesson-list-title">{{ other_lesson.title }}</div>
+                                <div class="lesson-list-status">Currently watching</div>
+                                {% else %}
+                                <a href="{% url 'student_portal:lesson_viewer' other_lesson.id %}" class="lesson-list-title">
+                                    {{ other_lesson.title }}
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="lesson-list-icon">
+                                {% if other_lesson.id == lesson.id %}
+                                <i class="fas fa-play-circle"></i>
+                                {% else %}
+                                <i class="far fa-play-circle"></i>
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="text-end">
-                            <div class="progress-circle">
-                                <svg viewBox="0 0 36 36" style="width: 60px; height: 60px;">
-                                    <path class="progress-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                                    <path class="progress-ring-fill" stroke-dasharray="{{ progress.completed_percentage }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                                </svg>
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <span class="fw-bold small">{{ progress.completed_percentage|floatformat:0 }}%</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    
-                    {% if lesson.description %}
-                    <div class="mb-4">
-                        <h6>Description</h6>
-                        <p class="text-muted">{{ lesson.description }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Progress Actions -->
-                    <div class="d-flex gap-2 mb-3">
-                        {% if not progress.completed %}
-                        <button id="mark-complete" class="btn btn-success">
-                            <i class="fas fa-check me-2"></i>Mark as Complete
-                        </button>
-                        {% else %}
-                        <button class="btn btn-success" disabled>
-                            <i class="fas fa-check me-2"></i>Completed
-                        </button>
-                        {% endif %}
-                        
-                        {% if lesson.resource_file %}
-                        <a href="{{ lesson.resource_file.url }}" target="_blank" class="btn btn-outline-primary">
-                            <i class="fas fa-download me-2"></i>Download Resources
-                        </a>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Navigation -->
-                    <div class="d-flex justify-content-between">
-                        {% if prev_lesson %}
-                        <a href="{% url 'student_portal:lesson_viewer' prev_lesson.id %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-chevron-left me-2"></i>Previous Lesson
-                        </a>
-                        {% else %}
-                        <div></div>
-                        {% endif %}
-                        
-                        {% if next_lesson %}
-                        <a href="{% url 'student_portal:lesson_viewer' next_lesson.id %}" class="btn btn-primary">
-                            Next Lesson<i class="fas fa-chevron-right ms-2"></i>
-                        </a>
-                        {% else %}
-                        <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-outline-primary">
-                            Back to Course<i class="fas fa-book ms-2"></i>
-                        </a>
-                        {% endif %}
-                    </div>
+                    {% endfor %}
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="col-lg-4">
-        <!-- Lesson Progress -->
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0">Lesson Progress</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Completion</span>
-                        <span id="progress-percentage">{{ progress.completed_percentage|floatformat:0 }}%</span>
-                    </div>
-                    <div class="progress" style="height: 10px;">
-                        <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: {{ progress.completed_percentage }}%"></div>
-                    </div>
-                </div>
-                
-                <div class="small text-muted">
-                    {% if progress.last_watched_at %}
-                    Last watched: {{ progress.last_watched_at|timesince }} ago
-                    {% else %}
-                    Not started yet
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Module Overview -->
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0">{{ module.title }}</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted small">{{ module.description|truncatechars:150 }}</p>
-                
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="small">Module Progress</span>
-                    <span class="small">{{ module_progress.completion_percentage|default:0|floatformat:0 }}%</span>
-                </div>
-                <div class="progress mb-3" style="height: 6px;">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ module_progress.completion_percentage|default:0 }}%"></div>
-                </div>
-                
-                <a href="{% url 'student_portal:course_detail' course.id %}" class="btn btn-outline-primary btn-sm w-100">
-                    <i class="fas fa-book me-2"></i>Back to Course
-                </a>
-            </div>
-        </div>
-        
-        <!-- Other Lessons in Module -->
-        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-            <div class="card-header bg-white border-0" style="border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0">Other Lessons</h5>
-            </div>
-            <div class="card-body p-0">
-                {% for other_lesson in module.video_lessons.all %}
-                <div class="p-3 {% if other_lesson.id == lesson.id %}bg-light{% endif %} {% if not forloop.last %}border-bottom{% endif %}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="flex-grow-1">
-                            {% if other_lesson.id == lesson.id %}
-                            <span class="fw-bold text-primary">{{ other_lesson.title }}</span>
-                            <small class="d-block text-muted">Currently watching</small>
-                            {% else %}
-                            <a href="{% url 'student_portal:lesson_viewer' other_lesson.id %}" class="text-decoration-none">
-                                {{ other_lesson.title }}
-                            </a>
-                            {% endif %}
-                        </div>
-                        <div class="text-end">
-                            {% if other_lesson.id == lesson.id %}
-                            <i class="fas fa-play text-primary"></i>
-                            {% else %}
-                            <i class="fas fa-play-circle text-muted"></i>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
@@ -252,17 +694,18 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     let lessonId = {{ lesson.id }};
     let currentProgress = {{ progress.completed_percentage }};
     let isCompleted = {% if progress.completed %}true{% else %}false{% endif %};
-    
+
     // Mark as complete functionality
     $('#mark-complete').click(function() {
         updateProgress(100, true);
     });
-    
+
     function updateProgress(percentage, completed = false) {
         $.post('{% url "student_portal:update_lesson_progress" lesson.id %}', {
             'completed_percentage': percentage,
@@ -275,13 +718,13 @@ $(document).ready(function() {
                 $('#progress-percentage').text(Math.round(data.completed_percentage) + '%');
                 $('#progress-bar').css('width', data.completed_percentage + '%');
                 $('.progress-ring-fill').attr('stroke-dasharray', data.completed_percentage + ', 100');
-                $('.progress-circle span').text(Math.round(data.completed_percentage) + '%');
-                
+                $('.progress-text span').text(Math.round(data.completed_percentage) + '%');
+
                 if (data.completed) {
-                    $('#mark-complete').prop('disabled', true).html('<i class="fas fa-check me-2"></i>Completed');
+                    $('#mark-complete').prop('disabled', true).html('<i class="fas fa-check"></i> Completed');
                     isCompleted = true;
                 }
-                
+
                 currentProgress = data.completed_percentage;
             }
         })
@@ -289,13 +732,13 @@ $(document).ready(function() {
             alert('Failed to update progress. Please try again.');
         });
     }
-    
+
     // YouTube API integration for automatic progress tracking
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    
+
     var player;
     window.onYouTubeIframeAPIReady = function() {
         {% if lesson.youtube_video_id %}
@@ -306,7 +749,7 @@ $(document).ready(function() {
         });
         {% endif %}
     }
-    
+
     function onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
             // Start tracking progress
@@ -314,15 +757,15 @@ $(document).ready(function() {
                 if (player && player.getCurrentTime && player.getDuration) {
                     let currentTime = player.getCurrentTime();
                     let duration = player.getDuration();
-                    
+
                     if (duration > 0) {
                         let percentage = (currentTime / duration) * 100;
-                        
+
                         // Only update if progress increased significantly (every 5%)
                         if (percentage > currentProgress + 5) {
                             updateProgress(percentage);
                         }
-                        
+
                         // Auto-complete when 90% watched
                         if (percentage >= 90 && !isCompleted) {
                             updateProgress(100, true);
@@ -332,7 +775,7 @@ $(document).ready(function() {
             }, 5000); // Check every 5 seconds
         }
     }
-    
+
     console.log('Lesson viewer loaded:', '{{ lesson.title }}');
 });
 </script>

@@ -66,10 +66,10 @@
 
           <!-- Module Selection -->
           <div class="mb-4">
-            <label for="{{ form.module.id_for_label }}" class="form-label">Module <span class="text-danger">*</span></label>
-            {{ form.module }}
-            {% if form.module.errors %}
-              <div class="text-danger small">{{ form.module.errors.0 }}</div>
+            <label for="{{ form.modules.id_for_label }}" class="form-label">Module <span class="text-danger">*</span></label>
+            {{ form.modules }}
+            {% if form.modules.errors %}
+              <div class="text-danger small">{{ form.modules.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Module selection feedback
-  const moduleField = document.getElementById('{{ form.module.id_for_label }}');
+  const moduleField = document.getElementById('{{ form.modules.id_for_label }}');
   if (moduleField) {
     moduleField.addEventListener('change', function() {
       const selectedOption = this.options[this.selectedIndex];

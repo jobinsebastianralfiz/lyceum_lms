@@ -1,0 +1,243 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Setting Change History - Lyceum Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="mb-1">
+              <i class="ti ti-history me-2" style="color: var(--lyceum-green);"></i>
+              Change History
+            </h5>
+            <p class="mb-0 text-muted">
+              Setting: <strong style="font-family: monospace; color: var(--lyceum-green);">{{ setting.key }}</strong>
+            </p>
+          </div>
+          <div>
+            <a href="{% url 'custom_admin:setting_edit' setting.id %}" class="btn btn-primary btn-sm me-2">
+              <i class="ti ti-edit me-1"></i>Edit Setting
+            </a>
+            <a href="{% url 'custom_admin:settings_list' %}" class="btn btn-secondary btn-sm">
+              <i class="ti ti-arrow-left me-1"></i>Back to List
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Setting Summary -->
+        <div class="card mb-4" style="background: var(--dark-bg-secondary); border: 1px solid var(--dark-border);">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <small class="text-muted">Category</small>
+                <p class="mb-0" style="color: var(--text-white);">{{ setting.get_category_display }}</p>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Current Value</small>
+                <p class="mb-0" style="font-family: monospace; color: var(--text-gray);">
+                  {{ setting.get_masked_value }}
+                </p>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Status</small>
+                <p class="mb-0">
+                  {% if setting.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                  {% if setting.is_sensitive %}
+                    <span class="badge bg-warning text-dark ms-1">
+                      <i class="ti ti-lock"></i> Sensitive
+                    </span>
+                  {% endif %}
+                </p>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Last Updated</small>
+                <p class="mb-0" style="color: var(--text-white);">
+                  {{ setting.updated_at|date:"M d, Y H:i" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if page_obj %}
+        <!-- Change Log Timeline -->
+        <div class="timeline-container">
+          {% for log in page_obj %}
+          <div class="timeline-item mb-4">
+            <div class="card" style="background: var(--dark-bg-secondary); border-left: 3px solid var(--lyceum-green);">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                  <div>
+                    <h6 class="mb-1" style="color: var(--text-white);">
+                      <i class="ti ti-edit me-2" style="color: var(--lyceum-green);"></i>
+                      Value Changed
+                    </h6>
+                    <small class="text-muted">
+                      <i class="ti ti-calendar me-1"></i>
+                      {{ log.changed_at|date:"F d, Y" }} at {{ log.changed_at|time:"H:i" }}
+                    </small>
+                  </div>
+                  <div class="text-end">
+                    {% if log.changed_by %}
+                      <div class="d-flex align-items-center">
+                        <div class="me-2 text-end">
+                          <div class="fw-bold" style="color: var(--text-white);">{{ log.changed_by.name }}</div>
+                          <small class="text-muted">{{ log.changed_by.email }}</small>
+                        </div>
+                        <div class="avatar-circle" style="background: var(--lyceum-green); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                          {{ log.changed_by.name|first|upper }}
+                        </div>
+                      </div>
+                    {% else %}
+                      <span class="badge bg-secondary">System</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <small class="text-muted">Old Value</small>
+                    <div class="p-2 rounded" style="background: var(--dark-bg); border: 1px solid var(--dark-border); font-family: monospace; color: var(--text-gray-dark);">
+                      {% if log.old_value %}
+                        {% if setting.is_sensitive %}
+                          ****{{ log.old_value|slice:"-4:" }}
+                        {% else %}
+                          {{ log.old_value|truncatewords:10 }}
+                        {% endif %}
+                      {% else %}
+                        <em class="text-muted">(empty)</em>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <small class="text-muted">New Value</small>
+                    <div class="p-2 rounded" style="background: var(--dark-bg); border: 1px solid var(--lyceum-green); font-family: monospace; color: var(--text-gray);">
+                      {% if log.new_value %}
+                        {% if setting.is_sensitive %}
+                          ****{{ log.new_value|slice:"-4:" }}
+                        {% else %}
+                          {{ log.new_value|truncatewords:10 }}
+                        {% endif %}
+                      {% else %}
+                        <em class="text-muted">(empty)</em>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                {% if log.change_reason %}
+                <div class="mb-2">
+                  <small class="text-muted">
+                    <i class="ti ti-message me-1"></i>Reason for Change:
+                  </small>
+                  <p class="mb-0 mt-1" style="color: var(--text-gray);">{{ log.change_reason }}</p>
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-3 text-muted small">
+                  {% if log.ip_address %}
+                  <span>
+                    <i class="ti ti-device-laptop me-1"></i>
+                    IP: {{ log.ip_address }}
+                  </span>
+                  {% endif %}
+                  {% if log.user_agent %}
+                  <span title="{{ log.user_agent }}">
+                    <i class="ti ti-browser me-1"></i>
+                    Browser: {{ log.user_agent|truncatewords:3 }}
+                  </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Change history pagination" class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1" style="background: var(--dark-bg-secondary); border-color: var(--dark-border); color: var(--text-gray);">
+                  <i class="ti ti-chevrons-left"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="background: var(--dark-bg-secondary); border-color: var(--dark-border); color: var(--text-gray);">
+                  <i class="ti ti-chevron-left"></i>
+                </a>
+              </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active">
+                  <span class="page-link" style="background: var(--lyceum-green); border-color: var(--lyceum-green);">{{ num }}</span>
+                </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}" style="background: var(--dark-bg-secondary); border-color: var(--dark-border); color: var(--text-gray);">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="background: var(--dark-bg-secondary); border-color: var(--dark-border); color: var(--text-gray);">
+                  <i class="ti ti-chevron-right"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="background: var(--dark-bg-secondary); border-color: var(--dark-border); color: var(--text-gray);">
+                  <i class="ti ti-chevrons-right"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+          <i class="ti ti-history-off fs-1 text-muted mb-3"></i>
+          <h5 class="mb-2">No Change History</h5>
+          <p class="mb-0 text-muted">This setting has not been modified since creation.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .timeline-container {
+    position: relative;
+  }
+
+  .timeline-item {
+    position: relative;
+  }
+
+  .avatar-circle {
+    font-size: 16px;
+  }
+
+  .page-link:hover {
+    background: var(--dark-bg-tertiary) !important;
+    border-color: var(--lyceum-green) !important;
+    color: var(--lyceum-green) !important;
+  }
+</style>
+{% endblock %}

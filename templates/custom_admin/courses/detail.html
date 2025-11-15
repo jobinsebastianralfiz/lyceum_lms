@@ -184,44 +184,45 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Course Modules -->
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Course Modules</h5>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Course Modules</h5>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+            <i class="ti ti-plus me-1"></i>Add Module
+          </button>
+        </div>
+
         {% if modules %}
-        <div class="accordion" id="modulesAccordion">
+        <div class="list-group">
           {% for module in modules %}
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" 
-                      data-bs-toggle="collapse" data-bs-target="#module{{ module.id }}">
-                <div class="d-flex align-items-center w-100">
-                  <i class="ti ti-book me-2"></i>
-                  <span class="fw-medium">{{ module.title }}</span>
-                  <span class="badge bg-primary ms-auto me-3">
-                    {{ module.video_lessons.count }} lessons
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-secondary me-2">Order: {{ module.course_order }}</span>
+                  <h6 class="mb-0">{{ module.title }}</h6>
+                </div>
+                <p class="text-muted small mb-2">{{ module.description|truncatewords:20 }}</p>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-info">
+                    <i class="ti ti-video me-1"></i>{{ module.videos_count }} Videos
+                  </span>
+                  <span class="badge bg-warning">
+                    <i class="ti ti-file-text me-1"></i>{{ module.assignments_count }} Assignments
+                  </span>
+                  <span class="badge bg-success">
+                    <i class="ti ti-clipboard-check me-1"></i>{{ module.quizzes_count }} Quizzes
                   </span>
                 </div>
-              </button>
-            </h2>
-            <div id="module{{ module.id }}" class="accordion-collapse collapse">
-              <div class="accordion-body">
-                <p class="text-muted mb-3">{{ module.description }}</p>
-                {% if module.video_lessons.exists %}
-                <div class="list-group list-group-flush">
-                  {% for lesson in module.video_lessons.all %}
-                  <div class="list-group-item d-flex align-items-center">
-                    <i class="ti ti-play me-2"></i>
-                    <div class="flex-grow-1">
-                      <h6 class="mb-0">{{ lesson.title }}</h6>
-                      <small class="text-muted">{{ lesson.description|truncatewords:10 }}</small>
-                    </div>
-                    {% if lesson.duration %}
-                    <span class="badge bg-light text-dark">{{ lesson.duration }} min</span>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted">No lessons available for this module.</p>
-                {% endif %}
+              </div>
+              <div class="ms-3 d-flex flex-column gap-2">
+                <a href="{% url 'custom_admin:module_detail' module_id=module.id %}"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="ti ti-eye me-1"></i>View
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="confirmRemoveModule({{ module.course_module_id }}, '{{ module.title|escapejs }}')">
+                  <i class="ti ti-trash me-1"></i>Remove
+                </button>
               </div>
             </div>
           </div>
@@ -230,8 +231,151 @@ document.addEventListener('DOMContentLoaded', function() {
         {% else %}
         <div class="text-center py-4">
           <i class="ti ti-book-off fs-1 text-muted mb-3"></i>
-          <h5 class="mb-2">No modules available</h5>
-          <p class="text-muted">Add modules to organize course content.</p>
+          <h5 class="mb-2">No modules assigned</h5>
+          <p class="text-muted mb-3">Add modules to organize course content.</p>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+            <i class="ti ti-plus me-1"></i>Add Your First Module
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Course-Level Assignments -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Course Assignments</h5>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+            <i class="ti ti-plus me-1"></i>Add Assignment
+          </button>
+        </div>
+
+        {% if course_assignments %}
+        <div class="list-group">
+          {% for ca in course_assignments %}
+          <div class="list-group-item">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-secondary me-2">Order: {{ ca.order }}</span>
+                  <h6 class="mb-0">{{ ca.assignment.title }}</h6>
+                </div>
+                <p class="text-muted small mb-1">{{ ca.assignment.description|truncatewords:15 }}</p>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-info">{{ ca.assignment.max_points }} points</span>
+                  <span class="badge bg-warning">Pass: {{ ca.assignment.passing_score }}%</span>
+                  {% if ca.assignment.is_required %}<span class="badge bg-danger">Required</span>{% endif %}
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger"
+                      onclick="confirmRemoveAssignment({{ ca.id }}, '{{ ca.assignment.title|escapejs }}')">
+                <i class="ti ti-trash me-1"></i>Remove
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-file-text-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-3">No course-level assignments yet.</p>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+            <i class="ti ti-plus me-1"></i>Add Assignment
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Course-Level Quizzes -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Course Quizzes</h5>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+            <i class="ti ti-plus me-1"></i>Add Quiz
+          </button>
+        </div>
+
+        {% if course_quizzes %}
+        <div class="list-group">
+          {% for cq in course_quizzes %}
+          <div class="list-group-item">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-secondary me-2">Order: {{ cq.order }}</span>
+                  <h6 class="mb-0">{{ cq.quiz.title }}</h6>
+                </div>
+                <p class="text-muted small mb-1">{{ cq.quiz.description|truncatewords:15 }}</p>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-info">{{ cq.quiz.total_questions }} questions</span>
+                  <span class="badge bg-warning">{{ cq.quiz.time_limit }} mins</span>
+                  {% if cq.quiz.is_required %}<span class="badge bg-danger">Required</span>{% endif %}
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger"
+                      onclick="confirmRemoveQuiz({{ cq.id }}, '{{ cq.quiz.title|escapejs }}')">
+                <i class="ti ti-trash me-1"></i>Remove
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-clipboard-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-3">No course-level quizzes yet.</p>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+            <i class="ti ti-plus me-1"></i>Add Quiz
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Course-Level PDFs -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="card-title mb-0">Course PDF Notes</h5>
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addPDFModal">
+            <i class="ti ti-plus me-1"></i>Add PDF
+          </button>
+        </div>
+
+        {% if course_pdfs %}
+        <div class="list-group">
+          {% for cp in course_pdfs %}
+          <div class="list-group-item">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-secondary me-2">Order: {{ cp.order }}</span>
+                  <h6 class="mb-0">{{ cp.pdf_note.title }}</h6>
+                </div>
+                <p class="text-muted small mb-1">{{ cp.pdf_note.description|truncatewords:15 }}</p>
+                <div class="d-flex gap-2">
+                  {% if cp.pdf_note.page_count %}<span class="badge bg-info">{{ cp.pdf_note.page_count }} pages</span>{% endif %}
+                  {% if cp.pdf_note.is_downloadable %}<span class="badge bg-success">Downloadable</span>{% endif %}
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger"
+                      onclick="confirmRemovePDF({{ cp.id }}, '{{ cp.pdf_note.title|escapejs }}')">
+                <i class="ti ti-trash me-1"></i>Remove
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-file-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-3">No course-level PDF notes yet.</p>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPDFModal">
+            <i class="ti ti-plus me-1"></i>Add PDF
+          </button>
         </div>
         {% endif %}
       </div>
@@ -341,4 +485,213 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
+<!-- Add Module Modal -->
+<div class="modal fade" id="addModuleModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:course_add_module' course_id=course.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Module to Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="module_id" class="form-label">Select Module</label>
+            <select name="module_id" id="module_id" class="form-select" required>
+              <option value="">-- Select a Module --</option>
+              {% for module in available_modules %}
+              <option value="{{ module.id }}">{{ module.title }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Choose a module to add to this course</div>
+          </div>
+          <div class="mb-3">
+            <label for="order" class="form-label">Order</label>
+            <input type="number" name="order" id="order" class="form-control" value="{{ modules|length|add:1 }}" min="1" required>
+            <div class="form-text">Position of this module in the course sequence</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Module</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Assignment Modal -->
+<div class="modal fade" id="addAssignmentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:course_add_assignment' course_id=course.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Assignment to Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="assignment_id" class="form-label">Select Assignment</label>
+            <select name="assignment_id" id="assignment_id" class="form-select" required>
+              <option value="">-- Select an Assignment --</option>
+              {% for assignment in available_assignments %}
+              <option value="{{ assignment.id }}">{{ assignment.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="assignment_order" class="form-label">Order</label>
+            <input type="number" name="order" id="assignment_order" class="form-control" value="{{ course_assignments|length|add:1 }}" min="1" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Quiz Modal -->
+<div class="modal fade" id="addQuizModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:course_add_quiz' course_id=course.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Quiz to Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="quiz_id" class="form-label">Select Quiz</label>
+            <select name="quiz_id" id="quiz_id" class="form-select" required>
+              <option value="">-- Select a Quiz --</option>
+              {% for quiz in available_quizzes %}
+              <option value="{{ quiz.id }}">{{ quiz.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="quiz_order" class="form-label">Order</label>
+            <input type="number" name="order" id="quiz_order" class="form-control" value="{{ course_quizzes|length|add:1 }}" min="1" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add PDF Modal -->
+<div class="modal fade" id="addPDFModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:course_add_pdf' course_id=course.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add PDF Note to Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="pdf_id" class="form-label">Select PDF Note</label>
+            <select name="pdf_id" id="pdf_id" class="form-select" required>
+              <option value="">-- Select a PDF --</option>
+              {% for pdf in available_pdfs %}
+              <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="pdf_order" class="form-label">Order</label>
+            <input type="number" name="order" id="pdf_order" class="form-control" value="{{ course_pdfs|length|add:1 }}" min="1" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add PDF</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmRemoveModule(courseModuleId, moduleTitle) {
+  if (confirm(`Are you sure you want to remove "${moduleTitle}" from this course?\n\nThis will NOT delete the module itself, only remove it from this course.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `{% url 'custom_admin:course_remove_module' course_id=course.id course_module_id=0 %}`.replace('/0/', `/${courseModuleId}/`);
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function confirmRemoveAssignment(courseAssignmentId, assignmentTitle) {
+  if (confirm(`Are you sure you want to remove "${assignmentTitle}" from this course?`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `{% url 'custom_admin:course_remove_assignment' course_id=course.id course_assignment_id=0 %}`.replace('/0/', `/${courseAssignmentId}/`);
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function confirmRemoveQuiz(courseQuizId, quizTitle) {
+  if (confirm(`Are you sure you want to remove "${quizTitle}" from this course?`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `{% url 'custom_admin:course_remove_quiz' course_id=course.id course_quiz_id=0 %}`.replace('/0/', `/${courseQuizId}/`);
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function confirmRemovePDF(coursePDFId, pdfTitle) {
+  if (confirm(`Are you sure you want to remove "${pdfTitle}" from this course?`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `{% url 'custom_admin:course_remove_pdf' course_id=course.id course_pdf_id=0 %}`.replace('/0/', `/${coursePDFId}/`);
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+
 {% endblock %}

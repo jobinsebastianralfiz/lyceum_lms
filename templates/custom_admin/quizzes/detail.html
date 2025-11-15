@@ -15,7 +15,13 @@
             <div class="d-flex align-items-center gap-2 mb-2">
               <span class="badge bg-info-subtle text-info">{{ quiz.module.course.title }}</span>
               <span class="text-muted">→</span>
-              <span class="badge bg-secondary-subtle text-secondary">{{ quiz.module.title }}</span>
+              <span class="badge bg-secondary-subtle text-secondary">{% for link in quiz.module_links.all %}
+                  <a href="{% url 'custom_admin:module_detail' link.module.id %}">
+                    {{ link.module.title }}
+                  </a>
+                  <span class="badge bg-secondary">#{{ link.order }}</span>
+                  {% if not forloop.last %}, {% endif %}
+                {% endfor %}</span>
             </div>
           </div>
           <div class="ms-auto">

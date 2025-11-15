@@ -1,0 +1,21 @@
+# Copy this content to your .htaccess file in public_html
+# This ensures /api/ requests are routed to Django
+
+RewriteEngine On
+
+# Handle API requests - route to Django
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ /cgi-bin/codelearn_lms.cgi/$1 [QSA,L]
+
+# Handle static files
+RewriteCond %{REQUEST_URI} ^/codelearnstatic/
+RewriteRule ^codelearnstatic/(.*)$ /codelearnstatic/$1 [L]
+
+# Handle media files
+RewriteCond %{REQUEST_URI} ^/codelearnmedia/
+RewriteRule ^codelearnmedia/(.*)$ /codelearnmedia/$1 [L]
+
+# Handle all other requests - route to Django
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /cgi-bin/codelearn_lms.cgi/$1 [QSA,L]

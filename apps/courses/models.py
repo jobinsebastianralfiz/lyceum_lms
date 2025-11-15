@@ -16,6 +16,9 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 class Course(models.Model):
+    # Many-to-many with Module through CourseModule
+    modules = models.ManyToManyField('Module', through='CourseModule', related_name='module_courses')
+
     title = models.CharField(max_length=200)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='courses')
@@ -31,7 +34,7 @@ class Course(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_courses')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.title
     
@@ -77,16 +80,18 @@ class Course(models.Model):
         ordering = ['-created_at']
 
 class Module(models.Model):
+    """Reusable module that can be added to multiple courses"""
     DIFFICULTY_CHOICES = [
         ('beginner', 'Beginner'),
         ('intermediate', 'Intermediate'),
         ('advanced', 'Advanced'),
     ]
-    
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
+
+    # Many-to-many with Course through CourseModule
+    courses = models.ManyToManyField('Course', through='CourseModule', related_name='course_modules')
+
     title = models.CharField(max_length=200)
     description = models.TextField(default="Module description not provided.")
-    order = models.PositiveIntegerField(default=1, help_text="Order of module in the course")
     learning_objectives = models.TextField(blank=True, null=True, help_text="What students will learn")
     duration_minutes = models.PositiveIntegerField(blank=True, null=True, help_text="Estimated completion time")
     difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
@@ -99,52 +104,98 @@ class Module(models.Model):
     tags = models.CharField(max_length=500, blank=True, null=True, help_text="Comma-separated tags")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
-        return f"{self.course.title} - {self.title}"
-    
+        return self.title
+
+    def get_first_course(self):
+        """Helper method to get first course (for backward compatibility)"""
+        first_link = self.course_links.select_related('course').first()
+        return first_link.course if first_link else None
+
+    @property
+    def course(self):
+        """Property for backward compatibility - returns first course"""
+        if not hasattr(self, '_cached_course'):
+            self._cached_course = self.get_first_course()
+        return self._cached_course
+
     class Meta:
         db_table = 'modules'
-        ordering = ['order']
+        ordering = ['title']
+
+
+class CourseModule(models.Model):
+    """Through model for Course-Module relationship with ordering"""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='module_links')
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='course_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of module in this course")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.module.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'course_modules'
+        ordering = ['course', 'order']
+        unique_together = ['course', 'module']
+
+class ModuleVideo(models.Model):
+    """Through model for Module-VideoLesson relationship with ordering"""
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='video_links')
+    video_lesson = models.ForeignKey('VideoLesson', on_delete=models.CASCADE, related_name='module_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of video in this module")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.module.title} - {self.video_lesson.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'module_videos'
+        ordering = ['module', 'order']
+        unique_together = ['module', 'video_lesson']
+
 
 class VideoLesson(models.Model):
+    """Reusable video lesson that can be added to multiple modules"""
     PLATFORM_CHOICES = [
         ('youtube', 'YouTube'),
         ('vimeo', 'Vimeo'),
         ('direct', 'Direct URL'),
     ]
-    
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='video_lessons')
+
+    # Many-to-many with Module through ModuleVideo
+    modules = models.ManyToManyField(Module, through='ModuleVideo', related_name='module_videos')
+
     title = models.CharField(max_length=200)
-    
+
     # Legacy fields (kept for backward compatibility)
     youtube_video_id = models.CharField(max_length=20, blank=True, null=True, help_text="YouTube video ID (legacy)")
     youtube_url = models.URLField(blank=True, null=True, help_text="Full YouTube URL (legacy)")
-    
+
     # New platform-agnostic fields
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES, default='youtube', help_text="Video platform")
     video_url = models.URLField(blank=True, null=True, help_text="Original video URL")
     video_id = models.CharField(max_length=50, blank=True, null=True, help_text="Platform-specific video ID")
     vimeo_video_id = models.CharField(max_length=20, blank=True, null=True, help_text="Vimeo video ID")
-    
+
     # Metadata (can be auto-fetched or manual)
     thumbnail_url = models.URLField(blank=True, null=True)
     duration = models.PositiveIntegerField(default=0, help_text="Duration in seconds")
     description = models.TextField(blank=True, null=True)
-    
+
     # API integration tracking
     auto_fetched = models.BooleanField(default=False, help_text="Was metadata fetched from API?")
     last_api_sync = models.DateTimeField(blank=True, null=True, help_text="Last time metadata was synced")
-    
+
     # Other fields
     resource_file = models.FileField(upload_to='lesson_resources/', blank=True, null=True)
-    order = models.PositiveIntegerField(default=1, help_text="Order of lesson in the module")
     is_preview = models.BooleanField(default=False, help_text="Free preview for non-enrolled students")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
-        return f"{self.module.title} - {self.title}"
+        return self.title
     
     @property
     def effective_video_id(self):
@@ -184,22 +235,22 @@ class VideoLesson(models.Model):
         """Fetch and update metadata from video platform API"""
         from .services import VideoIntegrationService
         from django.utils import timezone
-        
+
         url = self.video_url or self.youtube_url
         if not url:
             return False, "No video URL provided"
-        
+
         metadata = VideoIntegrationService.fetch_video_metadata(url)
-        
+
         if 'error' in metadata:
             return False, metadata['error']
-        
+
         # Update fields with fetched metadata
         self.title = self.title or metadata.get('title', self.title)
         self.description = self.description or metadata.get('description', self.description)
         self.thumbnail_url = self.thumbnail_url or metadata.get('thumbnail_url', self.thumbnail_url)
         self.duration = self.duration or metadata.get('duration', self.duration)
-        
+
         # Update platform-specific fields
         self.platform = metadata.get('platform', self.platform)
         self.video_id = metadata.get('video_id', self.video_id)
@@ -207,71 +258,322 @@ class VideoLesson(models.Model):
             self.youtube_video_id = self.youtube_video_id or self.video_id
         elif self.platform == 'vimeo':
             self.vimeo_video_id = self.vimeo_video_id or self.video_id
-        
+
         # Update tracking fields
         self.auto_fetched = True
         self.last_api_sync = timezone.now()
-        
+
         return True, "Metadata synced successfully"
-    
+
+    def get_first_module(self):
+        """Helper method to get first module (for backward compatibility)"""
+        first_link = self.module_links.select_related('module').first()
+        return first_link.module if first_link else None
+
+    def get_first_course(self):
+        """Helper method to get first course via module (for backward compatibility)"""
+        module = self.get_first_module()
+        if module:
+            first_course_link = module.course_links.select_related('course').first()
+            return first_course_link.course if first_course_link else None
+        return None
+
+    @property
+    def module(self):
+        """Property for backward compatibility - returns first module"""
+        if not hasattr(self, '_cached_module'):
+            self._cached_module = self.get_first_module()
+        return self._cached_module
+
     class Meta:
         db_table = 'video_lessons'
-        ordering = ['order']
+        ordering = ['title']
 
 class Assignment(models.Model):
-    """Assignments that students must complete to progress"""
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='assignments')
+    """Reusable assignments that can be added to courses, modules, or video lessons"""
+    # Many-to-many relationships at multiple levels
+    courses = models.ManyToManyField('Course', through='CourseAssignment', related_name='course_assignments', blank=True)
+    modules = models.ManyToManyField(Module, through='ModuleAssignment', related_name='module_assignments', blank=True)
+    video_lessons = models.ManyToManyField('VideoLesson', through='VideoAssignment', related_name='video_assignments', blank=True)
+
     title = models.CharField(max_length=200)
     description = models.TextField(help_text="Assignment instructions and requirements")
     requirements = models.TextField(blank=True, null=True, help_text="Specific requirements (e.g., 'Create a Python script that...')")
     resources = models.TextField(blank=True, null=True, help_text="Additional resources or links")
     max_points = models.PositiveIntegerField(default=100, help_text="Maximum points for this assignment")
     passing_score = models.PositiveIntegerField(default=70, help_text="Minimum score to pass")
-    due_days = models.PositiveIntegerField(default=7, help_text="Days from module start to complete assignment")
-    is_required = models.BooleanField(default=True, help_text="Required to proceed to next module")
-    order = models.PositiveIntegerField(default=1, help_text="Order within the module")
+    due_days = models.PositiveIntegerField(default=7, help_text="Days from start to complete assignment")
+    is_required = models.BooleanField(default=True, help_text="Required to proceed")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
-        return f"{self.module.title} - {self.title}"
-    
+        return self.title
+
+    def get_first_course(self):
+        """Get first directly linked course"""
+        first_link = self.course_links.select_related('course').first()
+        return first_link.course if first_link else None
+
+    def get_first_module(self):
+        """Helper method to get first module (for backward compatibility)"""
+        first_link = self.module_links.select_related('module').first()
+        return first_link.module if first_link else None
+
+    def get_first_video(self):
+        """Get first video lesson"""
+        first_link = self.video_links.select_related('video_lesson').first()
+        return first_link.video_lesson if first_link else None
+
+    @property
+    def module(self):
+        """Property for backward compatibility - returns first module"""
+        if not hasattr(self, '_cached_module'):
+            self._cached_module = self.get_first_module()
+        return self._cached_module
+
     class Meta:
         db_table = 'assignments'
-        ordering = ['order']
-        unique_together = ['module', 'order']
+        ordering = ['title']
+
+
+class CourseAssignment(models.Model):
+    """Through model for Course-Assignment relationship with ordering"""
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='assignment_links')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='course_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of assignment in this course")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.assignment.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'course_assignments'
+        ordering = ['course', 'order']
+        unique_together = ['course', 'assignment']
+
+
+class ModuleAssignment(models.Model):
+    """Through model for Module-Assignment relationship with ordering"""
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='assignment_links')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='module_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of assignment in this module")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.module.title} - {self.assignment.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'module_assignments'
+        ordering = ['module', 'order']
+        unique_together = ['module', 'assignment']
+
+
+class VideoAssignment(models.Model):
+    """Through model for VideoLesson-Assignment relationship with ordering"""
+    video_lesson = models.ForeignKey('VideoLesson', on_delete=models.CASCADE, related_name='assignment_links')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='video_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of assignment for this video")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.video_lesson.title} - {self.assignment.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'video_assignments'
+        ordering = ['video_lesson', 'order']
+        unique_together = ['video_lesson', 'assignment']
 
 
 class Quiz(models.Model):
-    """Quizzes that students must complete to progress"""
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='quizzes')
+    """Reusable quizzes that can be added to courses, modules, or video lessons"""
+    # Many-to-many relationships at multiple levels
+    courses = models.ManyToManyField('Course', through='CourseQuiz', related_name='course_quizzes', blank=True)
+    modules = models.ManyToManyField(Module, through='ModuleQuiz', related_name='module_quizzes', blank=True)
+    video_lessons = models.ManyToManyField('VideoLesson', through='VideoQuiz', related_name='video_quizzes', blank=True)
+
     title = models.CharField(max_length=200)
     description = models.TextField(help_text="Quiz instructions")
     time_limit = models.PositiveIntegerField(default=30, help_text="Time limit in minutes")
     max_attempts = models.PositiveIntegerField(default=3, help_text="Maximum attempts allowed")
     passing_score = models.PositiveIntegerField(default=70, help_text="Minimum score percentage to pass")
-    is_required = models.BooleanField(default=True, help_text="Required to proceed to next module")
+    is_required = models.BooleanField(default=True, help_text="Required to proceed")
     randomize_questions = models.BooleanField(default=True, help_text="Randomize question order")
     show_results_immediately = models.BooleanField(default=True, help_text="Show results after submission")
-    order = models.PositiveIntegerField(default=1, help_text="Order within the module")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
-        return f"{self.module.title} - {self.title}"
-    
+        return self.title
+
     @property
     def total_questions(self):
         return self.questions.count()
-    
+
     @property
     def total_points(self):
         return sum(q.points for q in self.questions.all())
-    
+
+    def get_first_course(self):
+        """Get first directly linked course"""
+        first_link = self.course_links.select_related('course').first()
+        return first_link.course if first_link else None
+
+    def get_first_module(self):
+        """Helper method to get first module (for backward compatibility)"""
+        first_link = self.module_links.select_related('module').first()
+        return first_link.module if first_link else None
+
+    def get_first_video(self):
+        """Get first video lesson"""
+        first_link = self.video_links.select_related('video_lesson').first()
+        return first_link.video_lesson if first_link else None
+
+    @property
+    def module(self):
+        """Property for backward compatibility - returns first module"""
+        if not hasattr(self, '_cached_module'):
+            self._cached_module = self.get_first_module()
+        return self._cached_module
+
     class Meta:
         db_table = 'quizzes'
-        ordering = ['order']
-        unique_together = ['module', 'order']
+        ordering = ['title']
+
+
+class CourseQuiz(models.Model):
+    """Through model for Course-Quiz relationship with ordering"""
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='quiz_links')
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='course_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of quiz in this course")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.quiz.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'course_quizzes'
+        ordering = ['course', 'order']
+        unique_together = ['course', 'quiz']
+
+
+class ModuleQuiz(models.Model):
+    """Through model for Module-Quiz relationship with ordering"""
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='quiz_links')
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='module_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of quiz in this module")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.module.title} - {self.quiz.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'module_quizzes'
+        ordering = ['module', 'order']
+        unique_together = ['module', 'quiz']
+
+
+class VideoQuiz(models.Model):
+    """Through model for VideoLesson-Quiz relationship with ordering"""
+    video_lesson = models.ForeignKey('VideoLesson', on_delete=models.CASCADE, related_name='quiz_links')
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='video_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of quiz for this video")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.video_lesson.title} - {self.quiz.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'video_quizzes'
+        ordering = ['video_lesson', 'order']
+        unique_together = ['video_lesson', 'quiz']
+
+
+class PDFNote(models.Model):
+    """PDF notes/documents that can be added to courses, modules, or video lessons"""
+    # Many-to-many relationships at multiple levels
+    courses = models.ManyToManyField('Course', through='CoursePDF', related_name='course_pdfs', blank=True)
+    modules = models.ManyToManyField(Module, through='ModulePDF', related_name='module_pdfs', blank=True)
+    video_lessons = models.ManyToManyField('VideoLesson', through='VideoPDF', related_name='video_pdfs', blank=True)
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True, help_text="Description of the PDF content")
+    pdf_file = models.FileField(upload_to='course_pdfs/', help_text="Upload PDF file")
+    file_size = models.PositiveIntegerField(blank=True, null=True, help_text="File size in bytes")
+    page_count = models.PositiveIntegerField(blank=True, null=True, help_text="Number of pages")
+    is_downloadable = models.BooleanField(default=True, help_text="Allow students to download")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    def get_first_course(self):
+        """Get first directly linked course"""
+        first_link = self.course_links.select_related('course').first()
+        return first_link.course if first_link else None
+
+    def get_first_module(self):
+        """Get first module"""
+        first_link = self.module_links.select_related('module').first()
+        return first_link.module if first_link else None
+
+    def get_first_video(self):
+        """Get first video lesson"""
+        first_link = self.video_links.select_related('video_lesson').first()
+        return first_link.video_lesson if first_link else None
+
+    class Meta:
+        db_table = 'pdf_notes'
+        ordering = ['title']
+
+
+class CoursePDF(models.Model):
+    """Through model for Course-PDFNote relationship with ordering"""
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='pdf_links')
+    pdf_note = models.ForeignKey(PDFNote, on_delete=models.CASCADE, related_name='course_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of PDF in this course")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.pdf_note.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'course_pdfs'
+        ordering = ['course', 'order']
+        unique_together = ['course', 'pdf_note']
+
+
+class ModulePDF(models.Model):
+    """Through model for Module-PDFNote relationship with ordering"""
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='pdf_links')
+    pdf_note = models.ForeignKey(PDFNote, on_delete=models.CASCADE, related_name='module_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of PDF in this module")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.module.title} - {self.pdf_note.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'module_pdfs'
+        ordering = ['module', 'order']
+        unique_together = ['module', 'pdf_note']
+
+
+class VideoPDF(models.Model):
+    """Through model for VideoLesson-PDFNote relationship with ordering"""
+    video_lesson = models.ForeignKey('VideoLesson', on_delete=models.CASCADE, related_name='pdf_links')
+    pdf_note = models.ForeignKey(PDFNote, on_delete=models.CASCADE, related_name='video_links')
+    order = models.PositiveIntegerField(default=1, help_text="Order of PDF for this video")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.video_lesson.title} - {self.pdf_note.title} (Order: {self.order})"
+
+    class Meta:
+        db_table = 'video_pdfs'
+        ordering = ['video_lesson', 'order']
+        unique_together = ['video_lesson', 'pdf_note']
 
 
 class QuizQuestion(models.Model):
@@ -282,7 +584,7 @@ class QuizQuestion(models.Model):
         ('short_answer', 'Short Answer'),
         ('essay', 'Essay'),
     ]
-    
+
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     question_text = models.TextField()
     question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default='multiple_choice')
@@ -291,10 +593,10 @@ class QuizQuestion(models.Model):
     order = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.quiz.title} - Q{self.order}"
-    
+
     class Meta:
         db_table = 'quiz_questions'
         ordering = ['order']
@@ -511,15 +813,20 @@ class ModuleProgress(models.Model):
     
     def check_completion(self):
         """Check if module is completed and update status"""
-        # Check video completion
-        total_videos = self.module.video_lessons.count()
-        completed_videos = self.student.progress.filter(
-            video_lesson__module=self.module, 
+        # Check video completion - use the through table relationship
+        total_videos = self.module.video_links.count()
+
+        # Count completed videos for this module (need to go through the through table)
+        completed_video_ids = self.student.progress.filter(
             completed=True
-        ).count()
-        
-        # Check assignment completion
-        required_assignments = self.module.assignments.filter(is_required=True)
+        ).values_list('video_lesson_id', flat=True)
+
+        module_video_ids = self.module.video_links.values_list('video_lesson_id', flat=True)
+        completed_videos = len(set(completed_video_ids) & set(module_video_ids))
+
+        # Check assignment completion - use the through table relationship
+        assignment_links = self.module.assignment_links.select_related('assignment')
+        required_assignments = [link.assignment for link in assignment_links if link.assignment.is_required]
         passed_assignments = 0
         for assignment in required_assignments:
             try:
@@ -528,9 +835,10 @@ class ModuleProgress(models.Model):
                     passed_assignments += 1
             except AssignmentSubmission.DoesNotExist:
                 pass
-        
-        # Check quiz completion
-        required_quizzes = self.module.quizzes.filter(is_required=True)
+
+        # Check quiz completion - use the through table relationship
+        quiz_links = self.module.quiz_links.select_related('quiz')
+        required_quizzes = [link.quiz for link in quiz_links if link.quiz.is_required]
         passed_quizzes = 0
         for quiz in required_quizzes:
             best_attempt = quiz.attempts.filter(student=self.student, completed=True).order_by('-score').first()
@@ -541,20 +849,20 @@ class ModuleProgress(models.Model):
         self.videos_completed = completed_videos
         self.assignments_completed = passed_assignments
         self.quizzes_passed = passed_quizzes
-        
+
         # Calculate completion percentage
-        total_requirements = total_videos + required_assignments.count() + required_quizzes.count()
+        total_requirements = total_videos + len(required_assignments) + len(required_quizzes)
         completed_requirements = completed_videos + passed_assignments + passed_quizzes
-        
+
         if total_requirements > 0:
             self.completion_percentage = (completed_requirements / total_requirements) * 100
         else:
             self.completion_percentage = 100
-        
+
         # Check if completed
         all_videos_done = (total_videos == 0) or (completed_videos == total_videos)
-        all_assignments_done = (required_assignments.count() == 0) or (passed_assignments == required_assignments.count())
-        all_quizzes_done = (required_quizzes.count() == 0) or (passed_quizzes == required_quizzes.count())
+        all_assignments_done = (len(required_assignments) == 0) or (passed_assignments == len(required_assignments))
+        all_quizzes_done = (len(required_quizzes) == 0) or (passed_quizzes == len(required_quizzes))
         
         was_completed = self.is_completed
         self.is_completed = all_videos_done and all_assignments_done and all_quizzes_done
@@ -710,28 +1018,59 @@ class StudentAnalytics(models.Model):
         ).count()
         
         # Update performance metrics
-        quiz_avg = QuizAttempt.objects.filter(
+        # Calculate average quiz score percentage using database fields
+        from django.db.models import F, FloatField
+        from django.db.models.functions import Cast
+
+        quiz_attempts = QuizAttempt.objects.filter(
             student=self.student,
             completed=True
-        ).aggregate(avg_score=Avg('score_percentage'))['avg_score']
-        self.avg_quiz_score = quiz_avg or 0
+        ).exclude(total_points=0)  # Avoid division by zero
+
+        if quiz_attempts.exists():
+            # Calculate percentage in database: (score / total_points) * 100
+            quiz_avg = quiz_attempts.aggregate(
+                avg_score=Avg(
+                    Cast(F('score'), FloatField()) * 100.0 / Cast(F('total_points'), FloatField())
+                )
+            )['avg_score']
+            self.avg_quiz_score = quiz_avg or 0
+        else:
+            self.avg_quiz_score = 0
         
-        assignment_avg = AssignmentSubmission.objects.filter(
+        # Calculate average assignment score percentage
+        assignment_submissions = AssignmentSubmission.objects.filter(
             student=self.student
-        ).exclude(status='draft').exclude(grade__isnull=True).aggregate(
-            avg_grade=Avg('grade')
-        )['avg_grade']
-        self.avg_assignment_score = assignment_avg or 0
+        ).exclude(status='draft').exclude(score__isnull=True).select_related('assignment')
+
+        if assignment_submissions.exists():
+            # Calculate percentage in database: (score / max_points) * 100
+            assignment_avg = assignment_submissions.aggregate(
+                avg_grade=Avg(
+                    Cast(F('score'), FloatField()) * 100.0 / Cast(F('assignment__max_points'), FloatField())
+                )
+            )['avg_grade']
+            self.avg_assignment_score = assignment_avg or 0
+        else:
+            self.avg_assignment_score = 0
         
         # Update login data
         self.last_login = self.student.last_login
         
         # Calculate completed modules
-        completed_modules = StudentProgress.objects.filter(
+        # Get completed videos
+        completed_video_ids = StudentProgress.objects.filter(
             user=self.student,
             completed=True
-        ).values('video_lesson__module').distinct().count()
-        self.modules_completed = completed_modules
+        ).values_list('video_lesson_id', flat=True)
+
+        # Get modules that contain these videos through ModuleVideo
+        from apps.courses.models import ModuleVideo
+        completed_module_ids = ModuleVideo.objects.filter(
+            video_lesson_id__in=completed_video_ids
+        ).values_list('module_id', flat=True).distinct()
+
+        self.modules_completed = len(set(completed_module_ids))
         
         # Recalculate risk score with updated data
         self.calculate_risk_score()

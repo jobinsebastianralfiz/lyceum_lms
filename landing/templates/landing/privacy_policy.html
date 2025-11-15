@@ -1,65 +1,231 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Privacy Policy - Uptrail{% endblock %}
+{% block title %}Privacy Policy - Lyceum Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Dark Theme for Policy Pages */
+.policy-hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  padding: 150px 0 80px;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+}
+
+.policy-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.policy-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 20px;
+}
+
+.policy-hero .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+}
+
+.policy-hero .breadcrumb-item {
+  color: #CBD5E1;
+}
+
+.policy-hero .breadcrumb-item a {
+  color: #2AB673;
+  text-decoration: none;
+}
+
+.policy-hero .breadcrumb-item + .breadcrumb-item::before {
+  color: #CBD5E1;
+}
+
+.policy-content {
+  background: #0F172A;
+  padding: 80px 0;
+}
+
+.policy-card {
+  background: #1E293B;
+  border-radius: 16px;
+  padding: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: none !important;
+}
+
+.policy-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #334155;
+}
+
+.policy-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2AB673;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.policy-card p {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.policy-card ul, .policy-card ol {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  padding-left: 30px;
+}
+
+.policy-card li {
+  margin-bottom: 12px;
+  color: #CBD5E1;
+}
+
+.policy-card strong {
+  color: #F9FAFB;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .policy-hero h1 {
+    font-size: 2rem;
+  }
+
+  .policy-card {
+    padding: 30px 20px;
+  }
+
+  .policy-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .policy-card h3 {
+    font-size: 1.4rem;
+  }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="cs-height_90 cs-height_lg_80"></div>
-
-<!-- Start Page Heading -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 300px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<!-- Hero Section -->
+<section class="policy-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">Privacy <b>Policy</b></h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item">Privacy Policy</li>
-      </ol>
+    <div class="policy-hero-content">
+      <h1>Privacy Policy</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Privacy Policy</li>
+        </ol>
+      </nav>
     </div>
   </div>
-</div>
-<!-- End Page Heading -->
+</section>
 
-<!-- Start Content -->
-<div class="cs-height_140 cs-height_lg_80"></div>
-<div class="container">
-  <div class="row">
-    <div class="col-lg-8 offset-lg-2">
-      <div class="cs-text_box cs-style1">
-        <h2 class="cs-text_box_title">Privacy Policy</h2>
-        <div class="cs-height_25 cs-height_lg_25"></div>
-        <div class="cs-text_box_text">
-          <p>At Uptrail, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our learning management platform.</p>
-          
+<!-- Content Section -->
+<section class="policy-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 offset-lg-1">
+        <div class="policy-card">
+          <h2>Privacy Policy</h2>
+
+          <p>At Lyceum Academy, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our learning management platform.</p>
+
           <h3>Information We Collect</h3>
           <p>We collect information you provide directly to us, such as when you create an account, enroll in courses, or contact us for support. This may include:</p>
           <ul>
-            <li>Name and contact information</li>
-            <li>Account credentials</li>
-            <li>Payment information</li>
+            <li>Name and contact information (email address, phone number)</li>
+            <li>Account credentials (username, password)</li>
+            <li>Payment information (processed securely through third-party payment processors)</li>
             <li>Course progress and performance data</li>
+            <li>Profile information and preferences</li>
           </ul>
-          
+
           <h3>How We Use Your Information</h3>
           <p>We use the information we collect to:</p>
           <ul>
-            <li>Provide and maintain our services</li>
-            <li>Process transactions and send notifications</li>
-            <li>Improve our platform and user experience</li>
-            <li>Communicate with you about our services</li>
+            <li>Provide and maintain our educational services</li>
+            <li>Process transactions and send notifications about your courses</li>
+            <li>Improve our platform and enhance user experience</li>
+            <li>Communicate with you about our services, updates, and promotional offers</li>
+            <li>Provide customer support and respond to your inquiries</li>
+            <li>Analyze usage patterns to improve our content and features</li>
           </ul>
-          
+
           <h3>Data Security</h3>
-          <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
-          
+          <p>We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes:</p>
+          <ul>
+            <li>Encryption of data in transit and at rest</li>
+            <li>Regular security audits and updates</li>
+            <li>Secure authentication mechanisms</li>
+            <li>Limited access to personal data on a need-to-know basis</li>
+          </ul>
+
+          <h3>Data Sharing and Disclosure</h3>
+          <p>We do not sell your personal information to third parties. We may share your information only in the following circumstances:</p>
+          <ul>
+            <li>With service providers who assist us in operating our platform</li>
+            <li>When required by law or to protect our rights</li>
+            <li>With your explicit consent</li>
+          </ul>
+
+          <h3>Your Rights</h3>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access and review your personal information</li>
+            <li>Request correction of inaccurate data</li>
+            <li>Request deletion of your account and data</li>
+            <li>Opt-out of marketing communications</li>
+            <li>Export your data in a portable format</li>
+          </ul>
+
+          <h3>Cookies and Tracking</h3>
+          <p>We use cookies and similar tracking technologies to enhance your experience, analyze usage, and deliver personalized content. You can control cookie preferences through your browser settings.</p>
+
+          <h3>Children's Privacy</h3>
+          <p>Our services are not intended for users under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected such information, please contact us immediately.</p>
+
+          <h3>Changes to This Policy</h3>
+          <p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on this page and updating the "Last Updated" date.</p>
+
           <h3>Contact Us</h3>
-          <p>If you have any questions about this Privacy Policy, please contact us at privacy@uptrail.com</p>
+          <p>If you have any questions about this Privacy Policy or our data practices, please contact us at:</p>
+          <p><strong>Email:</strong> privacy@lyceumacademy.com<br>
+          <strong>Address:</strong> Lyceum Academy, [Your Address]</p>
+
+          <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #94A3B8; font-size: 0.9rem;">
+            <strong>Last Updated:</strong> January 2025
+          </p>
         </div>
       </div>
     </div>
   </div>
-</div>
-<div class="cs-height_140 cs-height_lg_80"></div>
-<!-- End Content -->
+</section>
 {% endblock %}

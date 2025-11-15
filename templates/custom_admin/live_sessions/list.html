@@ -1,0 +1,283 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Live Sessions - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">Live Sessions</h4>
+        <p class="card-subtitle">Manage scheduled and completed live sessions</p>
+      </div>
+      <div class="ms-auto d-flex gap-2">
+        <a href="{% url 'custom_admin:live_session_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Create Live Session
+        </a>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary-subtle border-0">
+          <div class="card-body text-center">
+            <h4 class="mb-0 text-primary">{{ total_sessions }}</h4>
+            <small class="text-muted">Total Sessions</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-warning-subtle border-0">
+          <div class="card-body text-center">
+            <h4 class="mb-0 text-warning">{{ upcoming_sessions }}</h4>
+            <small class="text-muted">Upcoming</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-info-subtle border-0">
+          <div class="card-body text-center">
+            <h4 class="mb-0 text-info">{{ active_sessions }}</h4>
+            <small class="text-muted">Active Now</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-success-subtle border-0">
+          <div class="card-body text-center">
+            <h4 class="mb-0 text-success">{{ completed_sessions }}</h4>
+            <small class="text-muted">Completed</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <form method="get" class="d-flex gap-2">
+          <input type="text" name="search" class="form-control" placeholder="Search sessions..."
+                 value="{{ request.GET.search }}">
+          <select name="status" class="form-select" style="max-width: 150px;">
+            <option value="">All Status</option>
+            <option value="scheduled" {% if request.GET.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+          <select name="course" class="form-select" style="max-width: 200px;">
+            <option value="">All Courses</option>
+            {% for course in courses %}
+              <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"s" %}selected{% endif %}>
+                {{ course.title }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="ti ti-search"></i>
+          </button>
+          <a href="{% url 'custom_admin:live_sessions_list' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-refresh"></i>
+          </a>
+        </form>
+      </div>
+      <div class="col-md-4 text-end">
+        <small class="text-muted">{{ sessions.count }} session{{ sessions.count|pluralize }} found</small>
+      </div>
+    </div>
+
+    <!-- Sessions Table -->
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Session</th>
+            <th>Course</th>
+            <th>Scheduled Date</th>
+            <th>Duration</th>
+            <th>Participants</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in sessions %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2"
+                     style="width: 32px; height: 32px;">
+                  <i class="ti ti-video text-primary"></i>
+                </div>
+                <div>
+                  <div class="fw-medium">{{ session.title }}</div>
+                  <small class="text-muted">{{ session.description|truncatechars:50|default:"No description" }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if session.course %}
+                <div class="fw-medium">{{ session.course.title }}</div>
+                <small class="text-muted">{{ session.course.category.name|default:"Uncategorized" }}</small>
+              {% else %}
+                <span class="text-muted">No course assigned</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="fw-medium">{{ session.scheduled_date|date:"M d, Y" }}</div>
+              <small class="text-muted">{{ session.scheduled_date|time:"H:i" }}</small>
+            </td>
+            <td>
+              <span class="badge bg-info-subtle text-info">{{ session.duration_minutes }}m</span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <span class="fw-medium">{{ session.participants.count }}</span>
+                <span class="text-muted mx-1">/</span>
+                <span class="text-muted">{{ session.max_participants }}</span>
+              </div>
+            </td>
+            <td>
+              {% if session.status == 'scheduled' %}
+                <span class="badge bg-warning">Scheduled</span>
+              {% elif session.status == 'active' %}
+                <span class="badge bg-success">Active</span>
+              {% elif session.status == 'completed' %}
+                <span class="badge bg-info">Completed</span>
+              {% elif session.status == 'cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ session.status|title }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'custom_admin:live_session_detail' session.id %}"
+                   class="btn btn-sm btn-outline-info" title="View Details">
+                  <i class="ti ti-eye"></i>
+                </a>
+                <a href="{% url 'custom_admin:live_session_edit' session.id %}"
+                   class="btn btn-sm btn-outline-primary" title="Edit Session">
+                  <i class="ti ti-edit"></i>
+                </a>
+                {% if session.status == 'scheduled' %}
+                <a href="{% url 'custom_admin:session_manage_participants' session.id %}"
+                   class="btn btn-sm btn-outline-success" title="Manage Participants">
+                  <i class="ti ti-users"></i>
+                </a>
+                {% endif %}
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    {% if session.status == 'scheduled' %}
+                    <li><a class="dropdown-item" href="{% url 'custom_admin:session_start' session.id %}">
+                      <i class="ti ti-play me-2"></i>Start Session
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'custom_admin:session_cancel' session.id %}">
+                      <i class="ti ti-ban me-2"></i>Cancel Session
+                    </a></li>
+                    {% elif session.status == 'active' %}
+                    <li><a class="dropdown-item" href="{% url 'custom_admin:session_end' session.id %}">
+                      <i class="ti ti-stop me-2"></i>End Session
+                    </a></li>
+                    {% endif %}
+                    <li><a class="dropdown-item" href="{% url 'custom_admin:session_announcement_create' session.id %}">
+                      <i class="ti ti-speakerphone me-2"></i>Add Announcement
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'custom_admin:live_session_delete' session.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete Session
+                    </a></li>
+                  </ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <div class="text-muted">
+                <i class="ti ti-video fs-1 mb-2"></i>
+                <p class="mb-0">No live sessions found</p>
+                <a href="{% url 'custom_admin:live_session_create' %}" class="btn btn-primary mt-2">
+                  <i class="ti ti-plus me-1"></i>Create Your First Session
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if sessions.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if sessions.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ sessions.previous_page_number }}">
+              Previous
+            </a>
+          </li>
+        {% endif %}
+
+        {% for page_num in sessions.paginator.page_range %}
+          {% if page_num == sessions.number %}
+            <li class="page-item active">
+              <span class="page-link">{{ page_num }}</span>
+            </li>
+          {% elif page_num > sessions.number|add:'-3' and page_num < sessions.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_num }}">{{ page_num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if sessions.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ sessions.next_page_number }}">
+              Next
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Auto-refresh active sessions every 30 seconds
+{% if active_sessions > 0 %}
+setInterval(function() {
+  // Only refresh if no modals are open
+  if (!document.querySelector('.modal.show')) {
+    location.reload();
+  }
+}, 30000);
+{% endif %}
+
+// Status color coding
+document.addEventListener('DOMContentLoaded', function() {
+  const now = new Date();
+
+  document.querySelectorAll('tr[data-scheduled-date]').forEach(function(row) {
+    const scheduledDate = new Date(row.dataset.scheduledDate);
+    const timeDiff = scheduledDate - now;
+    const hoursUntil = timeDiff / (1000 * 60 * 60);
+
+    if (hoursUntil < 1 && hoursUntil > 0) {
+      row.classList.add('table-warning'); // Starting soon
+    } else if (hoursUntil < 0) {
+      row.classList.add('table-danger'); // Overdue
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -7,11 +7,11 @@
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="Uptrail">
+  <meta name="author" content="Lyceum">
   
   <!-- Site Title -->
-  <title>{% block title %}Uptrail - Your Learning Journey Starts Here{% endblock %}</title>
-  <meta name="description" content="{% block description %}Uptrail is a cutting-edge learning management platform that transforms how you learn and grow.{% endblock %}">
+  <title>{% block title %}Lyceum Academy - Excellence in Online Education{% endblock %}</title>
+  <meta name="description" content="{% block description %}Lyceum Academy is a premier online learning institution delivering world-class education through cutting-edge technology.{% endblock %}">
   
   <!-- CSS Files -->
   <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/fontawesome.min.css' %}">
@@ -22,7 +22,420 @@
   <link rel="stylesheet" href="{% static 'landing/assets/css/style.css' %}">
   <!-- Theme Style -->
   <link rel="stylesheet" href="{% static 'landing/assets/css/theme_8.css' %}">
-  
+
+  <!-- Lyceum Custom Styles - Dark Theme -->
+  <style>
+    /* Dark Theme Color Variables */
+    :root {
+      --lyceum-green: #2AB673;
+      --lyceum-green-dark: #229959;
+      --lyceum-green-light: #3DD186;
+      --dark-bg: #0F172A;
+      --dark-bg-secondary: #1E293B;
+      --dark-bg-tertiary: #334155;
+      --dark-border: #374151;
+      --text-white: #F9FAFB;
+      --text-gray: #CBD5E1;
+      --text-gray-dark: #94A3B8;
+    }
+
+    /* Global Dark Theme */
+    body {
+      background: var(--dark-bg) !important;
+      color: var(--text-gray) !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-white) !important;
+    }
+
+    /* Override any white backgrounds */
+    .cs-white_bg,
+    .cs-white,
+    .cs-light_bg {
+      background: transparent !important;
+    }
+
+    /* Ensure all containers have dark theme */
+    .container,
+    .container-fluid {
+      background: transparent !important;
+    }
+
+    /* Remove all outlines and borders */
+    section,
+    .section,
+    .section-padding,
+    .cs-hero,
+    .lyceum-hero,
+    .feature-card,
+    .course-card,
+    .stats-section,
+    .cta-section,
+    .content-card,
+    div[class*="section"] {
+      outline: none !important;
+      border: none !important;
+    }
+
+    /* Remove borders from rows and columns */
+    .row,
+    .col,
+    [class*="col-"] {
+      outline: none !important;
+      border: none !important;
+    }
+
+    /* Override accent colors */
+    .cs-accent_bg,
+    .cs-toolbox_btn.cs-accent_bg {
+      background-color: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    .cs-accent_color {
+      color: var(--lyceum-green) !important;
+      background-color: transparent !important;
+    }
+
+    .cs-accent_bg_2_hover:hover {
+      background-color: var(--lyceum-green-dark) !important;
+    }
+
+    /* Modern Dark Navigation Bar */
+    .cs-site_header,
+    .cs-site_header *,
+    .cs-main_header,
+    .cs-main_header *,
+    .cs-main_header_in {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .cs-site_header {
+      box-shadow: 0 2px 30px rgba(0, 0, 0, 0.5) !important;
+      border: none !important;
+      padding: 0 !important;
+      z-index: 9999 !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0;
+      right: 0;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+
+    .cs-sticky-header.cs-gescout_sticky {
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5) !important;
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .cs-nav,
+    .cs-nav_list,
+    .cs-main_header_left,
+    .cs-main_header_center,
+    .cs-main_header_right,
+    .cs-toolbox {
+      background: transparent !important;
+    }
+
+    /* Add spacing for fixed header */
+    body {
+      padding-top: 85px !important;
+    }
+
+    /* Logo Styling */
+    .cs-site_branding {
+      height: auto !important;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    .cs-site_branding img {
+      max-height: 55px !important;
+      height: 55px !important;
+      width: auto !important;
+      transition: all 0.3s ease;
+    }
+
+    .cs-site_branding:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Main Header Layout */
+    .cs-main_header {
+      padding: 0 !important;
+    }
+
+    .cs-main_header_in {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+      gap: 40px;
+    }
+
+    .cs-main_header_left {
+      flex: 0 0 auto;
+    }
+
+    .cs-main_header_center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .cs-main_header_right {
+      flex: 0 0 auto;
+    }
+
+    /* Modern Navigation Menu */
+    .cs-nav {
+      display: flex;
+      align-items: center;
+    }
+
+    .cs-nav_list {
+      display: flex;
+      align-items: center;
+      gap: 35px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .cs-nav_list li {
+      margin: 0;
+      position: relative;
+    }
+
+    .cs-nav_list a {
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--text-gray) !important;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      padding: 8px 0;
+      display: inline-block;
+      position: relative;
+    }
+
+    .cs-nav_list a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--lyceum-green);
+      transition: width 0.3s ease;
+    }
+
+    .cs-nav_list a:hover {
+      color: var(--lyceum-green) !important;
+    }
+
+    .cs-nav_list a:hover::after {
+      width: 100%;
+    }
+
+    /* Sign In Button */
+    .cs-toolbox_btn {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+      padding: 12px 30px !important;
+      border-radius: 8px !important;
+      font-weight: 600 !important;
+      font-size: 0.95rem !important;
+      transition: all 0.3s ease !important;
+      border: 2px solid var(--lyceum-green) !important;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cs-toolbox_btn:hover {
+      background: var(--lyceum-green-dark) !important;
+      border-color: var(--lyceum-green-dark) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(42, 182, 115, 0.3);
+    }
+
+    .cs-btn_text {
+      color: white !important;
+      background: transparent !important;
+    }
+
+    /* Mobile Menu Toggle */
+    .cs-toggle_btn,
+    .cs-munu_toggle,
+    .cs-munu_dropdown_toggle {
+      display: none;
+      background: transparent !important;
+      border: none !important;
+      color: white !important;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .cs-munu_toggle span,
+    .cs-munu_toggle span::before,
+    .cs-munu_toggle span::after {
+      background: white !important;
+    }
+
+    /* Mobile menu icon bars */
+    .cs-toggle_btn span,
+    .cs-toggle_btn::before,
+    .cs-toggle_btn::after {
+      background: white !important;
+    }
+
+    /* Close icon */
+    .cs-gescout_close {
+      color: white !important;
+    }
+
+    .cs-gescout_close::before,
+    .cs-gescout_close::after {
+      background: white !important;
+    }
+
+    /* Mobile Menu Dropdown */
+    .cs-nav.cs-active {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .cs-nav_list.cs-active {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+      body {
+        padding-top: 75px !important;
+      }
+
+      .cs-main_header_in {
+        gap: 20px;
+      }
+
+      .cs-nav_list {
+        gap: 25px;
+      }
+
+      .cs-site_branding img {
+        max-height: 50px !important;
+        height: 50px !important;
+      }
+
+      .cs-munu_toggle {
+        display: block !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-top: 70px !important;
+      }
+
+      .cs-main_header_center {
+        position: relative;
+      }
+
+      .cs-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--dark-bg-secondary) !important;
+        padding: 20px;
+      }
+
+      .cs-nav_list {
+        flex-direction: column;
+        gap: 15px !important;
+      }
+
+      .cs-nav_list li {
+        width: 100%;
+        text-align: center;
+      }
+
+      .cs-site_branding img {
+        max-height: 45px !important;
+        height: 45px !important;
+      }
+
+      .cs-toolbox_btn {
+        padding: 10px 20px !important;
+        font-size: 0.9rem !important;
+      }
+
+      .cs-munu_toggle {
+        display: block !important;
+      }
+    }
+
+    /* Footer styling */
+    .cs-footer,
+    .cs-footer *,
+    .cs-footer_item,
+    .cs-footer_item * {
+      background: var(--dark-bg-secondary) !important;
+    }
+
+    .cs-footer {
+      border: none !important;
+      color: var(--text-gray) !important;
+    }
+
+    .cs-footer h3, .cs-footer h4, .cs-footer h5 {
+      color: var(--text-white) !important;
+    }
+
+    .cs-footer a {
+      color: var(--text-gray) !important;
+      transition: color 0.3s ease;
+    }
+
+    .cs-footer a:hover {
+      color: var(--lyceum-green) !important;
+    }
+
+    .cs-footer_item .cs-logo_img img {
+      max-width: 180px !important;
+    }
+
+    .cs-footer ul,
+    .cs-footer li,
+    .cs-footer p,
+    .cs-footer div {
+      background: transparent !important;
+    }
+
+    .cs-bottom_footer,
+    .cs-bottom_footer * {
+      border: none !important;
+      background: var(--dark-bg) !important;
+    }
+
+    .cs-copyright {
+      color: var(--text-gray-dark) !important;
+    }
+
+    .cs-text_widget {
+      background: transparent !important;
+    }
+
+    /* Button hover effects */
+    .cs-btn:hover {
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+    }
+  </style>
+
   {% block extra_css %}{% endblock %}
 </head>
 
@@ -31,7 +444,7 @@
   <div class="cs-preloader cs-accent_color cs-white_bg">
     <div class="cs-preloader_bg cs-center cs-accent_8_bg_2">
       <div class="cs-preloader_in cs-accent_15_border">
-        <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Logo">
+        <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy" style="max-width: 200px;">
       </div>
     </div>
   </div>
@@ -43,34 +456,37 @@
       <div class="container">
         <div class="cs-main_header_in">
           <div class="cs-main_header_left">
+            <a class="cs-site_branding" href="{% url 'landing:home' %}">
+              <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
+            </a>
+          </div>
+          <div class="cs-main_header_center">
             <div class="cs-nav">
               <ul class="cs-nav_list">
                 <li><a href="{% url 'landing:home' %}">Home</a></li>
                 <li><a href="{% url 'landing:courses' %}">Courses</a></li>
                 <li><a href="{% url 'landing:home' %}#about">About</a></li>
                 <li><a href="{% url 'landing:contact' %}">Contact</a></li>
-                {% if user.is_authenticated %}
-                  {% if user.is_staff %}
-                    <li><a href="{% url 'custom_admin:dashboard' %}">Admin Panel</a></li>
-                  {% else %}
-                    <li><a href="{% url 'student_portal:dashboard' %}">Dashboard</a></li>
-                  {% endif %}
-                {% else %}
-                  <li><a href="{% url 'landing:login' %}">Sign In</a></li>
-                {% endif %}
               </ul>
             </div>
           </div>
-          <div class="cs-main_header_center">
-            <a class="cs-site_branding" href="{% url 'landing:home' %}">
-              <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Uptrail">
-            </a>
-          </div>
           <div class="cs-main_header_right">
-            {% if not user.is_authenticated %}
+            {% if user.is_authenticated %}
               <div class="cs-toolbox">
-                <a href="{% url 'landing:register' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
-                  <span class="cs-btn_text">Get Started</span>
+                {% if user.is_staff %}
+                  <a href="{% url 'custom_admin:dashboard' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
+                    <span class="cs-btn_text">Admin Panel</span>
+                  </a>
+                {% else %}
+                  <a href="{% url 'student_portal:dashboard' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
+                    <span class="cs-btn_text">Dashboard</span>
+                  </a>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="cs-toolbox">
+                <a href="{% url 'landing:login' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
+                  <span class="cs-btn_text">Sign In</span>
                 </a>
               </div>
             {% endif %}
@@ -95,12 +511,12 @@
               <div class="cs-logo cs-accent_color cs-mb_25">
                 <div class="cs-logo_in">
                   <div class="cs-logo_img">
-                    <img src="{% static 'landing/assets/img/online-education/logo.svg' %}" alt="Logo">
+                    <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
                   </div>
                 </div>
               </div>
               <div class="cs-m0">
-                <p>Empowering learners worldwide with innovative educational technology and personalized learning experiences.</p>
+                <p>Lyceum Academy - Empowering learners worldwide with world-class education and cutting-edge technology.</p>
               </div>
             </div>
           </div>
@@ -152,9 +568,9 @@
     <div class="container">
       <div class="cs-bottom_footer">
         <div class="cs-bottom_footer_left">
-          <div class="cs-copyright">© 2024 Uptrail. All rights reserved.</div>
+          <div class="cs-copyright">© 2024 Lyceum Academy. All rights reserved.</div>
         </div>
-       
+
       </div>
     </div>
   </footer>

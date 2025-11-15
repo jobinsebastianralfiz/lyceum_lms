@@ -1,5 +1,6 @@
 import json
 import razorpay
+import requests
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login
@@ -18,6 +19,45 @@ from apps.payments.models import Enrollment, Payment
 from apps.ratings.models import CourseRating
 
 User = get_user_model()
+
+# Helper function to verify Cloudflare Turnstile
+def verify_turnstile(token, remote_ip=None):
+    """
+    Verify Cloudflare Turnstile response
+    Returns (success: bool, error_message: str)
+    """
+    # Skip verification if Turnstile is not configured
+    turnstile_secret = getattr(settings, 'CLOUDFLARE_TURNSTILE_SECRET_KEY', '')
+    if not turnstile_secret or turnstile_secret == 'your-turnstile-secret-key':
+        # In development, if Turnstile is not configured, skip verification
+        if settings.DEBUG:
+            return True, None
+        return False, 'Turnstile verification is not configured.'
+
+    # Verify the token with Cloudflare
+    verify_url = getattr(settings, 'CLOUDFLARE_TURNSTILE_VERIFY_URL', 'https://challenges.cloudflare.com/turnstile/v0/siteverify')
+
+    data = {
+        'secret': turnstile_secret,
+        'response': token,
+    }
+
+    if remote_ip:
+        data['remoteip'] = remote_ip
+
+    try:
+        response = requests.post(verify_url, data=data, timeout=10)
+        result = response.json()
+
+        if result.get('success'):
+            return True, None
+        else:
+            error_codes = result.get('error-codes', [])
+            return False, f'Verification failed: {", ".join(error_codes)}'
+    except requests.RequestException as e:
+        return False, f'Verification request failed: {str(e)}'
+    except Exception as e:
+        return False, f'Verification error: {str(e)}'
 
 # Custom registration form
 class PublicUserRegistrationForm(UserCreationForm):
@@ -107,8 +147,20 @@ def register(request):
     """Public user registration with email verification"""
     if request.user.is_authenticated:
         return redirect('landing:home')
-    
+
     if request.method == 'POST':
+        # Verify Cloudflare Turnstile
+        turnstile_response = request.POST.get('cf-turnstile-response', '')
+        if turnstile_response:
+            remote_ip = request.META.get('REMOTE_ADDR')
+            is_valid, error_message = verify_turnstile(turnstile_response, remote_ip)
+            if not is_valid:
+                messages.error(request, f'Security verification failed. Please try again. {error_message or ""}')
+                context = {
+                    'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+                }
+                return render(request, 'landing/register.html', context)
+
         # Handle form data manually for new template
         email = request.POST.get('email')
         first_name = request.POST.get('first_name', '')
@@ -116,20 +168,29 @@ def register(request):
         phone = request.POST.get('phone', '')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
-        
+
         # Basic validation
         if not all([email, first_name, password1, password2]):
             messages.error(request, 'Please fill in all required fields.')
-            return render(request, 'landing/register.html')
-        
+            context = {
+                'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+            }
+            return render(request, 'landing/register.html', context)
+
         if password1 != password2:
             messages.error(request, 'Passwords do not match.')
-            return render(request, 'landing/register.html')
-        
+            context = {
+                'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+            }
+            return render(request, 'landing/register.html', context)
+
         if User.objects.filter(email=email).exists():
             messages.error(request, 'A user with this email already exists.')
-            return render(request, 'landing/register.html')
-        
+            context = {
+                'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+            }
+            return render(request, 'landing/register.html', context)
+
         try:
             # Create user
             username = email.split('@')[0]  # Use email prefix as username
@@ -138,7 +199,7 @@ def register(request):
             while User.objects.filter(username=username).exists():
                 username = f"{original_username}{counter}"
                 counter += 1
-            
+
             user = User.objects.create_user(
                 username=username,
                 email=email,
@@ -146,7 +207,7 @@ def register(request):
                 name=f"{first_name} {last_name}".strip(),
                 phone_number=phone
             )
-            
+
             # Send verification email
             from emails.utils import send_verification_email
             try:
@@ -156,13 +217,16 @@ def register(request):
                     messages.warning(request, f'Account created successfully! However, there was an issue sending the verification email. You can still log in.')
             except Exception as e:
                 messages.warning(request, f'Account created successfully! There was an issue sending the verification email, but you can still log in.')
-            
+
             return redirect('landing:login')
-            
+
         except Exception as e:
             messages.error(request, f'Error creating account: {str(e)}')
-    
-    return render(request, 'landing/register.html')
+
+    context = {
+        'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+    }
+    return render(request, 'landing/register.html', context)
 
 
 def login_view(request):
@@ -173,18 +237,33 @@ def login_view(request):
             return redirect('custom_admin:dashboard')
         else:
             return redirect('student_portal:dashboard')
-    
+
     if request.method == 'POST':
+        # Verify Cloudflare Turnstile
+        turnstile_response = request.POST.get('cf-turnstile-response', '')
+        if turnstile_response:
+            remote_ip = request.META.get('REMOTE_ADDR')
+            is_valid, error_message = verify_turnstile(turnstile_response, remote_ip)
+            if not is_valid:
+                messages.error(request, f'Security verification failed. Please try again. {error_message or ""}')
+                context = {
+                    'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+                }
+                return render(request, 'landing/login.html', context)
+
         email_or_username = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
-        
+
         if not email_or_username or not password:
             messages.error(request, 'Please provide both email/username and password.')
-            return render(request, 'landing/login.html')
-        
+            context = {
+                'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+            }
+            return render(request, 'landing/login.html', context)
+
         # Try to authenticate by username first
         user = authenticate(request, username=email_or_username, password=password)
-        
+
         # If that fails, try to find user by email and authenticate
         if not user:
             try:
@@ -192,15 +271,15 @@ def login_view(request):
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 user = None
-        
+
         if user:
             login(request, user)
-            
+
             # Handle next parameter for redirects
             next_url = request.POST.get('next') or request.GET.get('next')
             if next_url:
                 return redirect(next_url)
-            
+
             # Redirect based on user type
             if user.is_staff:
                 messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
@@ -210,8 +289,11 @@ def login_view(request):
                 return redirect('student_portal:dashboard')
         else:
             messages.error(request, 'Invalid email/username or password. Please try again.')
-    
-    return render(request, 'landing/login.html')
+
+    context = {
+        'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', '')
+    }
+    return render(request, 'landing/login.html', context)
 
 
 def courses(request):

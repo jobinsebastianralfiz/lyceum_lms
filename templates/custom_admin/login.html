@@ -4,9 +4,140 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - CodeLearn LMS Admin</title>
-  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png' %}" />
+  <title>Login - Lyceum Academy Admin</title>
+  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'images/logos/LOGO.svg' %}" />
   <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
+  <style>
+    /* Lyceum Dark Theme for Login */
+    :root {
+      --lyceum-green: #2AB673;
+      --lyceum-green-dark: #229959;
+      --lyceum-green-light: #3DD186;
+      --dark-bg: #0F172A;
+      --dark-bg-secondary: #1E293B;
+      --dark-bg-tertiary: #334155;
+      --dark-border: #374151;
+      --text-white: #F9FAFB;
+      --text-gray: #CBD5E1;
+      --text-gray-dark: #94A3B8;
+    }
+
+    body {
+      background: var(--dark-bg) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .page-wrapper {
+      background: var(--dark-bg) !important;
+    }
+
+    .text-bg-light {
+      background: var(--dark-bg) !important;
+    }
+
+    .card {
+      background: var(--dark-bg-secondary) !important;
+      border: 1px solid var(--dark-border) !important;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .card-body {
+      padding: 2.5rem !important;
+    }
+
+    .logo-img img {
+      max-height: 60px !important;
+      width: auto !important;
+    }
+
+    .text-center {
+      color: var(--text-gray) !important;
+    }
+
+    .form-label {
+      color: var(--text-white) !important;
+      font-weight: 500;
+    }
+
+    .form-control {
+      background: var(--dark-bg-tertiary) !important;
+      border: 1px solid var(--dark-border) !important;
+      color: var(--text-white) !important;
+    }
+
+    .form-control:focus {
+      background: var(--dark-bg-tertiary) !important;
+      border-color: var(--lyceum-green) !important;
+      color: var(--text-white) !important;
+      box-shadow: 0 0 0 0.2rem rgba(42, 182, 115, 0.25) !important;
+    }
+
+    .form-check-label {
+      color: var(--text-gray) !important;
+    }
+
+    .btn-primary {
+      background: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+      color: white !important;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--lyceum-green-dark) !important;
+      border-color: var(--lyceum-green-dark) !important;
+    }
+
+    .text-primary,
+    a.text-primary {
+      color: var(--lyceum-green) !important;
+    }
+
+    .text-primary:hover,
+    a.text-primary:hover {
+      color: var(--lyceum-green-light) !important;
+    }
+
+    .fw-bold {
+      color: var(--text-white) !important;
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      border: 1px solid #ef4444 !important;
+    }
+
+    p {
+      color: var(--text-gray) !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-white) !important;
+    }
+
+    /* Custom checkbox color */
+    .form-check-input:checked {
+      background-color: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    .form-check-input {
+      border-color: var(--dark-border) !important;
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--lyceum-green) !important;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      color: var(--text-gray-dark) !important;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 
 <body>
@@ -21,10 +152,11 @@
             <div class="card mb-0">
               <div class="card-body">
                 <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                  <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/logo.svg' %}" alt="CodeLearn">
+                  <img src="{% load static %}{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
                 </a>
-                <p class="text-center">CodeLearn LMS Admin Panel</p>
-                
+                <h3 class="login-title text-center">Admin Panel</h3>
+                <p class="login-subtitle text-center mb-4">Lyceum Academy Learning Management System</p>
+
                 {% if form.errors %}
                   <div class="alert alert-danger" role="alert">
                     {% for field, errors in form.errors.items %}
@@ -34,7 +166,7 @@
                     {% endfor %}
                   </div>
                 {% endif %}
-                
+
                 <form method="post">
                   {% csrf_token %}
                   <div class="mb-3">
@@ -48,16 +180,15 @@
                   <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
                       <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked">
-                      <label class="form-check-label text-dark" for="flexCheckChecked">
+                      <label class="form-check-label" for="flexCheckChecked">
                         Remember this Device
                       </label>
                     </div>
-                    <a class="text-primary fw-bold" href="javascript:void(0)">Forgot Password ?</a>
+                    <a class="text-primary fw-bold" href="javascript:void(0)">Forgot Password?</a>
                   </div>
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
                   <div class="d-flex align-items-center justify-content-center">
-                    <p class="fs-4 mb-0 fw-bold">CodeLearn LMS</p>
-                    <a class="text-primary fw-bold ms-2" href="javascript:void(0)">Learning Management System</a>
+                    <p class="fs-4 mb-0">Powered by <strong class="fw-bold">Lyceum Academy</strong></p>
                   </div>
                 </form>
               </div>

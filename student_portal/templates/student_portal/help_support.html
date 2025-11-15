@@ -1,0 +1,495 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Help & Support - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-life-ring"></i>
+  <span>Help & Support</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Quick Action Cards */
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .action-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px;
+    border: 2px solid var(--border-color);
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .action-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .action-card-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .action-card-icon i {
+    font-size: 28px;
+    color: var(--primary);
+  }
+
+  .action-card-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .action-card-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* FAQ Section */
+  .faq-section {
+    margin-bottom: 48px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title i {
+    color: var(--primary);
+  }
+
+  .faq-accordion {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+
+  .faq-question {
+    width: 100%;
+    padding: 20px 24px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .faq-question:hover {
+    background: var(--background);
+  }
+
+  .faq-question i {
+    transition: transform 0.3s ease;
+    color: var(--primary);
+  }
+
+  .faq-question.active i {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .faq-answer.active {
+    max-height: 500px;
+  }
+
+  .faq-answer-content {
+    padding: 0 24px 20px 24px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* Contact Section */
+  .contact-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 20px;
+    padding: 48px;
+    color: white;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .contact-section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .contact-section p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 32px;
+  }
+
+  .contact-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .contact-method {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .contact-method i {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .contact-method-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .contact-method-info {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .btn-white {
+    background: white;
+    color: var(--primary);
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    color: var(--primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+    }
+
+    .quick-actions-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-section {
+      padding: 32px 20px;
+    }
+
+    .contact-section h2 {
+      font-size: 24px;
+    }
+
+    .contact-methods {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>How can we help you?</h1>
+    <p class="page-subtitle">Find answers to common questions or reach out to our support team</p>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-grid">
+    <a href="mailto:support@lyceumacademy.com" class="action-card">
+      <div class="action-card-icon">
+        <i class="fas fa-envelope"></i>
+      </div>
+      <div class="action-card-title">Email Support</div>
+      <div class="action-card-description">Get help via email within 24 hours</div>
+    </a>
+
+    <a href="#" class="action-card" onclick="alert('Live chat coming soon!'); return false;">
+      <div class="action-card-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+      <div class="action-card-title">Live Chat</div>
+      <div class="action-card-description">Chat with our support team instantly</div>
+    </a>
+
+    <a href="#" class="action-card" onclick="alert('Knowledge base coming soon!'); return false;">
+      <div class="action-card-icon">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="action-card-title">Knowledge Base</div>
+      <div class="action-card-description">Browse articles and tutorials</div>
+    </a>
+
+    <a href="#" class="action-card" onclick="alert('Video tutorials coming soon!'); return false;">
+      <div class="action-card-icon">
+        <i class="fas fa-video"></i>
+      </div>
+      <div class="action-card-title">Video Tutorials</div>
+      <div class="action-card-description">Watch how-to videos and guides</div>
+    </a>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="faq-section">
+    <h2 class="section-title">
+      <i class="fas fa-question-circle"></i>
+      Frequently Asked Questions
+    </h2>
+
+    <div class="faq-accordion">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I access my enrolled courses?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Navigate to "My Courses" from the sidebar menu. You'll see all your enrolled courses with their progress. Click on any course to access its lessons, assignments, and quizzes.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I submit assignments?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Go to the course detail page and click on the "Assignments" tab. Find the assignment you want to submit, click on it, and follow the submission instructions. You can upload files or enter text depending on the assignment type.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I join live sessions?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Visit the "Live Sessions" page to see all your upcoming and live sessions. When a session is live, you'll see a "Join Session" button. Click it to join the meeting. You'll receive a notification 15 minutes before each session starts.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I track my course progress?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Your progress is automatically tracked as you complete lessons, assignments, and quizzes. You can view your overall progress on the Dashboard or on individual course pages. The progress bar shows your completion percentage.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I download my invoices?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Go to "Invoices" from the Account section in the sidebar. You'll see all your tax invoices. Click the "Download PDF" button next to any invoice to download it for your records.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I change my password?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Yes! Go to your "Profile" page and click the "Change Password" button. You'll need to enter your current password and choose a new one. Make sure your new password is strong and secure.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What if I'm having technical issues?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            First, try refreshing the page or clearing your browser cache. If the issue persists, contact our support team using the methods below. Include details about the issue, what you were trying to do, and any error messages you saw.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I get a certificate after completing a course?</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Once you complete all lessons, assignments, and quizzes in a course (achieving 100% progress), your certificate will be automatically generated. You can download it from the "Certificates" page or from the course detail page.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="contact-section">
+    <h2>Still need help?</h2>
+    <p>Our support team is here to assist you</p>
+
+    <div class="contact-methods">
+      <div class="contact-method">
+        <i class="fas fa-envelope"></i>
+        <div class="contact-method-title">Email Us</div>
+        <div class="contact-method-info">support@lyceumacademy.com</div>
+      </div>
+
+      <div class="contact-method">
+        <i class="fas fa-phone"></i>
+        <div class="contact-method-title">Call Us</div>
+        <div class="contact-method-info">+1 (555) 123-4567</div>
+      </div>
+
+      <div class="contact-method">
+        <i class="fas fa-clock"></i>
+        <div class="contact-method-title">Support Hours</div>
+        <div class="contact-method-info">Mon-Fri, 9AM-6PM</div>
+      </div>
+    </div>
+
+    <a href="mailto:support@lyceumacademy.com" class="btn-white">
+      <i class="fas fa-paper-plane"></i>
+      Send us a message
+    </a>
+  </div>
+</div>
+
+<script>
+  function toggleFaq(button) {
+    const answer = button.nextElementSibling;
+    const isActive = button.classList.contains('active');
+
+    // Close all FAQs
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.classList.remove('active');
+      q.nextElementSibling.classList.remove('active');
+    });
+
+    // Open clicked FAQ if it wasn't active
+    if (!isActive) {
+      button.classList.add('active');
+      answer.classList.add('active');
+    }
+  }
+</script>
+{% endblock %}

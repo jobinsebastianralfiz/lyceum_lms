@@ -74,7 +74,12 @@
               <span class="badge bg-info-subtle text-info">{{ assignment.module.course.title }}</span>
             </td>
             <td>
-              <span class="text-muted">{{ assignment.module.title }}</span>
+              <span class="text-muted">{% for link in assignment.module_links.all|slice:":2" %}
+                  {{ link.module.title }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                {% if assignment.modules.count > 2 %}
+                  <span class="badge bg-secondary">+{{ assignment.modules.count|add:"-2" }} more</span>
+                {% endif %}</span>
             </td>
             <td>
               <span class="fw-bold">{{ assignment.max_points }}</span>
@@ -88,7 +93,7 @@
               {% endif %}
             </td>
             <td>
-              <span class="badge bg-light text-dark">#{{ assignment.order }}</span>
+              <span class="badge bg-light text-dark">#{{ assignment.module_links.first.order|default:"-" }}</span>
             </td>
             <td>
               <div class="btn-group" role="group">

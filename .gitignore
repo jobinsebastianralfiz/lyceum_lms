@@ -1,0 +1,108 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static_root
+
+# Environment variables
+.env
+.env.local
+.env.production
+.venv
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Documentation (temporary/local)
+*.md.backup
+*_OLD.md
+*_BACKUP.md
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Logs
+logs/
+*.log
+
+# Local development scripts
+test_*.py
+quick_fix_test.py
+production_debug.py
+auto_link_content.py
+check_urls.py
+fix_*.py
+rebuild_*.py
+simple_url_check.py
+update_templates*.py
+
+# Zip files
+*.zip
+
+# Media files (uploaded by users - should be in cloud storage for production)
+# Uncomment if using cloud storage like S3
+# media/
+
+# Railway specific (will be set in Railway dashboard)
+railway.json

@@ -1,409 +1,724 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Payment Details - {{ enrollment.course.title }} - Student Portal - UpTrail{% endblock %}
+{% block title %}Payment Details - {{ enrollment.course.title }} - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-wallet"></i>
+  <span>Payment Details</span>
+</div>
+{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Responsive improvements for payment details */
-  @media (max-width: 768px) {
-    .detail-header {
-      flex-direction: column;
-      text-align: center;
-      gap: 1rem;
-    }
-    
-    .info-cards .col-md-6 {
-      margin-bottom: 1rem;
-    }
-    
-    .installment-grid .col-md-3 {
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    
-    .installment-value {
-      display: block;
-      margin-top: 0.5rem;
-    }
-    
-    /* Hide table on mobile, show card layout */
-    .payment-history-table {
-      display: none;
-    }
-    
-    .payment-history-mobile {
-      display: block;
-    }
-    
-    .payment-card-mobile {
-      border: 1px solid #dee2e6;
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      background: #f8f9fa;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .payment-field-mobile {
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #e9ecef;
-    }
-    
-    .payment-field-mobile:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-    
-    .field-label {
-      font-weight: 600;
-      font-size: 0.875rem;
-      color: #495057;
-      margin-bottom: 0.25rem;
-    }
-    
-    .field-value {
-      font-size: 0.9rem;
-      color: #212529;
-    }
-    
-    .transaction-code {
-      background: #e9ecef;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.8rem;
-      word-break: break-all;
-    }
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
-  
-  @media (min-width: 769px) {
-    .payment-history-table {
-      display: block;
-    }
-    
-    .payment-history-mobile {
-      display: none;
-    }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
   }
-  
-  @media (max-width: 576px) {
-    .detail-header h4 {
-      font-size: 1.25rem;
-    }
-    
-    .info-card {
-      margin-bottom: 1rem;
-    }
-    
-    .info-card h6 {
-      font-size: 1rem;
-    }
-    
-    .info-card ul {
-      font-size: 0.9rem;
-    }
-    
-    .installment-plan-card {
-      margin-bottom: 1rem;
-    }
-    
-    .installment-grid .col-md-3 {
-      margin-bottom: 1rem;
-    }
-    
-    .payment-card-mobile {
-      padding: 1rem;
-    }
-    
-    .badge {
-      font-size: 0.75rem;
-      padding: 0.375rem 0.5rem;
-    }
-    
-    .btn-sm {
-      font-size: 0.8rem;
-      padding: 0.25rem 0.5rem;
-    }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
   }
-  
-  /* Enhanced mobile card styling */
-  .payment-header-mobile {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1rem;
-    border-radius: 8px 8px 0 0;
-    margin: -1.25rem -1.25rem 1rem -1.25rem;
+
+  .page-title-section h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .course-name {
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+
+  .btn-back {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+  }
+
+  .btn-back:hover {
+    background: var(--background);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  /* Info Cards Grid */
+  .info-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .info-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+  }
+
+  .info-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .info-card-title i {
+    color: var(--primary);
+    font-size: 18px;
+  }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .info-list li:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+  }
+
+  .info-value.success {
+    color: var(--success);
+  }
+
+  .info-value.danger {
+    color: var(--danger);
+  }
+
+  /* Status Badge */
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .status-badge.partial {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  .status-badge.free {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--info);
+  }
+
+  .status-badge.pending {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+
+  /* Installment Plan Card */
+  .installment-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-radius: 16px;
+    padding: 28px;
+    border: 2px solid var(--primary);
+    margin-bottom: 32px;
+  }
+
+  .installment-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .installment-card-title i {
+    color: var(--primary);
+    font-size: 20px;
+  }
+
+  .installment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+  }
+
+  .installment-item {
     text-align: center;
   }
-  
-  .installment-number-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
+
+  .installment-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .installment-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .installment-value.small {
+    font-size: 18px;
+  }
+
+  /* Payment History */
+  .payment-history-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .payment-history-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-history-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .payment-history-title i {
+    color: var(--primary);
+  }
+
+  /* Payment Table */
+  .payment-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .payment-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .payment-table thead {
+    background: var(--background);
+  }
+
+  .payment-table th {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .payment-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-table tbody tr {
+    transition: background 0.2s ease;
+  }
+
+  .payment-table tbody tr:hover {
+    background: var(--background);
+  }
+
+  .payment-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .payment-table code {
+    background: var(--background);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--primary);
+  }
+
+  /* Mobile Payment Cards */
+  .payment-mobile-cards {
+    display: none;
+    padding: 20px;
+  }
+
+  .payment-mobile-card {
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .payment-mobile-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    margin: -20px -20px 16px -20px;
     font-weight: 600;
   }
-  
-  /* Status color indicators */
-  .status-completed .field-value { color: #198754; font-weight: 600; }
-  .status-pending .field-value { color: #fd7e14; font-weight: 600; }
-  .status-overdue .field-value { color: #dc3545; font-weight: 600; }
-  .status-failed .field-value { color: #dc3545; font-weight: 600; }
+
+  .payment-mobile-field {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-mobile-field:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-field-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .mobile-field-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .btn-view-invoice {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+
+  .btn-view-invoice:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .empty-state-icon i {
+    font-size: 40px;
+    color: var(--primary);
+  }
+
+  .empty-state h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .payment-table-wrapper {
+      display: none;
+    }
+
+    .payment-mobile-cards {
+      display: block;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .page-title-section h1 {
+      font-size: 24px;
+    }
+
+    .btn-back {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .info-cards-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .installment-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 993px) {
+    .payment-table-wrapper {
+      display: block;
+    }
+
+    .payment-mobile-cards {
+      display: none;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center detail-header">
-          <div>
-            <h4 class="card-title mb-1">Payment Details</h4>
-            <p class="mb-0 text-muted">{{ enrollment.course.title|truncatechars:50 }}</p>
-          </div>
-          <a href="{% url 'student_portal:my_payments' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="ti ti-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Payments</span><span class="d-sm-none">Back</span>
-          </a>
-        </div>
+<div class="content-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-section">
+      <h1>Payment Details</h1>
+      <div class="course-name">{{ enrollment.course.title }}</div>
+    </div>
+    <a href="{% url 'student_portal:my_payments' %}" class="btn-back">
+      <i class="fas fa-arrow-left"></i>
+      Back to Payments
+    </a>
+  </div>
+
+  <!-- Info Cards Grid -->
+  <div class="info-cards-grid">
+    <!-- Course Information -->
+    <div class="info-card">
+      <h3 class="info-card-title">
+        <i class="fas fa-book"></i>
+        Course Information
+      </h3>
+      <ul class="info-list">
+        <li>
+          <span class="info-label">Course</span>
+          <span class="info-value">{{ enrollment.course.title|truncatechars:30 }}</span>
+        </li>
+        <li>
+          <span class="info-label">Enrollment Type</span>
+          <span class="info-value">{{ enrollment.get_enrollment_type_display }}</span>
+        </li>
+        <li>
+          <span class="info-label">Enrolled On</span>
+          <span class="info-value">{{ enrollment.enrolled_on|date:"M d, Y" }}</span>
+        </li>
+        <li>
+          <span class="info-label">Status</span>
+          <span class="status-badge {% if enrollment.payment_status == 'completed' %}completed{% elif enrollment.payment_status == 'partial' %}partial{% elif enrollment.payment_status == 'free' %}free{% else %}pending{% endif %}">
+            <i class="fas fa-{% if enrollment.payment_status == 'completed' %}check-circle{% elif enrollment.payment_status == 'partial' %}clock{% elif enrollment.payment_status == 'free' %}gift{% else %}exclamation-circle{% endif %}"></i>
+            {{ enrollment.get_payment_status_display }}
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="info-card">
+      <h3 class="info-card-title">
+        <i class="fas fa-file-invoice-dollar"></i>
+        Payment Summary
+      </h3>
+      <ul class="info-list">
+        <li>
+          <span class="info-label">Total Amount</span>
+          <span class="info-value">₹{{ enrollment.total_amount|floatformat:2 }}</span>
+        </li>
+        {% if enrollment.tax_amount %}
+        <li>
+          <span class="info-label">Tax Amount</span>
+          <span class="info-value">₹{{ enrollment.tax_amount|floatformat:2 }}</span>
+        </li>
+        {% endif %}
+        <li>
+          <span class="info-label">Paid Amount</span>
+          <span class="info-value success">₹{{ enrollment.paid_amount|floatformat:2 }}</span>
+        </li>
+        {% if enrollment.outstanding_amount > 0 %}
+        <li>
+          <span class="info-label">Outstanding</span>
+          <span class="info-value danger">₹{{ enrollment.outstanding_amount|floatformat:2 }}</span>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Installment Plan -->
+  {% if installment_plan %}
+  <div class="installment-card">
+    <h3 class="installment-card-title">
+      <i class="fas fa-calendar-alt"></i>
+      Installment Plan Details
+    </h3>
+    <div class="installment-grid">
+      <div class="installment-item">
+        <div class="installment-label">Total Installments</div>
+        <div class="installment-value">{{ installment_plan.total_installments }}</div>
       </div>
-      <div class="card-body">
-        <!-- Course and Enrollment Information -->
-        <div class="row mb-4 info-cards">
-          <div class="col-12 col-md-6">
-            <div class="card bg-light info-card h-100">
-              <div class="card-body">
-                <h6 class="card-title">Course Information</h6>
-                <ul class="list-unstyled mb-0">
-                  <li><strong>Course:</strong> {{ enrollment.course.title }}</li>
-                  <li><strong>Enrollment Type:</strong> {{ enrollment.get_enrollment_type_display }}</li>
-                  <li><strong>Enrolled On:</strong> {{ enrollment.enrolled_on|date:"M d, Y" }}</li>
-                  <li><strong>Status:</strong> 
-                    <span class="badge 
-                      {% if enrollment.payment_status == 'completed' %}bg-success
-                      {% elif enrollment.payment_status == 'partial' %}bg-warning
-                      {% elif enrollment.payment_status == 'free' %}bg-info
-                      {% else %}bg-danger
-                      {% endif %}">
-                      {{ enrollment.get_payment_status_display }}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <div class="card bg-light info-card h-100">
-              <div class="card-body">
-                <h6 class="card-title">Payment Summary</h6>
-                <ul class="list-unstyled mb-0">
-                  <li><strong>Total Amount:</strong> ₹{{ enrollment.total_amount|floatformat:2 }}</li>
-                  {% if enrollment.tax_amount %}
-                    <li><strong>Tax Amount:</strong> ₹{{ enrollment.tax_amount|floatformat:2 }}</li>
-                  {% endif %}
-                  <li><strong>Paid Amount:</strong> <span class="text-success">₹{{ enrollment.paid_amount|floatformat:2 }}</span></li>
-                  {% if enrollment.outstanding_amount > 0 %}
-                    <li><strong>Outstanding:</strong> <span class="text-danger">₹{{ enrollment.outstanding_amount|floatformat:2 }}</span></li>
-                  {% endif %}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Installment Plan Information -->
-        {% if installment_plan %}
-          <div class="card mb-4 installment-plan-card">
-            <div class="card-header bg-primary text-white">
-              <h6 class="mb-0">Installment Plan Details</h6>
-            </div>
-            <div class="card-body">
-              <div class="row installment-grid">
-                <div class="col-12 col-sm-6 col-md-3">
-                  <strong>Total Installments:</strong>
-                  <span class="h5 installment-value d-block d-md-inline">{{ installment_plan.total_installments }}</span>
-                </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                  <strong>Amount per Installment:</strong>
-                  <span class="h5 text-primary installment-value d-block d-md-inline">₹{{ installment_plan.installment_amount|floatformat:2 }}</span>
-                </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                  <strong>Frequency:</strong>
-                  <span class="h6 installment-value d-block d-md-inline">{{ installment_plan.get_frequency_display }}</span>
-                </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                  <strong>Start Date:</strong>
-                  <span class="h6 installment-value d-block d-md-inline">{{ installment_plan.start_date|date:"M d, Y" }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-
-        <!-- Payment History -->
-        {% if payments %}
-          <div class="card">
-            <div class="card-header">
-              <h6 class="mb-0">Payment History</h6>
-            </div>
-            <div class="card-body">
-              <!-- Desktop Table View -->
-              <div class="payment-history-table">
-                <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead class="table-dark">
-                      <tr>
-                        <th>Installment #</th>
-                        <th>Amount</th>
-                        <th>Tax Amount</th>
-                        <th>Due Date</th>
-                        <th>Payment Date</th>
-                        <th>Payment Method</th>
-                        <th>Transaction ID</th>
-                        <th>Status</th>
-                        <th>Invoice</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for payment in payments %}
-                        <tr>
-                          <td>{{ payment.installment_number }}</td>
-                          <td>₹{{ payment.amount|floatformat:2 }}</td>
-                          <td>₹{{ payment.tax_amount|floatformat:2 }}</td>
-                          <td>{{ payment.due_date|date:"M d, Y" }}</td>
-                          <td>
-                            {% if payment.payment_date %}
-                              {{ payment.payment_date|date:"M d, Y H:i" }}
-                            {% else %}
-                              <span class="text-muted">Not paid</span>
-                            {% endif %}
-                          </td>
-                          <td>{{ payment.get_payment_method_display }}</td>
-                          <td>
-                            {% if payment.transaction_id %}
-                              <code>{{ payment.transaction_id }}</code>
-                            {% else %}
-                              <span class="text-muted">-</span>
-                            {% endif %}
-                          </td>
-                          <td>
-                            <span class="badge 
-                              {% if payment.status == 'completed' %}bg-success
-                              {% elif payment.status == 'overdue' %}bg-danger
-                              {% elif payment.status == 'failed' %}bg-danger
-                              {% else %}bg-warning
-                              {% endif %}">
-                              {{ payment.get_status_display }}
-                            </span>
-                          </td>
-                          <td>
-                            {% if payment.invoice_number %}
-                              <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-primary btn-sm">
-                                <i class="ti ti-file-text"></i> View
-                              </a>
-                            {% else %}
-                              <span class="text-muted">-</span>
-                            {% endif %}
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- Mobile Card View -->
-              <div class="payment-history-mobile">
-                {% for payment in payments %}
-                  <div class="payment-card-mobile">
-                    <div class="payment-header-mobile">
-                      <div class="installment-number-badge">Installment #{{ payment.installment_number }}</div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Amount</div>
-                      <div class="field-value">₹{{ payment.amount|floatformat:2 }}</div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Tax Amount</div>
-                      <div class="field-value">₹{{ payment.tax_amount|floatformat:2 }}</div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Due Date</div>
-                      <div class="field-value">{{ payment.due_date|date:"M d, Y" }}</div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Payment Date</div>
-                      <div class="field-value">
-                        {% if payment.payment_date %}
-                          {{ payment.payment_date|date:"M d, Y H:i" }}
-                        {% else %}
-                          <span class="text-muted">Not paid</span>
-                        {% endif %}
-                      </div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Payment Method</div>
-                      <div class="field-value">{{ payment.get_payment_method_display }}</div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Transaction ID</div>
-                      <div class="field-value">
-                        {% if payment.transaction_id %}
-                          <div class="transaction-code">{{ payment.transaction_id }}</div>
-                        {% else %}
-                          <span class="text-muted">-</span>
-                        {% endif %}
-                      </div>
-                    </div>
-                    
-                    <div class="payment-field-mobile status-{{ payment.status }}">
-                      <div class="field-label">Status</div>
-                      <div class="field-value">
-                        <span class="badge 
-                          {% if payment.status == 'completed' %}bg-success
-                          {% elif payment.status == 'overdue' %}bg-danger
-                          {% elif payment.status == 'failed' %}bg-danger
-                          {% else %}bg-warning
-                          {% endif %}">
-                          {{ payment.get_status_display }}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div class="payment-field-mobile">
-                      <div class="field-label">Invoice</div>
-                      <div class="field-value">
-                        {% if payment.invoice_number %}
-                          <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-primary btn-sm">
-                            <i class="ti ti-file-text me-1"></i> View Invoice
-                          </a>
-                        {% else %}
-                          <span class="text-muted">No invoice available</span>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        {% else %}
-          <div class="text-center py-4 py-md-5">
-            <div class="mb-4">
-              <i class="ti ti-credit-card-off text-muted" style="font-size: 4rem;"></i>
-            </div>
-            <h5 class="mb-3">No Payment History</h5>
-            <p class="text-muted">No payment records found for this enrollment.</p>
-          </div>
-        {% endif %}
+      <div class="installment-item">
+        <div class="installment-label">Amount per Installment</div>
+        <div class="installment-value">₹{{ installment_plan.installment_amount|floatformat:2 }}</div>
+      </div>
+      <div class="installment-item">
+        <div class="installment-label">Frequency</div>
+        <div class="installment-value small">{{ installment_plan.get_frequency_display }}</div>
+      </div>
+      <div class="installment-item">
+        <div class="installment-label">Start Date</div>
+        <div class="installment-value small">{{ installment_plan.start_date|date:"M d, Y" }}</div>
       </div>
     </div>
   </div>
+  {% endif %}
+
+  <!-- Payment History -->
+  {% if payments %}
+  <div class="payment-history-card">
+    <div class="payment-history-header">
+      <h3 class="payment-history-title">
+        <i class="fas fa-history"></i>
+        Payment History
+      </h3>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="payment-table-wrapper">
+      <table class="payment-table">
+        <thead>
+          <tr>
+            <th>Installment</th>
+            <th>Amount</th>
+            <th>Tax</th>
+            <th>Due Date</th>
+            <th>Payment Date</th>
+            <th>Method</th>
+            <th>Transaction ID</th>
+            <th>Status</th>
+            <th>Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr>
+            <td><strong>#{{ payment.installment_number }}</strong></td>
+            <td>₹{{ payment.amount|floatformat:2 }}</td>
+            <td>₹{{ payment.tax_amount|floatformat:2 }}</td>
+            <td>{{ payment.due_date|date:"M d, Y" }}</td>
+            <td>
+              {% if payment.payment_date %}
+                {{ payment.payment_date|date:"M d, Y H:i" }}
+              {% else %}
+                <span style="color: var(--text-secondary);">Not paid</span>
+              {% endif %}
+            </td>
+            <td>{{ payment.get_payment_method_display }}</td>
+            <td>
+              {% if payment.transaction_id %}
+                <code>{{ payment.transaction_id }}</code>
+              {% else %}
+                <span style="color: var(--text-secondary);">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="status-badge {% if payment.status == 'completed' %}completed{% elif payment.status == 'overdue' or payment.status == 'failed' %}pending{% else %}partial{% endif %}">
+                <i class="fas fa-{% if payment.status == 'completed' %}check-circle{% elif payment.status == 'overdue' or payment.status == 'failed' %}exclamation-circle{% else %}clock{% endif %}"></i>
+                {{ payment.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if payment.invoice_number %}
+                <a href="{% url 'student_portal:my_invoices' %}" class="btn-view-invoice">
+                  <i class="fas fa-file-invoice"></i> View
+                </a>
+              {% else %}
+                <span style="color: var(--text-secondary);">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="payment-mobile-cards">
+      {% for payment in payments %}
+      <div class="payment-mobile-card">
+        <div class="payment-mobile-header">
+          Installment #{{ payment.installment_number }}
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Amount</div>
+          <div class="mobile-field-value">₹{{ payment.amount|floatformat:2 }}</div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Tax Amount</div>
+          <div class="mobile-field-value">₹{{ payment.tax_amount|floatformat:2 }}</div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Due Date</div>
+          <div class="mobile-field-value">{{ payment.due_date|date:"M d, Y" }}</div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Payment Date</div>
+          <div class="mobile-field-value">
+            {% if payment.payment_date %}
+              {{ payment.payment_date|date:"M d, Y H:i" }}
+            {% else %}
+              Not paid
+            {% endif %}
+          </div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Payment Method</div>
+          <div class="mobile-field-value">{{ payment.get_payment_method_display }}</div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Transaction ID</div>
+          <div class="mobile-field-value">
+            {% if payment.transaction_id %}
+              <code>{{ payment.transaction_id }}</code>
+            {% else %}
+              -
+            {% endif %}
+          </div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Status</div>
+          <div class="mobile-field-value">
+            <span class="status-badge {% if payment.status == 'completed' %}completed{% elif payment.status == 'overdue' or payment.status == 'failed' %}pending{% else %}partial{% endif %}">
+              <i class="fas fa-{% if payment.status == 'completed' %}check-circle{% elif payment.status == 'overdue' or payment.status == 'failed' %}exclamation-circle{% else %}clock{% endif %}"></i>
+              {{ payment.get_status_display }}
+            </span>
+          </div>
+        </div>
+        <div class="payment-mobile-field">
+          <div class="mobile-field-label">Invoice</div>
+          <div class="mobile-field-value">
+            {% if payment.invoice_number %}
+              <a href="{% url 'student_portal:my_invoices' %}" class="btn-view-invoice">
+                <i class="fas fa-file-invoice"></i> View Invoice
+              </a>
+            {% else %}
+              No invoice available
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <!-- Empty State -->
+  <div class="payment-history-card">
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h3>No Payment History</h3>
+      <p>No payment records found for this enrollment.</p>
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

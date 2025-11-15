@@ -92,7 +92,7 @@
   --------------------------------------------------------------*/
   function preloader() {
     $(".cs-preloader_in").fadeOut();
-    $(".cs-preloader").delay(150).fadeOut("slow");
+    $(".cs-preloader").delay(1200).fadeOut("slow");
   }
 
   /*--------------------------------------------------------------

@@ -1,0 +1,307 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Lyceum Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+        <h5 class="mb-0">
+          <i class="ti ti-settings me-2" style="color: var(--lyceum-green);"></i>
+          {{ title }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="post" id="settingForm">
+          {% csrf_token %}
+
+          <!-- Display form errors -->
+          {% if form.errors %}
+          <div class="alert alert-danger" style="background: #7F1D1D; border: 1px solid #DC2626; color: #FCA5A5;">
+            <strong>Please correct the following errors:</strong>
+            <ul class="mb-0 mt-2">
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+              {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Key -->
+          <div class="mb-3">
+            <label for="{{ form.key.id_for_label }}" class="form-label" style="color: var(--text-white);">
+              Setting Key <span class="text-danger">*</span>
+            </label>
+            {{ form.key }}
+            {% if form.key.help_text %}
+              <div class="form-text" style="color: var(--text-gray-dark);">{{ form.key.help_text }}</div>
+            {% endif %}
+            {% if form.key.errors %}
+              <div class="text-danger small mt-1">{{ form.key.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Category -->
+          <div class="mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label" style="color: var(--text-white);">
+              Category <span class="text-danger">*</span>
+            </label>
+            {{ form.category }}
+            {% if form.category.help_text %}
+              <div class="form-text" style="color: var(--text-gray-dark);">{{ form.category.help_text }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label" style="color: var(--text-white);">
+              Description
+            </label>
+            {{ form.description }}
+            {% if form.description.help_text %}
+              <div class="form-text" style="color: var(--text-gray-dark);">{{ form.description.help_text }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Value -->
+          <div class="mb-3">
+            <label for="{{ form.value.id_for_label }}" class="form-label" style="color: var(--text-white);">
+              Value <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              {{ form.value }}
+              <button class="btn btn-outline-secondary" type="button" id="toggleValue">
+                <i class="ti ti-eye" id="toggleIcon"></i>
+              </button>
+            </div>
+            {% if form.value.help_text %}
+              <div class="form-text" style="color: var(--text-gray-dark);">{{ form.value.help_text }}</div>
+            {% endif %}
+            {% if form.value.errors %}
+              <div class="text-danger small mt-1">{{ form.value.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="form-check">
+                {{ form.is_sensitive }}
+                <label class="form-check-label" for="{{ form.is_sensitive.id_for_label }}" style="color: var(--text-white);">
+                  Sensitive Setting <i class="ti ti-lock ms-1"></i>
+                </label>
+                {% if form.is_sensitive.help_text %}
+                  <div class="form-text" style="color: var(--text-gray-dark);">{{ form.is_sensitive.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                {{ form.is_active }}
+                <label class="form-check-label" for="{{ form.is_active.id_for_label }}" style="color: var(--text-white);">
+                  Active <i class="ti ti-check-circle ms-1"></i>
+                </label>
+                {% if form.is_active.help_text %}
+                  <div class="form-text" style="color: var(--text-gray-dark);">{{ form.is_active.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Reason (only for edit) -->
+          {% if is_edit %}
+          <div class="mb-4">
+            <label for="change_reason" class="form-label" style="color: var(--text-white);">
+              Change Reason
+            </label>
+            <textarea name="change_reason" id="change_reason" class="form-control" rows="2"
+                      placeholder="Optional: Explain why you're changing this setting"></textarea>
+            <div class="form-text" style="color: var(--text-gray-dark);">
+              This will be logged in the change history
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>
+              {% if is_edit %}Update Setting{% else %}Create Setting{% endif %}
+            </button>
+            {% if is_edit and setting.category in 'email,payment' %}
+              <button type="button" class="btn btn-info" onclick="testConnection()">
+                <i class="ti ti-plug me-1"></i>Test Connection
+              </button>
+            {% endif %}
+            <a href="{% url 'custom_admin:settings_list' %}" class="btn btn-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar with Help -->
+  <div class="col-lg-4">
+    <div class="card" style="background: var(--dark-bg-secondary); border: 1px solid var(--dark-border);">
+      <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+        <h6 class="mb-0" style="color: var(--text-white);">
+          <i class="ti ti-info-circle me-2" style="color: var(--lyceum-green);"></i>
+          Setting Guidelines
+        </h6>
+      </div>
+      <div class="card-body" style="color: var(--text-gray);">
+        <h6 style="color: var(--lyceum-green);">Key Naming</h6>
+        <ul class="small mb-3">
+          <li>Use UPPERCASE with underscores</li>
+          <li>Be descriptive (e.g., RAZORPAY_KEY_ID)</li>
+          <li>Match .env variable names for consistency</li>
+        </ul>
+
+        <h6 style="color: var(--lyceum-green);">Security</h6>
+        <ul class="small mb-3">
+          <li>Mark API keys and secrets as "Sensitive"</li>
+          <li>All values are encrypted in the database</li>
+          <li>Masked values show as **** in the list view</li>
+        </ul>
+
+        <h6 style="color: var(--lyceum-green);">Categories</h6>
+        <ul class="small mb-3">
+          <li><strong>Email:</strong> SMTP and email service settings</li>
+          <li><strong>Payment:</strong> Razorpay and payment gateway</li>
+          <li><strong>Google:</strong> Google OAuth and services</li>
+          <li><strong>Firebase:</strong> FCM push notifications</li>
+          <li><strong>Storage:</strong> AWS S3 and file storage</li>
+        </ul>
+
+        <h6 style="color: var(--lyceum-green);">Fallback Behavior</h6>
+        <p class="small mb-0">
+          When a setting is inactive, the system automatically falls back to reading from the .env file.
+          This is useful for testing or temporary overrides.
+        </p>
+      </div>
+    </div>
+
+    {% if is_edit %}
+    <div class="card mt-3" style="background: var(--dark-bg-secondary); border: 1px solid var(--dark-border);">
+      <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--dark-border);">
+        <h6 class="mb-0" style="color: var(--text-white);">
+          <i class="ti ti-history me-2" style="color: var(--lyceum-green);"></i>
+          Setting Info
+        </h6>
+      </div>
+      <div class="card-body" style="color: var(--text-gray);">
+        <p class="small mb-2">
+          <strong>Created:</strong> {{ setting.created_at|date:"M d, Y H:i" }}
+        </p>
+        <p class="small mb-2">
+          <strong>Last Updated:</strong> {{ setting.updated_at|date:"M d, Y H:i" }}
+        </p>
+        {% if setting.updated_by %}
+        <p class="small mb-2">
+          <strong>Updated By:</strong> {{ setting.updated_by.name }}
+        </p>
+        {% endif %}
+        <a href="{% url 'custom_admin:setting_history' setting.id %}" class="btn btn-sm btn-outline-info mt-2">
+          <i class="ti ti-history me-1"></i>View Change History
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Toggle password visibility
+document.getElementById('toggleValue').addEventListener('click', function() {
+  const valueField = document.getElementById('{{ form.value.id_for_label }}');
+  const icon = document.getElementById('toggleIcon');
+
+  if (valueField.type === 'password') {
+    valueField.type = 'textarea';
+    icon.classList.remove('ti-eye');
+    icon.classList.add('ti-eye-off');
+  } else {
+    valueField.type = 'password';
+    icon.classList.remove('ti-eye-off');
+    icon.classList.add('ti-eye');
+  }
+});
+
+// If sensitive is checked, change value field to password
+document.getElementById('{{ form.is_sensitive.id_for_label }}').addEventListener('change', function() {
+  const valueField = document.getElementById('{{ form.value.id_for_label }}');
+  if (this.checked) {
+    valueField.setAttribute('type', 'password');
+  } else {
+    valueField.setAttribute('type', 'textarea');
+  }
+});
+
+{% if is_edit and setting.category in 'email,payment' %}
+// Test connection function
+function testConnection() {
+  const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader ti-spin me-1"></i>Testing...';
+
+  fetch('{% url "custom_admin:setting_test_connection" setting.id %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+
+    if (data.success) {
+      alert('✓ Connection test successful!\n\n' + data.message);
+    } else {
+      alert('✗ Connection test failed!\n\n' + data.message);
+    }
+  })
+  .catch(error => {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+    alert('✗ Error testing connection: ' + error);
+  });
+}
+{% endif %}
+</script>
+
+<style>
+  .form-control, .form-select {
+    background: var(--dark-bg) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--text-white) !important;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: var(--lyceum-green) !important;
+    box-shadow: 0 0 0 0.2rem rgba(42, 182, 115, 0.25) !important;
+  }
+
+  .btn-outline-secondary {
+    color: var(--text-gray);
+    border-color: var(--dark-border);
+  }
+
+  .btn-outline-secondary:hover {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--lyceum-green);
+    color: var(--lyceum-green);
+  }
+</style>
+{% endblock %}

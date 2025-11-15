@@ -1,0 +1,162 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Courses - CodeLearn Student Portal{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">My Courses</h1>
+        <p class="text-muted">Manage and continue your enrolled courses</p>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search courses...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="status">
+                    <option value="all" {% if status == 'all' %}selected{% endif %}>All Courses</option>
+                    <option value="in_progress" {% if status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Course List -->
+{% if page_obj %}
+<div class="row">
+    {% for enrollment in page_obj %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card course-card h-100">
+            {% if enrollment.course.thumbnail %}
+            <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ enrollment.course.title }}">
+            {% else %}
+            <div class="bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                <i class="fas fa-book fa-4x text-white"></i>
+            </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+                <div class="mb-auto">
+                    <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                    <p class="card-text text-muted small">{{ enrollment.course.description|truncatechars:100 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary">{{ enrollment.course.category.name }}</span>
+                        {% if enrollment.course.is_free %}
+                        <span class="badge bg-success">Free</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">{{ enrollment.course.price_display }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Enrollment Info -->
+                    <div class="small text-muted mb-3">
+                        <i class="fas fa-calendar me-1"></i>
+                        Enrolled: {{ enrollment.enrolled_on|date:"M d, Y" }}
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Progress</small>
+                            <small class="text-muted">{{ enrollment.progress_percentage|floatformat:1 }}%</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ enrollment.progress_percentage|floatformat:1 }}%;" aria-valuenow="{{ enrollment.progress_percentage|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <small class="text-muted">{{ enrollment.completed_modules }}/{{ enrollment.total_modules }} modules completed</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'student_portal:course_detail' enrollment.course.id %}" class="btn btn-primary">
+                        <i class="fas fa-play me-1"></i>Continue Learning
+                    </a>
+                    {% if enrollment.payment_status != 'completed' and not enrollment.course.is_free %}
+                    <div class="alert alert-warning alert-sm mb-0">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Payment pending
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Course pagination">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status != 'all' %}&status={{ status }}{% endif %}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+        </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status != 'all' %}&status={{ status }}{% endif %}">{{ num }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status != 'all' %}&status={{ status }}{% endif %}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-book-open fa-4x text-muted mb-4"></i>
+    <h3 class="text-muted">No courses found</h3>
+    {% if search %}
+    <p class="text-muted">No courses match your search "{{ search }}"</p>
+    <a href="{% url 'student_portal:my_courses' %}" class="btn btn-outline-primary me-2">Clear Search</a>
+    {% else %}
+    <p class="text-muted">You haven't enrolled in any courses yet. Contact your administrator to get enrolled in courses.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add any course list specific JavaScript here
+    console.log('My courses page loaded');
+});
+</script>
+{% endblock %}

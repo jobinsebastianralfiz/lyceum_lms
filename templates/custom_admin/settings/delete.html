@@ -1,0 +1,93 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Setting - Lyceum Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card" style="border: 2px solid #DC2626;">
+      <div class="card-header" style="background: #7F1D1D; border-bottom: 1px solid #DC2626;">
+        <h5 class="mb-0 text-white">
+          <i class="ti ti-alert-triangle me-2"></i>
+          Confirm Delete Setting
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-danger" style="background: #7F1D1D; border: 1px solid #DC2626; color: #FCA5A5;">
+          <h6 class="mb-3"><i class="ti ti-alert-triangle me-2"></i>Warning: This action cannot be undone!</h6>
+          <p class="mb-0">
+            You are about to delete a system setting. This will permanently remove the encrypted value
+            from the database and the system will fall back to reading from the .env file.
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <h6 style="color: var(--text-white);">Setting Details:</h6>
+          <table class="table table-borderless" style="color: var(--text-gray);">
+            <tr>
+              <td style="width: 30%;"><strong>Key:</strong></td>
+              <td style="font-family: monospace; color: var(--lyceum-green);">{{ setting.key }}</td>
+            </tr>
+            <tr>
+              <td><strong>Category:</strong></td>
+              <td>{{ setting.get_category_display }}</td>
+            </tr>
+            <tr>
+              <td><strong>Description:</strong></td>
+              <td>{{ setting.description|default:"No description" }}</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td>
+                {% if setting.is_active %}
+                  <span class="badge bg-success">Active</span>
+                {% else %}
+                  <span class="badge bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Sensitive:</strong></td>
+              <td>
+                {% if setting.is_sensitive %}
+                  <i class="ti ti-lock text-warning"></i> Yes
+                {% else %}
+                  No
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'custom_admin:settings_list' %}" class="btn btn-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-danger">
+              <i class="ti ti-trash me-1"></i>Yes, Delete Setting
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card mt-3" style="background: var(--dark-bg-secondary); border: 1px solid var(--lyceum-green);">
+      <div class="card-body" style="color: var(--text-gray);">
+        <h6 style="color: var(--lyceum-green);">
+          <i class="ti ti-info-circle me-2"></i>What happens after deletion?
+        </h6>
+        <ul class="small mb-0">
+          <li>The encrypted value will be removed from the database</li>
+          <li>The setting will no longer appear in the admin panel</li>
+          <li>The system will automatically fall back to the .env file</li>
+          <li>Change history for this setting will be preserved</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

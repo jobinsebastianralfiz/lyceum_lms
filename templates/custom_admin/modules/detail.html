@@ -13,9 +13,13 @@
           <div>
             <h4 class="card-title mb-1">{{ module.title }}</h4>
             <div class="d-flex align-items-center gap-2 mb-2">
-              <span class="badge bg-info-subtle text-info">{{ module.course.title }}</span>
-              <span class="text-muted">→</span>
-              <span class="badge bg-secondary-subtle text-secondary">Module {{ module.order }}</span>
+              {% for link in course_links %}
+                <span class="badge bg-info-subtle text-info">{{ link.course.title }}</span>
+                <span class="badge bg-secondary-subtle text-secondary">Order {{ link.order }}</span>
+                {% if not forloop.last %}<span class="text-muted">|</span>{% endif %}
+              {% empty %}
+                <span class="badge bg-warning-subtle text-warning">Not assigned to any course</span>
+              {% endfor %}
             </div>
           </div>
           <div class="ms-auto">
@@ -28,19 +32,19 @@
         <div class="row mb-4">
           <div class="col-md-3">
             <div class="text-center p-3 bg-primary-subtle rounded">
-              <h3 class="mb-0 text-primary">{{ module.video_lessons.count }}</h3>
+              <h3 class="mb-0 text-primary">{{ video_links.count }}</h3>
               <small class="text-muted">Video Lessons</small>
             </div>
           </div>
           <div class="col-md-3">
             <div class="text-center p-3 bg-success-subtle rounded">
-              <h3 class="mb-0 text-success">{{ module.assignments.count }}</h3>
+              <h3 class="mb-0 text-success">{{ assignment_links.count }}</h3>
               <small class="text-muted">Assignments</small>
             </div>
           </div>
           <div class="col-md-3">
             <div class="text-center p-3 bg-warning-subtle rounded">
-              <h3 class="mb-0 text-warning">{{ module.quizzes.count }}</h3>
+              <h3 class="mb-0 text-warning">{{ quiz_links.count }}</h3>
               <small class="text-muted">Quizzes</small>
             </div>
           </div>
@@ -79,208 +83,264 @@
     </div>
 
     <!-- Video Lessons Section -->
-    {% if module.video_lessons.all %}
     <div class="card mb-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="card-title mb-0">Video Lessons</h5>
-          <a href="{% url 'custom_admin:video_lesson_create' %}?module={{ module.id }}" class="btn btn-outline-primary btn-sm">
-            <i class="ti ti-plus me-1"></i>Add Video
-          </a>
+          <h5 class="card-title mb-0">Video Lessons ({{ video_links.count }})</h5>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteVideosBtn" style="display:none;" onclick="bulkDeleteVideos()">
+              <i class="ti ti-trash me-1"></i>Delete Selected
+            </button>
+            {% if video_links %}
+            <button type="button" class="btn btn-warning btn-sm" id="reorderVideosBtn" onclick="toggleReorderMode('videos')">
+              <i class="ti ti-arrows-sort me-1"></i>Reorder
+            </button>
+            <button type="button" class="btn btn-success btn-sm" id="saveVideosOrderBtn" style="display:none;" onclick="saveOrder('videos')">
+              <i class="ti ti-check me-1"></i>Save Order
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="cancelVideosOrderBtn" style="display:none;" onclick="cancelReorder('videos')">
+              <i class="ti ti-x me-1"></i>Cancel
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addVideoModal">
+              <i class="ti ti-plus me-1"></i>Add Video
+            </button>
+          </div>
         </div>
 
-        <div class="row">
-          {% for video in module.video_lessons.all %}
-          <div class="col-md-6 mb-3">
-            <div class="card border-0 bg-light">
-              <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ video.title }}</h6>
-                    <p class="text-muted mb-0 small">{{ video.description|truncatewords:10 }}</p>
+        {% if video_links %}
+        <form id="bulkDeleteVideosForm">
+          {% csrf_token %}
+          <div class="row" id="videosContainer">
+            {% for link in video_links %}
+            <div class="col-md-6 mb-3 video-item" data-link-id="{{ link.id }}" data-order="{{ link.order }}">
+              <div class="card border-0 bg-light">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="form-check me-2 checkbox-container">
+                      <input class="form-check-input video-checkbox" type="checkbox" value="{{ link.id }}" id="video_{{ link.id }}" onchange="toggleBulkDeleteButton('video')">
+                    </div>
+                    <div class="order-input-container" style="display:none; margin-right: 8px; min-width: 60px;">
+                      <input type="number" class="form-control form-control-sm order-input" value="{{ link.order }}" min="1" style="width: 60px;">
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ link.video_lesson.title }}</h6>
+                      <p class="text-muted mb-0 small">{{ link.video_lesson.description|truncatewords:10 }}</p>
+                    </div>
+                    <div class="ms-2">
+                      <span class="badge bg-primary-subtle text-primary order-badge">#{{ link.order }}</span>
+                    </div>
                   </div>
-                  <div class="ms-2">
-                    <span class="badge bg-primary-subtle text-primary">#{{ video.order }}</span>
-                  </div>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">
-                    <i class="ti ti-clock me-1"></i>{{ video.duration|default:"0" }} min
-                  </small>
-                  <div class="btn-group" role="group">
-                    <a href="{% url 'custom_admin:video_lesson_edit' video.id %}" 
-                       class="btn btn-outline-primary btn-sm">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    <a href="{% url 'custom_admin:video_lesson_delete' video.id %}" 
-                       class="btn btn-outline-danger btn-sm">
-                      <i class="ti ti-trash"></i>
-                    </a>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <i class="ti ti-clock me-1"></i>{{ link.video_lesson.duration|default:"0" }} min
+                    </small>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'custom_admin:video_lesson_edit' link.video_lesson.id %}"
+                         class="btn btn-outline-primary btn-sm">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+        </form>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-video-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-0">No videos assigned to this module yet.</p>
         </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
 
     <!-- Assignments Section -->
-    {% if module.assignments.all %}
     <div class="card mb-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="card-title mb-0">Assignments</h5>
-          <a href="{% url 'custom_admin:assignment_create' %}?module={{ module.id }}" class="btn btn-outline-success btn-sm">
-            <i class="ti ti-plus me-1"></i>Add Assignment
-          </a>
+          <h5 class="card-title mb-0">Assignments ({{ assignment_links.count }})</h5>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteAssignmentsBtn" style="display:none;" onclick="bulkDeleteAssignments()">
+              <i class="ti ti-trash me-1"></i>Delete Selected
+            </button>
+            {% if assignment_links %}
+            <button type="button" class="btn btn-warning btn-sm" id="reorderAssignmentsBtn" onclick="toggleReorderMode('assignments')">
+              <i class="ti ti-arrows-sort me-1"></i>Reorder
+            </button>
+            <button type="button" class="btn btn-success btn-sm" id="saveAssignmentsOrderBtn" style="display:none;" onclick="saveOrder('assignments')">
+              <i class="ti ti-check me-1"></i>Save Order
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="cancelAssignmentsOrderBtn" style="display:none;" onclick="cancelReorder('assignments')">
+              <i class="ti ti-x me-1"></i>Cancel
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+              <i class="ti ti-plus me-1"></i>Add Assignment
+            </button>
+          </div>
         </div>
 
-        <div class="row">
-          {% for assignment in module.assignments.all %}
-          <div class="col-12 mb-3">
-            <div class="card border-0 bg-light">
-              <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ assignment.title }}</h6>
-                    <p class="text-muted mb-0 small">{{ assignment.description|truncatewords:15 }}</p>
+        {% if assignment_links %}
+        <form id="bulkDeleteAssignmentsForm">
+          {% csrf_token %}
+          <div class="row" id="assignmentsContainer">
+            {% for link in assignment_links %}
+            <div class="col-12 mb-3 assignment-item" data-link-id="{{ link.id }}" data-order="{{ link.order }}">
+              <div class="card border-0 bg-light">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="form-check me-2 checkbox-container">
+                      <input class="form-check-input assignment-checkbox" type="checkbox" value="{{ link.id }}" id="assignment_{{ link.id }}" onchange="toggleBulkDeleteButton('assignment')">
+                    </div>
+                    <div class="order-input-container" style="display:none; margin-right: 8px; min-width: 60px;">
+                      <input type="number" class="form-control form-control-sm order-input" value="{{ link.order }}" min="1" style="width: 60px;">
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ link.assignment.title }}</h6>
+                      <p class="text-muted mb-0 small">{{ link.assignment.description|truncatewords:15 }}</p>
+                    </div>
+                    <div class="ms-2 d-flex align-items-center gap-2">
+                      <span class="badge bg-secondary-subtle text-secondary order-badge">#{{ link.order }}</span>
+                      {% if link.assignment.is_required %}
+                        <span class="badge bg-danger-subtle text-danger">Required</span>
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="ms-2 d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary-subtle text-secondary">#{{ assignment.order }}</span>
-                    {% if assignment.is_required %}
-                      <span class="badge bg-danger-subtle text-danger">Required</span>
-                    {% endif %}
-                  </div>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex gap-3">
-                    <small class="text-muted">
-                      <i class="ti ti-target me-1"></i>{{ assignment.max_points }} pts
-                    </small>
-                    <small class="text-muted">
-                      <i class="ti ti-calendar me-1"></i>{{ assignment.due_days }} days
-                    </small>
-                    <small class="text-muted">
-                      <i class="ti ti-clipboard-check me-1"></i>{{ assignment.submissions.count }} submissions
-                    </small>
-                  </div>
-                  <div class="btn-group" role="group">
-                    <a href="{% url 'custom_admin:assignment_detail' assignment.id %}" 
-                       class="btn btn-outline-primary btn-sm">
-                      <i class="ti ti-eye"></i>
-                    </a>
-                    <a href="{% url 'custom_admin:assignment_edit' assignment.id %}" 
-                       class="btn btn-outline-warning btn-sm">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    <a href="{% url 'custom_admin:assignment_delete' assignment.id %}" 
-                       class="btn btn-outline-danger btn-sm">
-                      <i class="ti ti-trash"></i>
-                    </a>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3">
+                      <small class="text-muted">
+                        <i class="ti ti-target me-1"></i>{{ link.assignment.max_points }} pts
+                      </small>
+                      <small class="text-muted">
+                        <i class="ti ti-calendar me-1"></i>{{ link.assignment.due_days }} days
+                      </small>
+                      <small class="text-muted">
+                        <i class="ti ti-clipboard-check me-1"></i>{{ link.assignment.submissions.count }} submissions
+                      </small>
+                    </div>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'custom_admin:assignment_detail' link.assignment.id %}"
+                         class="btn btn-outline-primary btn-sm">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                      <a href="{% url 'custom_admin:assignment_edit' link.assignment.id %}"
+                         class="btn btn-outline-warning btn-sm">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+        </form>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-clipboard-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-0">No assignments assigned to this module yet.</p>
         </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
 
     <!-- Quizzes Section -->
-    {% if module.quizzes.all %}
     <div class="card mb-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="card-title mb-0">Quizzes</h5>
-          <a href="{% url 'custom_admin:quiz_create' %}?module={{ module.id }}" class="btn btn-outline-warning btn-sm">
-            <i class="ti ti-plus me-1"></i>Add Quiz
-          </a>
+          <h5 class="card-title mb-0">Quizzes ({{ quiz_links.count }})</h5>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteQuizzesBtn" style="display:none;" onclick="bulkDeleteQuizzes()">
+              <i class="ti ti-trash me-1"></i>Delete Selected
+            </button>
+            {% if quiz_links %}
+            <button type="button" class="btn btn-warning btn-sm" id="reorderQuizzesBtn" onclick="toggleReorderMode('quizzes')">
+              <i class="ti ti-arrows-sort me-1"></i>Reorder
+            </button>
+            <button type="button" class="btn btn-success btn-sm" id="saveQuizzesOrderBtn" style="display:none;" onclick="saveOrder('quizzes')">
+              <i class="ti ti-check me-1"></i>Save Order
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="cancelQuizzesOrderBtn" style="display:none;" onclick="cancelReorder('quizzes')">
+              <i class="ti ti-x me-1"></i>Cancel
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+              <i class="ti ti-plus me-1"></i>Add Quiz
+            </button>
+          </div>
         </div>
 
-        <div class="row">
-          {% for quiz in module.quizzes.all %}
-          <div class="col-md-6 mb-3">
-            <div class="card border-0 bg-light">
-              <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ quiz.title }}</h6>
-                    <p class="text-muted mb-0 small">{{ quiz.description|truncatewords:10 }}</p>
+        {% if quiz_links %}
+        <form id="bulkDeleteQuizzesForm">
+          {% csrf_token %}
+          <div class="row" id="quizzesContainer">
+            {% for link in quiz_links %}
+            <div class="col-md-6 mb-3 quiz-item" data-link-id="{{ link.id }}" data-order="{{ link.order }}">
+              <div class="card border-0 bg-light">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="form-check me-2 checkbox-container">
+                      <input class="form-check-input quiz-checkbox" type="checkbox" value="{{ link.id }}" id="quiz_{{ link.id }}" onchange="toggleBulkDeleteButton('quiz')">
+                    </div>
+                    <div class="order-input-container" style="display:none; margin-right: 8px; min-width: 60px;">
+                      <input type="number" class="form-control form-control-sm order-input" value="{{ link.order }}" min="1" style="width: 60px;">
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ link.quiz.title }}</h6>
+                      <p class="text-muted mb-0 small">{{ link.quiz.description|truncatewords:10 }}</p>
+                    </div>
+                    <div class="ms-2 d-flex align-items-center gap-2">
+                      <span class="badge bg-secondary-subtle text-secondary order-badge">#{{ link.order }}</span>
+                      {% if link.quiz.is_required %}
+                        <span class="badge bg-danger-subtle text-danger">Required</span>
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="ms-2 d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary-subtle text-secondary">#{{ quiz.order }}</span>
-                    {% if quiz.is_required %}
-                      <span class="badge bg-danger-subtle text-danger">Required</span>
-                    {% endif %}
-                  </div>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex gap-3">
-                    <small class="text-muted">
-                      <i class="ti ti-help-circle me-1"></i>{{ quiz.questions.count }} questions
-                    </small>
-                    {% if quiz.time_limit %}
-                    <small class="text-muted">
-                      <i class="ti ti-clock me-1"></i>{{ quiz.time_limit }} min
-                    </small>
-                    {% endif %}
-                    <small class="text-muted">
-                      <i class="ti ti-clipboard-data me-1"></i>{{ quiz.attempts.count }} attempts
-                    </small>
-                  </div>
-                  <div class="btn-group" role="group">
-                    <a href="{% url 'custom_admin:quiz_detail' quiz.id %}" 
-                       class="btn btn-outline-primary btn-sm">
-                      <i class="ti ti-eye"></i>
-                    </a>
-                    <a href="{% url 'custom_admin:quiz_edit' quiz.id %}" 
-                       class="btn btn-outline-warning btn-sm">
-                      <i class="ti ti-edit"></i>
-                    </a>
-                    <a href="{% url 'custom_admin:quiz_delete' quiz.id %}" 
-                       class="btn btn-outline-danger btn-sm">
-                      <i class="ti ti-trash"></i>
-                    </a>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3">
+                      <small class="text-muted">
+                        <i class="ti ti-help-circle me-1"></i>{{ link.quiz.questions.count }} questions
+                      </small>
+                      {% if link.quiz.time_limit %}
+                      <small class="text-muted">
+                        <i class="ti ti-clock me-1"></i>{{ link.quiz.time_limit }} min
+                      </small>
+                      {% endif %}
+                      <small class="text-muted">
+                        <i class="ti ti-clipboard-data me-1"></i>{{ link.quiz.attempts.count }} attempts
+                      </small>
+                    </div>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'custom_admin:quiz_detail' link.quiz.id %}"
+                         class="btn btn-outline-primary btn-sm">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                      <a href="{% url 'custom_admin:quiz_edit' link.quiz.id %}"
+                         class="btn btn-outline-warning btn-sm">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+        </form>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-clipboard-list-off fs-1 text-muted mb-3"></i>
+          <p class="text-muted mb-0">No quizzes assigned to this module yet.</p>
         </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
-
-    <!-- Empty States -->
-    {% if not module.video_lessons.all and not module.assignments.all and not module.quizzes.all %}
-    <div class="card">
-      <div class="card-body text-center py-5">
-        <i class="ti ti-folder-x fs-1 text-muted mb-3"></i>
-        <h5 class="mb-2">No Content Added Yet</h5>
-        <p class="text-muted mb-4">This module doesn't have any lessons, assignments, or quizzes yet.</p>
-        <div class="d-flex gap-2 justify-content-center">
-          <a href="{% url 'custom_admin:video_lesson_create' %}?module={{ module.id }}" class="btn btn-primary">
-            <i class="ti ti-video me-1"></i>Add Video Lesson
-          </a>
-          <a href="{% url 'custom_admin:assignment_create' %}?module={{ module.id }}" class="btn btn-success">
-            <i class="ti ti-clipboard-text me-1"></i>Add Assignment
-          </a>
-          <a href="{% url 'custom_admin:quiz_create' %}?module={{ module.id }}" class="btn btn-warning">
-            <i class="ti ti-clipboard-list me-1"></i>Add Quiz
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endif %}
   </div>
 
   <div class="col-lg-4">
@@ -314,19 +374,21 @@
       <div class="card-body">
         <h5 class="card-title mb-3">Quick Actions</h5>
         <div class="d-grid gap-2">
-          <a href="{% url 'custom_admin:module_progress_list' %}?module={{ module.id }}" 
+          <a href="{% url 'custom_admin:module_progress_list' %}?module={{ module.id }}"
              class="btn btn-outline-primary">
             <i class="ti ti-progress-check me-1"></i>View Student Progress
           </a>
-          <a href="{% url 'custom_admin:module_edit' module.id %}" 
+          <a href="{% url 'custom_admin:module_edit' module.id %}"
              class="btn btn-outline-warning">
             <i class="ti ti-edit me-1"></i>Edit Module
           </a>
-          <a href="{% url 'custom_admin:course_detail' module.course.id %}" 
+          {% if course_links %}
+          <a href="{% url 'custom_admin:course_detail' course_id=course_links.0.course.id %}"
              class="btn btn-outline-info">
             <i class="ti ti-book me-1"></i>View Course
           </a>
-          <a href="{% url 'custom_admin:modules_list' %}" 
+          {% endif %}
+          <a href="{% url 'custom_admin:modules_list' %}"
              class="btn btn-outline-secondary">
             <i class="ti ti-arrow-left me-1"></i>Back to Modules
           </a>
@@ -338,27 +400,28 @@
     <div class="card mb-4">
       <div class="card-body">
         <h5 class="card-title mb-3">Module Information</h5>
-        
+
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted">Course:</span>
-          <span class="fw-medium">{{ module.course.title }}</span>
+          <span class="text-muted">Courses:</span>
+          <span class="fw-medium">
+            {% if course_links %}
+              {{ course_links.count }}
+            {% else %}
+              Not assigned
+            {% endif %}
+          </span>
         </div>
-        
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted">Module Order:</span>
-          <span class="fw-medium">#{{ module.order }}</span>
-        </div>
-        
+
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="text-muted">Duration:</span>
           <span class="fw-medium">{{ module.duration_minutes|default:"Not set" }} minutes</span>
         </div>
-        
+
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="text-muted">Prerequisites:</span>
-          <span class="fw-medium">{{ module.prerequisites_count|default:"None" }}</span>
+          <span class="fw-medium">{{ module.prerequisites|default:"None" }}</span>
         </div>
-        
+
         <div class="d-flex justify-content-between align-items-center">
           <span class="text-muted">Status:</span>
           {% if module.is_active %}
@@ -374,34 +437,34 @@
     <div class="card">
       <div class="card-body">
         <h5 class="card-title mb-3">Content Overview</h5>
-        
+
         <div class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-muted">Video Lessons:</span>
           <div class="d-flex align-items-center gap-2">
-            <span class="fw-medium">{{ module.video_lessons.count }}</span>
-            <a href="{% url 'custom_admin:video_lessons_list' %}?module={{ module.id }}" 
+            <span class="fw-medium">{{ video_links.count }}</span>
+            <a href="{% url 'custom_admin:video_lessons_list' %}?module={{ module.id }}"
                class="btn btn-outline-primary btn-sm">
               <i class="ti ti-eye"></i>
             </a>
           </div>
         </div>
-        
+
         <div class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-muted">Assignments:</span>
           <div class="d-flex align-items-center gap-2">
-            <span class="fw-medium">{{ module.assignments.count }}</span>
-            <a href="{% url 'custom_admin:assignments_list' %}?module={{ module.id }}" 
+            <span class="fw-medium">{{ assignment_links.count }}</span>
+            <a href="{% url 'custom_admin:assignments_list' %}?module={{ module.id }}"
                class="btn btn-outline-success btn-sm">
               <i class="ti ti-eye"></i>
             </a>
           </div>
         </div>
-        
+
         <div class="d-flex justify-content-between align-items-center">
           <span class="text-muted">Quizzes:</span>
           <div class="d-flex align-items-center gap-2">
-            <span class="fw-medium">{{ module.quizzes.count }}</span>
-            <a href="{% url 'custom_admin:quizzes_list' %}?module={{ module.id }}" 
+            <span class="fw-medium">{{ quiz_links.count }}</span>
+            <a href="{% url 'custom_admin:quizzes_list' %}?module={{ module.id }}"
                class="btn btn-outline-warning btn-sm">
               <i class="ti ti-eye"></i>
             </a>
@@ -411,4 +474,370 @@
     </div>
   </div>
 </div>
+
+<!-- Add Video Modal -->
+<div class="modal fade" id="addVideoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:module_add_video' module_id=module.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Video to Module</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="video_id" class="form-label">Select Video</label>
+            <select name="video_id" id="video_id" class="form-select" required>
+              <option value="">-- Select a Video --</option>
+              {% for video in available_videos %}
+              <option value="{{ video.id }}">{{ video.title }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Choose a video to add to this module</div>
+          </div>
+          <div class="mb-3">
+            <label for="video_order" class="form-label">Order</label>
+            <input type="number" name="order" id="video_order" class="form-control" value="{{ video_links.count|add:1 }}" min="1" required>
+            <div class="form-text">Position of this video in the module sequence</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Video</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Assignment Modal -->
+<div class="modal fade" id="addAssignmentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:module_add_assignment' module_id=module.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Assignment to Module</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="assignment_id" class="form-label">Select Assignment</label>
+            <select name="assignment_id" id="assignment_id" class="form-select" required>
+              <option value="">-- Select an Assignment --</option>
+              {% for assignment in available_assignments %}
+              <option value="{{ assignment.id }}">{{ assignment.title }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Choose an assignment to add to this module</div>
+          </div>
+          <div class="mb-3">
+            <label for="assignment_order" class="form-label">Order</label>
+            <input type="number" name="order" id="assignment_order" class="form-control" value="{{ assignment_links.count|add:1 }}" min="1" required>
+            <div class="form-text">Position of this assignment in the module sequence</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Add Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Quiz Modal -->
+<div class="modal fade" id="addQuizModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'custom_admin:module_add_quiz' module_id=module.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Quiz to Module</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="quiz_id" class="form-label">Select Quiz</label>
+            <select name="quiz_id" id="quiz_id" class="form-select" required>
+              <option value="">-- Select a Quiz --</option>
+              {% for quiz in available_quizzes %}
+              <option value="{{ quiz.id }}">{{ quiz.title }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Choose a quiz to add to this module</div>
+          </div>
+          <div class="mb-3">
+            <label for="quiz_order" class="form-label">Order</label>
+            <input type="number" name="order" id="quiz_order" class="form-control" value="{{ quiz_links.count|add:1 }}" min="1" required>
+            <div class="form-text">Position of this quiz in the module sequence</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">Add Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Reorder mode state
+let reorderMode = {
+  videos: false,
+  assignments: false,
+  quizzes: false
+};
+
+// Original order backup for cancel functionality
+let originalOrder = {
+  videos: [],
+  assignments: [],
+  quizzes: []
+};
+
+// Toggle bulk delete button visibility
+function toggleBulkDeleteButton(type) {
+  const checkboxes = document.querySelectorAll(`.${type}-checkbox:checked`);
+  const button = document.getElementById(`bulkDelete${type.charAt(0).toUpperCase() + type.slice(1)}${type === 'quiz' ? 'zes' : 's'}Btn`);
+
+  if (checkboxes.length > 0) {
+    button.style.display = 'inline-block';
+  } else {
+    button.style.display = 'none';
+  }
+}
+
+// Toggle reorder mode
+function toggleReorderMode(type) {
+  reorderMode[type] = true;
+
+  // Save original order for cancel
+  const container = document.getElementById(`${type}Container`);
+  const items = container.querySelectorAll(`.${type.slice(0, -1)}-item`);
+  originalOrder[type] = Array.from(items).map((item) => {
+    const orderInput = item.querySelector('.order-input');
+    return {
+      linkId: item.dataset.linkId,
+      order: parseInt(orderInput.value)
+    };
+  });
+
+  // Show/hide buttons
+  document.getElementById(`reorder${type.charAt(0).toUpperCase() + type.slice(1)}Btn`).style.display = 'none';
+  document.getElementById(`save${type.charAt(0).toUpperCase() + type.slice(1)}OrderBtn`).style.display = 'inline-block';
+  document.getElementById(`cancel${type.charAt(0).toUpperCase() + type.slice(1)}OrderBtn`).style.display = 'inline-block';
+
+  // Hide checkboxes and show order input fields
+  items.forEach(item => {
+    const checkboxContainer = item.querySelector('.checkbox-container');
+    const orderInputContainer = item.querySelector('.order-input-container');
+    if (checkboxContainer) checkboxContainer.style.display = 'none';
+    if (orderInputContainer) orderInputContainer.style.display = 'block';
+  });
+}
+
+// Save new order
+function saveOrder(type) {
+  const container = document.getElementById(`${type}Container`);
+  const items = container.querySelectorAll(`.${type.slice(0, -1)}-item`);
+
+  // Collect new order from input fields
+  const newOrder = [];
+  let isValid = true;
+  const usedOrders = new Set();
+
+  items.forEach((item) => {
+    const orderInput = item.querySelector('.order-input');
+    const order = parseInt(orderInput.value);
+
+    // Validate order number
+    if (!order || order < 1) {
+      alert('Please enter valid order numbers (must be 1 or greater)');
+      isValid = false;
+      return;
+    }
+
+    // Check for duplicates
+    if (usedOrders.has(order)) {
+      alert(`Order number ${order} is used more than once. Please use unique order numbers.`);
+      isValid = false;
+      return;
+    }
+
+    usedOrders.add(order);
+    newOrder.push({
+      link_id: parseInt(item.dataset.linkId),
+      order: order
+    });
+  });
+
+  if (!isValid) return;
+
+  // Send to server
+  const formData = new FormData();
+  formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  formData.append(`${type.slice(0, -1)}_order`, JSON.stringify(newOrder));
+
+  fetch(`{% url 'custom_admin:module_reorder_videos' module.id %}`.replace('videos', type), {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message and reload
+      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} order updated successfully!`);
+      location.reload();
+    } else {
+      alert('Error updating order. Please try again.');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error updating order. Please try again.');
+  });
+}
+
+// Cancel reorder
+function cancelReorder(type) {
+  const container = document.getElementById(`${type}Container`);
+  const items = container.querySelectorAll(`.${type.slice(0, -1)}-item`);
+
+  // Restore original order values
+  items.forEach(item => {
+    const linkId = item.dataset.linkId;
+    const original = originalOrder[type].find(o => o.linkId === linkId);
+    if (original) {
+      const orderInput = item.querySelector('.order-input');
+      if (orderInput) {
+        orderInput.value = original.order;
+      }
+    }
+  });
+
+  // Exit reorder mode
+  exitReorderMode(type);
+}
+
+// Exit reorder mode
+function exitReorderMode(type) {
+  reorderMode[type] = false;
+
+  // Show/hide buttons
+  document.getElementById(`reorder${type.charAt(0).toUpperCase() + type.slice(1)}Btn`).style.display = 'inline-block';
+  document.getElementById(`save${type.charAt(0).toUpperCase() + type.slice(1)}OrderBtn`).style.display = 'none';
+  document.getElementById(`cancel${type.charAt(0).toUpperCase() + type.slice(1)}OrderBtn`).style.display = 'none';
+
+  // Show checkboxes and hide order input fields
+  const container = document.getElementById(`${type}Container`);
+  const items = container.querySelectorAll(`.${type.slice(0, -1)}-item`);
+
+  items.forEach(item => {
+    const checkboxContainer = item.querySelector('.checkbox-container');
+    const orderInputContainer = item.querySelector('.order-input-container');
+    if (checkboxContainer) checkboxContainer.style.display = 'block';
+    if (orderInputContainer) orderInputContainer.style.display = 'none';
+  });
+}
+
+// Bulk delete videos
+function bulkDeleteVideos() {
+  const checkboxes = document.querySelectorAll('.video-checkbox:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert('Please select at least one video to delete.');
+    return;
+  }
+
+  if (confirm(`Are you sure you want to remove ${ids.length} video(s) from this module?\n\nThis will NOT delete the videos themselves, only remove them from this module.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "custom_admin:module_bulk_delete_videos" module_id=module.id %}';
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    const idsInput = document.createElement('input');
+    idsInput.type = 'hidden';
+    idsInput.name = 'ids';
+    idsInput.value = ids.join(',');
+    form.appendChild(idsInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+// Bulk delete assignments
+function bulkDeleteAssignments() {
+  const checkboxes = document.querySelectorAll('.assignment-checkbox:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert('Please select at least one assignment to delete.');
+    return;
+  }
+
+  if (confirm(`Are you sure you want to remove ${ids.length} assignment(s) from this module?\n\nThis will NOT delete the assignments themselves, only remove them from this module.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "custom_admin:module_bulk_delete_assignments" module_id=module.id %}';
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    const idsInput = document.createElement('input');
+    idsInput.type = 'hidden';
+    idsInput.name = 'ids';
+    idsInput.value = ids.join(',');
+    form.appendChild(idsInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+// Bulk delete quizzes
+function bulkDeleteQuizzes() {
+  const checkboxes = document.querySelectorAll('.quiz-checkbox:checked');
+  const ids = Array.from(checkboxes).map(cb => cb.value);
+
+  if (ids.length === 0) {
+    alert('Please select at least one quiz to delete.');
+    return;
+  }
+
+  if (confirm(`Are you sure you want to remove ${ids.length} quiz(zes) from this module?\n\nThis will NOT delete the quizzes themselves, only remove them from this module.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "custom_admin:module_bulk_delete_quizzes" module_id=module.id %}';
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+
+    const idsInput = document.createElement('input');
+    idsInput.type = 'hidden';
+    idsInput.name = 'ids';
+    idsInput.value = ids.join(',');
+    form.appendChild(idsInput);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+
 {% endblock %}

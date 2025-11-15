@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.views.decorators.cache import never_cache, cache_control
 from django.middleware.csrf import get_token
 from django.db.models import Q, Count, Avg
 from django.core.paginator import Paginator
@@ -144,20 +145,28 @@ def browse_courses(request):
     return render(request, 'student_portal/browse_courses.html', context)
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def student_logout(request):
-    """Student logout"""
+    """Student logout with cache clearing"""
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('landing:login')
+    response = redirect('landing:login')
+    # Add headers to prevent caching
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
+@never_cache
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def dashboard(request):
     """Enhanced modern student dashboard"""
     # Check authentication and role
     if not request.user.is_authenticated:
         messages.error(request, 'Please login to access the student portal.')
         return redirect('landing:login')
-    
+
     if not hasattr(request.user, 'role') or request.user.role != 'student':
         messages.error(request, 'Access denied. Student role required.')
         return redirect('landing:login')
@@ -185,12 +194,14 @@ def dashboard(request):
     for enrollment in enrollments:
         course = enrollment.course
         modules = course.modules.all()
-        
-        # Calculate video progress
-        course_videos = VideoLesson.objects.filter(module__course=course).count()
+
+        # Calculate video progress using many-to-many relationships
+        course_videos = VideoLesson.objects.filter(
+            module_links__module__course_links__course=course
+        ).distinct().count()
         completed_videos_in_course = StudentProgress.objects.filter(
             user=user,
-            video_lesson__module__course=course,
+            course=course,
             completed=True
         ).count()
         
@@ -214,10 +225,10 @@ def dashboard(request):
         else:
             progress_percentage = 0
         
-        # Count completed modules
+        # Count completed modules using many-to-many relationships
         completed_modules = ModuleProgress.objects.filter(
             student=user,
-            module__course=enrollment.course,
+            module__course_links__course=enrollment.course,
             is_completed=True
         ).count()
         
@@ -235,10 +246,12 @@ def dashboard(request):
     submitted_assignments = AssignmentSubmission.objects.filter(
         student=user
     ).exclude(status='draft').count()
-    
+
+    # Get total assignments for enrolled courses using many-to-many
+    enrolled_course_ids = [e.course.id for e in enrollments]
     total_assignments = Assignment.objects.filter(
-        module__course__in=[e.course for e in enrollments]
-    ).count()
+        module_links__module__course_links__course_id__in=enrolled_course_ids
+    ).distinct().count()
     
     # Quiz statistics
     quiz_attempts = QuizAttempt.objects.filter(
@@ -275,17 +288,57 @@ def dashboard(request):
     ).exclude(status='draft').count()
     
     # Recent activity with more details
+    # Note: Can't use select_related for video_lesson__module since it's now many-to-many
     recent_progress = StudentProgress.objects.filter(
         user=user
-    ).select_related('video_lesson', 'course', 'video_lesson__module').order_by('-last_watched_at')[:15]
-    
+    ).select_related('video_lesson', 'course').order_by('-last_watched_at')[:15]
+
+    # Continue Learning - Get last watched video that's not completed
+    continue_learning = StudentProgress.objects.filter(
+        user=user,
+        completed=False,
+        completed_percentage__gt=0
+    ).select_related('video_lesson', 'course').order_by('-last_watched_at').first()
+
+    # If no in-progress video, get the most recent completed one
+    if not continue_learning:
+        continue_learning = StudentProgress.objects.filter(
+            user=user,
+            completed=True
+        ).select_related('video_lesson', 'course').order_by('-last_watched_at').first()
+
+    # Calculate learning streak (consecutive days with activity)
+    learning_streak = 0
+    current_date = timezone.now().date()
+    for i in range(365):  # Check up to 1 year
+        check_date = current_date - timedelta(days=i)
+        has_activity = StudentProgress.objects.filter(
+            user=user,
+            last_watched_at__date=check_date
+        ).exists() or AssignmentSubmission.objects.filter(
+            student=user,
+            created_at__date=check_date
+        ).exists()
+
+        if has_activity:
+            learning_streak = i + 1
+        elif i > 0:  # If no activity and not today, break streak
+            break
+
+    # Calculate total learning time (estimate based on video progress)
+    total_learning_minutes = 0
+    for progress in StudentProgress.objects.filter(user=user, completed=True):
+        if progress.video_lesson and progress.video_lesson.duration_seconds:
+            total_learning_minutes += progress.video_lesson.duration_seconds / 60
+
     # Upcoming assignments (within next 7 days)
     upcoming_deadline = timezone.now() + timedelta(days=7)
     upcoming_assignments = []
-    
+
     for enrollment in enrollments:
         for module in enrollment.course.modules.all():
-            for assignment in module.assignments.all():
+            for module_assignment in module.assignment_links.all():
+                assignment = module_assignment.assignment
                 try:
                     # Check if student hasn't submitted this assignment
                     AssignmentSubmission.objects.get(student=user, assignment=assignment)
@@ -302,12 +355,18 @@ def dashboard(request):
     context = {
         'user': user,
         'current_time': timezone.now(),
-        
+
+        # Continue Learning
+        'continue_learning': continue_learning,
+        'learning_streak': learning_streak,
+        'total_learning_hours': round(total_learning_minutes / 60, 1),
+
         # Course data
         'enrollments': enrollments[:6],
+        'all_enrollments': enrollments,  # For full course list
         'enrolled_courses_count': total_courses,
         'completed_courses': completed_courses,
-        
+
         # Statistics
         'completed_videos_count': completed_videos,
         'submitted_assignments': submitted_assignments,
@@ -315,22 +374,28 @@ def dashboard(request):
         'quiz_attempts_count': quiz_attempts_count,
         'average_quiz_score': average_quiz_score,
         'modules_completed': modules_completed,
-        
+
         # Weekly activity
         'videos_this_week': videos_this_week,
         'assignments_this_week': assignments_this_week,
-        
+
         # Activity feeds
         'recent_progress': recent_progress,
         'upcoming_assignments': upcoming_assignments[:5],
-        
+
         # Content Management - Latest content for student dashboard
         'latest_news': News.objects.filter(is_published=True, is_featured=True).order_by('-published_at')[:3],
         'featured_testimonials': Testimonial.objects.filter(is_published=True, is_featured=True).order_by('-created_at')[:3],
         'recent_placements': Placement.objects.filter(is_published=True, is_featured=True).order_by('-published_at')[:4],
     }
     
-    return render(request, 'student_portal/dashboard.html', context)
+    # Use modern dashboard
+    response = render(request, 'student_portal/dashboard_modern.html', context)
+    # Add cache prevention headers
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
 
@@ -384,10 +449,10 @@ def my_courses(request):
         else:
             progress_percentage = 0
         
-        # Count truly completed modules for statistics
+        # Count truly completed modules for statistics using many-to-many
         completed_modules = ModuleProgress.objects.filter(
             student=user,
-            module__course=enrollment.course,
+            module__course_links__course=enrollment.course,
             is_completed=True
         ).count()
         
@@ -443,10 +508,29 @@ def course_detail(request, course_id):
     
     if is_enrolled:
         # For enrolled users - show full course content
-        modules = course.modules.prefetch_related(
-            'video_lessons', 'assignments', 'quizzes'
+        # Get modules through the CourseModule through table to access the order field
+        from apps.courses.models import CourseModule
+        course_modules = CourseModule.objects.filter(
+            course=course
+        ).select_related('module').prefetch_related(
+            'module__video_links__video_lesson',
+            'module__assignment_links__assignment',
+            'module__quiz_links__quiz'
         ).order_by('order')
-        
+
+        # Extract modules and attach order
+        modules = []
+        for cm in course_modules:
+            module = cm.module
+            module.course_order = cm.order  # Attach the order from CourseModule
+
+            # Count content through the many-to-many relationships
+            module.videos_count = module.video_links.count()
+            module.assignments_count = module.assignment_links.count()
+            module.quizzes_count = module.quiz_links.count()
+
+            modules.append(module)
+
         # Get user's module progress and attach to each module
         for module in modules:
             try:
@@ -460,7 +544,7 @@ def course_detail(request, course_id):
                 )
             # Attach progress to module object for easy template access
             module.progress = progress
-        
+
         context = {
             'course': course,
             'enrollment': enrollment,
@@ -471,8 +555,28 @@ def course_detail(request, course_id):
         return render(request, 'student_portal/courses/course_detail.html', context)
     else:
         # For non-enrolled users - show course preview and purchase option
-        modules = course.modules.order_by('order')[:3]  # Show first 3 modules as preview
-        
+        # Get first 3 modules via CourseModule for proper ordering
+        from apps.courses.models import CourseModule
+        course_modules = CourseModule.objects.filter(
+            course=course
+        ).select_related('module').prefetch_related(
+            'module__video_links__video_lesson',
+            'module__assignment_links__assignment',
+            'module__quiz_links__quiz'
+        ).order_by('order')[:3]
+
+        modules = []
+        for cm in course_modules:
+            module = cm.module
+            module.course_order = cm.order
+
+            # Count content through the many-to-many relationships
+            module.videos_count = module.video_links.count()
+            module.assignments_count = module.assignment_links.count()
+            module.quizzes_count = module.quiz_links.count()
+
+            modules.append(module)
+
         context = {
             'course': course,
             'modules': modules,
@@ -661,64 +765,114 @@ def lesson_viewer(request, lesson_id):
     """Video lesson viewer"""
     if not request.user.is_authenticated:
         return redirect('landing:login')
-    
+
     user = request.user
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
-    
-    # Check if user is enrolled in the course
-    try:
-        enrollment = Enrollment.objects.get(
-            user=user, 
-            course=lesson.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        messages.error(request, 'You are not enrolled in this course.')
+
+    # Get the first module this lesson belongs to
+    current_module = lesson.get_first_module()
+
+    if not current_module:
+        messages.error(request, 'This lesson is not assigned to any module.')
+        return redirect('student_portal:dashboard')
+
+    # Get all courses that have this module
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    if not course_modules.exists():
+        messages.error(request, 'This module is not assigned to any course.')
+        return redirect('student_portal:dashboard')
+
+    # Check if user is enrolled in ANY course that has this module
+    enrollment = None
+    course = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            course = cm.course
+            break  # Found an enrollment, use this course
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment or not course:
+        messages.error(request, 'You are not enrolled in any course containing this lesson.')
         return redirect('student_portal:my_courses')
-    
+
+    # Get or create module progress and ensure it's unlocked
+    module_progress, created = ModuleProgress.objects.get_or_create(
+        student=user,
+        module=current_module,
+        defaults={
+            'is_unlocked': True,
+            'is_completed': False,
+            'completion_percentage': 0.0
+        }
+    )
+
     # Check if module is unlocked
-    try:
-        module_progress = ModuleProgress.objects.get(
-            student=user, 
-            module=lesson.module
-        )
-        if not module_progress.is_unlocked:
-            messages.error(request, 'This module is not yet available.')
-            return redirect('student_portal:course_detail', course_id=lesson.module.course.id)
-    except ModuleProgress.DoesNotExist:
-        messages.error(request, 'Module progress not found.')
-        return redirect('student_portal:course_detail', course_id=lesson.module.course.id)
+    if not module_progress.is_unlocked:
+        messages.error(request, 'This module is not yet available.')
+        return redirect('student_portal:course_detail', course_id=course.id)
     
     # Get or create lesson progress
-    progress, _ = StudentProgress.objects.get_or_create(
+    # Note: Database constraint is on (user, video_lesson) only, not course
+    progress, created = StudentProgress.objects.get_or_create(
         user=user,
-        course=lesson.module.course,
         video_lesson=lesson,
-        defaults={'completed_percentage': 0.0}
+        defaults={
+            'course': course,
+            'completed_percentage': 0.0
+        }
     )
+
+    # Update course if it changed (due to many-to-many relationships)
+    if not created and progress.course != course:
+        progress.course = course
+        progress.save()
     
-    # Get next and previous lessons
-    current_module = lesson.module
-    next_lesson = VideoLesson.objects.filter(
-        module=current_module,
-        order__gt=lesson.order
-    ).order_by('order').first()
-    
-    prev_lesson = VideoLesson.objects.filter(
-        module=current_module,
-        order__lt=lesson.order
-    ).order_by('-order').first()
-    
+    # Get next and previous lessons through ModuleVideo through table
+    from apps.courses.models import ModuleVideo
+
+    # Get current lesson's order in this module
+    try:
+        current_mv = ModuleVideo.objects.get(module=current_module, video_lesson=lesson)
+        current_order = current_mv.order
+
+        # Get next lesson
+        next_mv = ModuleVideo.objects.filter(
+            module=current_module,
+            order__gt=current_order
+        ).select_related('video_lesson').order_by('order').first()
+        next_lesson = next_mv.video_lesson if next_mv else None
+
+        # Get previous lesson
+        prev_mv = ModuleVideo.objects.filter(
+            module=current_module,
+            order__lt=current_order
+        ).select_related('video_lesson').order_by('-order').first()
+        prev_lesson = prev_mv.video_lesson if prev_mv else None
+    except ModuleVideo.DoesNotExist:
+        next_lesson = None
+        prev_lesson = None
+
     context = {
         'lesson': lesson,
         'progress': progress,
         'next_lesson': next_lesson,
         'prev_lesson': prev_lesson,
-        'course': lesson.module.course,
+        'course': course,
         'module': current_module,
         'module_progress': module_progress,
     }
-    
+
     return render(request, 'student_portal/courses/lesson_viewer.html', context)
 
 
@@ -795,42 +949,73 @@ def update_lesson_progress(request, lesson_id):
     """AJAX endpoint to update lesson progress"""
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required'}, status=401)
-    
+
     user = request.user
     lesson = get_object_or_404(VideoLesson, id=lesson_id)
-    
-    # Check enrollment
-    try:
-        Enrollment.objects.get(
-            user=user, 
-            course=lesson.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        return JsonResponse({'error': 'Not enrolled'}, status=403)
-    
+
+    # Get the first module this lesson belongs to
+    current_module = lesson.get_first_module()
+
+    if not current_module:
+        return JsonResponse({'error': 'Lesson not assigned to any module'}, status=400)
+
+    # Get all courses that have this module and check enrollment
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    enrollment = None
+    course = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            course = cm.course
+            break
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment or not course:
+        return JsonResponse({'error': 'Not enrolled in any course with this lesson'}, status=403)
+
     # Get progress data
     completed_percentage = float(request.POST.get('completed_percentage', 0))
     completed = request.POST.get('completed', 'false').lower() == 'true'
-    
+
     # Update progress
     progress, created = StudentProgress.objects.get_or_create(
         user=user,
-        course=lesson.module.course,
         video_lesson=lesson,
         defaults={
+            'course': course,
             'completed_percentage': completed_percentage,
             'completed': completed
         }
     )
-    
+
     if not created:
         progress.completed_percentage = max(progress.completed_percentage, completed_percentage)
         progress.completed = completed or progress.completed
+        # Update course if it changed (due to many-to-many relationships)
+        if progress.course != course:
+            progress.course = course
         progress.save()
-    
-    # Update module progress
-    module_progress = ModuleProgress.objects.get(student=user, module=lesson.module)
+
+    # Get or create module progress
+    module_progress, mp_created = ModuleProgress.objects.get_or_create(
+        student=user,
+        module=current_module,
+        defaults={
+            'is_unlocked': True,
+            'is_completed': False,
+            'completion_percentage': 0.0
+        }
+    )
     module_progress.check_completion()
     
     # Update analytics for mentoring system
@@ -851,34 +1036,58 @@ def assignment_detail(request, assignment_id):
     """Assignment detail and submission interface"""
     if not request.user.is_authenticated:
         return redirect('landing:login')
-    
+
     user = request.user
     assignment = get_object_or_404(Assignment, id=assignment_id)
-    
-    # Check if user is enrolled in the course
-    try:
-        enrollment = Enrollment.objects.get(
-            user=user, 
-            course=assignment.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        messages.error(request, 'You are not enrolled in this course.')
+
+    # Get the first module this assignment belongs to
+    current_module = assignment.get_first_module()
+
+    if not current_module:
+        messages.error(request, 'This assignment is not assigned to any module.')
+        return redirect('student_portal:dashboard')
+
+    # Get all courses that have this module and check enrollment
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    enrollment = None
+    course = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            course = cm.course
+            break
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment or not course:
+        messages.error(request, 'You are not enrolled in any course containing this assignment.')
         return redirect('student_portal:my_courses')
-    
+
+    # Get or create module progress and ensure it's unlocked
+    module_progress, created = ModuleProgress.objects.get_or_create(
+        student=user,
+        module=current_module,
+        defaults={
+            'is_unlocked': True,
+            'is_completed': False,
+            'completion_percentage': 0.0
+        }
+    )
+
     # Check if module is unlocked
-    try:
-        module_progress = ModuleProgress.objects.get(
-            student=user, 
-            module=assignment.module
-        )
-        if not module_progress.is_unlocked:
-            messages.error(request, 'This module is not yet available.')
-            return redirect('student_portal:course_detail', course_id=assignment.module.course.id)
-    except ModuleProgress.DoesNotExist:
-        messages.error(request, 'Module progress not found.')
-        return redirect('student_portal:course_detail', course_id=assignment.module.course.id)
-    
+    if not module_progress.is_unlocked:
+        messages.error(request, 'This module is not yet available.')
+        return redirect('student_portal:course_detail', course_id=course.id)
+
     # Get existing submission if any
     submission = None
     try:
@@ -888,15 +1097,15 @@ def assignment_detail(request, assignment_id):
         )
     except AssignmentSubmission.DoesNotExist:
         pass
-    
+
     context = {
         'assignment': assignment,
         'submission': submission,
         'enrollment': enrollment,
-        'module': assignment.module,
-        'course': assignment.module.course,
+        'module': current_module,
+        'course': course,
     }
-    
+
     return render(request, 'student_portal/assignments/assignment_detail.html', context)
 
 
@@ -905,19 +1114,37 @@ def submit_assignment(request, assignment_id):
     """Submit an assignment"""
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required'}, status=401)
-    
+
     user = request.user
     assignment = get_object_or_404(Assignment, id=assignment_id)
-    
-    # Check enrollment
-    try:
-        Enrollment.objects.get(
-            user=user, 
-            course=assignment.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        return JsonResponse({'error': 'Not enrolled'}, status=403)
+
+    # Get the first module this assignment belongs to
+    current_module = assignment.get_first_module()
+
+    if not current_module:
+        return JsonResponse({'error': 'Assignment not assigned to any module'}, status=400)
+
+    # Get all courses that have this module and check enrollment
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    enrollment = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            break
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment:
+        return JsonResponse({'error': 'Not enrolled in any course with this assignment'}, status=403)
     
     # Get form data
     github_url = request.POST.get('github_url', '').strip()
@@ -993,33 +1220,57 @@ def quiz_detail(request, quiz_id):
     """Quiz detail and taking interface"""
     if not request.user.is_authenticated:
         return redirect('landing:login')
-    
+
     user = request.user
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    
-    # Check if user is enrolled in the course
-    try:
-        enrollment = Enrollment.objects.get(
-            user=user, 
-            course=quiz.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        messages.error(request, 'You are not enrolled in this course.')
+
+    # Get the first module this quiz belongs to
+    current_module = quiz.get_first_module()
+
+    if not current_module:
+        messages.error(request, 'This quiz is not assigned to any module.')
+        return redirect('student_portal:dashboard')
+
+    # Get all courses that have this module and check enrollment
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    enrollment = None
+    course = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            course = cm.course
+            break
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment or not course:
+        messages.error(request, 'You are not enrolled in any course containing this quiz.')
         return redirect('student_portal:my_courses')
-    
+
+    # Get or create module progress and ensure it's unlocked
+    module_progress, created = ModuleProgress.objects.get_or_create(
+        student=user,
+        module=current_module,
+        defaults={
+            'is_unlocked': True,
+            'is_completed': False,
+            'completion_percentage': 0.0
+        }
+    )
+
     # Check if module is unlocked
-    try:
-        module_progress = ModuleProgress.objects.get(
-            student=user, 
-            module=quiz.module
-        )
-        if not module_progress.is_unlocked:
-            messages.error(request, 'This module is not yet available.')
-            return redirect('student_portal:course_detail', course_id=quiz.module.course.id)
-    except ModuleProgress.DoesNotExist:
-        messages.error(request, 'Module progress not found.')
-        return redirect('student_portal:course_detail', course_id=quiz.module.course.id)
+    if not module_progress.is_unlocked:
+        messages.error(request, 'This module is not yet available.')
+        return redirect('student_portal:course_detail', course_id=course.id)
     
     # Get user's attempts (completed only)
     attempts = QuizAttempt.objects.filter(
@@ -1031,29 +1282,31 @@ def quiz_detail(request, quiz_id):
     # Allow unlimited attempts - removed max_attempts restriction
     attempt_count = attempts.count()
     can_attempt = True  # Always allow attempts
-    
+    unlimited_attempts = True  # Flag for template to show "Unlimited"
+
     # Debug logging for attempt count issues
     print(f"DEBUG: Quiz {quiz.id} - User {user.id} - Attempts: {attempt_count} - Can attempt: {can_attempt} (unlimited)")
-    
+
     # Get current attempt (if any)
     current_attempt = QuizAttempt.objects.filter(
         quiz=quiz,
         student=user,
         completed=False
     ).first()
-    
+
     # Get quiz questions for display
     questions = quiz.questions.prefetch_related('choices').order_by('order')
-    
+
     context = {
         'quiz': quiz,
         'questions': questions,
         'attempts': attempts,
         'can_attempt': can_attempt,
+        'unlimited_attempts': unlimited_attempts,
         'current_attempt': current_attempt,
         'enrollment': enrollment,
-        'module': quiz.module,
-        'course': quiz.module.course,
+        'module': current_module,
+        'course': course,
     }
     
     return render(request, 'student_portal/quizzes/quiz_detail.html', context)
@@ -1064,19 +1317,37 @@ def start_quiz_attempt(request, quiz_id):
     """Start a new quiz attempt"""
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required'}, status=401)
-    
+
     user = request.user
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    
-    # Check enrollment
-    try:
-        Enrollment.objects.get(
-            user=user, 
-            course=quiz.module.course, 
-            active=True
-        )
-    except Enrollment.DoesNotExist:
-        return JsonResponse({'error': 'Not enrolled'}, status=403)
+
+    # Get the first module this quiz belongs to
+    current_module = quiz.get_first_module()
+
+    if not current_module:
+        return JsonResponse({'error': 'Quiz not assigned to any module'}, status=400)
+
+    # Get all courses that have this module and check enrollment
+    from apps.courses.models import CourseModule
+    course_modules = CourseModule.objects.filter(
+        module=current_module
+    ).select_related('course')
+
+    enrollment = None
+
+    for cm in course_modules:
+        try:
+            enrollment = Enrollment.objects.get(
+                user=user,
+                course=cm.course,
+                active=True
+            )
+            break
+        except Enrollment.DoesNotExist:
+            continue
+
+    if not enrollment:
+        return JsonResponse({'error': 'Not enrolled in any course with this quiz'}, status=403)
     
     # Removed max_attempts restriction - allow unlimited attempts
     user_attempts = QuizAttempt.objects.filter(
@@ -1213,10 +1484,24 @@ def submit_quiz_answers(request, attempt_id):
         ).count()
         
         # Update average quiz score
-        quiz_avg = QuizAttempt.objects.filter(
-            student=user, completed=True
-        ).aggregate(avg_score=Avg('score_percentage'))['avg_score']
-        analytics.avg_quiz_score = quiz_avg or 0
+        # Calculate percentage in database using actual fields
+        from django.db.models import F, FloatField
+        from django.db.models.functions import Cast
+
+        quiz_attempts = QuizAttempt.objects.filter(
+            student=user,
+            completed=True
+        ).exclude(total_points=0)
+
+        if quiz_attempts.exists():
+            quiz_avg = quiz_attempts.aggregate(
+                avg_score=Avg(
+                    Cast(F('score'), FloatField()) * 100.0 / Cast(F('total_points'), FloatField())
+                )
+            )['avg_score']
+            analytics.avg_quiz_score = quiz_avg or 0
+        else:
+            analytics.avg_quiz_score = 0
         
         # Update modules completed
         analytics.modules_completed = user.module_progress.filter(
@@ -1342,3 +1627,66 @@ def invoice_detail(request, invoice_id):
     }
     
     return render(request, 'student_portal/payments/invoice_detail.html', context)
+
+
+
+def live_sessions(request):
+    """Show student's live sessions - upcoming, live now, and past"""
+    if not request.user.is_authenticated:
+        return redirect('landing:login')
+    
+    from apps.live_sessions.models import LiveSession, SessionParticipant
+    from django.db.models import Prefetch
+    
+    user = request.user
+    
+    # Get sessions where user is a participant
+    participant_sessions = SessionParticipant.objects.filter(
+        student=user
+    ).values_list('session_id', flat=True)
+    
+    # Get live sessions (currently happening)
+    live_sessions = LiveSession.objects.filter(
+        id__in=participant_sessions,
+        status='live'
+    ).select_related('course', 'created_by').order_by('scheduled_date')
+    
+    # Get upcoming sessions
+    upcoming_sessions = LiveSession.objects.filter(
+        id__in=participant_sessions,
+        status='scheduled',
+        scheduled_date__gt=timezone.now()
+    ).select_related('course', 'created_by').order_by('scheduled_date')
+    
+    # Get past sessions
+    past_sessions = LiveSession.objects.filter(
+        id__in=participant_sessions,
+        status='ended'
+    ).select_related('course', 'created_by').order_by('-scheduled_date')[:20]
+    
+    context = {
+        'live_sessions': live_sessions,
+        'upcoming_sessions': upcoming_sessions,
+        'past_sessions': past_sessions,
+    }
+    
+    return render(request, 'student_portal/live_sessions.html', context)
+
+
+
+
+def settings(request):
+    """Student settings page"""
+    if not request.user.is_authenticated:
+        return redirect('landing:login')
+    
+    return render(request, 'student_portal/settings.html')
+
+
+def help_support(request):
+    """Help and support page with FAQs"""
+    if not request.user.is_authenticated:
+        return redirect('landing:login')
+    
+    return render(request, 'student_portal/help_support.html')
+

@@ -38,14 +38,6 @@
               </div>
             </div>
             
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label for="order" class="form-label">Module Order <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="order" name="order" 
-                       value="{{ module.order|default:'' }}" required min="1"
-                       placeholder="1">
-              </div>
-            </div>
           </div>
 
           <div class="mb-4">
@@ -54,19 +46,19 @@
                       placeholder="Describe what students will learn in this module">{{ module.description|default:'' }}</textarea>
           </div>
 
-          <!-- Course Selection -->
+          <!-- Course Selection (Multiple) -->
           <div class="mb-4">
-            <label for="course" class="form-label">Course <span class="text-danger">*</span></label>
-            <select class="form-select" id="course" name="course" required>
-              <option value="">Select a course</option>
+            <label for="courses" class="form-label">Courses</label>
+            <select class="form-select" id="courses" name="courses" multiple size="5">
               {% for course in courses %}
-                <option value="{{ course.id }}" 
-                        {% if module and module.course.id == course.id %}selected{% endif %}>
+                <option value="{{ course.id }}"
+                        {% if module and course in current_modules %}selected{% endif %}>
                   {{ course.title }}
-                  {% if not course.is_active %}(Inactive){% endif %}
+                  {% if not course.is_published %}(Unpublished){% endif %}
                 </option>
               {% endfor %}
             </select>
+            <div class="form-text">Hold Ctrl/Cmd to select multiple courses. This module will be shared across selected courses.</div>
           </div>
 
           <!-- Learning Objectives -->

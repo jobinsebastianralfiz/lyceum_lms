@@ -1,0 +1,214 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}PDF Notes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="card bg-light-info shadow-none position-relative overflow-hidden mb-4">
+    <div class="card-body px-4 py-3">
+      <div class="row align-items-center">
+        <div class="col-9">
+          <h4 class="fw-semibold mb-2">PDF Notes</h4>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a class="text-muted" href="{% url 'custom_admin:dashboard' %}">Dashboard</a></li>
+              <li class="breadcrumb-item active" aria-current="page">PDF Notes</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-3 text-end">
+          <a href="{% url 'custom_admin:pdf_note_create' %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i>Upload PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h5 class="card-title">Total PDF Notes: <span class="badge bg-primary">{{ total_count }}</span></h5>
+            </div>
+            <div class="col-md-4">
+              <form method="get" class="position-relative">
+                <input type="search" name="search" class="form-control product-search ps-5"
+                       placeholder="Search PDFs..." value="{{ search_query }}">
+                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+              </form>
+            </div>
+          </div>
+
+          <!-- PDF Notes Table -->
+          {% if pdf_notes %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle text-nowrap">
+              <thead class="text-dark fs-4">
+                <tr>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Title</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">File</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Details</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Created</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0 text-end">Actions</h6>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pdf in pdf_notes %}
+                <tr>
+                  <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{ pdf.title }}</h6>
+                    {% if pdf.description %}
+                    <p class="text-muted mb-0 small">{{ pdf.description|truncatewords:15 }}</p>
+                    {% endif %}
+                  </td>
+                  <td class="border-bottom-0">
+                    {% if pdf.pdf_file %}
+                    <a href="{{ pdf.pdf_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                      <i class="ti ti-file-download me-1"></i>View PDF
+                    </a>
+                    {% else %}
+                    <span class="badge bg-danger">No File</span>
+                    {% endif %}
+                  </td>
+                  <td class="border-bottom-0">
+                    <div class="d-flex flex-column gap-1">
+                      {% if pdf.page_count %}
+                      <span class="badge bg-info">{{ pdf.page_count }} pages</span>
+                      {% endif %}
+                      {% if pdf.file_size %}
+                      <span class="badge bg-secondary">{{ pdf.file_size|filesizeformat }}</span>
+                      {% endif %}
+                      {% if pdf.is_downloadable %}
+                      <span class="badge bg-success">Downloadable</span>
+                      {% else %}
+                      <span class="badge bg-warning">View Only</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="border-bottom-0">
+                    <p class="mb-0 fw-normal">{{ pdf.created_at|date:"M d, Y" }}</p>
+                    <span class="text-muted small">{{ pdf.created_at|date:"g:i A" }}</span>
+                  </td>
+                  <td class="border-bottom-0 text-end">
+                    <div class="dropdown dropstart">
+                      <button class="btn btn-sm btn-light-primary" type="button" id="dropdownMenu{{ pdf.id }}"
+                              data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti ti-dots-vertical fs-6"></i>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ pdf.id }}">
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-3"
+                             href="{% url 'custom_admin:pdf_note_edit' pdf_id=pdf.id %}">
+                            <i class="ti ti-edit fs-4"></i>Edit
+                          </a>
+                        </li>
+                        {% if pdf.pdf_file %}
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-3"
+                             href="{{ pdf.pdf_file.url }}" target="_blank">
+                            <i class="ti ti-file-download fs-4"></i>Download
+                          </a>
+                        </li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-3 text-danger"
+                             href="#" onclick="confirmDelete('{{ pdf.id }}', '{{ pdf.title|escapejs }}')">
+                            <i class="ti ti-trash fs-4"></i>Delete
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          {% if pdf_notes.has_other_pages %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+              {% if pdf_notes.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ pdf_notes.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                  Previous
+                </a>
+              </li>
+              {% endif %}
+
+              {% for i in pdf_notes.paginator.page_range %}
+                {% if pdf_notes.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% elif i > pdf_notes.number|add:'-3' and i < pdf_notes.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+                </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if pdf_notes.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ pdf_notes.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                  Next
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+
+          {% else %}
+          <!-- Empty State -->
+          <div class="text-center py-5">
+            <i class="ti ti-file-off fs-1 text-muted mb-3 d-block"></i>
+            <h5 class="text-muted mb-3">No PDF notes found</h5>
+            {% if search_query %}
+            <p class="text-muted mb-3">No results for "{{ search_query }}"</p>
+            <a href="{% url 'custom_admin:pdf_notes_list' %}" class="btn btn-outline-primary">Clear Search</a>
+            {% else %}
+            <p class="text-muted mb-3">Start by uploading your first PDF note</p>
+            <a href="{% url 'custom_admin:pdf_note_create' %}" class="btn btn-primary">
+              <i class="ti ti-plus me-1"></i>Upload PDF
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Form -->
+<form id="deleteForm" method="post" style="display: none;">
+  {% csrf_token %}
+</form>
+
+<script>
+function confirmDelete(pdfId, pdfTitle) {
+  if (confirm(`Are you sure you want to delete "${pdfTitle}"?\n\nThis action cannot be undone.`)) {
+    const form = document.getElementById('deleteForm');
+    form.action = `/admin/pdf-notes/${pdfId}/delete/`;
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

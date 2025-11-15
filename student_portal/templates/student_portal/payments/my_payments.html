@@ -1,283 +1,703 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}My Payments - Student Portal - UpTrail{% endblock %}
+{% block title %}My Payments - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-wallet"></i>
+  <span>My Payments</span>
+</div>
+{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Responsive improvements for payments page */
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Payment Cards */
+  .payment-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+  }
+
+  .payment-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .payment-card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .payment-card-title {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .payment-card-title h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .payment-card-date {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .payment-card-date i {
+    font-size: 12px;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-badge i {
+    font-size: 12px;
+  }
+
+  .status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .status-badge.partial {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  .status-badge.free {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--info);
+  }
+
+  .status-badge.pending {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+
+  /* Payment Card Body */
+  .payment-card-body {
+    padding: 28px;
+  }
+
+  /* Summary Grid */
+  .payment-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .summary-section {
+    background: var(--background);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .summary-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-section h4 i {
+    color: var(--primary);
+    font-size: 18px;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .summary-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+  }
+
+  .summary-list li:last-child {
+    border-bottom: none;
+  }
+
+  .summary-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .summary-value {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .summary-value.outstanding {
+    color: var(--danger);
+    font-size: 16px;
+  }
+
+  .summary-value.success {
+    color: var(--success);
+  }
+
+  /* Payment History */
+  .payment-history {
+    margin-top: 32px;
+  }
+
+  .payment-history h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .payment-history h4 i {
+    color: var(--primary);
+  }
+
+  /* Payment Table */
+  .payment-table {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .payment-table thead {
+    background: var(--background);
+  }
+
+  .payment-table th {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .payment-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .payment-table tbody tr {
+    transition: background 0.2s ease;
+  }
+
+  .payment-table tbody tr:hover {
+    background: var(--background);
+  }
+
+  /* Mobile Payment Items */
+  .payment-item-mobile {
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .payment-item-mobile .row {
+    margin: 0;
+  }
+
+  .payment-item-mobile .col-6 {
+    padding: 8px 0;
+  }
+
+  .payment-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .payment-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* Action Buttons */
+  .payment-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .btn-modern {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary-modern {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    color: white;
+  }
+
+  .btn-outline-modern {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+
+  .btn-outline-modern:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .outstanding-badge {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .outstanding-badge i {
+    font-size: 16px;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-state-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .empty-state-icon i {
+    font-size: 48px;
+    color: var(--primary);
+  }
+
+  .empty-state h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .empty-state p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Responsive */
   @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
     .payment-card-header {
+      padding: 20px;
+    }
+
+    .payment-card-body {
+      padding: 20px;
+    }
+
+    .payment-card-header-content {
       flex-direction: column;
-      text-align: center;
-      gap: 0.5rem;
+      align-items: flex-start;
     }
-    
-    .payment-summary .col-md-6 {
-      margin-bottom: 1.5rem;
+
+    .payment-card-title {
+      min-width: 100%;
     }
-    
-    /* Hide table on mobile, show card layout */
+
+    .payment-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
     .payment-history-table {
       display: none;
     }
-    
+
     .payment-history-mobile {
       display: block;
     }
-    
-    .payment-item-mobile {
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background: #f8f9fa;
+
+    .page-header h1 {
+      font-size: 24px;
     }
-    
-    .payment-item-mobile .row {
-      margin: 0;
+
+    .payment-actions {
+      flex-direction: column;
+      align-items: stretch;
     }
-    
-    .payment-item-mobile .col-6 {
-      padding: 0.25rem 0.5rem;
-    }
-    
-    .payment-label {
-      font-weight: 600;
-      font-size: 0.875rem;
-      color: #6c757d;
-    }
-    
-    .payment-value {
-      font-weight: 500;
-      font-size: 0.875rem;
+
+    .btn-modern {
+      justify-content: center;
     }
   }
-  
+
   @media (min-width: 769px) {
     .payment-history-table {
       display: block;
     }
-    
+
     .payment-history-mobile {
       display: none;
     }
   }
-  
-  @media (max-width: 576px) {
-    .payment-card {
-      margin-bottom: 1rem;
-    }
-    
-    .payment-summary h6 {
-      font-size: 1rem;
-    }
-    
-    .payment-summary ul {
-      font-size: 0.9rem;
-    }
-    
-    .badge {
-      font-size: 0.75rem;
-      padding: 0.375rem 0.5rem;
-    }
-  }
-  
-  /* Payment status colors */
-  .status-completed { color: #198754; }
-  .status-pending { color: #ffc107; }
-  .status-overdue { color: #dc3545; }
-  .status-failed { color: #dc3545; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <h4 class="card-title mb-0">My Payments</h4>
-      </div>
-      <div class="card-body">
-        {% if enrollments %}
-          {% for enrollment in enrollments %}
-            <div class="card mb-4 border-1 payment-card">
-              <div class="card-header bg-light">
-                <div class="d-flex justify-content-between align-items-center payment-card-header">
-                  <div>
-                    <h5 class="mb-1">{{ enrollment.course.title }}</h5>
-                    <small class="text-muted">Enrolled on: {{ enrollment.enrolled_on|date:"M d, Y" }}</small>
-                  </div>
-                  <div>
-                    <span class="badge 
-                      {% if enrollment.payment_status == 'completed' %}bg-success
-                      {% elif enrollment.payment_status == 'partial' %}bg-warning
-                      {% elif enrollment.payment_status == 'free' %}bg-info
-                      {% else %}bg-danger
-                      {% endif %}">
-                      {{ enrollment.get_payment_status_display }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="row payment-summary">
-                  <div class="col-12 col-md-6">
-                    <h6>Payment Summary</h6>
-                    <ul class="list-unstyled">
-                      <li><strong>Total Amount:</strong> ₹{{ enrollment.total_amount|floatformat:2 }}</li>
-                      {% if enrollment.tax_amount %}
-                        <li><strong>Tax Amount:</strong> ₹{{ enrollment.tax_amount|floatformat:2 }}</li>
-                      {% endif %}
-                      <li><strong>Paid Amount:</strong> ₹{{ enrollment.paid_amount|floatformat:2 }}</li>
-                      {% if enrollment.outstanding_amount > 0 %}
-                        <li><strong>Outstanding:</strong> <span class="text-danger">₹{{ enrollment.outstanding_amount|floatformat:2 }}</span></li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    {% if enrollment.has_installment_plan and enrollment.installment_plan_obj %}
-                      <h6>Installment Plan</h6>
-                      <ul class="list-unstyled">
-                        <li><strong>Total Installments:</strong> {{ enrollment.installment_plan_obj.total_installments }}</li>
-                        <li><strong>Amount per Installment:</strong> ₹{{ enrollment.installment_plan_obj.installment_amount|floatformat:2 }}</li>
-                        <li><strong>Frequency:</strong> {{ enrollment.installment_plan_obj.get_frequency_display }}</li>
-                        <li><strong>Start Date:</strong> {{ enrollment.installment_plan_obj.start_date|date:"M d, Y" }}</li>
-                      </ul>
-                    {% endif %}
-                  </div>
-                </div>
-                
-                {% if enrollment.all_payments %}
-                  <div class="mt-4">
-                    <h6>Payment History</h6>
-                    
-                    <!-- Desktop Table View -->
-                    <div class="payment-history-table">
-                      <div class="table-responsive">
-                        <table class="table table-sm">
-                          <thead class="table-light">
-                            <tr>
-                              <th>Installment</th>
-                              <th>Amount</th>
-                              <th>Due Date</th>
-                              <th>Payment Date</th>
-                              <th>Method</th>
-                              <th>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {% for payment in enrollment.all_payments %}
-                              <tr>
-                                <td>{{ payment.installment_number }}</td>
-                                <td>₹{{ payment.amount|floatformat:2 }}</td>
-                                <td>{{ payment.due_date|date:"M d, Y" }}</td>
-                                <td>
-                                  {% if payment.payment_date %}
-                                    {{ payment.payment_date|date:"M d, Y" }}
-                                  {% else %}
-                                    -
-                                  {% endif %}
-                                </td>
-                                <td>{{ payment.get_payment_method_display }}</td>
-                                <td>
-                                  <span class="badge 
-                                    {% if payment.status == 'completed' %}bg-success
-                                    {% elif payment.status == 'overdue' %}bg-danger
-                                    {% elif payment.status == 'failed' %}bg-danger
-                                    {% else %}bg-warning
-                                    {% endif %}">
-                                    {{ payment.get_status_display }}
-                                  </span>
-                                </td>
-                              </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    
-                    <!-- Mobile Card View -->
-                    <div class="payment-history-mobile">
-                      {% for payment in enrollment.all_payments %}
-                        <div class="payment-item-mobile">
-                          <div class="row">
-                            <div class="col-6">
-                              <div class="payment-label">Installment:</div>
-                              <div class="payment-value">#{{ payment.installment_number }}</div>
-                            </div>
-                            <div class="col-6">
-                              <div class="payment-label">Amount:</div>
-                              <div class="payment-value">₹{{ payment.amount|floatformat:2 }}</div>
-                            </div>
-                          </div>
-                          <div class="row mt-2">
-                            <div class="col-6">
-                              <div class="payment-label">Due Date:</div>
-                              <div class="payment-value">{{ payment.due_date|date:"M d, Y" }}</div>
-                            </div>
-                            <div class="col-6">
-                              <div class="payment-label">Payment Date:</div>
-                              <div class="payment-value">
-                                {% if payment.payment_date %}
-                                  {{ payment.payment_date|date:"M d, Y" }}
-                                {% else %}
-                                  Not paid
-                                {% endif %}
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row mt-2">
-                            <div class="col-6">
-                              <div class="payment-label">Method:</div>
-                              <div class="payment-value">{{ payment.get_payment_method_display }}</div>
-                            </div>
-                            <div class="col-6">
-                              <div class="payment-label">Status:</div>
-                              <div class="payment-value">
-                                <span class="badge 
-                                  {% if payment.status == 'completed' %}bg-success
-                                  {% elif payment.status == 'overdue' %}bg-danger
-                                  {% elif payment.status == 'failed' %}bg-danger
-                                  {% else %}bg-warning
-                                  {% endif %}">
-                                  {{ payment.get_status_display }}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      {% endfor %}
-                    </div>
-                  </div>
-                {% endif %}
-                
-                <div class="mt-3 d-flex flex-wrap gap-2">
-                  <a href="{% url 'student_portal:payment_detail' enrollment.id %}" class="btn btn-outline-primary btn-sm">
-                    <i class="ti ti-eye me-1"></i> View Details
-                  </a>
-                  {% if enrollment.outstanding_amount > 0 %}
-                    <span class="badge bg-warning text-dark">
-                      <i class="ti ti-alert-triangle me-1"></i>Outstanding: ₹{{ enrollment.outstanding_amount|floatformat:2 }}
-                    </span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div class="text-center py-4 py-md-5">
-            <div class="mb-4">
-              <i class="ti ti-credit-card-off text-muted" style="font-size: 4rem;"></i>
-            </div>
-            <h5 class="mb-3">No Payment Information</h5>
-            <p class="text-muted mb-4">You don't have any course enrollments with payment information yet.</p>
-            <a href="{% url 'student_portal:my_courses' %}" class="btn btn-primary">
-              <i class="ti ti-book me-2"></i> Browse Courses
-            </a>
-          </div>
-        {% endif %}
-      </div>
-    </div>
+<div class="content-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>My Payments</h1>
+    <p class="page-subtitle">View and manage your course payments and installments</p>
   </div>
+
+  {% if enrollments %}
+    {% for enrollment in enrollments %}
+      <div class="payment-card">
+        <!-- Card Header -->
+        <div class="payment-card-header">
+          <div class="payment-card-header-content">
+            <div class="payment-card-title">
+              <h3>{{ enrollment.course.title }}</h3>
+              <div class="payment-card-date">
+                <i class="fas fa-calendar"></i>
+                <span>Enrolled on {{ enrollment.enrolled_on|date:"M d, Y" }}</span>
+              </div>
+            </div>
+            <div>
+              <span class="status-badge {% if enrollment.payment_status == 'completed' %}completed{% elif enrollment.payment_status == 'partial' %}partial{% elif enrollment.payment_status == 'free' %}free{% else %}pending{% endif %}">
+                <i class="fas fa-{% if enrollment.payment_status == 'completed' %}check-circle{% elif enrollment.payment_status == 'partial' %}clock{% elif enrollment.payment_status == 'free' %}gift{% else %}exclamation-circle{% endif %}"></i>
+                {{ enrollment.get_payment_status_display }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="payment-card-body">
+          <!-- Payment Summary Grid -->
+          <div class="payment-summary-grid">
+            <!-- Payment Summary -->
+            <div class="summary-section">
+              <h4>
+                <i class="fas fa-file-invoice-dollar"></i>
+                Payment Summary
+              </h4>
+              <ul class="summary-list">
+                <li>
+                  <span class="summary-label">Total Amount</span>
+                  <span class="summary-value">₹{{ enrollment.total_amount|floatformat:2 }}</span>
+                </li>
+                {% if enrollment.tax_amount %}
+                <li>
+                  <span class="summary-label">Tax Amount</span>
+                  <span class="summary-value">₹{{ enrollment.tax_amount|floatformat:2 }}</span>
+                </li>
+                {% endif %}
+                <li>
+                  <span class="summary-label">Paid Amount</span>
+                  <span class="summary-value success">₹{{ enrollment.paid_amount|floatformat:2 }}</span>
+                </li>
+                {% if enrollment.outstanding_amount > 0 %}
+                <li>
+                  <span class="summary-label">Outstanding</span>
+                  <span class="summary-value outstanding">₹{{ enrollment.outstanding_amount|floatformat:2 }}</span>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+
+            <!-- Installment Plan (if applicable) -->
+            {% if enrollment.has_installment_plan and enrollment.installment_plan_obj %}
+            <div class="summary-section">
+              <h4>
+                <i class="fas fa-calendar-alt"></i>
+                Installment Plan
+              </h4>
+              <ul class="summary-list">
+                <li>
+                  <span class="summary-label">Total Installments</span>
+                  <span class="summary-value">{{ enrollment.installment_plan_obj.total_installments }}</span>
+                </li>
+                <li>
+                  <span class="summary-label">Amount per Installment</span>
+                  <span class="summary-value">₹{{ enrollment.installment_plan_obj.installment_amount|floatformat:2 }}</span>
+                </li>
+                <li>
+                  <span class="summary-label">Frequency</span>
+                  <span class="summary-value">{{ enrollment.installment_plan_obj.get_frequency_display }}</span>
+                </li>
+                <li>
+                  <span class="summary-label">Start Date</span>
+                  <span class="summary-value">{{ enrollment.installment_plan_obj.start_date|date:"M d, Y" }}</span>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Payment History -->
+          {% if enrollment.all_payments %}
+          <div class="payment-history">
+            <h4>
+              <i class="fas fa-history"></i>
+              Payment History
+            </h4>
+
+            <!-- Desktop Table View -->
+            <div class="payment-history-table">
+              <div class="table-responsive">
+                <table class="payment-table">
+                  <thead>
+                    <tr>
+                      <th>Installment</th>
+                      <th>Amount</th>
+                      <th>Due Date</th>
+                      <th>Payment Date</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for payment in enrollment.all_payments %}
+                    <tr>
+                      <td><strong>#{{ payment.installment_number }}</strong></td>
+                      <td>₹{{ payment.amount|floatformat:2 }}</td>
+                      <td>{{ payment.due_date|date:"M d, Y" }}</td>
+                      <td>
+                        {% if payment.payment_date %}
+                          {{ payment.payment_date|date:"M d, Y" }}
+                        {% else %}
+                          <span style="color: var(--text-secondary);">Not paid</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ payment.get_payment_method_display }}</td>
+                      <td>
+                        <span class="status-badge {% if payment.status == 'completed' %}completed{% elif payment.status == 'overdue' or payment.status == 'failed' %}pending{% else %}partial{% endif %}">
+                          <i class="fas fa-{% if payment.status == 'completed' %}check-circle{% elif payment.status == 'overdue' or payment.status == 'failed' %}exclamation-circle{% else %}clock{% endif %}"></i>
+                          {{ payment.get_status_display }}
+                        </span>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="payment-history-mobile">
+              {% for payment in enrollment.all_payments %}
+              <div class="payment-item-mobile">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="payment-label">Installment</div>
+                    <div class="payment-value"><strong>#{{ payment.installment_number }}</strong></div>
+                  </div>
+                  <div class="col-6">
+                    <div class="payment-label">Amount</div>
+                    <div class="payment-value">₹{{ payment.amount|floatformat:2 }}</div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="payment-label">Due Date</div>
+                    <div class="payment-value">{{ payment.due_date|date:"M d, Y" }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="payment-label">Payment Date</div>
+                    <div class="payment-value">
+                      {% if payment.payment_date %}
+                        {{ payment.payment_date|date:"M d, Y" }}
+                      {% else %}
+                        Not paid
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="payment-label">Method</div>
+                    <div class="payment-value">{{ payment.get_payment_method_display }}</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="payment-label">Status</div>
+                    <div class="payment-value">
+                      <span class="status-badge {% if payment.status == 'completed' %}completed{% elif payment.status == 'overdue' or payment.status == 'failed' %}pending{% else %}partial{% endif %}">
+                        <i class="fas fa-{% if payment.status == 'completed' %}check-circle{% elif payment.status == 'overdue' or payment.status == 'failed' %}exclamation-circle{% else %}clock{% endif %}"></i>
+                        {{ payment.get_status_display }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Action Buttons -->
+          <div class="payment-actions">
+            <a href="{% url 'student_portal:payment_detail' enrollment.id %}" class="btn-modern btn-primary-modern">
+              <i class="fas fa-eye"></i>
+              View Full Details
+            </a>
+            {% if enrollment.outstanding_amount > 0 %}
+            <div class="outstanding-badge">
+              <i class="fas fa-exclamation-triangle"></i>
+              Outstanding: ₹{{ enrollment.outstanding_amount|floatformat:2 }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h3>No Payment Information</h3>
+      <p>You don't have any course enrollments with payment information yet. Browse our courses and start your learning journey today!</p>
+      <a href="{% url 'student_portal:my_courses' %}" class="btn-modern btn-primary-modern">
+        <i class="fas fa-book"></i>
+        Browse Courses
+      </a>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

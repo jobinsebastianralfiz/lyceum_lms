@@ -788,7 +788,7 @@
             <div class="section-body">
                 {% for enrollment in enrollments %}
                 {% if enrollment.active %}
-                <div class="course-item">
+                <a href="{% url 'student_portal:course_detail' enrollment.course.id %}" class="course-item" style="text-decoration: none; color: inherit; display: flex; align-items: center; cursor: pointer;">
                     <div class="course-icon">
                         <i class="ti ti-book"></i>
                     </div>
@@ -805,7 +805,7 @@
                         </div>
                     </div>
                     <div class="course-badge">Active</div>
-                </div>
+                </a>
                 {% endif %}
                 {% empty %}
                 <div class="empty-state">
@@ -828,7 +828,7 @@
                 </div>
                 <div class="section-body">
                     {% for progress in recent_progress|slice:":5" %}
-                    <div class="activity-item">
+                    <a href="{% url 'student_portal:lesson_viewer' progress.video_lesson.id %}" class="activity-item" style="text-decoration: none; color: inherit; display: flex; align-items: center; cursor: pointer;">
                         <div class="activity-icon">
                             <i class="ti ti-player-play"></i>
                         </div>
@@ -836,7 +836,7 @@
                             <h4>{{ progress.video_lesson.title|truncatechars:30 }}</h4>
                             <p>{{ progress.course.title }} - {{ progress.last_watched_at|timesince }} ago</p>
                         </div>
-                    </div>
+                    </a>
                     {% empty %}
                     <div class="empty-state">
                         <i class="ti ti-history"></i>

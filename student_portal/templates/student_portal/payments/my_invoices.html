@@ -1,83 +1,567 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}My Invoices - Student Portal - UpTrail{% endblock %}
+{% block title %}My Invoices - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-file-invoice"></i>
+  <span>My Invoices</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Invoices Card */
+  .invoices-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  /* Invoice Table */
+  .invoice-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .invoice-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .invoice-table thead {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+
+  .invoice-table th {
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .invoice-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+  }
+
+  .invoice-table tbody tr {
+    transition: background 0.2s ease;
+  }
+
+  .invoice-table tbody tr:hover {
+    background: var(--background);
+  }
+
+  .invoice-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Invoice Number */
+  .invoice-number {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  /* Course Info */
+  .course-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .course-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+
+  .course-category {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .course-category i {
+    font-size: 10px;
+  }
+
+  /* Amount Cells */
+  .amount-cell {
+    font-weight: 600;
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+
+  .amount-total {
+    color: var(--primary);
+    font-size: 15px;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .status-badge.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .status-badge i {
+    font-size: 10px;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    border: 2px solid;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-action i {
+    font-size: 12px;
+  }
+
+  .btn-view {
+    background: transparent;
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .btn-view:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .btn-download {
+    background: transparent;
+    color: var(--success);
+    border-color: var(--success);
+  }
+
+  .btn-download:hover {
+    background: var(--success);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Mobile Cards */
+  .invoice-mobile-cards {
+    display: none;
+  }
+
+  .invoice-mobile-card {
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .invoice-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .invoice-mobile-number {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 15px;
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+
+  .invoice-mobile-date {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .invoice-mobile-course {
+    margin-bottom: 16px;
+  }
+
+  .invoice-mobile-course-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .invoice-mobile-course-category {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .invoice-mobile-amounts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .invoice-mobile-amount {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .invoice-mobile-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .invoice-mobile-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+
+  .invoice-mobile-value.total {
+    font-size: 16px;
+    color: var(--primary);
+  }
+
+  .invoice-mobile-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-state-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .empty-state-icon i {
+    font-size: 48px;
+    color: var(--primary);
+  }
+
+  .empty-state h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .empty-state p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .btn-modern {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .invoice-table-wrapper {
+      display: none;
+    }
+
+    .invoice-mobile-cards {
+      display: block;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
+    .page-header h1 {
+      font-size: 24px;
+    }
+
+    .invoice-mobile-actions {
+      flex-direction: column;
+    }
+
+    .btn-action {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 993px) {
+    .invoice-table-wrapper {
+      display: block;
+    }
+
+    .invoice-mobile-cards {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header">
-        <h4 class="card-title mb-0">My Invoices</h4>
-        <p class="text-muted mb-0">Tax invoices for your course payments</p>
+<div class="content-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>My Invoices</h1>
+    <p class="page-subtitle">Tax invoices for your course payments</p>
+  </div>
+
+  {% if invoices %}
+    <div class="invoices-card">
+      <!-- Desktop Table View -->
+      <div class="invoice-table-wrapper">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Course</th>
+              <th>Invoice Date</th>
+              <th>Subtotal</th>
+              <th>Tax ({{ invoices.0.tax_rate }}%)</th>
+              <th>Total Amount</th>
+              <th>Payment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invoice in invoices %}
+            <tr>
+              <td>
+                <span class="invoice-number">{{ invoice.invoice_number }}</span>
+              </td>
+              <td>
+                <div class="course-info">
+                  <span class="course-title">{{ invoice.enrollment.course.title }}</span>
+                  <span class="course-category">
+                    <i class="fas fa-tag"></i>
+                    {{ invoice.enrollment.course.category.name }}
+                  </span>
+                </div>
+              </td>
+              <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+              <td>
+                <span class="amount-cell">₹{{ invoice.subtotal|floatformat:2 }}</span>
+              </td>
+              <td>
+                <span class="amount-cell">₹{{ invoice.tax_amount|floatformat:2 }}</span>
+              </td>
+              <td>
+                <span class="amount-cell amount-total">₹{{ invoice.total_amount|floatformat:2 }}</span>
+              </td>
+              <td>
+                {% if invoice.payment %}
+                  <span class="status-badge success">
+                    <i class="fas fa-check-circle"></i>
+                    Installment {{ invoice.payment.installment_number }}
+                  </span>
+                {% else %}
+                  <span style="color: var(--text-secondary); font-size: 14px;">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a href="{% url 'student_portal:invoice_detail' invoice.id %}" class="btn-action btn-view">
+                    <i class="fas fa-eye"></i> View
+                  </a>
+                  {% if invoice.invoice_pdf_path %}
+                    <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn-action btn-download">
+                      <i class="fas fa-download"></i> PDF
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div class="card-body">
-        {% if invoices %}
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead class="table-dark">
-                <tr>
-                  <th>Invoice #</th>
-                  <th>Course</th>
-                  <th>Invoice Date</th>
-                  <th>Subtotal</th>
-                  <th>Tax ({{ invoices.0.tax_rate }}%)</th>
-                  <th>Total Amount</th>
-                  <th>Payment</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for invoice in invoices %}
-                  <tr>
-                    <td><strong>{{ invoice.invoice_number }}</strong></td>
-                    <td>
-                      <div>
-                        <strong>{{ invoice.enrollment.course.title }}</strong><br>
-                        <small class="text-muted">{{ invoice.enrollment.course.category.name }}</small>
-                      </div>
-                    </td>
-                    <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
-                    <td>₹{{ invoice.subtotal|floatformat:2 }}</td>
-                    <td>₹{{ invoice.tax_amount|floatformat:2 }}</td>
-                    <td><strong>₹{{ invoice.total_amount|floatformat:2 }}</strong></td>
-                    <td>
-                      {% if invoice.payment %}
-                        <span class="badge bg-success">
-                          Installment {{ invoice.payment.installment_number }}
-                        </span>
-                      {% else %}
-                        <span class="text-muted">-</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      <div class="btn-group" role="group">
-                        <a href="{% url 'student_portal:invoice_detail' invoice.id %}" class="btn btn-outline-primary btn-sm">
-                          <i class="ti ti-eye"></i> View
-                        </a>
-                        {% if invoice.invoice_pdf_path %}
-                          <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn btn-outline-success btn-sm">
-                            <i class="ti ti-download"></i> PDF
-                          </a>
-                        {% endif %}
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+
+      <!-- Mobile Card View -->
+      <div class="invoice-mobile-cards">
+        {% for invoice in invoices %}
+        <div class="invoice-mobile-card">
+          <div class="invoice-mobile-header">
+            <div>
+              <div class="invoice-mobile-number">{{ invoice.invoice_number }}</div>
+              <div class="invoice-mobile-date">{{ invoice.invoice_date|date:"M d, Y" }}</div>
+            </div>
+            {% if invoice.payment %}
+              <span class="status-badge success">
+                <i class="fas fa-check-circle"></i>
+                Inst. {{ invoice.payment.installment_number }}
+              </span>
+            {% endif %}
           </div>
-        {% else %}
-          <div class="text-center py-5">
-            <i class="ti ti-file-text-off fs-1 text-muted"></i>
-            <h5 class="mt-3">No Invoices Found</h5>
-            <p class="text-muted">You don't have any tax invoices yet. Invoices are generated after payments are processed.</p>
-            <a href="{% url 'student_portal:my_payments' %}" class="btn btn-primary">
-              <i class="ti ti-credit-card"></i> View Payments
+
+          <div class="invoice-mobile-course">
+            <div class="invoice-mobile-course-title">{{ invoice.enrollment.course.title }}</div>
+            <div class="invoice-mobile-course-category">
+              <i class="fas fa-tag"></i> {{ invoice.enrollment.course.category.name }}
+            </div>
+          </div>
+
+          <div class="invoice-mobile-amounts">
+            <div class="invoice-mobile-amount">
+              <div class="invoice-mobile-label">Subtotal</div>
+              <div class="invoice-mobile-value">₹{{ invoice.subtotal|floatformat:2 }}</div>
+            </div>
+            <div class="invoice-mobile-amount">
+              <div class="invoice-mobile-label">Tax ({{ invoice.tax_rate }}%)</div>
+              <div class="invoice-mobile-value">₹{{ invoice.tax_amount|floatformat:2 }}</div>
+            </div>
+            <div class="invoice-mobile-amount">
+              <div class="invoice-mobile-label">Total</div>
+              <div class="invoice-mobile-value total">₹{{ invoice.total_amount|floatformat:2 }}</div>
+            </div>
+          </div>
+
+          <div class="invoice-mobile-actions">
+            <a href="{% url 'student_portal:invoice_detail' invoice.id %}" class="btn-action btn-view">
+              <i class="fas fa-eye"></i> View Invoice
             </a>
+            {% if invoice.invoice_pdf_path %}
+              <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn-action btn-download">
+                <i class="fas fa-download"></i> Download PDF
+              </a>
+            {% endif %}
           </div>
-        {% endif %}
+        </div>
+        {% endfor %}
       </div>
     </div>
-  </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-file-invoice"></i>
+      </div>
+      <h3>No Invoices Found</h3>
+      <p>You don't have any tax invoices yet. Invoices are generated after payments are processed.</p>
+      <a href="{% url 'student_portal:my_payments' %}" class="btn-modern">
+        <i class="fas fa-wallet"></i>
+        View Payments
+      </a>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

@@ -6,6 +6,7 @@ from apps.users.models import User, Team, TeamMembership
 from apps.youtube_integration.models import YouTubeChannelConfig, YouTubeVideo
 from apps.payments.models import Enrollment, InstallmentPlan, Payment
 from apps.courses.models import Course, Module, VideoLesson, Assignment, Quiz, QuizQuestion, QuizChoice
+from apps.live_sessions.models import LiveSession, SessionParticipant, SessionResource, SessionAnnouncement
 
 class CustomUserCreationForm(UserCreationForm):
     """Custom form for creating new users"""
@@ -852,11 +853,10 @@ class CustomVideoLessonForm(forms.ModelForm):
 
     class Meta:
         model = VideoLesson
-        fields = ('module', 'title', 'platform', 'video_url', 'video_id', 'vimeo_video_id',
-                  'youtube_video_id', 'youtube_url', 'thumbnail_url', 
-                  'duration', 'description', 'resource_file', 'order', 'is_preview')
+        fields = ('title', 'platform', 'video_url', 'video_id', 'vimeo_video_id',
+                  'youtube_video_id', 'youtube_url', 'thumbnail_url',
+                  'duration', 'description', 'resource_file', 'is_preview')
         widgets = {
-            'module': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter video lesson title'}),
             'platform': forms.Select(attrs={'class': 'form-select'}),
             'video_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Full video URL'}),
@@ -868,21 +868,17 @@ class CustomVideoLessonForm(forms.ModelForm):
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Duration in seconds'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe what students will learn'}),
             'resource_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
             'is_preview': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make module queryset more organized
-        self.fields['module'].queryset = Module.objects.select_related('course').all().order_by('course__title', 'order')
         
         # Set help texts
         self.fields['youtube_url'].help_text = 'Full YouTube URL (optional if video ID provided)'
         self.fields['youtube_video_id'].help_text = 'YouTube video ID (optional if URL provided)'
         self.fields['thumbnail_url'].help_text = 'Auto-generated from YouTube if not provided'
         self.fields['duration'].help_text = 'Video duration in seconds'
-        self.fields['order'].help_text = 'Order of lesson in the module'
         self.fields['is_preview'].help_text = 'Available as free preview for non-enrolled students'
 
     def clean(self):
@@ -931,10 +927,9 @@ class CustomAssignmentForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ('module', 'title', 'description', 'requirements', 'resources', 
-                  'max_points', 'passing_score', 'due_days', 'is_required', 'order')
+        fields = ('title', 'description', 'requirements', 'resources',
+                  'max_points', 'passing_score', 'due_days', 'is_required')
         widgets = {
-            'module': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter assignment title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe what students need to accomplish'}),
             'requirements': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'List specific requirements, technologies, or constraints'}),
@@ -943,16 +938,12 @@ class CustomAssignmentForm(forms.ModelForm):
             'passing_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '70'}),
             'due_days': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '7'}),
             'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make module queryset more organized
-        self.fields['module'].queryset = Module.objects.select_related('course').all().order_by('course__title', 'order')
-        
+
         # Set help texts
-        self.fields['module'].help_text = 'Select the module this assignment belongs to'
         self.fields['title'].help_text = 'Title of the assignment'
         self.fields['description'].help_text = 'Assignment instructions and requirements'
         self.fields['requirements'].help_text = 'Specific requirements (e.g., "Create a Python script that...")'
@@ -961,34 +952,17 @@ class CustomAssignmentForm(forms.ModelForm):
         self.fields['passing_score'].help_text = 'Minimum score to pass'
         self.fields['due_days'].help_text = 'Days from module start to complete assignment'
         self.fields['is_required'].help_text = 'Required to proceed to next module'
-        self.fields['order'].help_text = 'Order within the module'
 
     def clean(self):
         cleaned_data = super().clean()
         max_points = cleaned_data.get('max_points')
         passing_score = cleaned_data.get('passing_score')
-        
+
         # Validate that passing score doesn't exceed max points
         if max_points and passing_score and passing_score > max_points:
             raise ValidationError('Passing score cannot exceed maximum points.')
-        
-        return cleaned_data
 
-    def clean_order(self):
-        order = self.cleaned_data.get('order')
-        module = self.cleaned_data.get('module')
-        
-        if order and module:
-            # Check if another assignment in the same module already has this order
-            existing_assignment = Assignment.objects.filter(
-                module=module,
-                order=order
-            ).exclude(pk=self.instance.pk if self.instance else None)
-            
-            if existing_assignment.exists():
-                raise ValidationError(f'An assignment with order {order} already exists in this module.')
-        
-        return order
+        return cleaned_data
 
 
 class CustomQuizQuestionForm(forms.ModelForm):
@@ -1165,3 +1139,536 @@ class CustomQuizQuestionWithChoicesForm(forms.ModelForm):
                 )
         
         return question
+
+
+class CustomLiveSessionForm(forms.ModelForm):
+    """Custom form for creating and editing live sessions"""
+
+    title = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter session title'
+        }),
+        help_text='Session title (required)'
+    )
+
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Enter session description'
+        }),
+        help_text='Optional session description'
+    )
+
+    use_google_meet = forms.BooleanField(
+        initial=False,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'id': 'use_google_meet'
+        }),
+        help_text='Automatically create Google Meet link (requires Google Workspace connection)'
+    )
+
+    meeting_link = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter meeting link (e.g., Zoom, Meet, Teams)',
+            'id': 'meeting_link_input'
+        }),
+        help_text='Live session meeting link (required if not using Google Meet)'
+    )
+
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.filter(is_published=True),
+        required=False,
+        empty_label="Select course (optional)",
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Associated course (optional)'
+    )
+
+    scheduled_date = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control',
+            'type': 'datetime-local'
+        }),
+        help_text='When the session is scheduled'
+    )
+
+    duration_minutes = forms.IntegerField(
+        initial=60,
+        min_value=15,
+        max_value=300,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Duration in minutes'
+        }),
+        help_text='Expected duration in minutes (15-300)'
+    )
+
+    assignment_type = forms.ChoiceField(
+        choices=LiveSession.ASSIGNMENT_TYPE_CHOICES,
+        initial='manual',
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='How to assign participants to this session'
+    )
+
+    max_participants = forms.IntegerField(
+        initial=100,
+        min_value=1,
+        max_value=1000,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Maximum participants'
+        }),
+        help_text='Maximum number of participants (1-1000)'
+    )
+
+    send_notifications = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Send notifications to participants'
+    )
+
+    allow_recording = forms.BooleanField(
+        initial=False,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Allow session recording'
+    )
+
+    is_mandatory = forms.BooleanField(
+        initial=False,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Mandatory attendance for assigned students'
+    )
+
+    class Meta:
+        model = LiveSession
+        fields = ('title', 'description', 'meeting_link', 'course', 'scheduled_date',
+                  'duration_minutes', 'assignment_type', 'max_participants',
+                  'send_notifications', 'allow_recording', 'is_mandatory')
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Set default scheduled date to 1 hour from now
+        if not self.instance.pk:
+            from datetime import datetime, timedelta
+            from django.utils import timezone
+            default_time = timezone.now() + timedelta(hours=1)
+            self.fields['scheduled_date'].initial = default_time.strftime('%Y-%m-%dT%H:%M')
+
+    def clean_scheduled_date(self):
+        scheduled_date = self.cleaned_data.get('scheduled_date')
+        if scheduled_date:
+            from django.utils import timezone
+            if scheduled_date <= timezone.now():
+                raise ValidationError('Session cannot be scheduled in the past.')
+        return scheduled_date
+
+    def clean(self):
+        cleaned_data = super().clean()
+        use_google_meet = cleaned_data.get('use_google_meet')
+        meeting_link = cleaned_data.get('meeting_link')
+
+        # Either Google Meet or manual link is required
+        if not use_google_meet and not meeting_link:
+            raise ValidationError(
+                'Please either enable Google Meet or provide a manual meeting link.'
+            )
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.user:
+            instance.created_by = self.user
+        if commit:
+            instance.save()
+        return instance
+
+
+class SessionParticipantForm(forms.ModelForm):
+    """Form for adding individual participants to a session"""
+
+    student = forms.ModelChoiceField(
+        queryset=User.objects.filter(role='student', is_active=True),
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Select student to add to session'
+    )
+
+    status = forms.ChoiceField(
+        choices=SessionParticipant.PARTICIPANT_STATUS_CHOICES,
+        initial='assigned',
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Participant status'
+    )
+
+    class Meta:
+        model = SessionParticipant
+        fields = ('student', 'status')
+
+    def __init__(self, *args, **kwargs):
+        self.session = kwargs.pop('session', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_student(self):
+        student = self.cleaned_data.get('student')
+        if student and self.session:
+            # Check if student is already assigned to this session
+            existing = SessionParticipant.objects.filter(
+                session=self.session,
+                student=student
+            ).exclude(pk=self.instance.pk if self.instance else None)
+
+            if existing.exists():
+                raise ValidationError('This student is already assigned to this session.')
+        return student
+
+    def save(self, commit=True):
+        print(f"DEBUG SessionParticipantForm.save: commit={commit}, session={self.session}")
+
+        if commit and self.session:
+            # Use the session's add_participant method to handle notifications
+            student = self.cleaned_data.get('student')
+            status = self.cleaned_data.get('status', 'assigned')
+            print(f"DEBUG: Adding student {student.name} (ID: {student.id}) to session {self.session.title}")
+
+            try:
+                # Add participant through the session method
+                participant = self.session.add_participant(student)
+                print(f"DEBUG: Successfully added participant {participant.id}")
+
+                # Update status if it's different from default
+                if status != 'assigned':
+                    participant.status = status
+                    participant.save()
+                    print(f"DEBUG: Updated participant status to {status}")
+
+                return participant
+            except Exception as e:
+                print(f"DEBUG: Error in form save: {e}")
+                raise e
+        else:
+            print("DEBUG: Using fallback direct model creation")
+            # Fallback to direct model creation if commit=False
+            instance = super().save(commit=False)
+            if self.session:
+                instance.session = self.session
+            if commit:
+                instance.save()
+                print(f"DEBUG: Saved participant {instance.id} via fallback method")
+            return instance
+
+
+class BulkAssignParticipantsForm(forms.Form):
+    """Form for bulk assigning participants to a session"""
+
+    assignment_type = forms.ChoiceField(
+        choices=[
+            ('course_students', 'All students from selected course'),
+            ('team_members', 'All members from selected team'),
+            ('individual_students', 'Selected individual students'),
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='How to assign participants'
+    )
+
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.filter(is_published=True),
+        required=False,
+        empty_label="Select course",
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Course to assign all enrolled students from'
+    )
+
+    team = forms.ModelChoiceField(
+        queryset=Team.objects.filter(is_active=True),
+        required=False,
+        empty_label="Select team",
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Team to assign all members from'
+    )
+
+    students = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(role='student', is_active=True),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+        help_text='Select individual students'
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.session = kwargs.pop('session', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        assignment_type = cleaned_data.get('assignment_type')
+        course = cleaned_data.get('course')
+        team = cleaned_data.get('team')
+        students = cleaned_data.get('students')
+
+        if assignment_type == 'course_students' and not course:
+            raise ValidationError('Course is required when assigning course students.')
+
+        if assignment_type == 'team_members' and not team:
+            raise ValidationError('Team is required when assigning team members.')
+
+        if assignment_type == 'individual_students' and not students:
+            raise ValidationError('At least one student must be selected for individual assignment.')
+
+        return cleaned_data
+
+
+class SessionAnnouncementForm(forms.ModelForm):
+    """Form for creating session announcements"""
+
+    title = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter announcement title'
+        }),
+        help_text='Announcement title'
+    )
+
+    message = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Enter announcement message'
+        }),
+        help_text='Announcement message'
+    )
+
+    announcement_type = forms.ChoiceField(
+        choices=SessionAnnouncement.ANNOUNCEMENT_TYPE_CHOICES,
+        initial='general',
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Type of announcement'
+    )
+
+    send_to_all = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Send to all participants in the session'
+    )
+
+    class Meta:
+        model = SessionAnnouncement
+        fields = ('title', 'message', 'announcement_type', 'send_to_all')
+
+    def __init__(self, *args, **kwargs):
+        self.session = kwargs.pop('session', None)
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.session:
+            instance.session = self.session
+        if self.user:
+            instance.created_by = self.user
+        if commit:
+            instance.save()
+        return instance
+
+
+class SystemSettingForm(forms.ModelForm):
+    """Form for creating/editing system settings"""
+
+    key = forms.CharField(
+        max_length=255,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., RAZORPAY_KEY_ID'
+        }),
+        help_text='Setting key (e.g., RAZORPAY_KEY_ID, EMAIL_HOST)'
+    )
+
+    value = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Enter the setting value'
+        }),
+        help_text='The value for this setting'
+    )
+
+    category = forms.ChoiceField(
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        help_text='Category of the setting'
+    )
+
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'Brief description of what this setting is used for'
+        }),
+        help_text='Optional description'
+    )
+
+    is_sensitive = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='If checked, value will be masked in the UI'
+    )
+
+    is_active = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='If unchecked, the system will fall back to .env'
+    )
+
+    class Meta:
+        from system_settings.models import SystemSetting
+        model = SystemSetting
+        fields = ('key', 'value', 'category', 'description', 'is_sensitive', 'is_active')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Import inside __init__ to avoid circular imports
+        from system_settings.models import SystemSetting
+        self.fields['category'].choices = SystemSetting.CATEGORY_CHOICES
+
+    def clean_key(self):
+        key = self.cleaned_data.get('key')
+        if key:
+            # Convert to uppercase and remove spaces
+            key = key.upper().replace(' ', '_')
+        return key
+
+
+class PDFNoteForm(forms.ModelForm):
+    """Form for creating and editing PDF notes"""
+
+    title = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter PDF title'
+        }),
+        help_text='Title of the PDF note'
+    )
+
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Enter description (optional)'
+        }),
+        help_text='Description of the PDF content'
+    )
+
+    pdf_file = forms.FileField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf'
+        }),
+        help_text='Upload PDF file (required for new PDFs)'
+    )
+
+    page_count = forms.IntegerField(
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Number of pages (optional)',
+            'min': 1
+        }),
+        help_text='Total number of pages in the PDF'
+    )
+
+    is_downloadable = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Allow students to download this PDF'
+    )
+
+    class Meta:
+        from apps.courses.models import PDFNote
+        model = PDFNote
+        fields = ('title', 'description', 'pdf_file', 'page_count', 'is_downloadable')
+
+    def clean_pdf_file(self):
+        pdf_file = self.cleaned_data.get('pdf_file')
+
+        # If this is a new PDF (not editing), require pdf_file
+        if not self.instance.pk and not pdf_file:
+            raise forms.ValidationError('PDF file is required when creating a new PDF note.')
+
+        # Validate file extension if a new file is uploaded
+        if pdf_file:
+            if not pdf_file.name.endswith('.pdf'):
+                raise forms.ValidationError('Only PDF files are allowed.')
+
+            # Validate file size (max 50MB)
+            if pdf_file.size > 50 * 1024 * 1024:
+                raise forms.ValidationError('PDF file size cannot exceed 50MB.')
+
+        return pdf_file
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Auto-populate file_size if a new PDF is uploaded
+        if self.cleaned_data.get('pdf_file'):
+            instance.file_size = self.cleaned_data['pdf_file'].size
+
+        if commit:
+            instance.save()
+
+        return instance

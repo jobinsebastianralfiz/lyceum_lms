@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
+import random
+import string
 from django.utils import timezone
 from datetime import timedelta
 
@@ -97,6 +99,32 @@ class PasswordResetToken(models.Model):
     
     class Meta:
         db_table = 'password_reset_tokens'
+        ordering = ['-created_at']
+
+class PasswordResetCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_codes')
+    code = models.CharField(max_length=6, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.code:
+            # Generate a 6-digit numeric code
+            self.code = ''.join(random.choices(string.digits, k=6))
+        if not self.expires_at:
+            # Code expires in 10 minutes
+            self.expires_at = timezone.now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
+    
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.expires_at
+    
+    def __str__(self):
+        return f"Password reset code {self.code} for {self.user.email}"
+    
+    class Meta:
+        db_table = 'password_reset_codes'
         ordering = ['-created_at']
 
 # Add a property to User model to get teams

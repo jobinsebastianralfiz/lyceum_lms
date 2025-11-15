@@ -1,152 +1,629 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Invoice {{ invoice.invoice_number }} - Student Portal - UpTrail{% endblock %}
+{% block title %}Invoice {{ invoice.invoice_number }} - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-file-invoice"></i>
+  <span>Invoice Details</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .page-title-section h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .invoice-number {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-modern {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+  }
+
+  .btn-outline:hover {
+    background: var(--background);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    color: white;
+  }
+
+  /* Invoice Card */
+  .invoice-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  /* Invoice Header */
+  .invoice-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    padding: 40px;
+    color: white;
+    text-align: center;
+  }
+
+  .invoice-logo {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .invoice-tagline {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  /* Info Grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 32px;
+    background: var(--background);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .info-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .info-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .info-section-title i {
+    color: var(--primary);
+  }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-list li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .info-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .info-value {
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .info-value code {
+    background: var(--background);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--primary);
+  }
+
+  /* Course Section */
+  .course-section {
+    padding: 32px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    gap: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title i {
+    color: var(--primary);
+  }
+
+  .course-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .course-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .course-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .badge.info {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--info);
+  }
+
+  .badge.secondary {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--secondary);
+  }
+
+  .badge.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .enrollment-date {
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .enrollment-date strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 15px;
+    margin-top: 4px;
+  }
+
+  /* Payment Section */
+  .payment-section {
+    padding: 32px;
+    background: rgba(16, 185, 129, 0.05);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .payment-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .payment-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .payment-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Amount Breakdown */
+  .amount-section {
+    padding: 32px;
+  }
+
+  .amount-table {
+    max-width: 500px;
+    margin-left: auto;
+  }
+
+  .amount-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  .amount-row.subtotal,
+  .amount-row.tax {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .amount-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .amount-value {
+    font-weight: 600;
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: var(--text-primary);
+  }
+
+  .amount-row.total {
+    padding-top: 16px;
+    border-top: 2px solid var(--border-color);
+  }
+
+  .amount-row.total .amount-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .amount-row.total .amount-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  /* Footer Note */
+  .invoice-footer {
+    padding: 24px 32px;
+    background: var(--background);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .footer-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .footer-note i {
+    color: var(--info);
+    margin-right: 8px;
+  }
+
+  .footer-note strong {
+    color: var(--text-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
+    .header-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .action-buttons {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .btn-modern {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .invoice-header {
+      padding: 32px 20px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      padding: 24px;
+    }
+
+    .course-section,
+    .payment-section,
+    .amount-section {
+      padding: 24px;
+    }
+
+    .section-header {
+      flex-direction: column;
+    }
+
+    .enrollment-date {
+      text-align: left;
+    }
+
+    .payment-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .amount-table {
+      max-width: 100%;
+    }
+  }
+
+  @media print {
+    .header-actions,
+    .breadcrumbs {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h4 class="card-title mb-1">Tax Invoice</h4>
-            <p class="mb-0 text-muted">Invoice #{{ invoice.invoice_number }}</p>
+<div class="content-wrapper">
+  <!-- Header Actions -->
+  <div class="header-actions">
+    <div class="page-title-section">
+      <h1>Tax Invoice</h1>
+      <div class="invoice-number">Invoice #{{ invoice.invoice_number }}</div>
+    </div>
+    <div class="action-buttons">
+      <a href="{% url 'student_portal:my_invoices' %}" class="btn-modern btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Back to Invoices
+      </a>
+      {% if invoice.invoice_pdf_path %}
+        <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn-modern btn-success">
+          <i class="fas fa-download"></i>
+          Download PDF
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Invoice Card -->
+  <div class="invoice-card">
+    <!-- Invoice Header -->
+    <div class="invoice-header">
+      <div class="invoice-logo">Lyceum Academy</div>
+      <div class="invoice-tagline">Learning Excellence Platform</div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+      <!-- Invoice Details -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <i class="fas fa-file-invoice"></i>
+          Invoice Details
+        </div>
+        <ul class="info-list">
+          <li>
+            <span class="info-label">Invoice Number:</span>
+            <span class="info-value">{{ invoice.invoice_number }}</span>
+          </li>
+          <li>
+            <span class="info-label">Invoice Date:</span>
+            <span class="info-value">{{ invoice.invoice_date|date:"M d, Y" }}</span>
+          </li>
+          <li>
+            <span class="info-label">Generated:</span>
+            <span class="info-value">{{ invoice.created_at|date:"M d, Y H:i" }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Student Information -->
+      <div class="info-section">
+        <div class="info-section-title">
+          <i class="fas fa-user"></i>
+          Student Information
+        </div>
+        <ul class="info-list">
+          <li>
+            <span class="info-label">Name:</span>
+            <span class="info-value">{{ invoice.enrollment.user.name }}</span>
+          </li>
+          <li>
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ invoice.enrollment.user.email }}</span>
+          </li>
+          {% if invoice.enrollment.user.phone_number %}
+          <li>
+            <span class="info-label">Phone:</span>
+            <span class="info-value">{{ invoice.enrollment.user.phone_number }}</span>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Course Details -->
+    <div class="course-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <i class="fas fa-book"></i>
+            Course Details
+          </h2>
+          <div class="course-title">{{ invoice.enrollment.course.title }}</div>
+          <p class="course-description">{{ invoice.enrollment.course.description|truncatewords:20 }}</p>
+          <div class="course-badges">
+            <span class="badge info">
+              <i class="fas fa-tag"></i>
+              {{ invoice.enrollment.course.category.name }}
+            </span>
+            <span class="badge secondary">
+              <i class="fas fa-graduation-cap"></i>
+              {{ invoice.enrollment.get_enrollment_type_display }}
+            </span>
           </div>
-          <div>
-            <a href="{% url 'student_portal:my_invoices' %}" class="btn btn-outline-secondary btn-sm me-2">
-              <i class="ti ti-arrow-left"></i> Back to Invoices
-            </a>
-            {% if invoice.invoice_pdf_path %}
-              <a href="{{ invoice.invoice_pdf_path.url }}" target="_blank" class="btn btn-success btn-sm">
-                <i class="ti ti-download"></i> Download PDF
-              </a>
+        </div>
+        <div class="enrollment-date">
+          Enrolled on
+          <strong>{{ invoice.enrollment.enrolled_on|date:"M d, Y" }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Information -->
+    {% if invoice.payment %}
+    <div class="payment-section">
+      <h2 class="section-title">
+        <i class="fas fa-credit-card"></i>
+        Payment Information
+      </h2>
+      <div class="payment-grid">
+        <div class="payment-item">
+          <span class="payment-label">Installment Number</span>
+          <span class="payment-value">#{{ invoice.payment.installment_number }}</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Payment Date</span>
+          <span class="payment-value">{{ invoice.payment.payment_date|date:"M d, Y H:i" }}</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Payment Method</span>
+          <span class="payment-value">{{ invoice.payment.get_payment_method_display }}</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Transaction ID</span>
+          <span class="payment-value">
+            {% if invoice.payment.transaction_id %}
+              <code>{{ invoice.payment.transaction_id }}</code>
+            {% else %}
+              <span style="color: var(--text-secondary);">N/A</span>
             {% endif %}
-          </div>
+          </span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Status</span>
+          <span class="badge success">
+            <i class="fas fa-check-circle"></i>
+            {{ invoice.payment.get_status_display }}
+          </span>
         </div>
       </div>
-      <div class="card-body">
-        <!-- Invoice Header -->
-        <div class="row mb-4">
-          <div class="col-md-6">
-            <div class="card bg-light">
-              <div class="card-body">
-                <h6 class="card-title">Invoice Details</h6>
-                <ul class="list-unstyled mb-0">
-                  <li><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</li>
-                  <li><strong>Invoice Date:</strong> {{ invoice.invoice_date|date:"M d, Y" }}</li>
-                  <li><strong>Generated:</strong> {{ invoice.created_at|date:"M d, Y H:i" }}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card bg-light">
-              <div class="card-body">
-                <h6 class="card-title">Student Information</h6>
-                <ul class="list-unstyled mb-0">
-                  <li><strong>Name:</strong> {{ invoice.enrollment.user.name }}</li>
-                  <li><strong>Email:</strong> {{ invoice.enrollment.user.email }}</li>
-                  {% if invoice.enrollment.user.phone_number %}
-                    <li><strong>Phone:</strong> {{ invoice.enrollment.user.phone_number }}</li>
-                  {% endif %}
-                </ul>
-              </div>
-            </div>
-          </div>
+    </div>
+    {% endif %}
+
+    <!-- Amount Breakdown -->
+    <div class="amount-section">
+      <h2 class="section-title">
+        <i class="fas fa-calculator"></i>
+        Amount Breakdown
+      </h2>
+      <div class="amount-table">
+        <div class="amount-row subtotal">
+          <span class="amount-label">Subtotal</span>
+          <span class="amount-value">₹{{ invoice.subtotal|floatformat:2 }}</span>
         </div>
-
-        <!-- Course Information -->
-        <div class="card mb-4">
-          <div class="card-header bg-primary text-white">
-            <h6 class="mb-0">Course Details</h6>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-8">
-                <h5>{{ invoice.enrollment.course.title }}</h5>
-                <p class="text-muted mb-1">{{ invoice.enrollment.course.description|truncatewords:20 }}</p>
-                <p class="mb-0">
-                  <span class="badge bg-info">{{ invoice.enrollment.course.category.name }}</span>
-                  <span class="badge bg-secondary">{{ invoice.enrollment.get_enrollment_type_display }}</span>
-                </p>
-              </div>
-              <div class="col-md-4 text-end">
-                <p class="mb-1"><strong>Enrollment Date:</strong></p>
-                <p class="h6">{{ invoice.enrollment.enrolled_on|date:"M d, Y" }}</p>
-              </div>
-            </div>
-          </div>
+        <div class="amount-row tax">
+          <span class="amount-label">Tax ({{ invoice.tax_rate }}%)</span>
+          <span class="amount-value">₹{{ invoice.tax_amount|floatformat:2 }}</span>
         </div>
-
-        <!-- Payment Information -->
-        {% if invoice.payment %}
-          <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-              <h6 class="mb-0">Payment Information</h6>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <ul class="list-unstyled">
-                    <li><strong>Installment Number:</strong> {{ invoice.payment.installment_number }}</li>
-                    <li><strong>Payment Date:</strong> {{ invoice.payment.payment_date|date:"M d, Y H:i" }}</li>
-                    <li><strong>Payment Method:</strong> {{ invoice.payment.get_payment_method_display }}</li>
-                  </ul>
-                </div>
-                <div class="col-md-6">
-                  <ul class="list-unstyled">
-                    <li><strong>Transaction ID:</strong> 
-                      {% if invoice.payment.transaction_id %}
-                        <code>{{ invoice.payment.transaction_id }}</code>
-                      {% else %}
-                        <span class="text-muted">Not available</span>
-                      {% endif %}
-                    </li>
-                    <li><strong>Status:</strong> 
-                      <span class="badge bg-success">{{ invoice.payment.get_status_display }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-
-        <!-- Invoice Amount Breakdown -->
-        <div class="card">
-          <div class="card-header">
-            <h6 class="mb-0">Amount Breakdown</h6>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-borderless">
-                <tbody>
-                  <tr>
-                    <td class="text-end"><strong>Subtotal:</strong></td>
-                    <td class="text-end" style="width: 150px;">₹{{ invoice.subtotal|floatformat:2 }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-end"><strong>Tax ({{ invoice.tax_rate }}%):</strong></td>
-                    <td class="text-end">₹{{ invoice.tax_amount|floatformat:2 }}</td>
-                  </tr>
-                  <tr class="border-top">
-                    <td class="text-end"><strong>Total Amount:</strong></td>
-                    <td class="text-end"><h5 class="text-primary">₹{{ invoice.total_amount|floatformat:2 }}</h5></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Additional Notes -->
-        <div class="mt-4 p-3 bg-light rounded">
-          <small class="text-muted">
-            <strong>Note:</strong> This is a computer-generated invoice. For any queries regarding this invoice, 
-            please contact support with the invoice number {{ invoice.invoice_number }}.
-          </small>
+        <div class="amount-row total">
+          <span class="amount-label">Total Amount</span>
+          <span class="amount-value">₹{{ invoice.total_amount|floatformat:2 }}</span>
         </div>
       </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="invoice-footer">
+      <p class="footer-note">
+        <i class="fas fa-info-circle"></i>
+        <strong>Note:</strong> This is a computer-generated invoice. For any queries regarding this invoice,
+        please contact support@lyceumacademy.com with the invoice number <strong>{{ invoice.invoice_number }}</strong>.
+      </p>
     </div>
   </div>
 </div>

@@ -1,0 +1,350 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Create Announcement - {{ session.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">Create Session Announcement</h4>
+            <p class="card-subtitle">{{ session.title }} - {{ session.scheduled_date|date:"M d, Y H:i" }}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Session
+            </a>
+          </div>
+        </div>
+
+        <!-- Session Info -->
+        <div class="alert alert-info mb-4">
+          <div class="d-flex align-items-center">
+            <i class="ti ti-info-circle me-3 fs-4"></i>
+            <div>
+              <h6 class="alert-heading mb-1">Session: {{ session.title }}</h6>
+              <div class="small">
+                <strong>Participants:</strong> {{ session.participants.count }} students
+                <span class="mx-2">•</span>
+                <strong>Status:</strong> {{ session.get_status_display }}
+                <span class="mx-2">•</span>
+                <strong>Scheduled:</strong> {{ session.scheduled_date|date:"M d, Y H:i" }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- Basic Information -->
+          <div class="mb-4">
+            <label for="{{ form.title.id_for_label }}" class="form-label">
+              {{ form.title.label }} <span class="text-danger">*</span>
+            </label>
+            {{ form.title }}
+            {% if form.title.help_text %}
+              <div class="form-text">{{ form.title.help_text }}</div>
+            {% endif %}
+            {% if form.title.errors %}
+              <div class="text-danger">{{ form.title.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.message.id_for_label }}" class="form-label">
+              {{ form.message.label }} <span class="text-danger">*</span>
+            </label>
+            {{ form.message }}
+            {% if form.message.help_text %}
+              <div class="form-text">{{ form.message.help_text }}</div>
+            {% endif %}
+            {% if form.message.errors %}
+              <div class="text-danger">{{ form.message.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Announcement Settings -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.announcement_type.id_for_label }}" class="form-label">{{ form.announcement_type.label }}</label>
+                {{ form.announcement_type }}
+                {% if form.announcement_type.help_text %}
+                  <div class="form-text">{{ form.announcement_type.help_text }}</div>
+                {% endif %}
+                {% if form.announcement_type.errors %}
+                  <div class="text-danger">{{ form.announcement_type.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="form-check">
+                  {{ form.send_to_all }}
+                  <label class="form-check-label" for="{{ form.send_to_all.id_for_label }}">
+                    {{ form.send_to_all.label }}
+                  </label>
+                </div>
+                {% if form.send_to_all.help_text %}
+                  <div class="form-text">{{ form.send_to_all.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="card border-info mb-4">
+            <div class="card-header bg-info-subtle">
+              <h6 class="card-title mb-0 text-info">
+                <i class="ti ti-eye me-2"></i>Announcement Preview
+              </h6>
+            </div>
+            <div class="card-body">
+              <div id="announcement-preview">
+                <div class="d-flex align-items-start">
+                  <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-3"
+                       style="width: 40px; height: 40px;">
+                    <i class="ti ti-speakerphone text-primary"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <h6 class="mb-0" id="preview-title">Enter announcement title...</h6>
+                      <small class="text-muted">
+                        <span id="preview-type" class="badge bg-secondary">General</span>
+                      </small>
+                    </div>
+                    <p class="mb-2" id="preview-message">Enter announcement message...</p>
+                    <div class="small text-muted">
+                      <i class="ti ti-clock me-1"></i>Just now
+                      <span class="mx-2">•</span>
+                      <i class="ti ti-user me-1"></i>{{ request.user.name|default:request.user.username }}
+                      <span class="mx-2">•</span>
+                      <i class="ti ti-users me-1"></i>
+                      <span id="preview-recipients">{{ session.participants.count }} participant{{ session.participants.count|pluralize }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipients Info -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card bg-light border-0">
+                <div class="card-body">
+                  <h6 class="card-title mb-3">
+                    <i class="ti ti-users me-2"></i>Recipients Summary
+                  </h6>
+                  <div class="row text-center">
+                    <div class="col-3">
+                      <div class="border-end">
+                        <h5 class="mb-0 text-primary">{{ session.participants.count }}</h5>
+                        <small class="text-muted">Total Participants</small>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="border-end">
+                        <h5 class="mb-0 text-warning">{{ assigned_count }}</h5>
+                        <small class="text-muted">Assigned</small>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="border-end">
+                        <h5 class="mb-0 text-success">{{ joined_count }}</h5>
+                        <small class="text-muted">Joined</small>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <h5 class="mb-0 text-info">{{ session.announcements.count }}</h5>
+                      <small class="text-muted">Previous Announcements</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Announcements -->
+          {% if session.announcements.exists %}
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="ti ti-history me-2"></i>Recent Announcements
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                {% for announcement in session.announcements.all|slice:":3" %}
+                <div class="timeline-item">
+                  <div class="timeline-marker bg-primary"></div>
+                  <div class="timeline-content">
+                    <div class="d-flex align-items-start justify-content-between">
+                      <div>
+                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                        <p class="mb-1 small">{{ announcement.message|truncatechars:100 }}</p>
+                        <small class="text-muted">
+                          {{ announcement.created_at|date:"M d, Y H:i" }}
+                          <span class="badge bg-info-subtle text-info ms-2">{{ announcement.get_announcement_type_display }}</span>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% if session.announcements.count > 3 %}
+              <div class="text-center mt-3">
+                <small class="text-muted">
+                  ... and {{ session.announcements.count|add:"-3" }} more announcement{{ session.announcements.count|add:"-3"|pluralize }}
+                </small>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="ti ti-speakerphone me-1"></i>Create Announcement
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Live preview functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const titleInput = document.getElementById('{{ form.title.id_for_label }}');
+  const messageInput = document.getElementById('{{ form.message.id_for_label }}');
+  const typeSelect = document.getElementById('{{ form.announcement_type.id_for_label }}');
+  const sendToAllCheckbox = document.getElementById('{{ form.send_to_all.id_for_label }}');
+
+  const previewTitle = document.getElementById('preview-title');
+  const previewMessage = document.getElementById('preview-message');
+  const previewType = document.getElementById('preview-type');
+  const previewRecipients = document.getElementById('preview-recipients');
+
+  function updatePreview() {
+    // Update title
+    previewTitle.textContent = titleInput.value || 'Enter announcement title...';
+
+    // Update message
+    previewMessage.textContent = messageInput.value || 'Enter announcement message...';
+
+    // Update type badge
+    const selectedType = typeSelect.options[typeSelect.selectedIndex];
+    previewType.textContent = selectedType.text;
+    previewType.className = 'badge bg-' + getTypeColor(typeSelect.value);
+
+    // Update recipients
+    const participantCount = {{ session.participants.count }};
+    previewRecipients.textContent = participantCount + ' participant' + (participantCount !== 1 ? 's' : '');
+  }
+
+  function getTypeColor(type) {
+    switch(type) {
+      case 'urgent': return 'danger';
+      case 'important': return 'warning';
+      case 'info': return 'info';
+      default: return 'secondary';
+    }
+  }
+
+  // Add event listeners
+  titleInput.addEventListener('input', updatePreview);
+  messageInput.addEventListener('input', updatePreview);
+  typeSelect.addEventListener('change', updatePreview);
+  sendToAllCheckbox.addEventListener('change', updatePreview);
+
+  // Initial preview update
+  updatePreview();
+});
+
+// Character counter for message field
+document.addEventListener('DOMContentLoaded', function() {
+  const messageField = document.getElementById('{{ form.message.id_for_label }}');
+  const maxLength = 1000; // Adjust based on your model's max_length
+
+  // Create character counter element
+  const counter = document.createElement('div');
+  counter.className = 'form-text text-end';
+  counter.style.fontSize = '0.875em';
+  messageField.parentNode.appendChild(counter);
+
+  function updateCounter() {
+    const remaining = maxLength - messageField.value.length;
+    counter.textContent = messageField.value.length + '/' + maxLength + ' characters';
+
+    if (remaining < 50) {
+      counter.className = 'form-text text-end text-warning';
+    } else if (remaining < 0) {
+      counter.className = 'form-text text-end text-danger';
+    } else {
+      counter.className = 'form-text text-end text-muted';
+    }
+  }
+
+  messageField.addEventListener('input', updateCounter);
+  updateCounter();
+});
+</script>
+
+<style>
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-left: 2px solid #e0e6ed;
+}
+
+.timeline-item:last-child {
+  border-left: 2px solid transparent;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -6px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.timeline-content {
+  padding-left: 20px;
+}
+
+.border-end {
+  border-right: 1px solid #e0e6ed !important;
+}
+
+#announcement-preview {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #0d6efd;
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+</style>
+{% endblock %}

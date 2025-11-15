@@ -68,23 +68,43 @@
             </td>
             <td>
               <div>
-                <h6 class="mb-0">{{ module.course.title }}</h6>
-                <small class="text-muted">{{ module.course.category.name }}</small>
+                {% with courses=module.courses.all %}
+                  {% if courses %}
+                    {% for course in courses|slice:":2" %}
+                      <h6 class="mb-0">{{ course.title }}</h6>
+                      <small class="text-muted">{{ course.category.name }}</small>
+                      {% if not forloop.last %}<br>{% endif %}
+                    {% endfor %}
+                    {% if courses.count > 2 %}
+                      <small class="text-muted">+{{ courses.count|add:"-2" }} more</small>
+                    {% endif %}
+                  {% else %}
+                    <small class="text-muted">Not assigned to any course</small>
+                  {% endif %}
+                {% endwith %}
               </div>
             </td>
             <td>
-              <span class="badge bg-info">{{ module.order }}</span>
+              {% with course_links=module.course_links.all %}
+                {% if course_links.exists %}
+                  {% for link in course_links|slice:":1" %}
+                    <span class="badge bg-info">{{ link.order }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="badge bg-secondary">-</span>
+                {% endif %}
+              {% endwith %}
             </td>
             <td>
               <div class="d-flex gap-1">
                 <span class="badge bg-primary" title="Video Lessons">
-                  <i class="ti ti-video me-1"></i>{{ module.video_lessons.count }}
+                  <i class="ti ti-video me-1"></i>{{ module.module_videos.count }}
                 </span>
                 <span class="badge bg-success" title="Assignments">
-                  <i class="ti ti-clipboard-text me-1"></i>{{ module.assignments.count }}
+                  <i class="ti ti-clipboard-text me-1"></i>{{ module.module_assignments.count }}
                 </span>
                 <span class="badge bg-warning" title="Quizzes">
-                  <i class="ti ti-clipboard-list me-1"></i>{{ module.quizzes.count }}
+                  <i class="ti ti-clipboard-list me-1"></i>{{ module.module_quizzes.count }}
                 </span>
               </div>
             </td>
@@ -130,11 +150,15 @@
                     </a>
                   </li>
                   <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <a class="dropdown-item" href="{% url 'custom_admin:course_detail' module.course.id %}">
-                      <i class="ti ti-book me-2"></i>View Course
-                    </a>
-                  </li>
+                  {% with first_course=module.courses.first %}
+                    {% if first_course %}
+                      <li>
+                        <a class="dropdown-item" href="{% url 'custom_admin:course_detail' first_course.id %}">
+                          <i class="ti ti-book me-2"></i>View Course
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% endwith %}
                   <li>
                     <a class="dropdown-item text-danger" href="{% url 'custom_admin:module_delete' module.id %}">
                       <i class="ti ti-trash me-2"></i>Delete

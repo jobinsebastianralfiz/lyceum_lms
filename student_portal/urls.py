@@ -47,4 +47,11 @@ urlpatterns = [
     
     # AJAX endpoints
     path('api/lesson/<int:lesson_id>/progress/', views.update_lesson_progress, name='update_lesson_progress'),
+
+    # Live Sessions
+    path('live-sessions/', views.live_sessions, name='live_sessions'),
+
+    # Settings and Help
+    path('settings/', views.settings, name='settings'),
+    path('help/', views.help_support, name='help_support'),
 ]

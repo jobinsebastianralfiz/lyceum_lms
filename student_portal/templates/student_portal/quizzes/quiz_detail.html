@@ -1,6 +1,322 @@
 {% extends 'student_portal/base.html' %}
+{% load static %}
 
-{% block title %}{{ quiz.title }} - CodeLearn Student Portal{% endblock %}
+{% block title %}{{ quiz.title }} - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-question-circle"></i>
+  <span>{{ quiz.title }}</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --text-primary: #1a202c;
+        --text-secondary: #718096;
+        --border-color: #e2e8f0;
+        --border-radius: 12px;
+        --border-radius-lg: 16px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Quiz Header Card */
+    .quiz-header-card {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+
+    .quiz-header-top {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        padding: 32px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quiz-header-top::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -150px;
+        right: -100px;
+    }
+
+    .quiz-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .quiz-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .quiz-breadcrumb {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .quiz-status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .quiz-status-badge.in-progress {
+        background: rgba(251, 191, 36, 0.2);
+        color: #f59e0b;
+    }
+
+    .quiz-status-badge.attempted {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+    }
+
+    .quiz-status-badge.not-attempted {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    /* Stats Grid */
+    .quiz-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        padding: 32px;
+    }
+
+    .stat-card {
+        background: var(--bg-secondary);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .stat-icon.primary { color: var(--primary); }
+    .stat-icon.info { color: var(--info); }
+    .stat-icon.success { color: var(--success); }
+    .stat-icon.warning { color: var(--warning); }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Card Styles */
+    .modern-card {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+
+    .modern-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+    }
+
+    .modern-card-header h5 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .modern-card-body {
+        padding: 24px;
+    }
+
+    /* Alert Styles */
+    .modern-alert {
+        padding: 16px 20px;
+        border-radius: var(--border-radius);
+        border: none;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: start;
+        gap: 12px;
+    }
+
+    .modern-alert.warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .modern-alert.info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .modern-alert i {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    /* Button Styles */
+    .btn-modern {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-modern.btn-success {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-modern.btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-modern.btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-modern.btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Question Card */
+    .question-card {
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .question-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .question-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+    }
+
+    .question-text {
+        font-size: 15px;
+        color: var(--text-primary);
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .form-check {
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .form-check:hover {
+        background: var(--border-color);
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+    }
+
+    .form-check-label {
+        font-size: 15px;
+        color: var(--text-primary);
+        margin-left: 8px;
+    }
+
+    /* Timer */
+    .timer {
+        font-size: 18px;
+        font-weight: 700;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .quiz-header-top {
+            padding: 24px;
+        }
+
+        .quiz-title {
+            font-size: 22px;
+        }
+
+        .quiz-stats {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 24px;
+        }
+
+        .modern-card-body {
+            padding: 20px;
+        }
+
+        .question-card {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <!-- Quiz Header -->
@@ -17,7 +333,7 @@
             {% if current_attempt %}
               <span class="badge bg-warning">In Progress</span>
             {% elif attempts %}
-              <span class="badge bg-info">{{ attempts.count }}/{{ quiz.max_attempts }} Attempts Used</span>
+              <span class="badge bg-info">{{ attempts.count }}{% if unlimited_attempts %} Attempt{{ attempts.count|pluralize }}{% else %}/{{ quiz.max_attempts }} Attempts Used{% endif %}</span>
             {% else %}
               <span class="badge bg-secondary">Not Attempted</span>
             {% endif %}
@@ -57,7 +373,7 @@
           <div class="col-md-3 mb-2">
             <div class="bg-light p-3 rounded text-center">
               <i class="ti ti-refresh text-warning fs-4 d-block mb-1"></i>
-              <strong>{{ quiz.max_attempts }}</strong><br>
+              <strong>{% if unlimited_attempts %}Unlimited{% else %}{{ quiz.max_attempts }}{% endif %}</strong><br>
               <small class="text-muted">Max Attempts</small>
             </div>
           </div>
@@ -134,7 +450,11 @@
                 <h6 class="alert-heading">Important Instructions:</h6>
                 <ul class="mb-0">
                   <li>You have <strong>{{ quiz.time_limit }} minutes</strong> to complete this quiz</li>
+                  {% if unlimited_attempts %}
+                  <li>You can attempt this quiz <strong>unlimited times</strong></li>
+                  {% else %}
                   <li>You can attempt this quiz <strong>{{ quiz.max_attempts }} times</strong></li>
+                  {% endif %}
                   <li>You need <strong>{{ quiz.passing_score }}%</strong> to pass</li>
                   <li>Once started, the timer cannot be paused</li>
                   {% if quiz.randomize_questions %}
@@ -152,12 +472,16 @@
             </div>
           </div>
         {% else %}
-          <!-- No More Attempts -->
+          <!-- No More Attempts - This should never show if unlimited_attempts is True -->
           <div class="alert alert-warning">
             <i class="ti ti-x me-2"></i>
+            {% if unlimited_attempts %}
+            Unable to start new attempt at this time.
+            {% else %}
             You have used all {{ quiz.max_attempts }} attempts for this quiz.
+            {% endif %}
             <br><small class="text-muted">
-              Debug: Attempts used: {{ attempts.count }}/{{ quiz.max_attempts }} | Can attempt: {{ can_attempt }}
+              Debug: Attempts used: {{ attempts.count }}{% if not unlimited_attempts %}/{{ quiz.max_attempts }}{% endif %} | Can attempt: {{ can_attempt }}
             </small>
           </div>
         {% endif %}
@@ -185,7 +509,7 @@
         
         <div class="mb-3">
           <small class="text-muted d-block">Attempts Used</small>
-          <strong>{{ attempts.count }}/{{ quiz.max_attempts }}</strong>
+          <strong>{{ attempts.count }}{% if unlimited_attempts %} (Unlimited){% else %}/{{ quiz.max_attempts }}{% endif %}</strong>
         </div>
         
         <div class="mb-3">

@@ -24,12 +24,33 @@ urlpatterns = [
     path('courses/<int:course_id>/', views.course_detail_view, name='course_detail'),
     path('courses/<int:course_id>/edit/', views.course_edit_view, name='course_edit'),
     path('courses/<int:course_id>/delete/', views.course_delete_view, name='course_delete'),
-    
+    path('courses/<int:course_id>/add-module/', views.course_add_module_view, name='course_add_module'),
+    path('courses/<int:course_id>/remove-module/<int:course_module_id>/', views.course_remove_module_view, name='course_remove_module'),
+    path('courses/<int:course_id>/reorder-modules/', views.course_reorder_modules_view, name='course_reorder_modules'),
+    path('courses/<int:course_id>/add-assignment/', views.course_add_assignment_view, name='course_add_assignment'),
+    path('courses/<int:course_id>/remove-assignment/<int:course_assignment_id>/', views.course_remove_assignment_view, name='course_remove_assignment'),
+    path('courses/<int:course_id>/add-quiz/', views.course_add_quiz_view, name='course_add_quiz'),
+    path('courses/<int:course_id>/remove-quiz/<int:course_quiz_id>/', views.course_remove_quiz_view, name='course_remove_quiz'),
+    path('courses/<int:course_id>/add-pdf/', views.course_add_pdf_view, name='course_add_pdf'),
+    path('courses/<int:course_id>/remove-pdf/<int:course_pdf_id>/', views.course_remove_pdf_view, name='course_remove_pdf'),
+
     path('modules/', views.modules_list_view, name='modules_list'),
     path('modules/<int:module_id>/', views.module_detail_view, name='module_detail'),
     path('modules/add/', views.module_create_view, name='module_create'),
     path('modules/<int:module_id>/edit/', views.module_edit_view, name='module_edit'),
     path('modules/<int:module_id>/delete/', views.module_delete_view, name='module_delete'),
+    path('modules/<int:module_id>/add-video/', views.module_add_video_view, name='module_add_video'),
+    path('modules/<int:module_id>/remove-video/<int:module_video_id>/', views.module_remove_video_view, name='module_remove_video'),
+    path('modules/<int:module_id>/add-assignment/', views.module_add_assignment_view, name='module_add_assignment'),
+    path('modules/<int:module_id>/remove-assignment/<int:module_assignment_id>/', views.module_remove_assignment_view, name='module_remove_assignment'),
+    path('modules/<int:module_id>/add-quiz/', views.module_add_quiz_view, name='module_add_quiz'),
+    path('modules/<int:module_id>/remove-quiz/<int:module_quiz_id>/', views.module_remove_quiz_view, name='module_remove_quiz'),
+    path('modules/<int:module_id>/bulk-delete-videos/', views.module_bulk_delete_videos_view, name='module_bulk_delete_videos'),
+    path('modules/<int:module_id>/bulk-delete-assignments/', views.module_bulk_delete_assignments_view, name='module_bulk_delete_assignments'),
+    path('modules/<int:module_id>/bulk-delete-quizzes/', views.module_bulk_delete_quizzes_view, name='module_bulk_delete_quizzes'),
+    path('modules/<int:module_id>/reorder-videos/', views.module_reorder_videos_view, name='module_reorder_videos'),
+    path('modules/<int:module_id>/reorder-assignments/', views.module_reorder_assignments_view, name='module_reorder_assignments'),
+    path('modules/<int:module_id>/reorder-quizzes/', views.module_reorder_quizzes_view, name='module_reorder_quizzes'),
     
     path('student-progress/', views.student_progress_list_view, name='student_progress_list'),
     
@@ -78,7 +99,13 @@ urlpatterns = [
     path('quiz-attempts/<int:attempt_id>/', views.quiz_attempt_detail_view, name='quiz_attempt_detail'),
     path('quiz-attempts/<int:attempt_id>/delete/', views.quiz_attempt_delete_view, name='quiz_attempt_delete'),
     path('quizzes/<int:quiz_id>/reset-attempts/', views.quiz_attempt_reset_view, name='quiz_attempt_reset'),
-    
+
+    # PDF NOTES
+    path('pdf-notes/', views.pdf_notes_list_view, name='pdf_notes_list'),
+    path('pdf-notes/add/', views.pdf_note_create_view, name='pdf_note_create'),
+    path('pdf-notes/<int:pdf_id>/edit/', views.pdf_note_edit_view, name='pdf_note_edit'),
+    path('pdf-notes/<int:pdf_id>/delete/', views.pdf_note_delete_view, name='pdf_note_delete'),
+
     # MODULE PROGRESS
     path('module-progress/', views.module_progress_list_view, name='module_progress_list'),
     path('module-progress/<int:progress_id>/', views.module_progress_detail_view, name='module_progress_detail'),
@@ -131,6 +158,7 @@ urlpatterns = [
     path('users/<int:user_id>/', views.user_detail_view, name='user_detail'),
     path('users/<int:user_id>/edit/', views.user_edit_view, name='user_edit'),
     path('users/<int:user_id>/delete/', views.user_delete_view, name='user_delete'),
+    path('users/bulk-delete/', views.users_bulk_delete_view, name='users_bulk_delete'),
     
     # YOUTUBE INTEGRATION
     path('youtube-channel-configs/', views.youtube_channel_configs_list_view, name='youtube_channel_configs_list'),
@@ -180,6 +208,33 @@ urlpatterns = [
     path('content/testimonials/<int:testimonial_id>/edit/', admin_views.testimonial_edit_view, name='testimonial_edit'),
     path('content/testimonials/<int:testimonial_id>/delete/', admin_views.testimonial_delete_view, name='testimonial_delete'),
     path('content/testimonials/add/', admin_views.testimonial_create_view, name='testimonial_create'),
+
+    # LIVE SESSIONS
+    path('live-sessions/', views.live_sessions_list_view, name='live_sessions_list'),
+    path('live-sessions/add/', views.live_session_create_view, name='live_session_create'),
+    path('live-sessions/<int:session_id>/', views.live_session_detail_view, name='live_session_detail'),
+    path('live-sessions/<int:session_id>/edit/', views.live_session_edit_view, name='live_session_edit'),
+    path('live-sessions/<int:session_id>/delete/', views.live_session_delete_view, name='live_session_delete'),
+    path('live-sessions/<int:session_id>/participants/', views.session_manage_participants_view, name='session_manage_participants'),
+    path('live-sessions/<int:session_id>/participants/<int:participant_id>/delete/', views.session_participant_delete_view, name='session_participant_delete'),
+    path('live-sessions/<int:session_id>/start/', views.session_start_view, name='session_start'),
+    path('live-sessions/<int:session_id>/end/', views.session_end_view, name='session_end'),
+    path('live-sessions/<int:session_id>/cancel/', views.session_cancel_view, name='session_cancel'),
+    path('live-sessions/<int:session_id>/announcements/add/', views.session_announcement_create_view, name='session_announcement_create'),
+
+    # SYSTEM SETTINGS
+    path('settings/', views.settings_list_view, name='settings_list'),
+    path('settings/add/', views.setting_create_view, name='setting_create'),
+    path('settings/<int:setting_id>/edit/', views.setting_edit_view, name='setting_edit'),
+    path('settings/<int:setting_id>/delete/', views.setting_delete_view, name='setting_delete'),
+    path('settings/<int:setting_id>/history/', views.setting_history_view, name='setting_history'),
+    path('settings/<int:setting_id>/test-connection/', views.setting_test_connection_view, name='setting_test_connection'),
+
+    # GOOGLE WORKSPACE OAUTH
+    path('google/oauth/initiate/', views.google_oauth_initiate_view, name='google_oauth_initiate'),
+    path('google/oauth/callback/', views.google_oauth_callback_view, name='google_oauth_callback'),
+    path('google/oauth/disconnect/', views.google_oauth_disconnect_view, name='google_oauth_disconnect'),
+    path('google/oauth/test/', views.google_oauth_test_view, name='google_oauth_test'),
 
     # AJAX ENDPOINTS
     path('get-course-info/<int:course_id>/', views.get_course_info, name='get_course_info'),

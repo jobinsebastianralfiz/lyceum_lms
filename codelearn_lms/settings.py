@@ -16,6 +16,14 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-in-production'
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# Firebase Cloud Messaging (FCM) Configuration
+# Legacy approach (deprecated)
+FCM_SERVER_KEY = config('FCM_SERVER_KEY', default='your-fcm-server-key-here')
+
+# Modern approach - Firebase Admin SDK
+FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default='')
+FIREBASE_PROJECT_ID = config('FIREBASE_PROJECT_ID', default='')
+
 # Application definition
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -45,6 +53,8 @@ LOCAL_APPS = [
     'apps.ratings',
     'apps.custom_admin',
     'apps.content_management',
+    'apps.live_sessions',
+    'system_settings',
     'landing',
     'student_portal',
     'emails',
@@ -167,8 +177,8 @@ REST_FRAMEWORK = {
 
 # JWT Configuration
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=config('JWT_ACCESS_TOKEN_LIFETIME', default=15, cast=int)),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=config('JWT_REFRESH_TOKEN_LIFETIME', default=7, cast=int)),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=config('JWT_ACCESS_TOKEN_LIFETIME', default=10080, cast=int)),  # 7 days
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=config('JWT_REFRESH_TOKEN_LIFETIME', default=90, cast=int)),  # 90 days
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -179,6 +189,17 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
 }
+
+# Field Encryption Key for encrypted model fields
+# Generate a valid Fernet key if not set in environment
+try:
+    FIELD_ENCRYPTION_KEY = config('FIELD_ENCRYPTION_KEY')
+except:
+    # Generate a key based on SECRET_KEY (for development only)
+    import base64
+    import hashlib
+    key_material = hashlib.sha256(SECRET_KEY.encode()).digest()
+    FIELD_ENCRYPTION_KEY = base64.urlsafe_b64encode(key_material).decode()
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000').split(',')
@@ -230,6 +251,11 @@ VIMEO_ACCESS_TOKEN = config('VIMEO_ACCESS_TOKEN', default='')
 # Razorpay Configuration
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')
 RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='')
+
+# Cloudflare Turnstile Configuration (Anti-spam/Bot protection)
+CLOUDFLARE_TURNSTILE_SITE_KEY = config('CLOUDFLARE_TURNSTILE_SITE_KEY', default='')
+CLOUDFLARE_TURNSTILE_SECRET_KEY = config('CLOUDFLARE_TURNSTILE_SECRET_KEY', default='')
+CLOUDFLARE_TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
 # AWS S3 Configuration (Optional)
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')

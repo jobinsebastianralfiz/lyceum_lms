@@ -1,0 +1,342 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}End Session - {{ session.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0 text-danger">
+              <i class="ti ti-stop me-2"></i>End Live Session
+            </h4>
+            <p class="card-subtitle">
+              Ready to end this active session?
+            </p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Session
+            </a>
+          </div>
+        </div>
+
+        <!-- Active Session Alert -->
+        <div class="alert alert-warning mb-4">
+          <h6 class="alert-heading mb-2">
+            <i class="ti ti-alert-triangle me-2"></i>Active Session
+          </h6>
+          <p class="mb-0">
+            This session is currently active and may have participants connected.
+            Ending the session will mark it as completed and stop all session activities.
+          </p>
+        </div>
+
+        <!-- Session Information -->
+        <div class="card border-info mb-4">
+          <div class="card-header bg-info-subtle">
+            <h5 class="card-title mb-0 text-info">
+              <i class="ti ti-video me-2"></i>Session Summary
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Session Title:</td>
+                    <td>
+                      <div class="fw-medium">{{ session.title }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Started At:</td>
+                    <td class="fw-medium">{{ session.started_at|date:"M d, Y H:i"|default:"Not recorded" }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Duration So Far:</td>
+                    <td class="fw-medium">
+                      {% if session.started_at %}
+                        <span id="session-duration">Calculating...</span>
+                      {% else %}
+                        Unknown
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Meeting Link:</td>
+                    <td>
+                      <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="ti ti-external-link me-1"></i>Open Meeting
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <table class="table table-sm table-borderless">
+                  <tr>
+                    <td class="text-muted fw-medium">Total Participants:</td>
+                    <td class="fw-medium">{{ session.participants.count }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Joined Participants:</td>
+                    <td class="fw-medium text-success">{{ joined_count }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Absent Participants:</td>
+                    <td class="fw-medium text-warning">{{ absent_count }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted fw-medium">Announcements:</td>
+                    <td class="fw-medium">{{ session.announcements.count }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participants Status -->
+        {% if session.participants.exists %}
+        <div class="card border-success mb-4">
+          <div class="card-header bg-success-subtle">
+            <h6 class="card-title mb-0 text-success">
+              <i class="ti ti-users me-2"></i>Final Attendance ({{ session.participants.count }})
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              {% for participant in session.participants.all %}
+              <div class="col-md-6 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2"
+                         style="width: 24px; height: 24px;">
+                      <i class="ti ti-user text-primary"></i>
+                    </div>
+                    <div>
+                      <div class="fw-medium">{{ participant.student.name }}</div>
+                      <small class="text-muted">{{ participant.student.email }}</small>
+                    </div>
+                  </div>
+                  <div>
+                    {% if participant.status == 'joined' %}
+                      <span class="badge bg-success">Attended</span>
+                    {% elif participant.status == 'assigned' %}
+                      <span class="badge bg-warning">Assigned</span>
+                    {% elif participant.status == 'absent' %}
+                      <span class="badge bg-danger">Absent</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Quick attendance actions -->
+            <div class="mt-3 pt-3 border-top">
+              <div class="row">
+                <div class="col-md-6">
+                  <form method="post" action="{% url 'custom_admin:session_mark_all_attended' session.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">
+                      <i class="ti ti-check-all me-1"></i>Mark All as Attended
+                    </button>
+                  </form>
+                </div>
+                <div class="col-md-6 text-end">
+                  <form method="post" action="{% url 'custom_admin:session_mark_absent' session.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                      <i class="ti ti-user-x me-1"></i>Mark Non-Joined as Absent
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- End Session Information -->
+        <div class="alert alert-danger mb-4">
+          <h6 class="alert-heading mb-2">
+            <i class="ti ti-info-circle me-2"></i>What happens when you end the session?
+          </h6>
+          <ul class="mb-0">
+            <li>Session status will change to "Completed"</li>
+            <li>End time will be recorded for duration tracking</li>
+            <li>Meeting room access may be closed</li>
+            <li>Final attendance will be locked in</li>
+            {% if session.allow_recording %}
+            <li>Recording will stop and be processed</li>
+            {% endif %}
+            <li>Participants will be notified of session completion</li>
+          </ul>
+        </div>
+
+        <!-- Confirmation Form -->
+        <form method="post" class="mb-0">
+          {% csrf_token %}
+
+          <!-- Session completion notes -->
+          <div class="mb-4">
+            <label for="completion_notes" class="form-label">Session Completion Notes</label>
+            <textarea class="form-control" id="completion_notes" name="completion_notes" rows="4"
+                      placeholder="Add notes about the session (attendance, content covered, issues encountered, etc.)"></textarea>
+            <div class="form-text">These notes will be saved with the session record</div>
+          </div>
+
+          <!-- Recording information -->
+          {% if session.allow_recording %}
+          <div class="mb-4">
+            <label for="recording_info" class="form-label">Recording Information</label>
+            <textarea class="form-control" id="recording_info" name="recording_info" rows="2"
+                      placeholder="Recording location, access details, or any recording-related notes"></textarea>
+            <div class="form-text">Optional: Add information about session recording</div>
+          </div>
+          {% endif %}
+
+          <!-- Attendance confirmation -->
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="attendance_confirmed" name="attendance_confirmed">
+              <label class="form-check-label" for="attendance_confirmed">
+                I have reviewed and confirmed the final attendance for all participants
+              </label>
+            </div>
+          </div>
+
+          <!-- Final confirmation -->
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="confirm_end" name="confirm_end" required>
+              <label class="form-check-label text-danger fw-medium" for="confirm_end">
+                I confirm that I want to end the session "{{ session.title }}" now. This action cannot be undone.
+              </label>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-outline-primary">
+              <i class="ti ti-external-link me-1"></i>Check Meeting
+            </a>
+            <button type="submit" class="btn btn-danger" id="end_button" disabled>
+              <i class="ti ti-stop me-1"></i>End Session
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmCheckbox = document.getElementById('confirm_end');
+  const endButton = document.getElementById('end_button');
+
+  confirmCheckbox.addEventListener('change', function() {
+    endButton.disabled = !this.checked;
+  });
+
+  // Calculate session duration
+  {% if session.started_at %}
+  const startTime = new Date('{{ session.started_at|date:"c" }}');
+  const now = new Date();
+
+  function updateDuration() {
+    const diff = now - startTime;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    let durationText = '';
+    if (hours > 0) {
+      durationText = `${hours}h ${minutes}m`;
+    } else {
+      durationText = `${minutes}m`;
+    }
+
+    document.getElementById('session-duration').textContent = durationText;
+  }
+
+  updateDuration();
+  setInterval(updateDuration, 60000); // Update every minute
+  {% endif %}
+
+  // Auto-fill some completion notes based on session data
+  const completionNotes = document.getElementById('completion_notes');
+  const sessionData = {
+    participants: {{ session.participants.count }},
+    joined: {{ joined_count }},
+    announcements: {{ session.announcements.count }}
+  };
+
+  completionNotes.addEventListener('focus', function() {
+    if (this.value === '') {
+      let suggestedNotes = `Session completed with ${sessionData.joined}/${sessionData.participants} participants attended.`;
+      if (sessionData.announcements > 0) {
+        suggestedNotes += ` ${sessionData.announcements} announcement(s) were made during the session.`;
+      }
+      this.placeholder = suggestedNotes;
+    }
+  });
+});
+
+// Warn if session has been running for a very long time
+document.addEventListener('DOMContentLoaded', function() {
+  {% if session.started_at %}
+  const startTime = new Date('{{ session.started_at|date:"c" }}');
+  const plannedDuration = {{ session.duration_minutes }};
+  const now = new Date();
+  const actualMinutes = Math.floor((now - startTime) / (1000 * 60));
+
+  if (actualMinutes > plannedDuration + 30) { // 30 minutes over planned duration
+    const overtimeWarning = document.createElement('div');
+    overtimeWarning.className = 'alert alert-warning';
+    overtimeWarning.innerHTML = `
+      <i class="ti ti-clock-exclamation me-2"></i>
+      <strong>Overtime Notice:</strong> This session has been running ${actualMinutes - plannedDuration} minutes longer than planned.
+    `;
+    document.querySelector('.card-body').appendChild(overtimeWarning);
+  }
+  {% endif %}
+});
+</script>
+
+<style>
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.bg-success-subtle {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.border-top {
+  border-top: 1px solid #dee2e6 !important;
+}
+</style>
+{% endblock %}

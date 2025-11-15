@@ -1,0 +1,516 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Settings - Lyceum Academy{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-cog"></i>
+  <span>Settings</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background: #f9fafb;
+    --card-bg: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .content-wrapper {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Settings Card */
+  .settings-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .settings-card-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .settings-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .settings-card-title i {
+    color: var(--primary);
+  }
+
+  .settings-card-body {
+    padding: 28px;
+  }
+
+  /* Setting Item */
+  .setting-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .setting-item:last-child {
+    border-bottom: none;
+  }
+
+  .setting-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 8px;
+  }
+
+  .setting-item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .setting-item-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 26px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .toggle-slider {
+    background-color: var(--primary);
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+  }
+
+  /* Select Dropdown */
+  .setting-select {
+    width: 200px;
+    padding: 10px 40px 10px 14px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+  }
+
+  .setting-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  .setting-select:hover {
+    border-color: var(--primary);
+  }
+
+  /* Buttons */
+  .btn-modern {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary-modern {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-danger-modern {
+    background: transparent;
+    color: var(--danger);
+    border: 2px solid var(--danger);
+  }
+
+  .btn-danger-modern:hover {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Badge */
+  .badge-pro {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 16px;
+    }
+
+    .page-header h1 {
+      font-size: 24px;
+    }
+
+    .settings-card-body {
+      padding: 20px;
+    }
+
+    .setting-item-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .setting-select {
+      width: 100%;
+    }
+
+    .btn-modern {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Settings</h1>
+    <p class="page-subtitle">Manage your account preferences and notification settings</p>
+  </div>
+
+  <!-- Notification Settings -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title">
+        <i class="fas fa-bell"></i>
+        Notifications
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Email Notifications</div>
+            <div class="setting-item-description">Receive email updates about your courses and activities</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="email-notifications" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Push Notifications</div>
+            <div class="setting-item-description">Get push notifications on your device for important updates</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="push-notifications" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Course Updates</div>
+            <div class="setting-item-description">Notifications when new content is added to your courses</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="course-updates" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Assignment Reminders</div>
+            <div class="setting-item-description">Reminders for upcoming assignment deadlines</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="assignment-reminders" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Live Session Reminders</div>
+            <div class="setting-item-description">Get notified 15 minutes before live sessions start</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="live-session-reminders" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning Preferences -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title">
+        <i class="fas fa-graduation-cap"></i>
+        Learning Preferences
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Auto-play Next Lesson</div>
+            <div class="setting-item-description">Automatically start the next lesson when you finish one</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoplay">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Video Quality</div>
+            <div class="setting-item-description">Default video playback quality</div>
+          </div>
+          <select class="setting-select" id="video-quality">
+            <option value="auto">Auto</option>
+            <option value="1080p">1080p</option>
+            <option value="720p">720p</option>
+            <option value="480p">480p</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Playback Speed</div>
+            <div class="setting-item-description">Default video playback speed</div>
+          </div>
+          <select class="setting-select" id="playback-speed">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1.0" selected>Normal</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2.0">2.0x</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Show Subtitles</div>
+            <div class="setting-item-description">Display subtitles when available</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="subtitles">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Settings -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title">
+        <i class="fas fa-shield-alt"></i>
+        Privacy & Security
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Profile Visibility</div>
+            <div class="setting-item-description">Control who can see your profile information</div>
+          </div>
+          <select class="setting-select" id="profile-visibility">
+            <option value="public">Public</option>
+            <option value="students" selected>Students Only</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Show Progress</div>
+            <div class="setting-item-description">Let others see your course progress and achievements</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="show-progress" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-header">
+          <div>
+            <div class="setting-item-title">Two-Factor Authentication</div>
+            <div class="setting-item-description">Add an extra layer of security to your account <span class="badge-pro">Pro</span></div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="two-factor" disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Button -->
+  <div style="text-align: right;">
+    <button class="btn-modern btn-primary-modern" onclick="saveSettings()">
+      <i class="fas fa-save"></i>
+      Save Settings
+    </button>
+  </div>
+</div>
+
+<script>
+  function saveSettings() {
+    // Collect all settings
+    const settings = {
+      email_notifications: document.getElementById('email-notifications').checked,
+      push_notifications: document.getElementById('push-notifications').checked,
+      course_updates: document.getElementById('course-updates').checked,
+      assignment_reminders: document.getElementById('assignment-reminders').checked,
+      live_session_reminders: document.getElementById('live-session-reminders').checked,
+      autoplay: document.getElementById('autoplay').checked,
+      video_quality: document.getElementById('video-quality').value,
+      playback_speed: document.getElementById('playback-speed').value,
+      subtitles: document.getElementById('subtitles').checked,
+      profile_visibility: document.getElementById('profile-visibility').value,
+      show_progress: document.getElementById('show-progress').checked,
+    };
+
+    // Send to server (you'll need to implement the endpoint)
+    alert('Settings saved successfully! (API endpoint needs to be implemented)');
+    console.log('Settings to save:', settings);
+  }
+
+  // Load saved settings on page load (implement this with actual API call)
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('Load saved settings here');
+  });
+</script>
+{% endblock %}

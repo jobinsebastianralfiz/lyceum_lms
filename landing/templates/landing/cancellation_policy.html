@@ -1,218 +1,374 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Cancellation Policy - Uptrail{% endblock %}
-{% block description %}Learn about Uptrail's cancellation policy for courses and subscriptions.{% endblock %}
+{% block title %}Cancellation Policy - Lyceum Academy{% endblock %}
+{% block description %}Learn about Lyceum Academy's cancellation policy for courses and subscriptions.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Dark Theme for Policy Pages */
+.policy-hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  padding: 150px 0 80px;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+}
+
+.policy-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.policy-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 20px;
+}
+
+.policy-hero .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+}
+
+.policy-hero .breadcrumb-item {
+  color: #CBD5E1;
+}
+
+.policy-hero .breadcrumb-item a {
+  color: #2AB673;
+  text-decoration: none;
+}
+
+.policy-hero .breadcrumb-item + .breadcrumb-item::before {
+  color: #CBD5E1;
+}
+
+.policy-content {
+  background: #0F172A;
+  padding: 80px 0;
+}
+
+.policy-card {
+  background: #1E293B;
+  border-radius: 16px;
+  padding: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: none !important;
+}
+
+.policy-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #334155;
+}
+
+.policy-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2AB673;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.policy-card h4 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #F9FAFB;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.policy-card p {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.policy-card ul, .policy-card ol {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  padding-left: 30px;
+}
+
+.policy-card li {
+  margin-bottom: 12px;
+  color: #CBD5E1;
+}
+
+.policy-card strong {
+  color: #F9FAFB;
+  font-weight: 600;
+}
+
+.policy-card a {
+  color: #2AB673;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.policy-card a:hover {
+  color: #3DD186;
+  text-decoration: underline;
+}
+
+.important-notice {
+  background: rgba(42, 182, 115, 0.1);
+  border-left: 4px solid #2AB673;
+  padding: 20px 25px;
+  border-radius: 8px;
+  margin-top: 40px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.important-notice i {
+  color: #2AB673;
+  font-size: 1.5rem;
+  margin-top: 5px;
+}
+
+.important-notice p {
+  margin: 0;
+  color: #CBD5E1;
+  flex: 1;
+}
+
+.important-notice strong {
+  color: #2AB673;
+}
+
+@media (max-width: 768px) {
+  .policy-hero h1 {
+    font-size: 2rem;
+  }
+
+  .policy-card {
+    padding: 30px 20px;
+  }
+
+  .policy-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .policy-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .policy-card h4 {
+    font-size: 1.2rem;
+  }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="cs-height_150 cs-height_lg_120"></div>
-
-<!-- Start Page Heading -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 300px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<!-- Hero Section -->
+<section class="policy-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">Cancellation <b>Policy</b></h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item">Cancellation Policy</li>
-      </ol>
+    <div class="policy-hero-content">
+      <h1>Cancellation Policy</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Cancellation Policy</li>
+        </ol>
+      </nav>
     </div>
   </div>
-</div>
-<!-- End Page Heading -->
+</section>
 
-<!-- Start Content -->
-<div class="cs-height_140 cs-height_lg_80"></div>
-<div class="container">
-  <div class="row">
-    <div class="col-lg-8 offset-lg-2">
-      <div class="cs-text_box cs-style1">
-        <h2 class="cs-text_box_title">Cancellation Policy</h2>
-        <div class="cs-height_30"></div>
-        <p>This cancellation policy explains how you can cancel your course enrollments, subscriptions, and services with Uptrail. We strive to provide flexible options while maintaining fair policies for all users.</p>
-        <p><strong>Last Updated:</strong> January 1, 2024</p>
-        
-        <div class="cs-height_40"></div>
-        
-        <h3 class="cs-text_box_title">1. Course Enrollment Cancellations</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Individual Courses:</strong></h4>
-        <ul>
-          <li>You can cancel your course enrollment within 7 days of purchase</li>
-          <li>Cancellation is only allowed if you haven't accessed more than 30% of the course content</li>
-          <li>Free courses cannot be cancelled but can be unenrolled from your dashboard</li>
-          <li>Upon cancellation, you will lose access to all course materials immediately</li>
-        </ul>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Course Bundles:</strong></h4>
-        <ul>
-          <li>Bundle cancellations must be requested within 7 days of purchase</li>
-          <li>You cannot cancel individual courses within a bundle</li>
-          <li>Partial access to bundle content may affect cancellation eligibility</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">2. Subscription Cancellations</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Monthly Subscriptions:</strong></h4>
-        <ul>
-          <li>Can be cancelled at any time during the subscription period</li>
-          <li>Access continues until the end of the current billing cycle</li>
-          <li>No prorated refunds for partial months</li>
-          <li>Auto-renewal will be disabled upon cancellation</li>
-        </ul>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Annual Subscriptions:</strong></h4>
-        <ul>
-          <li>Can be cancelled within the first 30 days for a full refund</li>
-          <li>After 30 days, no refund is provided but access continues until expiry</li>
-          <li>Prorated refunds may be considered in special circumstances</li>
-          <li>Auto-renewal will be disabled upon cancellation</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">3. How to Cancel</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Self-Service Cancellation:</strong></h4>
-        <ol>
-          <li>Log into your Uptrail account</li>
-          <li>Go to your dashboard and navigate to "My Courses" or "Subscriptions"</li>
-          <li>Find the item you want to cancel</li>
-          <li>Click on "Cancel" or "Manage Subscription"</li>
-          <li>Follow the prompts to complete the cancellation</li>
-          <li>You'll receive a confirmation email</li>
-        </ol>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Contact Support:</strong></h4>
-        <ul>
-          <li>Email us at <a href="mailto:support@uptrail.info">support@uptrail.info</a></li>
-          <li>Include your account details and reason for cancellation</li>
-          <li>Response time: Within 24 hours</li>
-          <li>Phone support: +91 123 456 7890 (Mon-Fri, 9 AM - 6 PM IST)</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">4. What Happens After Cancellation</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Immediate Effects:</strong></h4>
-        <ul>
-          <li>Access to cancelled course content is removed immediately (for eligible cancellations)</li>
-          <li>Downloaded materials must be deleted as per our terms</li>
-          <li>Progress tracking and certificates are no longer available</li>
-          <li>Forum access and community features are disabled</li>
-        </ul>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>For Subscriptions:</strong></h4>
-        <ul>
-          <li>Access continues until the end of the current billing period</li>
-          <li>Auto-renewal is disabled</li>
-          <li>You can re-subscribe at any time</li>
-          <li>Previous progress may be retained for a limited time</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">5. Exceptions and Special Cases</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Non-Cancellable Items:</strong></h4>
-        <ul>
-          <li>Completed courses with certificates already issued</li>
-          <li>Downloaded course materials and resources</li>
-          <li>Live session recordings you've attended</li>
-          <li>One-time consulting or mentorship sessions</li>
-        </ul>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Special Circumstances:</strong></h4>
-        <ul>
-          <li>Medical emergencies with documentation</li>
-          <li>Technical issues preventing course access</li>
-          <li>Course content significantly different from description</li>
-          <li>Instructor unavailability for live sessions</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">6. Processing Timeline</h3>
-        <div class="cs-height_20"></div>
-        <ul>
-          <li><strong>Immediate:</strong> Self-service cancellations take effect immediately</li>
-          <li><strong>24 hours:</strong> Support-assisted cancellations are processed within 24 hours</li>
-          <li><strong>3-5 business days:</strong> Refund processing time (if applicable)</li>
-          <li><strong>5-10 business days:</strong> Bank processing time for refunds</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">7. Re-enrollment After Cancellation</h3>
-        <div class="cs-height_20"></div>
-        <ul>
-          <li>You can re-enroll in cancelled courses at any time</li>
-          <li>Previous progress may not be restored</li>
-          <li>Standard pricing applies unless you have a valid discount code</li>
-          <li>Re-enrollment is subject to course availability</li>
-          <li>Some courses may have limited enrollment periods</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">8. Need Help with Cancellation?</h3>
-        <div class="cs-height_20"></div>
-        <p>If you need assistance with cancelling your enrollment or subscription, our support team is here to help:</p>
-        <ul>
-          <li><strong>Email:</strong> <a href="mailto:support@uptrail.info">support@uptrail.info</a></li>
-          <li><strong>Phone:</strong> +91 123 456 7890</li>
-          <li><strong>Live Chat:</strong> Available on our website during business hours</li>
-          <li><strong>Support Hours:</strong> Monday to Friday, 9:00 AM - 6:00 PM IST</li>
-          <li><strong>Response Time:</strong> Within 24 hours for email inquiries</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">9. Changes to This Policy</h3>
-        <div class="cs-height_20"></div>
-        <p>We may update this cancellation policy from time to time. When we make changes, we will:</p>
-        <ul>
-          <li>Update the "Last Updated" date at the top of this page</li>
-          <li>Send email notifications to active users about significant changes</li>
-          <li>Post announcements on our website and social media channels</li>
-          <li>Provide a grace period for existing subscriptions to adapt to new policies</li>
-        </ul>
-        
-        <div class="cs-height_50"></div>
-        
-        <!-- Important Notice -->
-        <div class="cs-note cs-style1">
-          <div class="cs-note_left">
-            <i class="fas fa-info-circle cs-accent_color"></i>
+<!-- Content Section -->
+<section class="policy-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 offset-lg-1">
+        <div class="policy-card">
+          <h2>Cancellation Policy</h2>
+
+          <p>This cancellation policy explains how you can cancel your course enrollments, subscriptions, and services with Lyceum Academy. We strive to provide flexible options while maintaining fair policies for all users.</p>
+          <p><strong>Last Updated:</strong> January 2025</p>
+
+          <h3>1. Course Enrollment Cancellations</h3>
+
+          <h4>Individual Courses:</h4>
+          <ul>
+            <li>You can cancel your course enrollment within 7 days of purchase</li>
+            <li>Cancellation is only allowed if you haven't accessed more than 30% of the course content</li>
+            <li>Free courses cannot be cancelled but can be unenrolled from your dashboard</li>
+            <li>Upon cancellation, you will lose access to all course materials immediately</li>
+            <li>Refunds are processed according to our Refund Policy</li>
+          </ul>
+
+          <h4>Course Bundles:</h4>
+          <ul>
+            <li>Bundle cancellations must be requested within 7 days of purchase</li>
+            <li>You cannot cancel individual courses within a bundle</li>
+            <li>Partial access to bundle content may affect cancellation eligibility</li>
+            <li>Bundle cancellations are processed as a complete package</li>
+          </ul>
+
+          <h3>2. Subscription Cancellations</h3>
+
+          <h4>Monthly Subscriptions:</h4>
+          <ul>
+            <li>Can be cancelled at any time during the subscription period</li>
+            <li>Access continues until the end of the current billing cycle</li>
+            <li>No prorated refunds for partial months</li>
+            <li>Auto-renewal will be disabled upon cancellation</li>
+            <li>You can re-subscribe at any time without penalty</li>
+          </ul>
+
+          <h4>Annual Subscriptions:</h4>
+          <ul>
+            <li>Can be cancelled within the first 30 days for a full refund</li>
+            <li>After 30 days, no refund is provided but access continues until expiry</li>
+            <li>Prorated refunds may be considered in special circumstances</li>
+            <li>Auto-renewal will be disabled upon cancellation</li>
+            <li>Early cancellation does not result in automatic refunds</li>
+          </ul>
+
+          <h3>3. How to Cancel</h3>
+
+          <h4>Self-Service Cancellation:</h4>
+          <ol>
+            <li>Log into your Lyceum Academy account</li>
+            <li>Go to your dashboard and navigate to "My Courses" or "Subscriptions"</li>
+            <li>Find the item you want to cancel</li>
+            <li>Click on "Cancel" or "Manage Subscription"</li>
+            <li>Follow the prompts to complete the cancellation</li>
+            <li>You'll receive a confirmation email</li>
+          </ol>
+
+          <h4>Contact Support:</h4>
+          <ul>
+            <li>Email us at <a href="mailto:support@lyceumacademy.com">support@lyceumacademy.com</a></li>
+            <li>Include your account details and reason for cancellation</li>
+            <li>Response time: Within 24 hours</li>
+            <li>Phone support: [Your Phone Number] (Mon-Fri, 9 AM - 6 PM)</li>
+          </ul>
+
+          <h3>4. What Happens After Cancellation</h3>
+
+          <h4>Immediate Effects:</h4>
+          <ul>
+            <li>Access to cancelled course content is removed immediately (for eligible cancellations)</li>
+            <li>Downloaded materials must be deleted as per our terms</li>
+            <li>Progress tracking and certificates are no longer available</li>
+            <li>Forum access and community features are disabled</li>
+            <li>Assignment submissions are no longer accepted</li>
+          </ul>
+
+          <h4>For Subscriptions:</h4>
+          <ul>
+            <li>Access continues until the end of the current billing period</li>
+            <li>Auto-renewal is disabled</li>
+            <li>You can re-subscribe at any time</li>
+            <li>Previous progress may be retained for a limited time</li>
+            <li>Saved bookmarks and notes will be preserved for 30 days</li>
+          </ul>
+
+          <h3>5. Exceptions and Special Cases</h3>
+
+          <h4>Non-Cancellable Items:</h4>
+          <ul>
+            <li>Completed courses with certificates already issued</li>
+            <li>Downloaded course materials and resources</li>
+            <li>Live session recordings you've attended</li>
+            <li>One-time consulting or mentorship sessions</li>
+            <li>Custom or personalized course content</li>
+          </ul>
+
+          <h4>Special Circumstances:</h4>
+          <ul>
+            <li>Medical emergencies with documentation</li>
+            <li>Technical issues preventing course access (unresolved after 48 hours)</li>
+            <li>Course content significantly different from description</li>
+            <li>Instructor unavailability for scheduled live sessions</li>
+            <li>Platform downtime exceeding 24 hours</li>
+          </ul>
+
+          <h3>6. Processing Timeline</h3>
+          <ul>
+            <li><strong>Immediate:</strong> Self-service cancellations take effect immediately</li>
+            <li><strong>24 hours:</strong> Support-assisted cancellations are processed within 24 hours</li>
+            <li><strong>3-5 business days:</strong> Refund processing time (if applicable)</li>
+            <li><strong>5-10 business days:</strong> Bank processing time for refunds</li>
+            <li><strong>Email Confirmation:</strong> Sent within 1 hour of cancellation</li>
+          </ul>
+
+          <h3>7. Re-enrollment After Cancellation</h3>
+          <ul>
+            <li>You can re-enroll in cancelled courses at any time</li>
+            <li>Previous progress may not be restored</li>
+            <li>Standard pricing applies unless you have a valid discount code</li>
+            <li>Re-enrollment is subject to course availability</li>
+            <li>Some courses may have limited enrollment periods</li>
+            <li>Early cancellation does not guarantee priority re-enrollment</li>
+          </ul>
+
+          <h3>8. Corporate and Group Enrollments</h3>
+          <ul>
+            <li>Group cancellations must be initiated by the account administrator</li>
+            <li>Minimum cancellation period may apply based on contract terms</li>
+            <li>Partial group cancellations may be subject to additional fees</li>
+            <li>Contact our corporate team for custom cancellation arrangements</li>
+          </ul>
+
+          <h3>9. Need Help with Cancellation?</h3>
+          <p>If you need assistance with cancelling your enrollment or subscription, our support team is here to help:</p>
+          <ul>
+            <li><strong>Email:</strong> <a href="mailto:support@lyceumacademy.com">support@lyceumacademy.com</a></li>
+            <li><strong>Phone:</strong> [Your Phone Number]</li>
+            <li><strong>Live Chat:</strong> Available on our website during business hours</li>
+            <li><strong>Support Hours:</strong> Monday to Friday, 9:00 AM - 6:00 PM</li>
+            <li><strong>Response Time:</strong> Within 24 hours for email inquiries</li>
+          </ul>
+
+          <h3>10. Changes to This Policy</h3>
+          <p>We may update this cancellation policy from time to time. When we make changes, we will:</p>
+          <ul>
+            <li>Update the "Last Updated" date at the top of this page</li>
+            <li>Send email notifications to active users about significant changes</li>
+            <li>Post announcements on our website and social media channels</li>
+            <li>Provide a grace period for existing subscriptions to adapt to new policies</li>
+            <li>Maintain previous policy terms for purchases made before the update</li>
+          </ul>
+
+          <div class="important-notice">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <p><strong>Important Notice:</strong> Cancellation policies may vary for special promotional offers, group enrollments, or corporate training programs. Please check the specific terms provided at the time of purchase or contact our support team for clarification. All cancellations are subject to verification and approval by Lyceum Academy.</p>
+            </div>
           </div>
-          <div class="cs-note_right">
-            <p><strong>Important Notice:</strong> Cancellation policies may vary for special promotional offers, group enrollments, or corporate training programs. Please check the specific terms provided at the time of purchase or contact our support team for clarification.</p>
-          </div>
+
+          <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #94A3B8; font-size: 0.9rem;">
+            <strong>Last Updated:</strong> January 2025
+          </p>
         </div>
-        
       </div>
     </div>
   </div>
-</div>
-<div class="cs-height_140 cs-height_lg_80"></div>
-<!-- End Content -->
+</section>
 {% endblock %}

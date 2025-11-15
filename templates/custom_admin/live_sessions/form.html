@@ -1,0 +1,384 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if session %}Edit Live Session{% else %}Create Live Session{% endif %} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{% if session %}Edit Live Session{% else %}Create New Live Session{% endif %}</h4>
+            <p class="card-subtitle">{% if session %}Update session details{% else %}Schedule a new live session{% endif %}</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:live_sessions_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Live Sessions
+            </a>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- Basic Information -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Basic Information</h5>
+            </div>
+
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label">
+                  {{ form.title.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.help_text %}
+                  <div class="form-text">{{ form.title.help_text }}</div>
+                {% endif %}
+                {% if form.title.errors %}
+                  <div class="text-danger">{{ form.title.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.help_text %}
+              <div class="form-text">{{ form.description.help_text }}</div>
+            {% endif %}
+            {% if form.description.errors %}
+              <div class="text-danger">{{ form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Meeting Configuration -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Meeting Configuration</h5>
+            </div>
+
+            <!-- Google Meet Toggle -->
+            {% if google_connected %}
+            <div class="col-12">
+              <div class="alert alert-success d-flex align-items-center mb-3">
+                <i class="ti ti-brand-google me-2" style="font-size: 1.5rem;"></i>
+                <div class="flex-grow-1">
+                  <div class="form-check form-switch mb-0">
+                    {{ form.use_google_meet }}
+                    <label class="form-check-label" for="{{ form.use_google_meet.id_for_label }}">
+                      <strong>{{ form.use_google_meet.label }}</strong>
+                    </label>
+                  </div>
+                  <small class="text-muted d-block mt-1">{{ form.use_google_meet.help_text }}</small>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+              <div class="alert alert-warning mb-3">
+                <i class="ti ti-alert-circle me-2"></i>
+                <strong>Google Meet not connected.</strong>
+                <a href="{% url 'custom_admin:settings_list' %}" class="alert-link">Connect Google Workspace</a>
+                to automatically create Google Meet links.
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Manual Meeting Link (conditionally shown) -->
+            <div class="col-12" id="manual_meeting_link_container">
+              <div class="mb-3">
+                <label for="{{ form.meeting_link.id_for_label }}" class="form-label">
+                  {{ form.meeting_link.label }} <span class="text-danger" id="meeting_link_required">*</span>
+                </label>
+                {{ form.meeting_link }}
+                {% if form.meeting_link.help_text %}
+                  <div class="form-text">{{ form.meeting_link.help_text }}</div>
+                {% endif %}
+                {% if form.meeting_link.errors %}
+                  <div class="text-danger">{{ form.meeting_link.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.course.id_for_label }}" class="form-label">{{ form.course.label }}</label>
+                {{ form.course }}
+                {% if form.course.help_text %}
+                  <div class="form-text">{{ form.course.help_text }}</div>
+                {% endif %}
+                {% if form.course.errors %}
+                  <div class="text-danger">{{ form.course.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.assignment_type.id_for_label }}" class="form-label">{{ form.assignment_type.label }}</label>
+                {{ form.assignment_type }}
+                {% if form.assignment_type.help_text %}
+                  <div class="form-text">{{ form.assignment_type.help_text }}</div>
+                {% endif %}
+                {% if form.assignment_type.errors %}
+                  <div class="text-danger">{{ form.assignment_type.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule Configuration -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Schedule Configuration</h5>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.scheduled_date.id_for_label }}" class="form-label">
+                  {{ form.scheduled_date.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.scheduled_date }}
+                {% if form.scheduled_date.help_text %}
+                  <div class="form-text">{{ form.scheduled_date.help_text }}</div>
+                {% endif %}
+                {% if form.scheduled_date.errors %}
+                  <div class="text-danger">{{ form.scheduled_date.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">{{ form.duration_minutes.label }}</label>
+                {{ form.duration_minutes }}
+                {% if form.duration_minutes.help_text %}
+                  <div class="form-text">{{ form.duration_minutes.help_text }}</div>
+                {% endif %}
+                {% if form.duration_minutes.errors %}
+                  <div class="text-danger">{{ form.duration_minutes.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">Session Settings</h5>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="{{ form.max_participants.id_for_label }}" class="form-label">{{ form.max_participants.label }}</label>
+                {{ form.max_participants }}
+                {% if form.max_participants.help_text %}
+                  <div class="form-text">{{ form.max_participants.help_text }}</div>
+                {% endif %}
+                {% if form.max_participants.errors %}
+                  <div class="text-danger">{{ form.max_participants.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-12">
+                  <div class="mb-3">
+                    <div class="form-check">
+                      {{ form.send_notifications }}
+                      <label class="form-check-label" for="{{ form.send_notifications.id_for_label }}">
+                        {{ form.send_notifications.label }}
+                      </label>
+                    </div>
+                    {% if form.send_notifications.help_text %}
+                      <div class="form-text">{{ form.send_notifications.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="mb-3">
+                    <div class="form-check">
+                      {{ form.allow_recording }}
+                      <label class="form-check-label" for="{{ form.allow_recording.id_for_label }}">
+                        {{ form.allow_recording.label }}
+                      </label>
+                    </div>
+                    {% if form.allow_recording.help_text %}
+                      <div class="form-text">{{ form.allow_recording.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="mb-3">
+                    <div class="form-check">
+                      {{ form.is_mandatory }}
+                      <label class="form-check-label" for="{{ form.is_mandatory.id_for_label }}">
+                        {{ form.is_mandatory.label }}
+                      </label>
+                    </div>
+                    {% if form.is_mandatory.help_text %}
+                      <div class="form-text">{{ form.is_mandatory.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Summary (if editing) -->
+          {% if session %}
+          <div class="mb-4">
+            <h5 class="mb-3">Current Session Status</h5>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card bg-info-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-info">{{ session.participants.count }}</h4>
+                    <small class="text-muted">Participants</small>
+                    {% if session.participants.count > 0 %}
+                      <div class="mt-2">
+                        <a href="{% url 'custom_admin:session_manage_participants' session.id %}"
+                           class="btn btn-sm btn-outline-info">Manage</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-warning-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-warning">{{ session.status|title }}</h4>
+                    <small class="text-muted">Status</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-success-subtle border-0">
+                  <div class="card-body text-center">
+                    <h4 class="mb-0 text-success">{{ session.announcements.count }}</h4>
+                    <small class="text-muted">Announcements</small>
+                    <div class="mt-2">
+                      <a href="{% url 'custom_admin:session_announcement_create' session.id %}"
+                         class="btn btn-sm btn-outline-success">Add</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:live_sessions_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            {% if session %}
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-info">
+              <i class="ti ti-eye me-1"></i>View Session
+            </a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-check me-1"></i>{% if session %}Update Session{% else %}Create Session{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Set minimum date to now
+document.addEventListener('DOMContentLoaded', function() {
+  const scheduleInput = document.getElementById('{{ form.scheduled_date.id_for_label }}');
+  if (scheduleInput) {
+    const now = new Date();
+    const minDate = now.toISOString().slice(0, 16);
+    scheduleInput.min = minDate;
+  }
+});
+
+// Duration calculator
+document.getElementById('{{ form.duration_minutes.id_for_label }}').addEventListener('input', function() {
+  const minutes = parseInt(this.value) || 0;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  let durationText = '';
+  if (hours > 0) {
+    durationText = `${hours}h ${remainingMinutes}m`;
+  } else {
+    durationText = `${minutes}m`;
+  }
+
+  // Update helper text if exists
+  const helperElement = this.parentElement.querySelector('.duration-helper');
+  if (helperElement) {
+    helperElement.textContent = `Duration: ${durationText}`;
+  } else {
+    // Create helper element
+    const helper = document.createElement('small');
+    helper.className = 'text-muted duration-helper';
+    helper.textContent = `Duration: ${durationText}`;
+    this.parentElement.appendChild(helper);
+  }
+});
+
+// Meeting link validation
+const meetingLinkInput = document.getElementById('{{ form.meeting_link.id_for_label }}');
+if (meetingLinkInput) {
+  meetingLinkInput.addEventListener('blur', function() {
+    const url = this.value.trim();
+    if (url && !url.match(/^https?:\/\//)) {
+      this.value = 'https://' + url;
+    }
+  });
+}
+
+// Google Meet toggle functionality
+const googleMeetCheckbox = document.getElementById('use_google_meet');
+const meetingLinkContainer = document.getElementById('manual_meeting_link_container');
+const meetingLinkRequired = document.getElementById('meeting_link_required');
+
+if (googleMeetCheckbox && meetingLinkContainer) {
+  function toggleMeetingLink() {
+    if (googleMeetCheckbox.checked) {
+      // Hide manual meeting link input
+      meetingLinkContainer.style.opacity = '0.5';
+      if (meetingLinkInput) {
+        meetingLinkInput.disabled = true;
+        meetingLinkInput.required = false;
+      }
+      if (meetingLinkRequired) {
+        meetingLinkRequired.style.display = 'none';
+      }
+    } else {
+      // Show manual meeting link input
+      meetingLinkContainer.style.opacity = '1';
+      if (meetingLinkInput) {
+        meetingLinkInput.disabled = false;
+        meetingLinkInput.required = true;
+      }
+      if (meetingLinkRequired) {
+        meetingLinkRequired.style.display = 'inline';
+      }
+    }
+  }
+
+  // Initial state
+  toggleMeetingLink();
+
+  // Listen for changes
+  googleMeetCheckbox.addEventListener('change', toggleMeetingLink);
+}
+</script>
+{% endblock %}

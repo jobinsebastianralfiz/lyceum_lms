@@ -1,0 +1,356 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ session.title }} - Live Session Details - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">{{ session.title }}</h4>
+            <p class="card-subtitle">{{ session.description|default:"No description provided" }}</p>
+          </div>
+          <div class="ms-auto d-flex gap-2">
+            <a href="{% url 'custom_admin:live_sessions_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Sessions
+            </a>
+            <a href="{% url 'custom_admin:live_session_edit' session.id %}" class="btn btn-primary">
+              <i class="ti ti-edit me-1"></i>Edit Session
+            </a>
+          </div>
+        </div>
+
+        <!-- Session Status -->
+        <div class="alert
+                    {% if session.status == 'scheduled' %}alert-warning
+                    {% elif session.status == 'active' %}alert-success
+                    {% elif session.status == 'completed' %}alert-info
+                    {% elif session.status == 'cancelled' %}alert-danger
+                    {% else %}alert-secondary{% endif %} mb-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="alert-heading mb-0">
+                <i class="ti ti-info-circle me-2"></i>Session Status: {{ session.get_status_display }}
+              </h6>
+            </div>
+            <div>
+              {% if session.status == 'scheduled' %}
+                <a href="{% url 'custom_admin:session_start' session.id %}" class="btn btn-sm btn-success">
+                  <i class="ti ti-play me-1"></i>Start Session
+                </a>
+              {% elif session.status == 'active' %}
+                <a href="{% url 'custom_admin:session_end' session.id %}" class="btn btn-sm btn-danger">
+                  <i class="ti ti-stop me-1"></i>End Session
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Session Information -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h6 class="mb-3">Session Details</h6>
+            <table class="table table-sm table-borderless">
+              <tr>
+                <td class="text-muted fw-medium">Scheduled Date:</td>
+                <td class="fw-medium">{{ session.scheduled_date|date:"M d, Y H:i" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Duration:</td>
+                <td class="fw-medium">{{ session.duration_minutes }} minutes</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Meeting Link:</td>
+                <td>
+                  <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="ti ti-external-link me-1"></i>Join Meeting
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Course:</td>
+                <td>
+                  {% if session.course %}
+                    <div class="fw-medium">{{ session.course.title }}</div>
+                    <small class="text-muted">{{ session.course.category.name|default:"Uncategorized" }}</small>
+                  {% else %}
+                    <span class="text-muted">No course assigned</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Assignment Type:</td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">{{ session.get_assignment_type_display }}</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h6 class="mb-3">Settings</h6>
+            <table class="table table-sm table-borderless">
+              <tr>
+                <td class="text-muted fw-medium">Max Participants:</td>
+                <td class="fw-medium">{{ session.max_participants }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Notifications:</td>
+                <td>
+                  {% if session.send_notifications %}
+                    <span class="text-success"><i class="ti ti-check"></i> Enabled</span>
+                  {% else %}
+                    <span class="text-muted"><i class="ti ti-x"></i> Disabled</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Recording:</td>
+                <td>
+                  {% if session.allow_recording %}
+                    <span class="text-success"><i class="ti ti-check"></i> Allowed</span>
+                  {% else %}
+                    <span class="text-muted"><i class="ti ti-x"></i> Not Allowed</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Mandatory:</td>
+                <td>
+                  {% if session.is_mandatory %}
+                    <span class="text-warning"><i class="ti ti-alert-triangle"></i> Yes</span>
+                  {% else %}
+                    <span class="text-muted">No</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Created:</td>
+                <td>{{ session.created_at|date:"M d, Y H:i" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Created By:</td>
+                <td>{{ session.created_by.name|default:session.created_by.username }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Participants Section -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="mb-0">Participants ({{ session.participants.count }}/{{ session.max_participants }})</h6>
+            {% if session.status == 'scheduled' %}
+            <a href="{% url 'custom_admin:session_manage_participants' session.id %}" class="btn btn-sm btn-outline-primary">
+              <i class="ti ti-users me-1"></i>Manage Participants
+            </a>
+            {% endif %}
+          </div>
+
+          {% if session.participants.exists %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Status</th>
+                  <th>Joined At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for participant in session.participants.all %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2"
+                           style="width: 24px; height: 24px;">
+                        <i class="ti ti-user text-primary"></i>
+                      </div>
+                      <div>
+                        <div class="fw-medium">{{ participant.student.name }}</div>
+                        <small class="text-muted">{{ participant.student.email }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if participant.status == 'assigned' %}
+                      <span class="badge bg-warning">Assigned</span>
+                    {% elif participant.status == 'joined' %}
+                      <span class="badge bg-success">Joined</span>
+                    {% elif participant.status == 'absent' %}
+                      <span class="badge bg-danger">Absent</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ participant.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if participant.joined_at %}
+                      {{ participant.joined_at|date:"M d, Y H:i" }}
+                    {% else %}
+                      <span class="text-muted">Not joined</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if session.status == 'scheduled' %}
+                    <a href="{% url 'custom_admin:session_participant_delete' session.id participant.id %}"
+                       class="btn btn-sm btn-outline-danger" title="Remove Participant">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="ti ti-users fs-1 mb-2"></i>
+            <p class="mb-0">No participants assigned yet</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Announcements Section -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="mb-0">Announcements ({{ session.announcements.count }})</h6>
+            <a href="{% url 'custom_admin:session_announcement_create' session.id %}" class="btn btn-sm btn-outline-success">
+              <i class="ti ti-plus me-1"></i>Add Announcement
+            </a>
+          </div>
+
+          {% if session.announcements.exists %}
+          <div class="timeline">
+            {% for announcement in session.announcements.all %}
+            <div class="timeline-item">
+              <div class="timeline-marker bg-primary"></div>
+              <div class="timeline-content">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div>
+                    <h6 class="mb-1">{{ announcement.title }}</h6>
+                    <p class="mb-1">{{ announcement.message }}</p>
+                    <small class="text-muted">
+                      {{ announcement.created_at|date:"M d, Y H:i" }} by {{ announcement.created_by.name }}
+                      <span class="badge bg-info-subtle text-info ms-2">{{ announcement.get_announcement_type_display }}</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="ti ti-speakerphone fs-1 mb-2"></i>
+            <p class="mb-0">No announcements yet</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Quick Actions -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h6 class="card-title mb-0">Quick Actions</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          {% if session.status == 'scheduled' %}
+          <a href="{% url 'custom_admin:session_start' session.id %}" class="btn btn-success">
+            <i class="ti ti-play me-2"></i>Start Session
+          </a>
+          <a href="{% url 'custom_admin:session_cancel' session.id %}" class="btn btn-outline-warning">
+            <i class="ti ti-ban me-2"></i>Cancel Session
+          </a>
+          {% elif session.status == 'active' %}
+          <a href="{% url 'custom_admin:session_end' session.id %}" class="btn btn-danger">
+            <i class="ti ti-stop me-2"></i>End Session
+          </a>
+          {% endif %}
+
+          <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-outline-primary">
+            <i class="ti ti-external-link me-2"></i>Join Meeting
+          </a>
+          <a href="{% url 'custom_admin:session_announcement_create' session.id %}" class="btn btn-outline-success">
+            <i class="ti ti-speakerphone me-2"></i>Add Announcement
+          </a>
+          <hr>
+          <a href="{% url 'custom_admin:live_session_edit' session.id %}" class="btn btn-outline-primary">
+            <i class="ti ti-edit me-2"></i>Edit Session
+          </a>
+          <a href="{% url 'custom_admin:live_session_delete' session.id %}" class="btn btn-outline-danger">
+            <i class="ti ti-trash me-2"></i>Delete Session
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Statistics -->
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0">Session Statistics</h6>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="mb-0 text-primary">{{ session.participants.count }}</h4>
+            <small class="text-muted">Participants</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-success">{{ joined_participants_count }}</h4>
+            <small class="text-muted">Joined</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-info">{{ session.announcements.count }}</h4>
+            <small class="text-muted">Announcements</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-left: 2px solid #e0e6ed;
+}
+
+.timeline-item:last-child {
+  border-left: 2px solid transparent;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -6px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.timeline-content {
+  padding-left: 20px;
+}
+
+.table-borderless td {
+  padding: 0.25rem 0;
+  border: none;
+}
+</style>
+{% endblock %}

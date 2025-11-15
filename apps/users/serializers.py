@@ -232,3 +232,23 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['new_password_confirm']:
             raise serializers.ValidationError("Passwords don't match")
         return attrs
+
+class PasswordResetCodeSerializer(serializers.Serializer):
+    """
+    Serializer for password reset with verification code.
+    """
+    email = serializers.EmailField(required=True)
+    verification_code = serializers.CharField(required=True, max_length=6, min_length=6)
+    new_password = serializers.CharField(required=True, min_length=8)
+    new_password_confirm = serializers.CharField(required=True)
+    
+    def validate_verification_code(self, value):
+        # Ensure the code contains only digits
+        if not value.isdigit():
+            raise serializers.ValidationError("Verification code must contain only digits")
+        return value
+    
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError("Passwords don't match")
+        return attrs

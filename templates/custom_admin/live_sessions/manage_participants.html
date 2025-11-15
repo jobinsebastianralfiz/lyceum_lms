@@ -1,0 +1,366 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Manage Participants - {{ session.title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">Manage Participants</h4>
+            <p class="card-subtitle">{{ session.title }}</p>
+          </div>
+          <div class="ms-auto d-flex gap-2">
+            <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back to Session
+            </a>
+          </div>
+        </div>
+
+        <!-- Session Info -->
+        <div class="alert alert-info mb-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="alert-heading mb-0">
+                <i class="ti ti-info-circle me-2"></i>
+                Session: {{ session.title }} - {{ session.scheduled_date|date:"M d, Y H:i" }}
+              </h6>
+              <small>Capacity: {{ session.participants.count }}/{{ session.max_participants }}</small>
+            </div>
+            <div>
+              {% if session.participants.count < session.max_participants %}
+                <span class="badge bg-success">{{ session.max_participants|add:"-"|add:session.participants.count }} spots available</span>
+              {% else %}
+                <span class="badge bg-warning">Full</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Individual Participant -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-user-plus me-2"></i>Add Individual Participant
+            </h6>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="add_individual">
+
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-3">
+                    <label for="{{ participant_form.student.id_for_label }}" class="form-label">{{ participant_form.student.label }}</label>
+                    {{ participant_form.student }}
+                    {% if participant_form.student.help_text %}
+                      <div class="form-text">{{ participant_form.student.help_text }}</div>
+                    {% endif %}
+                    {% if participant_form.student.errors %}
+                      <div class="text-danger">{{ participant_form.student.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="{{ participant_form.status.id_for_label }}" class="form-label">{{ participant_form.status.label }}</label>
+                    {{ participant_form.status }}
+                    {% if participant_form.status.help_text %}
+                      <div class="form-text">{{ participant_form.status.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" {% if session.participants.count >= session.max_participants %}disabled{% endif %}>
+                <i class="ti ti-plus me-1"></i>Add Participant
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Bulk Assignment -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-users-plus me-2"></i>Bulk Assignment
+            </h6>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="bulk_assign">
+
+              <div class="mb-3">
+                <label for="{{ bulk_form.assignment_type.id_for_label }}" class="form-label">{{ bulk_form.assignment_type.label }}</label>
+                {{ bulk_form.assignment_type }}
+                {% if bulk_form.assignment_type.help_text %}
+                  <div class="form-text">{{ bulk_form.assignment_type.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3" id="course-selection" style="display: none;">
+                <label for="{{ bulk_form.course.id_for_label }}" class="form-label">{{ bulk_form.course.label }}</label>
+                {{ bulk_form.course }}
+                {% if bulk_form.course.help_text %}
+                  <div class="form-text">{{ bulk_form.course.help_text }}</div>
+                {% endif %}
+                {% if bulk_form.course.errors %}
+                  <div class="text-danger">{{ bulk_form.course.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3" id="team-selection" style="display: none;">
+                <label for="{{ bulk_form.team.id_for_label }}" class="form-label">{{ bulk_form.team.label }}</label>
+                {{ bulk_form.team }}
+                {% if bulk_form.team.help_text %}
+                  <div class="form-text">{{ bulk_form.team.help_text }}</div>
+                {% endif %}
+                {% if bulk_form.team.errors %}
+                  <div class="text-danger">{{ bulk_form.team.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3" id="students-selection" style="display: none;">
+                <label for="{{ bulk_form.students.id_for_label }}" class="form-label">{{ bulk_form.students.label }}</label>
+                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                  {{ bulk_form.students }}
+                </div>
+                {% if bulk_form.students.help_text %}
+                  <div class="form-text">{{ bulk_form.students.help_text }}</div>
+                {% endif %}
+                {% if bulk_form.students.errors %}
+                  <div class="text-danger">{{ bulk_form.students.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <button type="submit" class="btn btn-success" {% if session.participants.count >= session.max_participants %}disabled{% endif %}>
+                <i class="ti ti-users-plus me-1"></i>Bulk Assign
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Current Participants -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="ti ti-users me-2"></i>Current Participants ({{ session.participants.count }})
+            </h6>
+          </div>
+          <div class="card-body">
+            {% if session.participants.exists %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Added</th>
+                    <th>Joined At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for participant in session.participants.all %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center me-2"
+                             style="width: 32px; height: 32px;">
+                          <i class="ti ti-user text-primary"></i>
+                        </div>
+                        <div>
+                          <div class="fw-medium">{{ participant.student.name }}</div>
+                          <small class="text-muted">{{ participant.student.email }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if participant.status == 'assigned' %}
+                        <span class="badge bg-warning">Assigned</span>
+                      {% elif participant.status == 'joined' %}
+                        <span class="badge bg-success">Joined</span>
+                      {% elif participant.status == 'absent' %}
+                        <span class="badge bg-danger">Absent</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ participant.get_status_display }}</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <small class="text-muted">{{ participant.created_at|date:"M d, Y H:i" }}</small>
+                    </td>
+                    <td>
+                      {% if participant.joined_at %}
+                        <small class="text-muted">{{ participant.joined_at|date:"M d, Y H:i" }}</small>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        {% if participant.status != 'joined' %}
+                        <form method="post" style="display: inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="update_status">
+                          <input type="hidden" name="participant_id" value="{{ participant.id }}">
+                          <input type="hidden" name="status" value="joined">
+                          <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as Joined">
+                            <i class="ti ti-check"></i>
+                          </button>
+                        </form>
+                        {% endif %}
+
+                        <a href="{% url 'custom_admin:session_participant_delete' session.id participant.id %}"
+                           class="btn btn-sm btn-outline-danger" title="Remove Participant"
+                           onclick="return confirm('Remove {{ participant.student.name }} from this session?')">
+                          <i class="ti ti-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted">
+              <i class="ti ti-users fs-1 mb-2"></i>
+              <p class="mb-0">No participants assigned yet</p>
+              <p class="small">Use the forms above to add participants to this session</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Session Summary -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h6 class="card-title mb-0">Session Summary</h6>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="mb-0 text-primary">{{ session.participants.count }}</h4>
+            <small class="text-muted">Total</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-success">{{ assigned_count }}</h4>
+            <small class="text-muted">Assigned</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-info">{{ joined_count }}</h4>
+            <small class="text-muted">Joined</small>
+          </div>
+        </div>
+        <hr>
+        <div class="small">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted">Capacity:</span>
+            <span class="fw-medium">{{ session.max_participants }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted">Available:</span>
+            <span class="fw-medium">{{ available_slots }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Utilization:</span>
+            <span class="fw-medium">{{ utilization_percent }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0">Quick Actions</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'custom_admin:live_session_detail' session.id %}" class="btn btn-outline-info">
+            <i class="ti ti-eye me-2"></i>View Session Details
+          </a>
+          <a href="{% url 'custom_admin:session_announcement_create' session.id %}" class="btn btn-outline-success">
+            <i class="ti ti-speakerphone me-2"></i>Send Announcement
+          </a>
+          <hr>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="clear_all">
+            <button type="submit" class="btn btn-outline-warning w-100"
+                    onclick="return confirm('Remove all participants from this session?')"
+                    {% if not session.participants.exists %}disabled{% endif %}>
+              <i class="ti ti-user-x me-2"></i>Clear All Participants
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Show/hide form sections based on assignment type
+document.addEventListener('DOMContentLoaded', function() {
+  const assignmentTypeSelect = document.getElementById('{{ bulk_form.assignment_type.id_for_label }}');
+  const courseSelection = document.getElementById('course-selection');
+  const teamSelection = document.getElementById('team-selection');
+  const studentsSelection = document.getElementById('students-selection');
+
+  function toggleSections() {
+    const selectedType = assignmentTypeSelect.value;
+
+    courseSelection.style.display = selectedType === 'course_students' ? 'block' : 'none';
+    teamSelection.style.display = selectedType === 'team_members' ? 'block' : 'none';
+    studentsSelection.style.display = selectedType === 'individual_students' ? 'block' : 'none';
+  }
+
+  assignmentTypeSelect.addEventListener('change', toggleSections);
+  toggleSections(); // Initial state
+});
+
+// Auto-refresh participant count every 30 seconds
+setInterval(function() {
+  const participantCountElements = document.querySelectorAll('[data-participant-count]');
+  // You could add AJAX here to refresh counts without full page reload
+}, 30000);
+
+// Select all/none for individual students
+function toggleAllStudents(checked) {
+  const checkboxes = document.querySelectorAll('#students-selection input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = checked;
+  });
+}
+
+// Add select all/none buttons if there are many students
+document.addEventListener('DOMContentLoaded', function() {
+  const studentsContainer = document.getElementById('students-selection');
+  if (studentsContainer) {
+    const checkboxes = studentsContainer.querySelectorAll('input[type="checkbox"]');
+    if (checkboxes.length > 5) {
+      const controlsDiv = document.createElement('div');
+      controlsDiv.className = 'mb-2';
+      controlsDiv.innerHTML = `
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2" onclick="toggleAllStudents(true)">
+          Select All
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAllStudents(false)">
+          Select None
+        </button>
+      `;
+      studentsContainer.insertBefore(controlsDiv, studentsContainer.firstChild);
+    }
+  }
+});
+</script>
+{% endblock %}

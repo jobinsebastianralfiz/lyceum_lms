@@ -1,10 +1,79 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Courses - Uptrail{% endblock %}
+{% block title %}Courses - Lyceum Academy{% endblock %}
 
 {% block extra_css %}
 <style>
+/* Hero Section */
+.lyceum-courses-hero {
+  background: linear-gradient(135deg, #2AB673 0%, #3DD186 100%);
+  padding: 150px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lyceum-courses-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+}
+
+.lyceum-courses-hero .hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.lyceum-courses-hero .hero-title span {
+  color: white;
+}
+
+.lyceum-courses-hero .hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 30px;
+}
+
+.breadcrumb-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 10px;
+}
+
+.breadcrumb-custom li {
+  color: white;
+  font-size: 1rem;
+}
+
+.breadcrumb-custom li a {
+  color: white;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.3s;
+}
+
+.breadcrumb-custom li a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.breadcrumb-custom li:not(:last-child)::after {
+  content: '/';
+  margin-left: 10px;
+  opacity: 0.7;
+}
+
 /* Course Filter Styling */
 .cs-isotope_filter {
   margin-bottom: 0;
@@ -41,21 +110,21 @@
 
 .cs-isotope_filter_btn:hover {
   background: #e2e8f0;
-  color: #2563eb;
+  color: #2AB673;
   text-decoration: none;
 }
 
 .cs-isotope_filter_btn.active {
-  background: #2563eb;
+  background: #2AB673;
   color: white;
-  border-color: #2563eb;
+  border-color: #2AB673;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(42, 182, 115, 0.3);
 }
 
 .cs-isotope_filter_btn.active:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #229959;
+  border-color: #229959;
   color: white;
 }
 
@@ -98,7 +167,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, #2563eb, #1d4ed8);
+  background: linear-gradient(45deg, #2AB673, #229959);
   opacity: 0.1;
   z-index: 1;
 }
@@ -113,7 +182,7 @@
   font-size: 48px;
   margin-bottom: 10px;
   display: block;
-  color: #2563eb;
+  color: #2AB673;
 }
 
 .cs-course_info {
@@ -133,7 +202,7 @@
   font-weight: 600;
   font-size: 14px;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(42, 182, 115, 0.3);
 }
 
 .cs-course_meta {
@@ -164,7 +233,7 @@
 }
 
 .cs-course_title a:hover {
-  color: #2563eb;
+  color: #2AB673;
 }
 
 .cs-course_description {
@@ -180,8 +249,8 @@
 }
 
 .cs-course_category span {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
+  background: rgba(42, 182, 115, 0.1);
+  color: #2AB673;
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
@@ -224,7 +293,7 @@
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 1px;
-  color: #2563eb;
+  color: #2AB673;
   width: 100%;
   float: none !important;
 }
@@ -302,15 +371,17 @@
 
 {% block content %}
 <!-- Start Hero -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 400px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<div class="lyceum-courses-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">Our Awesome <b>Courses</b></h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item">Courses</li>
-      </ol>
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="hero-title">Explore Our <span>Courses</span></h1>
+        <p class="hero-subtitle">Discover world-class courses designed to help you achieve your learning goals</p>
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'landing:home' %}">Home</a></li>
+          <li>Courses</li>
+        </ol>
+      </div>
     </div>
   </div>
 </div>

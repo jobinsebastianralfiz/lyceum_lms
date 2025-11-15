@@ -1,0 +1,821 @@
+{% extends 'student_portal/base.html' %}
+{% load static %}
+
+{% block title %}Browse Courses - Lyceum{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumb-item">
+  <i class="fas fa-home"></i>
+  <span>Home</span>
+</div>
+<span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+<div class="breadcrumb-item">
+  <span>Browse Courses</span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner */
+  .browse-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: var(--border-radius-lg);
+    padding: 48px 40px;
+    color: white;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .browse-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    opacity: 0.95;
+    margin-bottom: 32px;
+  }
+
+  .hero-search {
+    max-width: 600px;
+    position: relative;
+  }
+
+  .hero-search input {
+    width: 100%;
+    padding: 16px 56px 16px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero-search input:focus {
+    outline: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .hero-search-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .hero-search-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  /* Main Layout */
+  .browse-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+
+  /* Sidebar Filters */
+  .filters-sidebar {
+    position: sticky;
+    top: 90px;
+    height: fit-content;
+  }
+
+  .filter-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .filter-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .filter-title i {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+  }
+
+  .filter-option:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .filter-option.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .filter-option input[type="checkbox"],
+  .filter-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: var(--primary);
+  }
+
+  .filter-option-label {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .filter-option-count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  /* Price Range */
+  .price-inputs {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .price-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+  }
+
+  .price-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-bg);
+  }
+
+  /* Apply Button */
+  .filter-apply-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-top: 16px;
+  }
+
+  .filter-apply-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .filter-clear-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-top: 8px;
+  }
+
+  .filter-clear-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  /* Main Content */
+  .courses-main {
+    min-width: 0;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .results-count {
+    font-size: 16px;
+    color: var(--text-secondary);
+  }
+
+  .results-count strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .sort-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sort-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .sort-select {
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    min-width: 200px;
+  }
+
+  .sort-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-bg);
+  }
+
+  /* Course Grid */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .course-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+  }
+
+  .course-thumbnail {
+    width: 100%;
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+  }
+
+  .course-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .course-card:hover .course-thumbnail img {
+    transform: scale(1.05);
+  }
+
+  .course-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .course-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+
+  .badge-enrolled {
+    background: rgba(16, 185, 129, 0.95);
+    color: white;
+  }
+
+  .badge-free {
+    background: rgba(245, 158, 11, 0.95);
+    color: white;
+  }
+
+  .badge-price {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary);
+  }
+
+  .course-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .course-category {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .course-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .course-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .course-footer {
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  .rating-stars {
+    color: #f59e0b;
+  }
+
+  .rating-value {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .rating-count {
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  .course-action {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    transition: var(--transition-fast);
+  }
+
+  .course-action:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .course-action.enrolled {
+    background: var(--accent);
+  }
+
+  .course-action.enrolled:hover {
+    background: var(--accent-dark);
+  }
+
+  /* Pagination */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+  }
+
+  .pagination {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .page-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    transition: var(--transition-fast);
+  }
+
+  .page-btn:hover:not(.active) {
+    background: var(--bg-secondary);
+    border-color: var(--primary);
+  }
+
+  .page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 24px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+  }
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: var(--primary-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .browse-container {
+      grid-template-columns: 250px 1fr;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .browse-container {
+      grid-template-columns: 1fr;
+    }
+
+    .filters-sidebar {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .filter-section {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .browse-hero {
+      padding: 32px 24px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+    }
+
+    .courses-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .filters-sidebar {
+      grid-template-columns: 1fr;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .sort-dropdown {
+      width: 100%;
+    }
+
+    .sort-select {
+      flex: 1;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="browse-hero">
+  <div class="hero-content">
+    <h1 class="hero-title">Explore Our Courses</h1>
+    <p class="hero-subtitle">Discover thousands of courses to advance your career and skills</p>
+    <form method="get" class="hero-search">
+      <input
+        type="text"
+        name="search"
+        value="{{ search_query }}"
+        placeholder="Search for courses...">
+      <button type="submit" class="hero-search-btn">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="browse-container">
+  <!-- Sidebar Filters -->
+  <aside class="filters-sidebar">
+    <form method="get" id="filtersForm">
+      <!-- Category Filter -->
+      <div class="filter-section">
+        <h3 class="filter-title">
+          <i class="fas fa-folder"></i>
+          Categories
+        </h3>
+        <div class="filter-options">
+          <label class="filter-option {% if not category_filter %}active{% endif %}">
+            <input type="radio" name="category" value="" {% if not category_filter %}checked{% endif %} onchange="this.form.submit()">
+            <span class="filter-option-label">All Categories</span>
+            <span class="filter-option-count">{{ courses.count }}</span>
+          </label>
+          {% for category in categories %}
+          <label class="filter-option {% if category.name == category_filter %}active{% endif %}">
+            <input type="radio" name="category" value="{{ category.name }}" {% if category.name == category_filter %}checked{% endif %} onchange="this.form.submit()">
+            <span class="filter-option-label">{{ category.name }}</span>
+            <span class="filter-option-count">{{ category.course_count|default:0 }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Price Filter -->
+      <div class="filter-section">
+        <h3 class="filter-title">
+          <i class="fas fa-tag"></i>
+          Price
+        </h3>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" name="free" {% if free_only %}checked{% endif %}>
+            <span class="filter-option-label">Free Courses</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="paid" {% if paid_only %}checked{% endif %}>
+            <span class="filter-option-label">Paid Courses</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Enrollment Status -->
+      <div class="filter-section">
+        <h3 class="filter-title">
+          <i class="fas fa-user-check"></i>
+          Status
+        </h3>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" name="enrolled" {% if enrolled_only %}checked{% endif %}>
+            <span class="filter-option-label">My Enrolled</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="not_enrolled" {% if not_enrolled_only %}checked{% endif %}>
+            <span class="filter-option-label">Not Enrolled</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Hidden Search Input -->
+      <input type="hidden" name="search" value="{{ search_query }}">
+
+      <button type="submit" class="filter-apply-btn">
+        <i class="fas fa-check"></i> Apply Filters
+      </button>
+      <a href="{% url 'student_portal:browse_courses' %}" class="filter-clear-btn">
+        <i class="fas fa-times"></i> Clear All
+      </a>
+    </form>
+  </aside>
+
+  <!-- Courses Main Content -->
+  <main class="courses-main">
+    <!-- Results Header -->
+    <div class="results-header">
+      <div class="results-count">
+        {% if search_query %}
+          Showing <strong>{{ courses.count }}</strong> result{{ courses.count|pluralize }} for "<strong>{{ search_query }}</strong>"
+        {% else %}
+          <strong>{{ courses.count }}</strong> course{{ courses.count|pluralize }} available
+        {% endif %}
+      </div>
+      <div class="sort-dropdown">
+        <label class="sort-label">Sort by:</label>
+        <select class="sort-select" name="sort" onchange="window.location.href='?sort=' + this.value + '{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}'">
+          <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most Popular</option>
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+          <option value="title" {% if sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+          <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Courses Grid -->
+    {% if courses %}
+      <div class="courses-grid">
+        {% for course in courses %}
+        <div class="course-card" onclick="window.location.href='{% url 'student_portal:course_detail' course.id %}'">
+          <div class="course-thumbnail">
+            {% if course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+            {% endif %}
+            <div class="course-badges">
+              {% if course.is_enrolled %}
+                <span class="course-badge badge-enrolled">
+                  <i class="fas fa-check-circle"></i> Enrolled
+                </span>
+              {% endif %}
+              {% if course.is_free %}
+                <span class="course-badge badge-free">Free</span>
+              {% else %}
+                <span class="course-badge badge-price">${{ course.price }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="course-body">
+            <div class="course-category">{{ course.category.name|default:"Course" }}</div>
+            <h3 class="course-title">{{ course.title }}</h3>
+            <p class="course-description">{{ course.description }}</p>
+
+            <div class="course-footer">
+              <div class="course-rating">
+                <span class="rating-stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= course.rating|floatformat:0 %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </span>
+                <span class="rating-value">{{ course.rating|floatformat:1 }}</span>
+                <span class="rating-count">({{ course.ratings_count|default:0 }})</span>
+              </div>
+              <a href="{% url 'student_portal:course_detail' course.id %}" class="course-action {% if course.is_enrolled %}enrolled{% endif %}">
+                {% if course.is_enrolled %}
+                  <i class="fas fa-play"></i> Continue
+                {% else %}
+                  View Course
+                {% endif %}
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if courses.has_other_pages %}
+      <div class="pagination-container">
+        <div class="pagination">
+          {% if courses.has_previous %}
+            <a href="?page={{ courses.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="page-btn">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          {% endif %}
+
+          {% for num in courses.paginator.page_range %}
+            {% if courses.number == num %}
+              <button class="page-btn active">{{ num }}</button>
+            {% elif num > courses.number|add:'-3' and num < courses.number|add:'3' %}
+              <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if courses.has_next %}
+            <a href="?page={{ courses.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="page-btn">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h2 class="empty-title">No courses found</h2>
+        <p class="empty-text">
+          {% if search_query %}
+            We couldn't find any courses matching "{{ search_query }}". Try different keywords or browse all courses.
+          {% else %}
+            No courses available at the moment. Check back soon!
+          {% endif %}
+        </p>
+        {% if search_query %}
+        <a href="{% url 'student_portal:browse_courses' %}" class="course-action">
+          <i class="fas fa-compass"></i> Browse All Courses
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

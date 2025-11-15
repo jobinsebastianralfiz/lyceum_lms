@@ -12,7 +12,10 @@ class EmailVerification(models.Model):
     verified_at = models.DateTimeField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     expires_at = models.DateTimeField()
-    
+
+    class Meta:
+        app_label = 'emails'
+
     def __str__(self):
         return f"Email verification for {self.user.email}"
     
@@ -57,6 +60,7 @@ class EmailTemplate(models.Model):
         return f"{self.name} ({self.template_type})"
     
     class Meta:
+        app_label = 'emails'
         unique_together = ['template_type']
 
 
@@ -90,4 +94,5 @@ class SentEmail(models.Model):
         return f"Email to {self.recipient_email} - {self.subject}"
     
     class Meta:
+        app_label = 'emails'
         ordering = ['-created_at']

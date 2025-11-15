@@ -27,6 +27,7 @@ class CourseRating(models.Model):
     is_approved = models.BooleanField(default=True, help_text="Admin can moderate reviews")
     
     class Meta:
+        app_label = 'ratings'
         unique_together = ('course', 'user')
         ordering = ['-created_at']
         verbose_name = 'Course Rating'
@@ -52,6 +53,7 @@ class CourseReview(models.Model):
     is_approved = models.BooleanField(default=True)
     
     class Meta:
+        app_label = 'ratings'
         ordering = ['-created_at']
         verbose_name = 'Course Review'
         verbose_name_plural = 'Course Reviews'
@@ -67,6 +69,7 @@ class ReviewHelpful(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        app_label = 'ratings'
         unique_together = ('review', 'user')
         verbose_name = 'Review Helpfulness Vote'
         verbose_name_plural = 'Review Helpfulness Votes'

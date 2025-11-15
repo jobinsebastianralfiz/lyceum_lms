@@ -187,27 +187,40 @@ def student_detail(request, student_id):
     course_progress = []
     for enrollment in enrollments:
         course = enrollment.course
-        modules = course.modules.all()
-        
-        # Video progress
-        videos_total = sum(module.video_lessons.count() for module in modules)
+
+        # Get modules through CourseModule many-to-many
+        from apps.courses.models import CourseModule, ModuleVideo, ModuleQuiz, ModuleAssignment
+        course_modules = CourseModule.objects.filter(course=course).select_related('module')
+        module_ids = [cm.module.id for cm in course_modules]
+
+        # Video progress - get videos through ModuleVideo many-to-many
+        module_videos = ModuleVideo.objects.filter(module_id__in=module_ids)
+        video_lesson_ids = [mv.video_lesson_id for mv in module_videos]
+
+        videos_total = len(video_lesson_ids)
         videos_completed = StudentProgress.objects.filter(
-            user=student, 
-            video_lesson__module__course=course,
+            user=student,
+            video_lesson_id__in=video_lesson_ids,
             completed=True
         ).count()
-        
-        # Quiz progress
+
+        # Quiz progress - get quizzes through ModuleQuiz many-to-many
+        module_quizzes = ModuleQuiz.objects.filter(module_id__in=module_ids)
+        quiz_ids = [mq.quiz_id for mq in module_quizzes]
+
         quiz_attempts = QuizAttempt.objects.filter(
             student=student,
-            quiz__module__course=course,
+            quiz_id__in=quiz_ids,
             completed=True
         )
-        
-        # Assignment progress
+
+        # Assignment progress - get assignments through ModuleAssignment many-to-many
+        module_assignments = ModuleAssignment.objects.filter(module_id__in=module_ids)
+        assignment_ids = [ma.assignment_id for ma in module_assignments]
+
         assignment_submissions = AssignmentSubmission.objects.filter(
             student=student,
-            assignment__module__course=course
+            assignment_id__in=assignment_ids
         ).exclude(status='draft')
         
         course_progress.append({

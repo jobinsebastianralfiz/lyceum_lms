@@ -1,67 +1,269 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Terms & Conditions - Uptrail{% endblock %}
+{% block title %}Terms & Conditions - Lyceum Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Dark Theme for Policy Pages */
+.policy-hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  padding: 150px 0 80px;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+}
+
+.policy-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.policy-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 20px;
+}
+
+.policy-hero .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+}
+
+.policy-hero .breadcrumb-item {
+  color: #CBD5E1;
+}
+
+.policy-hero .breadcrumb-item a {
+  color: #2AB673;
+  text-decoration: none;
+}
+
+.policy-hero .breadcrumb-item + .breadcrumb-item::before {
+  color: #CBD5E1;
+}
+
+.policy-content {
+  background: #0F172A;
+  padding: 80px 0;
+}
+
+.policy-card {
+  background: #1E293B;
+  border-radius: 16px;
+  padding: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: none !important;
+}
+
+.policy-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #334155;
+}
+
+.policy-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2AB673;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.policy-card p {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.policy-card ul, .policy-card ol {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  padding-left: 30px;
+}
+
+.policy-card li {
+  margin-bottom: 12px;
+  color: #CBD5E1;
+}
+
+.policy-card strong {
+  color: #F9FAFB;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .policy-hero h1 {
+    font-size: 2rem;
+  }
+
+  .policy-card {
+    padding: 30px 20px;
+  }
+
+  .policy-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .policy-card h3 {
+    font-size: 1.4rem;
+  }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="cs-height_90 cs-height_lg_80"></div>
-
-<!-- Start Page Heading -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 300px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<!-- Hero Section -->
+<section class="policy-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">Terms & <b>Conditions</b></h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item">Terms & Conditions</li>
-      </ol>
+    <div class="policy-hero-content">
+      <h1>Terms & Conditions</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Terms & Conditions</li>
+        </ol>
+      </nav>
     </div>
   </div>
-</div>
-<!-- End Page Heading -->
+</section>
 
-<!-- Start Content -->
-<div class="cs-height_140 cs-height_lg_80"></div>
-<div class="container">
-  <div class="row">
-    <div class="col-lg-8 offset-lg-2">
-      <div class="cs-text_box cs-style1">
-        <h2 class="cs-text_box_title">Terms & Conditions</h2>
-        <div class="cs-height_25 cs-height_lg_25"></div>
-        <div class="cs-text_box_text">
-          <p>Welcome to Uptrail. These Terms and Conditions govern your use of our learning management platform. By accessing or using Uptrail, you agree to be bound by these terms.</p>
-          
+<!-- Content Section -->
+<section class="policy-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 offset-lg-1">
+        <div class="policy-card">
+          <h2>Terms & Conditions</h2>
+
+          <p>Welcome to Lyceum Academy. These Terms and Conditions govern your use of our learning management platform. By accessing or using Lyceum Academy, you agree to be bound by these terms.</p>
+
+          <h3>Acceptance of Terms</h3>
+          <p>By creating an account or using any part of our platform, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you may not use our services.</p>
+
           <h3>Use of Our Service</h3>
           <p>You may use our service only as permitted by law and these Terms. You agree to:</p>
           <ul>
             <li>Provide accurate and complete information when creating your account</li>
-            <li>Maintain the security of your account credentials</li>
-            <li>Use our platform for legitimate educational purposes</li>
-            <li>Respect intellectual property rights</li>
+            <li>Maintain the security of your account credentials and not share them with others</li>
+            <li>Use our platform for legitimate educational purposes only</li>
+            <li>Respect intellectual property rights of all content creators and instructors</li>
+            <li>Not engage in any activity that interferes with or disrupts our services</li>
+            <li>Comply with all applicable laws and regulations</li>
           </ul>
-          
-          <h3>Course Access and Content</h3>
-          <p>When you enroll in a course, you receive a license to access the course materials for personal, non-commercial use. You may not:</p>
+
+          <h3>Account Registration and Security</h3>
+          <p>To access certain features of our platform, you must register for an account. You are responsible for:</p>
           <ul>
-            <li>Share your account with others</li>
-            <li>Reproduce or distribute course materials</li>
-            <li>Reverse engineer or attempt to extract source code</li>
+            <li>Maintaining the confidentiality of your password and account</li>
+            <li>All activities that occur under your account</li>
+            <li>Notifying us immediately of any unauthorized use of your account</li>
+            <li>Ensuring your contact information is current and accurate</li>
           </ul>
-          
+
+          <h3>Course Access and Content</h3>
+          <p>When you enroll in a course, you receive a non-transferable license to access the course materials for personal, non-commercial use. You may not:</p>
+          <ul>
+            <li>Share your account credentials with others</li>
+            <li>Reproduce, distribute, or publicly display course materials without permission</li>
+            <li>Reverse engineer or attempt to extract source code from our platform</li>
+            <li>Use course content for commercial purposes without explicit authorization</li>
+            <li>Download or copy course materials except where explicitly permitted</li>
+            <li>Remove or modify any copyright, trademark, or other proprietary notices</li>
+          </ul>
+
           <h3>Payment Terms</h3>
-          <p>Payment for courses is due at the time of enrollment. All sales are final unless otherwise specified in our refund policy.</p>
-          
+          <p>Payment for courses is due at the time of enrollment unless otherwise specified. By providing payment information, you represent that:</p>
+          <ul>
+            <li>You are authorized to use the payment method provided</li>
+            <li>All payment information is accurate and current</li>
+            <li>You will pay all applicable fees and charges</li>
+          </ul>
+          <p>All prices are subject to change. We reserve the right to refuse or cancel any order for any reason.</p>
+
+          <h3>Refund and Cancellation Policy</h3>
+          <p>Our refund and cancellation policies are outlined in separate documents. Please refer to our Refund Policy and Cancellation Policy for detailed information about eligibility, timelines, and procedures.</p>
+
+          <h3>Intellectual Property Rights</h3>
+          <p>All content on Lyceum Academy, including but not limited to text, graphics, logos, videos, and software, is the property of Lyceum Academy or its content suppliers and is protected by copyright, trademark, and other intellectual property laws.</p>
+
+          <h3>User Conduct and Content</h3>
+          <p>You agree not to use our platform to:</p>
+          <ul>
+            <li>Post or transmit any unlawful, threatening, abusive, or obscene material</li>
+            <li>Impersonate any person or entity</li>
+            <li>Interfere with or disrupt the platform or servers</li>
+            <li>Upload viruses or other malicious code</li>
+            <li>Collect information about other users without consent</li>
+            <li>Violate any applicable laws or regulations</li>
+          </ul>
+
+          <h3>Disclaimer of Warranties</h3>
+          <p>Lyceum Academy provides the platform and services "as is" and "as available" without warranty of any kind, either express or implied. We do not warrant that:</p>
+          <ul>
+            <li>The service will be uninterrupted, secure, or error-free</li>
+            <li>The results obtained from the use of our service will be accurate or reliable</li>
+            <li>Any errors in the platform will be corrected</li>
+          </ul>
+
           <h3>Limitation of Liability</h3>
-          <p>Uptrail provides the platform "as is" without warranty of any kind. We are not liable for any damages arising from your use of our services.</p>
-          
+          <p>To the fullest extent permitted by law, Lyceum Academy shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from:</p>
+          <ul>
+            <li>Your use or inability to use our services</li>
+            <li>Any unauthorized access to or use of our servers and/or any personal information stored therein</li>
+            <li>Any interruption or cessation of transmission to or from our services</li>
+            <li>Any bugs, viruses, or other harmful code that may be transmitted through our services</li>
+          </ul>
+
+          <h3>Indemnification</h3>
+          <p>You agree to indemnify and hold harmless Lyceum Academy, its affiliates, and their respective officers, directors, employees, and agents from any claims, losses, damages, liabilities, including legal fees, arising out of your use or misuse of our platform, violation of these Terms, or infringement of any intellectual property or other rights.</p>
+
+          <h3>Modifications to Service and Terms</h3>
+          <p>We reserve the right to modify or discontinue, temporarily or permanently, the service (or any part thereof) with or without notice. We may also modify these Terms at any time. Your continued use of the platform after any such changes constitutes your acceptance of the new Terms.</p>
+
+          <h3>Termination</h3>
+          <p>We may terminate or suspend your account and access to our services immediately, without prior notice or liability, for any reason, including if you breach these Terms. Upon termination, your right to use the services will immediately cease.</p>
+
+          <h3>Governing Law</h3>
+          <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which Lyceum Academy operates, without regard to its conflict of law provisions.</p>
+
+          <h3>Dispute Resolution</h3>
+          <p>Any disputes arising out of or relating to these Terms or our services shall first be attempted to be resolved through good faith negotiations. If the dispute cannot be resolved through negotiations, it shall be resolved through binding arbitration in accordance with applicable arbitration rules.</p>
+
+          <h3>Severability</h3>
+          <p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+
           <h3>Contact Information</h3>
-          <p>For questions about these Terms & Conditions, please contact us at legal@uptrail.com</p>
+          <p>If you have any questions about these Terms & Conditions, please contact us at:</p>
+          <p><strong>Email:</strong> legal@lyceumacademy.com<br>
+          <strong>Address:</strong> Lyceum Academy, [Your Address]</p>
+
+          <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #94A3B8; font-size: 0.9rem;">
+            <strong>Last Updated:</strong> January 2025
+          </p>
         </div>
       </div>
     </div>
   </div>
-</div>
-<div class="cs-height_140 cs-height_lg_80"></div>
-<!-- End Content -->
+</section>
 {% endblock %}

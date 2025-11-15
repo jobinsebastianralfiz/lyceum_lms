@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse
-from django.db.models import Q
+from django.db.models import Q, Case, When
 
 from .models import (
     Category, Course, Module, VideoLesson, StudentProgress,
@@ -174,12 +174,8 @@ class CourseDetailView(generics.RetrieveAPIView):
             # For anonymous users, only show public courses
             queryset = Course.objects.filter(is_published=True, allow_public_enrollment=True)
         
-        return queryset.select_related('category', 'created_by').prefetch_related(
-            'modules__video_lessons',
-            'modules__assignments', 
-            'modules__quizzes',
-            'modules__student_progress'
-        )
+        # The serializer handles all prefetching via SerializerMethodField
+        return queryset.select_related('category', 'created_by')
 
 @extend_schema_view(
     get=extend_schema(
@@ -194,21 +190,27 @@ class CourseDetailView(generics.RetrieveAPIView):
 )
 class EnrolledCoursesView(generics.ListAPIView):
     """
-    List courses that the authenticated student is enrolled in.
+    List courses that the authenticated student is enrolled in with full details.
+    Includes modules, course-level assignments, quizzes, and PDFs.
     """
-    serializer_class = CourseListSerializer
+    serializer_class = CourseDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         from apps.payments.models import Enrollment
         enrolled_course_ids = Enrollment.objects.filter(
             user=self.request.user,
             active=True
         ).values_list('course_id', flat=True)
-        
+
         return Course.objects.filter(
             id__in=enrolled_course_ids
-        ).select_related('category')
+        ).select_related('category').prefetch_related(
+            'module_links__module',
+            'assignment_links__assignment',
+            'quiz_links__quiz',
+            'pdf_links__pdf_note'
+        )
 
 @extend_schema_view(
     get=extend_schema(
@@ -360,15 +362,21 @@ class ModuleAssignmentsView(generics.ListAPIView):
         # Check if user is enrolled in the course
         from apps.payments.models import Enrollment
         module = Module.objects.get(id=module_id)
-        
+
         if not Enrollment.objects.filter(
-            user=self.request.user, 
-            course=module.course, 
+            user=self.request.user,
+            course=module.course,
             active=True
         ).exists():
             return Assignment.objects.none()
-        
-        return Assignment.objects.filter(module_id=module_id).order_by('order')
+
+        # Get assignments linked to this module via many-to-many relationship
+        assignment_links = module.assignment_links.select_related('assignment').order_by('order')
+        assignment_ids = [link.assignment_id for link in assignment_links]
+
+        # Return assignments preserving the order from the through model
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(assignment_ids)])
+        return Assignment.objects.filter(id__in=assignment_ids).order_by(preserved)
 
 
 @extend_schema_view(
@@ -387,12 +395,21 @@ class AssignmentDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        # Check if user is enrolled in the course
+        # Check if user is enrolled in any course that contains this assignment
         from apps.payments.models import Enrollment
+
+        # Get enrolled courses for the user
+        enrolled_course_ids = Enrollment.objects.filter(
+            user=self.request.user,
+            active=True
+        ).values_list('course_id', flat=True)
+
+        # Return assignments that are linked to modules in enrolled courses
         return Assignment.objects.filter(
-            module__course__enrollment__user=self.request.user,
-            module__course__enrollment__active=True
-        )
+            Q(modules__course_id__in=enrolled_course_ids) |
+            Q(courses__id__in=enrolled_course_ids) |
+            Q(video_lessons__module__course_id__in=enrolled_course_ids)
+        ).distinct()
 
 
 @extend_schema_view(
@@ -420,16 +437,23 @@ class AssignmentSubmissionView(generics.ListCreateAPIView):
     def get_queryset(self):
         return AssignmentSubmission.objects.filter(
             student=self.request.user
-        ).select_related('assignment', 'assignment__module', 'assignment__module__course')
-    
+        ).select_related('assignment').prefetch_related('assignment__courses', 'assignment__modules', 'assignment__video_lessons')
+
     def perform_create(self, serializer):
         assignment = serializer.validated_data['assignment']
-        
-        # Check if user is enrolled in the course
+
+        # Check if user is enrolled in any course that contains this assignment
         from apps.payments.models import Enrollment
-        if not Enrollment.objects.filter(
+
+        # Get all courses that contain this assignment (at any level)
+        course_ids = set()
+        course_ids.update(assignment.courses.values_list('id', flat=True))
+        course_ids.update(assignment.modules.values_list('course_id', flat=True))
+        course_ids.update(assignment.video_lessons.values_list('module__course_id', flat=True))
+
+        if not course_ids or not Enrollment.objects.filter(
             user=self.request.user,
-            course=assignment.module.course,
+            course_id__in=course_ids,
             active=True
         ).exists():
             from rest_framework.exceptions import PermissionDenied
@@ -511,15 +535,21 @@ class ModuleQuizzesView(generics.ListAPIView):
         # Check if user is enrolled in the course
         from apps.payments.models import Enrollment
         module = Module.objects.get(id=module_id)
-        
+
         if not Enrollment.objects.filter(
             user=self.request.user,
             course=module.course,
             active=True
         ).exists():
             return Quiz.objects.none()
-        
-        return Quiz.objects.filter(module_id=module_id).order_by('order').prefetch_related('questions__choices')
+
+        # Get quizzes linked to this module via many-to-many relationship
+        quiz_links = module.quiz_links.select_related('quiz').order_by('order')
+        quiz_ids = [link.quiz_id for link in quiz_links]
+
+        # Return quizzes preserving the order from the through model
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(quiz_ids)])
+        return Quiz.objects.filter(id__in=quiz_ids).order_by(preserved).prefetch_related('questions__choices')
 
 
 @extend_schema_view(
@@ -538,12 +568,21 @@ class QuizDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        # Check if user is enrolled in the course
+        # Check if user is enrolled in any course that contains this quiz
         from apps.payments.models import Enrollment
+
+        # Get enrolled courses for the user
+        enrolled_course_ids = Enrollment.objects.filter(
+            user=self.request.user,
+            active=True
+        ).values_list('course_id', flat=True)
+
+        # Return quizzes that are linked to modules/courses/videos in enrolled courses
         return Quiz.objects.filter(
-            module__course__enrollment__user=self.request.user,
-            module__course__enrollment__active=True
-        ).prefetch_related('questions__choices')
+            Q(modules__course_id__in=enrolled_course_ids) |
+            Q(courses__id__in=enrolled_course_ids) |
+            Q(video_lessons__module__course_id__in=enrolled_course_ids)
+        ).distinct().prefetch_related('questions__choices')
 
 
 @extend_schema_view(
@@ -564,12 +603,19 @@ class StartQuizAttemptView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         quiz_id = kwargs['quiz_id']
         quiz = Quiz.objects.get(id=quiz_id)
-        
-        # Check if user is enrolled
+
+        # Check if user is enrolled in any course that contains this quiz
         from apps.payments.models import Enrollment
-        if not Enrollment.objects.filter(
+
+        # Get all courses that contain this quiz (at any level)
+        course_ids = set()
+        course_ids.update(quiz.courses.values_list('id', flat=True))
+        course_ids.update(quiz.modules.values_list('course_id', flat=True))
+        course_ids.update(quiz.video_lessons.values_list('module__course_id', flat=True))
+
+        if not course_ids or not Enrollment.objects.filter(
             user=request.user,
-            course=quiz.module.course,
+            course_id__in=course_ids,
             active=True
         ).exists():
             return Response(
@@ -671,16 +717,18 @@ class SubmitQuizAnswersView(APIView):
         # Update attempt
         attempt.score = total_score
         attempt.complete()
-        
-        # Update module progress
-        try:
-            module_progress = ModuleProgress.objects.get(
-                student=request.user,
-                module=attempt.quiz.module
-            )
-            module_progress.check_completion()
-        except ModuleProgress.DoesNotExist:
-            pass
+
+        # Update module progress for all modules that contain this quiz
+        quiz_modules = attempt.quiz.modules.all()
+        for module in quiz_modules:
+            try:
+                module_progress = ModuleProgress.objects.get(
+                    student=request.user,
+                    module=module
+                )
+                module_progress.check_completion()
+            except ModuleProgress.DoesNotExist:
+                pass
         
         serializer = QuizAttemptSerializer(attempt)
         return Response(serializer.data)

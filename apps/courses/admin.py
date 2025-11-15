@@ -3,7 +3,10 @@ from django import forms
 from .models import (
     Category, Course, Module, VideoLesson, StudentProgress,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer, ModuleProgress
+    QuizAttempt, QuizAnswer, ModuleProgress, CourseModule, ModuleVideo,
+    ModuleAssignment, ModuleQuiz, PDFNote,
+    CourseAssignment, CourseQuiz, CoursePDF,
+    VideoAssignment, VideoQuiz, VideoPDF, ModulePDF
 )
 from .admin_actions import publish_courses, unpublish_courses, export_courses_csv, duplicate_course
 
@@ -33,29 +36,85 @@ class CourseAdminForm(forms.ModelForm):
         fields = '__all__'
 
 class ModuleInline(admin.TabularInline):
-    model = Module
+    model = CourseModule
     extra = 1
-    fields = ('title', 'order')
+    fields = ('module', 'order')
     ordering = ('order',)
 
 class VideoLessonInline(admin.TabularInline):
-    model = VideoLesson
+    model = ModuleVideo
     extra = 1
-    fields = ('title', 'youtube_video_id', 'youtube_url', 'duration', 'order', 'is_preview')
+    fields = ('video_lesson', 'order')
     readonly_fields = ()
     ordering = ('order',)
 
 class AssignmentInline(admin.TabularInline):
-    model = Assignment
+    model = ModuleAssignment
     extra = 0
-    fields = ('title', 'max_points', 'passing_score', 'is_required', 'order')
+    fields = ('assignment', 'order')
     ordering = ('order',)
 
 class QuizInline(admin.TabularInline):
-    model = Quiz
+    model = ModuleQuiz
     extra = 0
-    fields = ('title', 'time_limit', 'max_attempts', 'is_required', 'order')
+    fields = ('quiz', 'order')
     ordering = ('order',)
+
+class CourseAssignmentInline(admin.TabularInline):
+    model = CourseAssignment
+    extra = 0
+    fields = ('assignment', 'order')
+    ordering = ('order',)
+    verbose_name = "Course Assignment"
+    verbose_name_plural = "Course Assignments"
+
+class CourseQuizInline(admin.TabularInline):
+    model = CourseQuiz
+    extra = 0
+    fields = ('quiz', 'order')
+    ordering = ('order',)
+    verbose_name = "Course Quiz"
+    verbose_name_plural = "Course Quizzes"
+
+class CoursePDFInline(admin.TabularInline):
+    model = CoursePDF
+    extra = 0
+    fields = ('pdf_note', 'order')
+    ordering = ('order',)
+    verbose_name = "Course PDF Note"
+    verbose_name_plural = "Course PDF Notes"
+
+class ModulePDFInline(admin.TabularInline):
+    model = ModulePDF
+    extra = 0
+    fields = ('pdf_note', 'order')
+    ordering = ('order',)
+    verbose_name = "Module PDF Note"
+    verbose_name_plural = "Module PDF Notes"
+
+class VideoAssignmentInline(admin.TabularInline):
+    model = VideoAssignment
+    extra = 0
+    fields = ('assignment', 'order')
+    ordering = ('order',)
+    verbose_name = "Video Assignment"
+    verbose_name_plural = "Video Assignments"
+
+class VideoQuizInline(admin.TabularInline):
+    model = VideoQuiz
+    extra = 0
+    fields = ('quiz', 'order')
+    ordering = ('order',)
+    verbose_name = "Video Quiz"
+    verbose_name_plural = "Video Quizzes"
+
+class VideoPDFInline(admin.TabularInline):
+    model = VideoPDF
+    extra = 0
+    fields = ('pdf_note', 'order')
+    ordering = ('order',)
+    verbose_name = "Video PDF Note"
+    verbose_name_plural = "Video PDF Notes"
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -70,7 +129,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('category', 'is_free', 'is_published', 'allow_public_enrollment', 'created_at')
     search_fields = ('title', 'description', 'curriculum', 'what_you_will_learn')
     readonly_fields = ('is_free_course_display', 'total_price_display_formatted', 'tax_amount_display', 'price_display_formatted', 'total_price_display', 'created_at', 'updated_at')
-    inlines = [ModuleInline]
+    inlines = [ModuleInline, CourseAssignmentInline, CourseQuizInline, CoursePDFInline]
     actions = [publish_courses, unpublish_courses, export_courses_csv, duplicate_course]
     
     class Media:
@@ -147,17 +206,18 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Module)
 class ModuleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'order', 'created_at')
-    list_filter = ('course', 'created_at')
-    search_fields = ('title', 'course__title')
-    inlines = [VideoLessonInline, AssignmentInline, QuizInline]
+    list_display = ('title', 'difficulty_level', 'is_active', 'created_at')
+    list_filter = ('difficulty_level', 'is_active', 'created_at')
+    search_fields = ['title', 'description', 'tags']
+    inlines = [VideoLessonInline, AssignmentInline, QuizInline, ModulePDFInline]
 
 @admin.register(VideoLesson)
 class VideoLessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module', 'youtube_video_id', 'duration', 'is_preview', 'order')
-    list_filter = ('module__course', 'is_preview', 'created_at')
-    search_fields = ('title', 'youtube_video_id', 'module__title')
+    list_display = ('title', 'platform', 'duration', 'is_preview', 'created_at')
+    list_filter = ('platform', 'is_preview', 'created_at')
+    search_fields = ['title', 'description', 'video_id']
     readonly_fields = ('created_at', 'updated_at')
+    inlines = [VideoAssignmentInline, VideoQuizInline, VideoPDFInline]
 
 @admin.register(StudentProgress)
 class StudentProgressAdmin(admin.ModelAdmin):
@@ -186,17 +246,17 @@ class QuizQuestionInline(admin.StackedInline):
 
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module', 'max_points', 'passing_score', 'is_required', 'order', 'created_at')
-    list_filter = ('module__course', 'is_required', 'created_at')
-    search_fields = ('title', 'module__title', 'module__course__title')
+    list_display = ('title', 'max_points', 'passing_score', 'is_required', 'created_at')
+    list_filter = ('is_required', 'created_at')
+    search_fields = ['title', 'description', 'requirements']
     readonly_fields = ('created_at', 'updated_at')
-    
+
     fieldsets = (
         ('Assignment Details', {
-            'fields': ('module', 'title', 'description', 'requirements', 'resources')
+            'fields': ('title', 'description', 'requirements', 'resources')
         }),
         ('Scoring & Requirements', {
-            'fields': ('max_points', 'passing_score', 'due_days', 'is_required', 'order')
+            'fields': ('max_points', 'passing_score', 'due_days', 'is_required')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -207,18 +267,18 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'module', 'total_questions', 'time_limit', 'passing_score', 'is_required', 'order')
-    list_filter = ('module__course', 'is_required', 'created_at')
-    search_fields = ('title', 'module__title', 'module__course__title')
+    list_display = ('title', 'total_questions', 'time_limit', 'passing_score', 'is_required', 'created_at')
+    list_filter = ('is_required', 'created_at')
+    search_fields = ['title', 'description']
     readonly_fields = ('total_questions', 'total_points', 'created_at', 'updated_at')
     inlines = [QuizQuestionInline]
-    
+
     fieldsets = (
         ('Quiz Details', {
-            'fields': ('module', 'title', 'description')
+            'fields': ('title', 'description')
         }),
         ('Quiz Settings', {
-            'fields': ('time_limit', 'max_attempts', 'passing_score', 'is_required', 'order')
+            'fields': ('time_limit', 'max_attempts', 'passing_score', 'is_required')
         }),
         ('Display Options', {
             'fields': ('randomize_questions', 'show_results_immediately')
@@ -237,7 +297,7 @@ class QuizAdmin(admin.ModelAdmin):
 @admin.register(QuizQuestion)
 class QuizQuestionAdmin(admin.ModelAdmin):
     list_display = ('quiz', 'question_text_short', 'question_type', 'points', 'order')
-    list_filter = ('quiz__module__course', 'question_type')
+    list_filter = ('question_type',)
     search_fields = ('question_text', 'quiz__title')
     inlines = [QuizChoiceInline]
     
@@ -249,7 +309,7 @@ class QuizQuestionAdmin(admin.ModelAdmin):
 @admin.register(AssignmentSubmission)
 class AssignmentSubmissionAdmin(admin.ModelAdmin):
     list_display = ('student_name', 'assignment', 'status', 'score_display', 'submitted_at', 'graded_at')
-    list_filter = ('status', 'assignment__module__course', 'submitted_at', 'graded_at')
+    list_filter = ('status', 'submitted_at', 'graded_at')
     search_fields = ('student__name', 'student__email', 'assignment__title', 'github_url')
     readonly_fields = ('submitted_at', 'created_at', 'updated_at', 'score_percentage')
     
@@ -293,7 +353,7 @@ class AssignmentSubmissionAdmin(admin.ModelAdmin):
 @admin.register(QuizAttempt)
 class QuizAttemptAdmin(admin.ModelAdmin):
     list_display = ('student_name', 'quiz', 'attempt_number', 'score_display', 'completed', 'started_at', 'completed_at')
-    list_filter = ('completed', 'quiz__module__course', 'started_at')
+    list_filter = ('completed', 'started_at')
     search_fields = ('student__name', 'student__email', 'quiz__title')
     readonly_fields = ('score_percentage', 'started_at', 'completed_at')
     
@@ -309,8 +369,8 @@ class QuizAttemptAdmin(admin.ModelAdmin):
 @admin.register(ModuleProgress)
 class ModuleProgressAdmin(admin.ModelAdmin):
     list_display = ('student_name', 'module', 'completion_percentage', 'is_completed', 'is_unlocked', 'completed_at')
-    list_filter = ('is_completed', 'is_unlocked', 'module__course', 'completed_at')
-    search_fields = ('student__name', 'student__email', 'module__title', 'module__course__title')
+    list_filter = ('is_completed', 'is_unlocked', 'completed_at')
+    search_fields = ('student__name', 'student__email', 'module__title')
     readonly_fields = ('completion_percentage', 'started_at', 'completed_at', 'created_at', 'updated_at')
     
     def student_name(self, obj):
@@ -326,3 +386,39 @@ class ModuleProgressAdmin(admin.ModelAdmin):
             updated_count += 1
         self.message_user(request, f"Recalculated progress for {updated_count} modules.")
     recalculate_progress.short_description = "Recalculate progress for selected modules"
+
+
+@admin.register(PDFNote)
+class PDFNoteAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_downloadable', 'file_size_display', 'page_count', 'created_at')
+    list_filter = ('is_downloadable', 'created_at')
+    search_fields = ('title', 'description')
+    readonly_fields = ('file_size', 'created_at', 'updated_at')
+
+    def file_size_display(self, obj):
+        if not obj.file_size:
+            return "N/A"
+        # Convert bytes to MB
+        size_mb = obj.file_size / (1024 * 1024)
+        if size_mb < 1:
+            size_kb = obj.file_size / 1024
+            return f"{size_kb:.2f} KB"
+        return f"{size_mb:.2f} MB"
+    file_size_display.short_description = 'File Size'
+
+    fieldsets = (
+        ('PDF Information', {
+            'fields': ('title', 'description', 'pdf_file')
+        }),
+        ('Settings', {
+            'fields': ('is_downloadable',)
+        }),
+        ('File Details', {
+            'fields': ('file_size', 'page_count'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )

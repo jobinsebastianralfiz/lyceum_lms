@@ -1,154 +1,298 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Refund Policy - Uptrail{% endblock %}
-{% block description %}Learn about Uptrail's refund policy and how to request refunds for courses.{% endblock %}
+{% block title %}Refund Policy - Lyceum Academy{% endblock %}
+{% block description %}Learn about Lyceum Academy's refund policy and how to request refunds for courses.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Dark Theme for Policy Pages */
+.policy-hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  padding: 150px 0 80px;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+}
+
+.policy-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
+}
+
+.policy-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.policy-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 20px;
+}
+
+.policy-hero .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+}
+
+.policy-hero .breadcrumb-item {
+  color: #CBD5E1;
+}
+
+.policy-hero .breadcrumb-item a {
+  color: #2AB673;
+  text-decoration: none;
+}
+
+.policy-hero .breadcrumb-item + .breadcrumb-item::before {
+  color: #CBD5E1;
+}
+
+.policy-content {
+  background: #0F172A;
+  padding: 80px 0;
+}
+
+.policy-card {
+  background: #1E293B;
+  border-radius: 16px;
+  padding: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: none !important;
+}
+
+.policy-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #334155;
+}
+
+.policy-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2AB673;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.policy-card h4 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #F9FAFB;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.policy-card p {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.policy-card ul, .policy-card ol {
+  color: #CBD5E1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  padding-left: 30px;
+}
+
+.policy-card li {
+  margin-bottom: 12px;
+  color: #CBD5E1;
+}
+
+.policy-card strong {
+  color: #F9FAFB;
+  font-weight: 600;
+}
+
+.policy-card a {
+  color: #2AB673;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.policy-card a:hover {
+  color: #3DD186;
+  text-decoration: underline;
+}
+
+.important-note {
+  background: rgba(42, 182, 115, 0.1);
+  border-left: 4px solid #2AB673;
+  padding: 20px 25px;
+  border-radius: 8px;
+  margin-top: 40px;
+}
+
+.important-note p {
+  margin: 0;
+  color: #CBD5E1;
+}
+
+.important-note strong {
+  color: #2AB673;
+}
+
+@media (max-width: 768px) {
+  .policy-hero h1 {
+    font-size: 2rem;
+  }
+
+  .policy-card {
+    padding: 30px 20px;
+  }
+
+  .policy-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .policy-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .policy-card h4 {
+    font-size: 1.2rem;
+  }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="cs-height_150 cs-height_lg_120"></div>
-
-<!-- Start Page Heading -->
-<div class="cs-hero cs-style7 cs-accent_bg_2 cs-center cs-hobble" style="min-height: 300px;">
-  <div class="cs-hero_bg_frame"><div class="cs-hero_bg"></div></div>
+<!-- Hero Section -->
+<section class="policy-hero">
   <div class="container">
-    <div class="cs-hero_text">
-      <h1 class="cs-hero_title">Refund <b>Policy</b></h1>
-      <ol class="cs-breadcrumb cs-style2 cs-type1">
-        <li class="cs-breadcrumb_item"><a href="{% url 'landing:home' %}" class="cs-primary_color">Home</a></li>
-        <li class="cs-breadcrumb_item">Refund Policy</li>
-      </ol>
+    <div class="policy-hero-content">
+      <h1>Refund Policy</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Refund Policy</li>
+        </ol>
+      </nav>
     </div>
   </div>
-</div>
-<!-- End Page Heading -->
+</section>
 
-<!-- Start Content -->
-<div class="cs-height_140 cs-height_lg_80"></div>
-<div class="container">
-  <div class="row">
-    <div class="col-lg-8 offset-lg-2">
-      <div class="cs-text_box cs-style1">
-        <h2 class="cs-text_box_title">Refund Policy</h2>
-        <div class="cs-height_30"></div>
-        <p>At Uptrail, we are committed to providing high-quality educational content and ensuring student satisfaction. This refund policy outlines the conditions under which refunds may be requested and processed.</p>
-        <p><strong>Last Updated:</strong> January 1, 2024</p>
-        
-        <div class="cs-height_40"></div>
-        
-        <h3 class="cs-text_box_title">1. 7-Day Money-Back Guarantee</h3>
-        <div class="cs-height_20"></div>
-        <p>We offer a 7-day money-back guarantee on all paid courses, subject to the following conditions:</p>
-        <ul>
-          <li>Refund requests must be made within 7 days of the original purchase date</li>
-          <li>You must not have completed more than 30% of the course content</li>
-          <li>You must not have downloaded any course materials or certificates</li>
-          <li>The request must include a valid reason for the refund</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">2. Refund Eligibility Criteria</h3>
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Eligible for Refund:</strong></h4>
-        <ul>
-          <li>Technical issues that prevent access to course content (if not resolved within 48 hours)</li>
-          <li>Course content significantly different from what was advertised</li>
-          <li>Quality issues with video or audio content that affect learning</li>
-          <li>Duplicate purchase made in error</li>
-          <li>Unauthorized purchase made by someone else using your account</li>
-        </ul>
-        
-        <div class="cs-height_20"></div>
-        
-        <h4><strong>Not Eligible for Refund:</strong></h4>
-        <ul>
-          <li>Requests made after the 7-day period</li>
-          <li>Courses that have been completed or significantly progressed (>30%)</li>
-          <li>Change of mind after completing significant portions of the course</li>
-          <li>Free courses or promotional content</li>
-          <li>Requests due to lack of time to complete the course</li>
-          <li>Technical issues on the student's end (poor internet connection, outdated browser, etc.)</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">3. How to Request a Refund</h3>
-        <div class="cs-height_20"></div>
-        <p>To request a refund, please follow these steps:</p>
-        <ol>
-          <li>Log into your Uptrail account and go to your dashboard</li>
-          <li>Navigate to the "My Courses" section</li>
-          <li>Find the course you want to refund and click on "Request Refund"</li>
-          <li>Fill out the refund form with the required information and reason</li>
-          <li>Submit the request and wait for our team to review it</li>
-        </ol>
-        <p>Alternatively, you can contact our support team directly at <a href="mailto:support@uptrail.info">support@uptrail.info</a> with your refund request.</p>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">4. Processing Time</h3>
-        <div class="cs-height_20"></div>
-        <ul>
-          <li><strong>Review Process:</strong> 2-3 business days to review your refund request</li>
-          <li><strong>Approval Notification:</strong> You'll receive an email confirmation once approved</li>
-          <li><strong>Refund Processing:</strong> 5-10 business days for the refund to appear in your original payment method</li>
-          <li><strong>Bank Processing:</strong> Additional 2-5 business days depending on your bank</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">5. Refund Methods</h3>
-        <div class="cs-height_20"></div>
-        <p>Refunds will be processed using the same payment method used for the original purchase:</p>
-        <ul>
-          <li><strong>Credit/Debit Cards:</strong> Refunded to the original card</li>
-          <li><strong>UPI/Net Banking:</strong> Refunded to the original bank account</li>
-          <li><strong>Digital Wallets:</strong> Refunded to the original wallet</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">6. Special Circumstances</h3>
-        <div class="cs-height_20"></div>
-        <p><strong>Promotional Courses:</strong> Courses purchased during special promotions or with discount codes are subject to the same refund policy, but the refund amount will be the actual amount paid.</p>
-        <p><strong>Bundle Courses:</strong> If you purchased a course bundle, refunds will be calculated based on the individual course prices and the portion you've accessed.</p>
-        <p><strong>Subscription Services:</strong> Monthly or yearly subscriptions can be cancelled at any time, but refunds are only provided for the unused portion of prepaid periods.</p>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">7. Contact Us</h3>
-        <div class="cs-height_20"></div>
-        <p>If you have any questions about this refund policy or need assistance with a refund request, please contact us:</p>
-        <ul>
-          <li><strong>Email:</strong> <a href="mailto:support@uptrail.info">support@uptrail.info</a></li>
-          <li><strong>Phone:</strong> +91 123 456 7890</li>
-          <li><strong>Support Hours:</strong> Monday to Friday, 9:00 AM - 6:00 PM IST</li>
-          <li><strong>Response Time:</strong> Within 24 hours</li>
-        </ul>
-        
-        <div class="cs-height_30"></div>
-        
-        <h3 class="cs-text_box_title">8. Changes to This Policy</h3>
-        <div class="cs-height_20"></div>
-        <p>We reserve the right to modify this refund policy at any time. Changes will be effective immediately upon posting on this page. We encourage you to review this policy periodically for any updates.</p>
-        
-        <div class="cs-height_50"></div>
-        
-        <!-- Important Note -->
-        <div class="cs-note cs-style1">
-          <div class="cs-note_left">
-            <i class="fas fa-exclamation-triangle cs-accent_color"></i>
+<!-- Content Section -->
+<section class="policy-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 offset-lg-1">
+        <div class="policy-card">
+          <h2>Refund Policy</h2>
+
+          <p>At Lyceum Academy, we are committed to providing high-quality educational content and ensuring student satisfaction. This refund policy outlines the conditions under which refunds may be requested and processed.</p>
+          <p><strong>Last Updated:</strong> January 2025</p>
+
+          <h3>1. 7-Day Money-Back Guarantee</h3>
+          <p>We offer a 7-day money-back guarantee on all paid courses, subject to the following conditions:</p>
+          <ul>
+            <li>Refund requests must be made within 7 days of the original purchase date</li>
+            <li>You must not have completed more than 30% of the course content</li>
+            <li>You must not have downloaded any course materials or certificates</li>
+            <li>The request must include a valid reason for the refund</li>
+          </ul>
+
+          <h3>2. Refund Eligibility Criteria</h3>
+
+          <h4>Eligible for Refund:</h4>
+          <ul>
+            <li>Technical issues that prevent access to course content (if not resolved within 48 hours)</li>
+            <li>Course content significantly different from what was advertised</li>
+            <li>Quality issues with video or audio content that affect learning</li>
+            <li>Duplicate purchase made in error</li>
+            <li>Unauthorized purchase made by someone else using your account</li>
+          </ul>
+
+          <h4>Not Eligible for Refund:</h4>
+          <ul>
+            <li>Requests made after the 7-day period</li>
+            <li>Courses that have been completed or significantly progressed (>30%)</li>
+            <li>Change of mind after completing significant portions of the course</li>
+            <li>Free courses or promotional content</li>
+            <li>Requests due to lack of time to complete the course</li>
+            <li>Technical issues on the student's end (poor internet connection, outdated browser, etc.)</li>
+          </ul>
+
+          <h3>3. How to Request a Refund</h3>
+          <p>To request a refund, please follow these steps:</p>
+          <ol>
+            <li>Log into your Lyceum Academy account and go to your dashboard</li>
+            <li>Navigate to the "My Courses" section</li>
+            <li>Find the course you want to refund and click on "Request Refund"</li>
+            <li>Fill out the refund form with the required information and reason</li>
+            <li>Submit the request and wait for our team to review it</li>
+          </ol>
+          <p>Alternatively, you can contact our support team directly at <a href="mailto:support@lyceumacademy.com">support@lyceumacademy.com</a> with your refund request.</p>
+
+          <h3>4. Processing Time</h3>
+          <ul>
+            <li><strong>Review Process:</strong> 2-3 business days to review your refund request</li>
+            <li><strong>Approval Notification:</strong> You'll receive an email confirmation once approved</li>
+            <li><strong>Refund Processing:</strong> 5-10 business days for the refund to appear in your original payment method</li>
+            <li><strong>Bank Processing:</strong> Additional 2-5 business days depending on your bank</li>
+          </ul>
+
+          <h3>5. Refund Methods</h3>
+          <p>Refunds will be processed using the same payment method used for the original purchase:</p>
+          <ul>
+            <li><strong>Credit/Debit Cards:</strong> Refunded to the original card</li>
+            <li><strong>UPI/Net Banking:</strong> Refunded to the original bank account</li>
+            <li><strong>Digital Wallets:</strong> Refunded to the original wallet</li>
+          </ul>
+
+          <h3>6. Special Circumstances</h3>
+          <p><strong>Promotional Courses:</strong> Courses purchased during special promotions or with discount codes are subject to the same refund policy, but the refund amount will be the actual amount paid.</p>
+          <p><strong>Bundle Courses:</strong> If you purchased a course bundle, refunds will be calculated based on the individual course prices and the portion you've accessed.</p>
+          <p><strong>Subscription Services:</strong> Monthly or yearly subscriptions can be cancelled at any time, but refunds are only provided for the unused portion of prepaid periods.</p>
+
+          <h3>7. Course Access After Refund</h3>
+          <p>Once a refund is approved and processed:</p>
+          <ul>
+            <li>Your access to the course will be immediately revoked</li>
+            <li>You will no longer be able to view or download course materials</li>
+            <li>Any certificates earned will be invalidated</li>
+            <li>Your course progress will not be saved for future enrollments</li>
+          </ul>
+
+          <h3>8. Contact Us</h3>
+          <p>If you have any questions about this refund policy or need assistance with a refund request, please contact us:</p>
+          <ul>
+            <li><strong>Email:</strong> <a href="mailto:support@lyceumacademy.com">support@lyceumacademy.com</a></li>
+            <li><strong>Phone:</strong> [Your Phone Number]</li>
+            <li><strong>Support Hours:</strong> Monday to Friday, 9:00 AM - 6:00 PM</li>
+            <li><strong>Response Time:</strong> Within 24 hours</li>
+          </ul>
+
+          <h3>9. Changes to This Policy</h3>
+          <p>We reserve the right to modify this refund policy at any time. Changes will be effective immediately upon posting on this page. We encourage you to review this policy periodically for any updates. Continued use of our services after changes constitutes acceptance of the updated policy.</p>
+
+          <div class="important-note">
+            <p><strong>Important Note:</strong> This refund policy is designed to be fair to both students and instructors. We reserve the right to refuse refunds for requests that appear to abuse this policy or are made in bad faith. All refund decisions are final and at the sole discretion of Lyceum Academy.</p>
           </div>
-          <div class="cs-note_right">
-            <p><strong>Important Note:</strong> This refund policy is designed to be fair to both students and instructors. We reserve the right to refuse refunds for requests that appear to abuse this policy or are made in bad faith.</p>
-          </div>
+
+          <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #94A3B8; font-size: 0.9rem;">
+            <strong>Last Updated:</strong> January 2025
+          </p>
         </div>
-        
       </div>
     </div>
   </div>
-</div>
-<div class="cs-height_140 cs-height_lg_80"></div>
-<!-- End Content -->
+</section>
 {% endblock %}

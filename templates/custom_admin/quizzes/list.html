@@ -75,7 +75,12 @@
               <span class="badge bg-info-subtle text-info">{{ quiz.module.course.title }}</span>
             </td>
             <td>
-              <span class="text-muted">{{ quiz.module.title }}</span>
+              <span class="text-muted">{% for link in quiz.module_links.all|slice:":2" %}
+                  {{ link.module.title }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                {% if quiz.modules.count > 2 %}
+                  <span class="badge bg-secondary">+{{ quiz.modules.count|add:"-2" }} more</span>
+                {% endif %}</span>
             </td>
             <td>
               <div class="d-flex align-items-center gap-1">

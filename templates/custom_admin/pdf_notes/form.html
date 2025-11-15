@@ -1,0 +1,170 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Upload{% endif %} PDF Note{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="card bg-light-info shadow-none position-relative overflow-hidden mb-4">
+    <div class="card-body px-4 py-3">
+      <div class="row align-items-center">
+        <div class="col-9">
+          <h4 class="fw-semibold mb-2">{% if is_edit %}Edit{% else %}Upload{% endif %} PDF Note</h4>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a class="text-muted" href="{% url 'custom_admin:dashboard' %}">Dashboard</a></li>
+              <li class="breadcrumb-item"><a class="text-muted" href="{% url 'custom_admin:pdf_notes_list' %}">PDF Notes</a></li>
+              <li class="breadcrumb-item active" aria-current="page">{% if is_edit %}Edit{% else %}Upload{% endif %}</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-3 text-end">
+          <a href="{% url 'custom_admin:pdf_notes_list' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Back to List
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Display form errors -->
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ form.non_field_errors }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <!-- Title -->
+            <div class="mb-4">
+              <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                Title <span class="text-danger">*</span>
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+              {% endif %}
+              {% if form.title.help_text %}
+                <div class="form-text">{{ form.title.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">
+                Description
+              </label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+              {% endif %}
+              {% if form.description.help_text %}
+                <div class="form-text">{{ form.description.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <!-- PDF File Upload -->
+            <div class="mb-4">
+              <label for="{{ form.pdf_file.id_for_label }}" class="form-label fw-semibold">
+                PDF File {% if not is_edit %}<span class="text-danger">*</span>{% endif %}
+              </label>
+
+              {% if is_edit and pdf_note.pdf_file %}
+              <div class="alert alert-info mb-2">
+                <div class="d-flex align-items-center">
+                  <i class="ti ti-file-text me-2"></i>
+                  <div>
+                    <strong>Current file:</strong>
+                    <a href="{{ pdf_note.pdf_file.url }}" target="_blank" class="text-decoration-underline">
+                      {{ pdf_note.pdf_file.name|slice:"13:" }}
+                    </a>
+                    {% if pdf_note.file_size %}
+                    <span class="badge bg-secondary ms-2">{{ pdf_note.file_size|filesizeformat }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <small class="d-block mt-2 text-muted">Leave blank to keep the current file, or upload a new one to replace it.</small>
+              </div>
+              {% endif %}
+
+              {{ form.pdf_file }}
+              {% if form.pdf_file.errors %}
+                <div class="text-danger small mt-1">{{ form.pdf_file.errors.0 }}</div>
+              {% endif %}
+              {% if form.pdf_file.help_text %}
+                <div class="form-text">{{ form.pdf_file.help_text }}</div>
+              {% endif %}
+              <div class="form-text">Maximum file size: 50MB</div>
+            </div>
+
+            <!-- Page Count -->
+            <div class="mb-4">
+              <label for="{{ form.page_count.id_for_label }}" class="form-label fw-semibold">
+                Page Count
+              </label>
+              {{ form.page_count }}
+              {% if form.page_count.errors %}
+                <div class="text-danger small mt-1">{{ form.page_count.errors.0 }}</div>
+              {% endif %}
+              {% if form.page_count.help_text %}
+                <div class="form-text">{{ form.page_count.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Is Downloadable -->
+            <div class="mb-4">
+              <div class="form-check">
+                {{ form.is_downloadable }}
+                <label class="form-check-label fw-semibold" for="{{ form.is_downloadable.id_for_label }}">
+                  {{ form.is_downloadable.label }}
+                </label>
+              </div>
+              {% if form.is_downloadable.errors %}
+                <div class="text-danger small mt-1">{{ form.is_downloadable.errors.0 }}</div>
+              {% endif %}
+              {% if form.is_downloadable.help_text %}
+                <div class="form-text">{{ form.is_downloadable.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2 justify-content-end mt-4">
+              <a href="{% url 'custom_admin:pdf_notes_list' %}" class="btn btn-light">
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="ti ti-device-floppy me-1"></i>
+                {% if is_edit %}Update PDF Note{% else %}Upload PDF Note{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="ti ti-info-circle me-1"></i> PDF Upload Guidelines
+          </h5>
+          <ul class="mb-0">
+            <li class="mb-2">Only PDF files are accepted</li>
+            <li class="mb-2">Maximum file size is 50MB</li>
+            <li class="mb-2">Use descriptive titles for easy identification</li>
+            <li class="mb-2">Add page count to help students know the document length</li>
+            <li class="mb-2">Uncheck "Downloadable" if you want students to only view the PDF online</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

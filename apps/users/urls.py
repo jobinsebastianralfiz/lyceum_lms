@@ -11,6 +11,7 @@ urlpatterns = [
     path('auth/register/', views.UserRegistrationView.as_view(), name='register'),
     path('auth/password-reset/', views.PasswordResetRequestView.as_view(), name='password_reset_request'),
     path('auth/password-reset-confirm/<uuid:token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('auth/password-reset-with-code/', views.PasswordResetWithCodeView.as_view(), name='password_reset_with_code'),
     
     # User profile endpoints
     path('profile/', views.UserProfileView.as_view(), name='profile'),

@@ -16,12 +16,13 @@ from .serializers import (
     PasswordChangeSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    PasswordResetCodeSerializer,
     TeamSerializer,
     TeamCreateSerializer,
     TeamMembershipSerializer,
     UserBasicSerializer
 )
-from .models import Team, TeamMembership, PasswordResetToken
+from .models import Team, TeamMembership, PasswordResetToken, PasswordResetCode
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -231,19 +232,17 @@ class PasswordResetRequestView(APIView):
             try:
                 user = User.objects.get(email=email)
                 
-                # Deactivate old tokens
-                PasswordResetToken.objects.filter(user=user, is_used=False).update(is_used=True)
+                # Deactivate old codes
+                PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
                 
-                # Create new token
-                reset_token = PasswordResetToken.objects.create(user=user)
+                # Create new verification code
+                reset_code = PasswordResetCode.objects.create(user=user)
                 
-                # Send email
-                reset_url = f"{request.build_absolute_uri('/')[:-1]}/auth/password-reset-confirm/{reset_token.token}/"
-                
+                # Send email with verification code
                 try:
                     send_mail(
-                        subject='Password Reset Request - CodeLearn LMS',
-                        message=f'Click the following link to reset your password: {reset_url}',
+                        subject='Password Reset Code - CodeLearn LMS',
+                        message=f'Your password reset verification code is: {reset_code.code}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this password reset, please ignore this email.',
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         recipient_list=[email],
                         fail_silently=False,
@@ -251,10 +250,10 @@ class PasswordResetRequestView(APIView):
                 except Exception as e:
                     return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-                return Response({'message': 'Password reset email sent successfully'})
+                return Response({'message': 'Password reset code sent successfully'})
             except User.DoesNotExist:
                 # Return success even if user doesn't exist for security
-                return Response({'message': 'Password reset email sent successfully'})
+                return Response({'message': 'Password reset code sent successfully'})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @extend_schema_view(
@@ -307,6 +306,73 @@ class PasswordResetConfirmView(APIView):
             
         except PasswordResetToken.DoesNotExist:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Password Reset with Code",
+        description="Reset password using verification code sent to email",
+        request=PasswordResetCodeSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Password reset successful",
+                examples=[
+                    OpenApiExample(
+                        'Success Response',
+                        value={"message": "Password reset successful"}
+                    )
+                ]
+            ),
+            400: OpenApiResponse(description="Invalid code or validation errors")
+        },
+        tags=['Authentication']
+    )
+)
+class PasswordResetWithCodeView(APIView):
+    """
+    Reset password using verification code.
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        serializer = PasswordResetCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            verification_code = serializer.validated_data['verification_code']
+            new_password = serializer.validated_data['new_password']
+            
+            try:
+                user = User.objects.get(email=email)
+                
+                # Find the verification code
+                reset_code = PasswordResetCode.objects.filter(
+                    user=user,
+                    code=verification_code,
+                    is_used=False
+                ).order_by('-created_at').first()
+                
+                if not reset_code:
+                    return Response({'error': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                if not reset_code.is_valid():
+                    return Response({'error': 'Verification code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Update password
+                user.set_password(new_password)
+                user.save()
+                
+                # Mark code as used
+                reset_code.is_used = True
+                reset_code.save()
+                
+                # Deactivate all other codes for this user
+                PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
+                
+                return Response({'message': 'Password reset successful'})
+                
+            except User.DoesNotExist:
+                return Response({'error': 'Invalid email address'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Team Management Views
 
