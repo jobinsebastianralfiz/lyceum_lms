@@ -94,25 +94,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'codelearn_lms.wsgi.application'
 
 # Database Configuration
-if config('DATABASE_URL', default='').startswith('postgresql'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
-        }
-    }
-else:
-    # Default to SQLite for development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# Use dj_database_url for Railway compatibility
+import dj_database_url
+
+# Railway provides DATABASE_URL automatically when PostgreSQL is added
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
@@ -141,19 +133,16 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-if not DEBUG:
-    # Production paths to match .htaccess configuration
-    STATIC_URL = '/codelearnstatic/'
-    STATIC_ROOT = '/home/ralffmqq/public_html/codelearnstatic/'
-    MEDIA_URL = '/codelearnmedia/'
-    MEDIA_ROOT = '/home/ralffmqq/public_html/codelearnmedia/'
-else:
-    # Development paths
-    STATIC_URL = '/static/'
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Only include STATICFILES_DIRS if 'static' directory exists
+if (BASE_DIR / 'static').exists():
     STATICFILES_DIRS = [BASE_DIR / 'static']
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
+
+# Media files (User uploads) - Railway volume will be mounted here
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -376,7 +365,3 @@ LMS_SETTINGS = {
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
-
-# WhiteNoise configuration for static files
-# Uncomment when whitenoise is installed:
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
