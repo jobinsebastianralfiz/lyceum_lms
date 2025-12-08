@@ -34,7 +34,7 @@ class CourseSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return Course.objects.filter(is_active=True, is_published=True)
+        return Course.objects.filter(is_published=True)
 
     def lastmod(self, obj):
         return obj.updated_at
@@ -50,7 +50,7 @@ class NewsSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return News.objects.filter(is_active=True)
+        return News.objects.filter(is_published=True)
 
     def lastmod(self, obj):
         return obj.updated_at if hasattr(obj, 'updated_at') else obj.created_at
@@ -66,7 +66,7 @@ class EventSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return Event.objects.filter(is_active=True)
+        return Event.objects.filter(is_published=True)
 
     def lastmod(self, obj):
         return obj.updated_at if hasattr(obj, 'updated_at') else obj.created_at
