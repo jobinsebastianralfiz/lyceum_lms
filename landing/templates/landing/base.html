@@ -8,9 +8,29 @@
   <meta name="author" content="Lyceum Academy">
 
   <title>{% block title %}Lyceum Academy - Excellence in Online Education{% endblock %}</title>
-  <meta name="description" content="{% block description %}Lyceum Academy is a premier online learning institution delivering world-class education through cutting-edge technology.{% endblock %}">
+  <meta name="description" content="{% block description %}Lyceum Academy is a premier online learning institution delivering world-class education through cutting-edge technology. Join our expert-led courses in programming, web development, and more.{% endblock %}">
+  <meta name="keywords" content="{% block keywords %}Lyceum Academy, online courses, programming courses, web development, coding bootcamp, learn programming, online education, IT training, software development courses, Kerala, India{% endblock %}">
+  <meta name="robots" content="index, follow">
+
+  <!-- Google Search Console Verification -->
+  {% block google_verification %}{% endblock %}
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.lmacademy.info{% block og_url %}{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}Lyceum Academy - Excellence in Online Education{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Join Lyceum Academy for world-class online education. Expert-led courses in programming, web development, and more.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'images/logos/logo.png' %}{% endblock %}">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}Lyceum Academy{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Excellence in Online Education{% endblock %}">
 
   <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logos/logo.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logos/logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/logos/logo.png' %}">
   <link rel="shortcut icon" type="image/png" href="{% static 'images/logos/logo.png' %}">
 
   <!-- Google Fonts - Inter -->
