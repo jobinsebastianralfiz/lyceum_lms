@@ -108,4 +108,5 @@ google-api-python-client==2.186.0
 
 # Railway/Production deployment
 whitenoise==6.7.0
+setuptools>=70.0.0
 
