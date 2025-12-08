@@ -1,0 +1,401 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="mb-0">Notifications</h4>
+    <p class="text-muted mb-0">Manage system notifications sent to users</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:notification_create' %}" class="btn btn-primary">
+      <i class="ti ti-plus me-1"></i>Send Notification
+    </a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="ti ti-search"></i></span>
+          <input type="text" class="form-control" name="search" placeholder="Search notifications..."
+                 value="{{ search_query }}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="type">
+          <option value="">All Types</option>
+          <option value="payment_due" {% if request.GET.type == 'payment_due' %}selected{% endif %}>Payment Due</option>
+          <option value="payment_received" {% if request.GET.type == 'payment_received' %}selected{% endif %}>Payment Received</option>
+          <option value="course_assigned" {% if request.GET.type == 'course_assigned' %}selected{% endif %}>Course Assigned</option>
+          <option value="course_completed" {% if request.GET.type == 'course_completed' %}selected{% endif %}>Course Completed</option>
+          <option value="enrollment_confirmed" {% if request.GET.type == 'enrollment_confirmed' %}selected{% endif %}>Enrollment Confirmed</option>
+          <option value="system_alert" {% if request.GET.type == 'system_alert' %}selected{% endif %}>System Alert</option>
+          <option value="session_assigned" {% if request.GET.type == 'session_assigned' %}selected{% endif %}>Session Assigned</option>
+          <option value="session_reminder" {% if request.GET.type == 'session_reminder' %}selected{% endif %}>Session Reminder</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="status">
+          <option value="">All Status</option>
+          <option value="read" {% if request.GET.status == 'read' %}selected{% endif %}>Read</option>
+          <option value="unread" {% if request.GET.status == 'unread' %}selected{% endif %}>Unread</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary me-2">
+          <i class="ti ti-filter me-1"></i>Filter
+        </button>
+        <a href="{% url 'custom_admin:notifications_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Clear
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card stats-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+            <i class="ti ti-bell"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ stats.total|default:0 }}</h3>
+            <small class="text-muted">Total Notifications</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stats-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+            <i class="ti ti-bell-ringing"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ stats.unread|default:0 }}</h3>
+            <small class="text-muted">Unread</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stats-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stats-icon bg-success bg-opacity-10 text-success">
+            <i class="ti ti-mail-check"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ stats.email_sent|default:0 }}</h3>
+            <small class="text-muted">Emails Sent</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stats-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stats-icon bg-info bg-opacity-10 text-info">
+            <i class="ti ti-device-mobile"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ stats.push_sent|default:0 }}</h3>
+            <small class="text-muted">Push Sent</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notifications Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="width: 40px;">
+              <input type="checkbox" class="form-check-input" id="selectAll">
+            </th>
+            <th>User</th>
+            <th>Notification</th>
+            <th>Type</th>
+            <th>Delivery Status</th>
+            <th>Read</th>
+            <th>Date</th>
+            <th style="width: 100px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for notification in page_obj %}
+          <tr>
+            <td>
+              <input type="checkbox" class="form-check-input row-checkbox" value="{{ notification.id }}">
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-2">
+                  <span class="avatar-text rounded-circle bg-primary">
+                    {{ notification.user.name|slice:":1"|upper }}
+                  </span>
+                </div>
+                <div>
+                  <div class="fw-medium">{{ notification.user.name }}</div>
+                  <small class="text-muted">{{ notification.user.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="fw-medium">{{ notification.title|truncatechars:40 }}</div>
+              <small class="text-muted">{{ notification.message|truncatechars:60 }}</small>
+            </td>
+            <td>
+              {% if notification.notification_type == 'payment_due' %}
+                <span class="badge bg-warning text-dark">Payment Due</span>
+              {% elif notification.notification_type == 'payment_received' %}
+                <span class="badge bg-success">Payment Received</span>
+              {% elif notification.notification_type == 'course_assigned' %}
+                <span class="badge bg-primary">Course Assigned</span>
+              {% elif notification.notification_type == 'course_completed' %}
+                <span class="badge bg-success">Course Completed</span>
+              {% elif notification.notification_type == 'enrollment_confirmed' %}
+                <span class="badge bg-info">Enrollment</span>
+              {% elif notification.notification_type == 'system_alert' %}
+                <span class="badge bg-danger">System Alert</span>
+              {% elif notification.notification_type == 'session_assigned' %}
+                <span class="badge bg-purple">Session Assigned</span>
+              {% elif notification.notification_type == 'session_reminder' %}
+                <span class="badge bg-orange">Session Reminder</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ notification.get_notification_type_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                {% if notification.email_sent %}
+                  <span class="badge bg-success" title="Email sent">
+                    <i class="ti ti-mail-check"></i>
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary" title="Email not sent">
+                    <i class="ti ti-mail-off"></i>
+                  </span>
+                {% endif %}
+                {% if notification.push_sent %}
+                  <span class="badge bg-success" title="Push sent">
+                    <i class="ti ti-device-mobile"></i>
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary" title="Push not sent">
+                    <i class="ti ti-device-mobile-off"></i>
+                  </span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              {% if notification.read %}
+                <span class="badge bg-success">Read</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Unread</span>
+              {% endif %}
+            </td>
+            <td>
+              <small>{{ notification.created_at|date:"M d, Y" }}</small><br>
+              <small class="text-muted">{{ notification.created_at|time:"h:i A" }}</small>
+            </td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-icon" data-bs-toggle="dropdown">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewModal{{ notification.id }}">
+                      <i class="ti ti-eye me-2"></i>View Details
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="{% url 'custom_admin:notification_delete' notification.id %}">
+                      <i class="ti ti-trash me-2"></i>Delete
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+
+          <!-- View Modal -->
+          <div class="modal fade" id="viewModal{{ notification.id }}" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Notification Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <dl class="row mb-0">
+                    <dt class="col-sm-4">User</dt>
+                    <dd class="col-sm-8">{{ notification.user.name }} ({{ notification.user.email }})</dd>
+
+                    <dt class="col-sm-4">Type</dt>
+                    <dd class="col-sm-8">{{ notification.get_notification_type_display }}</dd>
+
+                    <dt class="col-sm-4">Title</dt>
+                    <dd class="col-sm-8">{{ notification.title }}</dd>
+
+                    <dt class="col-sm-4">Message</dt>
+                    <dd class="col-sm-8">{{ notification.message }}</dd>
+
+                    <dt class="col-sm-4">Email Status</dt>
+                    <dd class="col-sm-8">
+                      {% if notification.email_sent %}
+                        <span class="badge bg-success">Sent</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ notification.email_status|title }}</span>
+                      {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Push Status</dt>
+                    <dd class="col-sm-8">
+                      {% if notification.push_sent %}
+                        <span class="badge bg-success">Sent</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ notification.push_status|title }}</span>
+                      {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Read</dt>
+                    <dd class="col-sm-8">
+                      {% if notification.read %}
+                        Yes - {{ notification.read_at|date:"M d, Y h:i A" }}
+                      {% else %}
+                        No
+                      {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Created</dt>
+                    <dd class="col-sm-8">{{ notification.created_at|date:"M d, Y h:i A" }}</dd>
+                  </dl>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <div class="text-muted">
+                <i class="ti ti-bell-off" style="font-size: 48px;"></i>
+                <p class="mt-2 mb-0">No notifications found</p>
+                {% if search_query %}
+                  <small>Try adjusting your search criteria</small>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if page_obj and page_obj.has_other_pages %}
+  <div class="card-footer">
+    <nav aria-label="Page navigation">
+      <ul class="pagination mb-0 justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.stats-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.avatar-text {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-gray);
+}
+
+.btn-icon:hover {
+  background: var(--dark-bg-tertiary);
+}
+
+.bg-purple {
+  background-color: #8B5CF6 !important;
+}
+
+.bg-orange {
+  background-color: #F97316 !important;
+}
+</style>
+{% endblock %}

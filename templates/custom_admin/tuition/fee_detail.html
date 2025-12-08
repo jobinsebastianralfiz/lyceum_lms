@@ -1,0 +1,185 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Fee Details</h4>
+    <small class="text-muted">{{ fee.enrollment.student.name }} - {{ fee.month_name }} {{ fee.year }}</small>
+  </div>
+  <div class="d-flex gap-2">
+    {% if fee.status != 'paid' and fee.status != 'waived' %}
+    <a href="{% url 'custom_admin:collect_fee' fee.id %}" class="btn btn-success btn-sm">
+      <i class="ti ti-cash me-1"></i>Collect Payment
+    </a>
+    {% endif %}
+    {% if fee.status == 'paid' and fee.receipt_number %}
+    <a href="{% url 'custom_admin:fee_receipt' fee.id %}" class="btn btn-outline-primary btn-sm" target="_blank">
+      <i class="ti ti-printer me-1"></i>Print Receipt
+    </a>
+    {% endif %}
+    <a href="{% url 'custom_admin:tuition_fees_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="ti ti-arrow-left me-1"></i>Back
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Fee Info -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Fee Information</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Student</td>
+            <td class="text-end">
+              <a href="{% url 'custom_admin:tuition_student_detail' fee.enrollment.student.id %}">{{ fee.enrollment.student.name }}</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Enrollment</td>
+            <td class="text-end">
+              <a href="{% url 'custom_admin:tuition_enrollment_detail' fee.enrollment.id %}">
+                {% if fee.enrollment.batch %}{{ fee.enrollment.batch.name }}{% else %}{{ fee.enrollment.effective_subject.name }}{% endif %}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Period</td>
+            <td class="text-end fw-medium">{{ fee.month_name }} {{ fee.year }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Due Date</td>
+            <td class="text-end">{{ fee.due_date|date:"d M Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Status</td>
+            <td class="text-end">
+              {% if fee.status == 'paid' %}
+              <span class="badge bg-success">Paid</span>
+              {% elif fee.status == 'partial' %}
+              <span class="badge bg-warning">Partial</span>
+              {% elif fee.status == 'overdue' %}
+              <span class="badge bg-danger">Overdue</span>
+              {% elif fee.status == 'waived' %}
+              <span class="badge bg-secondary">Waived</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ fee.get_status_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% if fee.receipt_number %}
+          <tr>
+            <td class="text-muted">Receipt #</td>
+            <td class="text-end"><code>{{ fee.receipt_number }}</code></td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amount Details -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Amount Details</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Fee Amount</td>
+            <td class="text-end">{{ fee.fee_amount|floatformat:2 }}</td>
+          </tr>
+          {% if fee.discount > 0 %}
+          <tr>
+            <td class="text-muted">Discount</td>
+            <td class="text-end text-success">-{{ fee.discount|floatformat:2 }}</td>
+          </tr>
+          {% endif %}
+          <tr class="border-top">
+            <td class="fw-medium">Total Amount</td>
+            <td class="text-end fw-medium">{{ fee.total_amount|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Paid Amount</td>
+            <td class="text-end text-success">{{ fee.paid_amount|floatformat:2 }}</td>
+          </tr>
+          <tr class="border-top">
+            <td class="fw-medium">Outstanding</td>
+            <td class="text-end fw-medium {% if fee.outstanding > 0 %}text-danger{% else %}text-success{% endif %}">
+              {{ fee.outstanding|floatformat:2 }}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Details -->
+  {% if fee.payment_date %}
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Payment Details</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Payment Date</td>
+            <td class="text-end">{{ fee.payment_date|date:"d M Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Payment Method</td>
+            <td class="text-end">{{ fee.get_payment_method_display|default:'-' }}</td>
+          </tr>
+          {% if fee.transaction_id %}
+          <tr>
+            <td class="text-muted">Transaction ID</td>
+            <td class="text-end"><code>{{ fee.transaction_id }}</code></td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Notes -->
+  {% if fee.notes %}
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Notes</h6>
+      </div>
+      <div class="card-body" style="font-size: 13px;">
+        {{ fee.notes|linebreaks }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Finance Integration -->
+  {% if fee.income_record %}
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Linked Finance Record</h6>
+      </div>
+      <div class="card-body">
+        <p class="mb-0" style="font-size: 13px;">
+          <i class="ti ti-link me-1"></i>
+          Income Record: <a href="{% url 'custom_admin:income_detail' fee.income_record.id %}">{{ fee.income_record.title }}</a>
+          - {{ fee.income_record.amount|floatformat:2 }}
+        </p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

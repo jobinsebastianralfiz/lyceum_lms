@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.89 595.28">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: PFDinTextUniversal-Medium, 'PF Din Text Universal';
+      }
+
+      .cls-1, .cls-2 {
+        fill: #565656;
+      }
+
+      .cls-1, .cls-3 {
+        font-size: 67.15px;
+      }
+
+      .cls-4, .cls-3 {
+        fill: #2ab773;
+      }
+
+      .cls-3 {
+        font-family: PFDinTextUniversal-Bold, 'PF Din Text Universal';
+      }
+    </style>
+  </defs>
+  <g>
+    <text class="cls-1" transform="translate(413.4 418.03)"><tspan x="0" y="0">APP</tspan></text>
+    <text class="cls-3" transform="translate(306.88 418.03)"><tspan x="0" y="0">LM</tspan></text>
+  </g>
+  <g>
+    <polygon class="cls-2" points="527.25 312.9 527.25 313.38 492.92 346.91 492.6 347.22 314.64 347.22 314.64 207.41 348.97 146.89 348.97 312.9 527.25 312.9"/>
+    <polygon class="cls-4" points="527.25 146.89 527.25 308.02 492.92 308.02 492.92 234.87 470 288.68 418.58 288.68 394.97 233.26 394.97 308.02 360.65 308.02 360.65 146.89 395.49 146.89 444.29 261.44 492.92 147.29 493.09 146.89 527.25 146.89"/>
+  </g>
+</svg>

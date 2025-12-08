@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.89 595.28">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: .17em;
+      }
+
+      .cls-2 {
+        letter-spacing: .14em;
+      }
+
+      .cls-3, .cls-4, .cls-5 {
+        fill: #565656;
+      }
+
+      .cls-6, .cls-7 {
+        fill: #2ab773;
+      }
+
+      .cls-4 {
+        font-family: PFDinTextUniversal-Medium, 'PF Din Text Universal';
+      }
+
+      .cls-4, .cls-7 {
+        font-size: 70.27px;
+      }
+
+      .cls-8 {
+        letter-spacing: .17em;
+      }
+
+      .cls-7 {
+        font-family: PFDinTextUniversal-Bold, 'PF Din Text Universal';
+      }
+
+      .cls-5 {
+        font-family: Nexa-Bold, Nexa;
+        font-size: 22.28px;
+      }
+
+      .cls-9 {
+        letter-spacing: .14em;
+      }
+    </style>
+  </defs>
+  <g>
+    <text class="cls-4" transform="translate(321.11 415.09)"><tspan x="0" y="0">ACADEMY</tspan></text>
+    <text class="cls-5" transform="translate(211.84 448.53)"><tspan class="cls-1" x="0" y="0" xml:space="preserve">DREAM     LEARN    </tspan><tspan class="cls-9" x="284.21" y="0"> </tspan><tspan class="cls-2" x="292.83" y="0">A</tspan><tspan class="cls-8" x="313.11" y="0">CHIEVE</tspan></text>
+    <text class="cls-7" transform="translate(209.64 415.09)"><tspan x="0" y="0">LM</tspan></text>
+    <circle class="cls-6" cx="335.97" cy="441.09" r="4.12"/>
+    <circle class="cls-6" cx="479.71" cy="441.09" r="4.12"/>
+  </g>
+  <g>
+    <polygon class="cls-3" points="527.25 281.81 527.25 282.29 492.92 315.82 492.6 316.13 314.64 316.13 314.64 176.32 348.97 115.8 348.97 281.81 527.25 281.81"/>
+    <polygon class="cls-6" points="527.25 115.8 527.25 276.93 492.92 276.93 492.92 203.77 470 257.59 418.58 257.59 394.97 202.16 394.97 276.93 360.65 276.93 360.65 115.8 395.49 115.8 444.29 230.35 492.92 116.2 493.09 115.8 527.25 115.8"/>
+  </g>
+</svg>

@@ -1,220 +1,558 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Mentoring Sessions - {{ request.user.name }}{% endblock %}
+{% block title %}Session History - LM Academy{% endblock %}
 
 {% block extra_css %}
 <style>
-    .session-card {
-        border-radius: 15px;
-        transition: transform 0.2s;
-        border-left: 4px solid;
+  /* Session History - matching dashboard style */
+  .sp-sessions {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .sp-sessions * {
+    box-sizing: border-box;
+  }
+
+  /* Page Header */
+  .sp-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .sp-page-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+  }
+
+  .sp-page-title p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .sp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+
+  .sp-btn-outline {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .sp-btn-outline:hover {
+    background: #f9fafb;
+    color: #111827;
+  }
+
+  /* Stats Grid */
+  .sp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .sp-stat {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .sp-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin: 0 auto 10px;
+    background: #f0fdf4;
+    color: var(--primary);
+  }
+
+  .sp-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .sp-stat-label {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* Cards */
+  .sp-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .sp-card-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sp-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sp-card-title i {
+    color: var(--primary);
+  }
+
+  .sp-card-body {
+    padding: 16px;
+  }
+
+  /* Session Item */
+  .sp-session-item {
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border-left: 3px solid var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .sp-session-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-session-item.one-on-one { border-left-color: #2563eb; }
+  .sp-session-item.group { border-left-color: #059669; }
+  .sp-session-item.follow-up { border-left-color: #d97706; }
+  .sp-session-item.career { border-left-color: #7c3aed; }
+
+  .sp-session-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .sp-session-main {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .sp-session-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .sp-session-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .sp-session-item.one-on-one .sp-session-badge { background: #2563eb; }
+  .sp-session-item.group .sp-session-badge { background: #059669; }
+  .sp-session-item.follow-up .sp-session-badge { background: #d97706; }
+  .sp-session-item.career .sp-session-badge { background: #7c3aed; }
+
+  .sp-session-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .sp-session-duration {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .sp-session-duration i {
+    margin-right: 4px;
+  }
+
+  .sp-session-mentor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #374151;
+  }
+
+  .sp-session-mentor i {
+    color: #6b7280;
+    margin-right: 4px;
+  }
+
+  .sp-session-course {
+    color: #6b7280;
+  }
+
+  .sp-session-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .sp-session-item.one-on-one .sp-session-icon { background: #dbeafe; color: #2563eb; }
+  .sp-session-item.group .sp-session-icon { background: #d1fae5; color: #059669; }
+  .sp-session-item.follow-up .sp-session-icon { background: #fef3c7; color: #d97706; }
+  .sp-session-item.career .sp-session-icon { background: #ede9fe; color: #7c3aed; }
+
+  .sp-session-content {
+    margin-top: 12px;
+  }
+
+  .sp-session-section {
+    margin-bottom: 12px;
+  }
+
+  .sp-session-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-session-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sp-session-section-title i {
+    font-size: 11px;
+  }
+
+  .sp-session-section-title.primary { color: var(--primary); }
+  .sp-session-section-title.success { color: #059669; }
+
+  .sp-session-text {
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.5;
+  }
+
+  .sp-session-box {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+  }
+
+  .sp-session-feedback {
+    font-style: italic;
+    color: #6b7280;
+  }
+
+  .sp-session-time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  /* Empty State */
+  .sp-empty {
+    text-align: center;
+    padding: 48px 20px;
+  }
+
+  .sp-empty i {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+  }
+
+  .sp-empty h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+
+  .sp-empty p {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+
+  /* Pagination */
+  .sp-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 20px;
+  }
+
+  .sp-page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    text-decoration: none;
+  }
+
+  .sp-page-link:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+
+  .sp-page-link.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 768px) {
+    .sp-page-header {
+      flex-direction: column;
+      align-items: stretch;
     }
-    .session-card:hover {
-        transform: translateY(-2px);
+
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
-    
-    .session-card.one-on-one { border-left-color: #007bff; }
-    .session-card.group { border-left-color: #28a745; }
-    .session-card.follow-up { border-left-color: #ffc107; }
-    .session-card.career { border-left-color: #17a2b8; }
-    
-    .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
+
+    .sp-session-header {
+      flex-direction: column;
     }
-    
-    .session-type-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
+
+    .sp-session-icon {
+      display: none;
     }
+
+    .sp-session-mentor {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .sp-stat {
+      padding: 12px;
+    }
+
+    .sp-stat-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+    }
+
+    .sp-stat-value {
+      font-size: 20px;
+    }
+
+    .sp-session-item {
+      padding: 12px;
+    }
+
+    .sp-session-top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>My Mentoring Sessions</h2>
-            <p class="text-muted">Complete history of your mentoring journey</p>
-        </div>
-        <div>
-            <a href="{% url 'student_portal:mentoring_dashboard' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-            </a>
-        </div>
+<div class="sp-sessions">
+  <!-- Page Header -->
+  <div class="sp-page-header">
+    <div class="sp-page-title">
+      <h1>Session History</h1>
+      <p>Complete history of your mentoring sessions</p>
     </div>
+    <a href="{% url 'student_portal:mentoring_dashboard' %}" class="sp-btn sp-btn-outline">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
 
-    <!-- Session Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-comments fa-2x mb-3"></i>
-                    <h3 class="mb-0">{{ session_stats.total_sessions }}</h3>
-                    <small>Total Sessions</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-clock fa-2x mb-3"></i>
-                    <h3 class="mb-0">{{ session_stats.total_duration }}</h3>
-                    <small>Total Minutes</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-stopwatch fa-2x mb-3"></i>
-                    <h3 class="mb-0">{{ session_stats.avg_duration|floatformat:0 }}</h3>
-                    <small>Avg Duration</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card border-0 h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-calendar fa-2x mb-3"></i>
-                    <h3 class="mb-0">{{ session_stats.sessions_this_month }}</h3>
-                    <small>This Month</small>
-                </div>
-            </div>
-        </div>
+  <!-- Session Stats -->
+  <div class="sp-stats">
+    <div class="sp-stat">
+      <div class="sp-stat-icon"><i class="fas fa-comments"></i></div>
+      <div class="sp-stat-value">{{ session_stats.total_sessions }}</div>
+      <div class="sp-stat-label">Total Sessions</div>
     </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon"><i class="fas fa-clock"></i></div>
+      <div class="sp-stat-value">{{ session_stats.total_duration }}</div>
+      <div class="sp-stat-label">Total Minutes</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon"><i class="fas fa-stopwatch"></i></div>
+      <div class="sp-stat-value">{{ session_stats.avg_duration|floatformat:0 }}</div>
+      <div class="sp-stat-label">Avg Duration</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon"><i class="fas fa-calendar"></i></div>
+      <div class="sp-stat-value">{{ session_stats.sessions_this_month }}</div>
+      <div class="sp-stat-label">This Month</div>
+    </div>
+  </div>
 
-    <!-- Session History -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0">
-            <h5 class="mb-0">
-                <i class="fas fa-history me-2"></i>Session History
-            </h5>
-        </div>
-        <div class="card-body">
-            {% for session in sessions %}
-            <div class="card session-card {{ session.session_type }} border-0 shadow-sm mb-3">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="session-type-badge bg-primary text-white me-3">
-                                    {{ session.get_session_type_display }}
-                                </span>
-                                <h6 class="mb-0">{{ session.session_date|date:"F d, Y" }}</h6>
-                                <span class="text-muted ms-3">
-                                    <i class="fas fa-clock me-1"></i>{{ session.duration_minutes }} minutes
-                                </span>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-user-tie me-2 text-muted"></i>
-                                    <span class="fw-semibold">{{ session.mentor.name|default:session.mentor.username }}</span>
-                                    {% if session.course %}
-                                    <span class="text-muted ms-3">
-                                        <i class="fas fa-book me-1"></i>{{ session.course.title }}
-                                    </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            {% if session.topics_discussed %}
-                            <div class="mb-3">
-                                <h6 class="text-muted mb-2">Topics Discussed:</h6>
-                                <p class="mb-0">{{ session.topics_discussed }}</p>
-                            </div>
-                            {% endif %}
-                            
-                            {% if session.action_items %}
-                            <div class="mb-3">
-                                <h6 class="text-primary mb-2">
-                                    <i class="fas fa-tasks me-1"></i>Action Items:
-                                </h6>
-                                <div class="bg-light p-3 rounded">
-                                    {{ session.action_items|linebreaks }}
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            {% if session.student_feedback %}
-                            <div class="mb-3">
-                                <h6 class="text-success mb-2">
-                                    <i class="fas fa-comment me-1"></i>My Feedback:
-                                </h6>
-                                <p class="mb-0 fst-italic">"{{ session.student_feedback }}"</p>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4 text-center">
-                            {% if session.session_type == 'one_on_one' %}
-                                <i class="fas fa-user-friends fa-3x text-primary mb-2"></i>
-                            {% elif session.session_type == 'group' %}
-                                <i class="fas fa-users fa-3x text-success mb-2"></i>
-                            {% elif session.session_type == 'follow_up' %}
-                                <i class="fas fa-redo fa-3x text-warning mb-2"></i>
-                            {% elif session.session_type == 'career' %}
-                                <i class="fas fa-briefcase fa-3x text-info mb-2"></i>
-                            {% endif %}
-                            
-                            <div class="text-muted small">
-                                {{ session.session_date|timesince }} ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Session History -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title"><i class="fas fa-history"></i> All Sessions</span>
+    </div>
+    <div class="sp-card-body">
+      {% if sessions %}
+        {% for session in sessions %}
+        <div class="sp-session-item {{ session.session_type }}">
+          <div class="sp-session-header">
+            <div class="sp-session-main">
+              <div class="sp-session-top">
+                <span class="sp-session-badge">{{ session.get_session_type_display }}</span>
+                <span class="sp-session-date">{{ session.session_date|date:"F d, Y" }}</span>
+                <span class="sp-session-duration"><i class="fas fa-clock"></i>{{ session.duration_minutes }} min</span>
+              </div>
+              <div class="sp-session-mentor">
+                <span><i class="fas fa-user-tie"></i>{{ session.mentor.name|default:session.mentor.username }}</span>
+                {% if session.course %}
+                <span class="sp-session-course"><i class="fas fa-book"></i>{{ session.course.title }}</span>
+                {% endif %}
+              </div>
             </div>
-            {% empty %}
-            <div class="text-center py-5">
-                <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No mentoring sessions yet</h5>
-                <p class="text-muted">Your mentoring sessions will appear here once they're scheduled.</p>
+            <div class="sp-session-icon">
+              {% if session.session_type == 'one_on_one' %}
+                <i class="fas fa-user-friends"></i>
+              {% elif session.session_type == 'group' %}
+                <i class="fas fa-users"></i>
+              {% elif session.session_type == 'follow_up' %}
+                <i class="fas fa-redo"></i>
+              {% elif session.session_type == 'career' %}
+                <i class="fas fa-briefcase"></i>
+              {% else %}
+                <i class="fas fa-comments"></i>
+              {% endif %}
             </div>
-            {% endfor %}
-            
-            <!-- Pagination -->
-            {% if sessions.has_other_pages %}
-            <div class="d-flex justify-content-center mt-4">
-                <nav aria-label="Session pagination">
-                    <ul class="pagination">
-                        {% if sessions.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1">&laquo; First</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ sessions.previous_page_number }}">Previous</a>
-                        </li>
-                        {% endif %}
-                        
-                        {% for num in sessions.paginator.page_range %}
-                        {% if sessions.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
-                        {% elif num > sessions.number|add:'-3' and num < sessions.number|add:'3' %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                        </li>
-                        {% endif %}
-                        {% endfor %}
-                        
-                        {% if sessions.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ sessions.next_page_number }}">Next</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ sessions.paginator.num_pages }}">Last &raquo;</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+          </div>
+
+          <div class="sp-session-content">
+            {% if session.topics_discussed %}
+            <div class="sp-session-section">
+              <div class="sp-session-section-title">Topics Discussed</div>
+              <div class="sp-session-text">{{ session.topics_discussed }}</div>
             </div>
             {% endif %}
+
+            {% if session.action_items %}
+            <div class="sp-session-section">
+              <div class="sp-session-section-title primary"><i class="fas fa-tasks"></i> Action Items</div>
+              <div class="sp-session-box">{{ session.action_items|linebreaks }}</div>
+            </div>
+            {% endif %}
+
+            {% if session.student_feedback %}
+            <div class="sp-session-section">
+              <div class="sp-session-section-title success"><i class="fas fa-comment"></i> My Feedback</div>
+              <div class="sp-session-feedback">"{{ session.student_feedback }}"</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="sp-session-time">{{ session.session_date|timesince }} ago</div>
         </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if sessions.has_other_pages %}
+        <div class="sp-pagination">
+          {% if sessions.has_previous %}
+          <a href="?page=1" class="sp-page-link">&laquo;</a>
+          <a href="?page={{ sessions.previous_page_number }}" class="sp-page-link">Prev</a>
+          {% endif %}
+
+          {% for num in sessions.paginator.page_range %}
+            {% if sessions.number == num %}
+            <span class="sp-page-link active">{{ num }}</span>
+            {% elif num > sessions.number|add:'-3' and num < sessions.number|add:'3' %}
+            <a href="?page={{ num }}" class="sp-page-link">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if sessions.has_next %}
+          <a href="?page={{ sessions.next_page_number }}" class="sp-page-link">Next</a>
+          <a href="?page={{ sessions.paginator.num_pages }}" class="sp-page-link">&raquo;</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="sp-empty">
+          <i class="fas fa-calendar-plus"></i>
+          <h4>No mentoring sessions yet</h4>
+          <p>Your mentoring sessions will appear here once they're scheduled.</p>
+        </div>
+      {% endif %}
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,297 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Tuition Dashboard - LM Academy Admin{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Tuition Dashboard</h4>
+    <small class="text-muted">Manage offline tuition students, attendance & fees</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:tuition_student_create' %}" class="btn btn-primary btn-sm">
+      <i class="ti ti-user-plus me-1"></i>Add Student
+    </a>
+    <a href="{% url 'custom_admin:batch_create' %}" class="btn btn-outline-primary btn-sm">
+      <i class="ti ti-plus me-1"></i>New Batch
+    </a>
+    <a href="{% url 'custom_admin:generate_monthly_fees' %}" class="btn btn-success btn-sm text-white">
+      <i class="ti ti-receipt me-1"></i>Generate Fees
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row g-2 mb-3">
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.15);">
+            <i class="ti ti-users" style="color: #3b82f6;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #3b82f6 !important;">{{ stats.active_students }}</h5>
+            <small class="text-muted">Active Students</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(16, 185, 129, 0.15);">
+            <i class="ti ti-school" style="color: #10b981;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #10b981 !important;">{{ stats.active_batches }}</h5>
+            <small class="text-muted">Active Batches</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(22, 130, 75, 0.15);">
+            <i class="ti ti-currency-rupee" style="color: #16824b;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #16824b !important;">{{ stats.total_collected|floatformat:0 }}</h5>
+            <small class="text-muted">This Month</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.15);">
+            <i class="ti ti-alert-circle" style="color: #f59e0b;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #f59e0b !important;">{{ stats.pending_amount|floatformat:0 }}</h5>
+            <small class="text-muted">Pending</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(139, 92, 246, 0.15);">
+            <i class="ti ti-calendar" style="color: #8b5cf6;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #8b5cf6 !important;">{{ stats.todays_batches }}</h5>
+            <small class="text-muted">Today's Classes</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(20, 184, 166, 0.15);">
+            <i class="ti ti-chart-bar" style="color: #14b8a6;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #14b8a6 !important;">{{ stats.attendance_rate }}%</h5>
+            <small class="text-muted">Attendance</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions & Content -->
+<div class="row g-2 mb-3">
+  <!-- Quick Actions -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Quick Actions</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'custom_admin:mark_attendance' %}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-clipboard-check me-2"></i>Mark Attendance
+          </a>
+          <a href="{% url 'custom_admin:tuition_fees_list' %}?status=pending" class="btn btn-outline-warning btn-sm">
+            <i class="ti ti-receipt me-2"></i>Collect Pending Fees
+          </a>
+          <a href="{% url 'custom_admin:tuition_enrollment_create' %}" class="btn btn-outline-success btn-sm">
+            <i class="ti ti-user-check me-2"></i>New Enrollment
+          </a>
+          <a href="{% url 'custom_admin:standards_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="ti ti-list me-2"></i>Manage Standards
+          </a>
+          <a href="{% url 'custom_admin:subjects_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="ti ti-book me-2"></i>Manage Subjects
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Batches -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Today's Batches</h6>
+        <a href="{% url 'custom_admin:batches_list' %}" class="btn btn-sm btn-link p-0">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if todays_batches %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 12px;">
+            <tbody>
+              {% for batch in todays_batches|slice:":5" %}
+              <tr>
+                <td class="py-2">
+                  <div>
+                    <span class="fw-medium">{{ batch.name }}</span>
+                    <br><small class="text-muted">{{ batch.standard.name }} - {{ batch.subject.name }}</small>
+                  </div>
+                </td>
+                <td class="py-2 text-end">
+                  <a href="{% url 'custom_admin:batch_attendance' batch.id %}?date={{ today|date:'Y-m-d' }}" class="btn btn-sm btn-outline-primary py-0 px-2">
+                    <i class="ti ti-clipboard-check"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="ti ti-calendar-off mb-2" style="font-size: 24px;"></i>
+          <p class="mb-0" style="font-size: 12px;">No batches scheduled today</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Collections -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Recent Collections</h6>
+        <a href="{% url 'custom_admin:tuition_fees_list' %}?status=paid" class="btn btn-sm btn-link p-0">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_collections %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 12px;">
+            <tbody>
+              {% for fee in recent_collections %}
+              <tr>
+                <td class="py-2">
+                  <div>
+                    <span class="fw-medium">{{ fee.enrollment.student.name }}</span>
+                    <br><small class="text-muted">{{ fee.month_name }} {{ fee.year }}</small>
+                  </div>
+                </td>
+                <td class="py-2 text-end">
+                  <span class="text-success fw-medium">{{ fee.paid_amount|floatformat:0 }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="ti ti-receipt-off mb-2" style="font-size: 24px;"></i>
+          <p class="mb-0" style="font-size: 12px;">No recent collections</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Fees -->
+<div class="row g-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+          <i class="ti ti-alert-triangle text-warning me-1"></i>
+          Pending Fee Collections
+        </h6>
+        <a href="{% url 'custom_admin:tuition_fees_list' %}?status=pending" class="btn btn-sm btn-link p-0">View All ({{ stats.pending_fees_count }})</a>
+      </div>
+      <div class="card-body p-0">
+        {% if pending_fees %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 12px;">
+            <thead class="table-light">
+              <tr>
+                <th class="py-2">Student</th>
+                <th class="py-2">Period</th>
+                <th class="py-2 text-end">Amount</th>
+                <th class="py-2 text-center">Due Date</th>
+                <th class="py-2 text-center">Status</th>
+                <th class="py-2 text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fee in pending_fees %}
+              <tr>
+                <td class="py-2">
+                  <span class="fw-medium">{{ fee.enrollment.student.name }}</span>
+                  {% if fee.enrollment.batch %}
+                  <br><small class="text-muted">{{ fee.enrollment.batch.name }}</small>
+                  {% endif %}
+                </td>
+                <td class="py-2">{{ fee.month_name }} {{ fee.year }}</td>
+                <td class="py-2 text-end fw-medium">{{ fee.outstanding|floatformat:0 }}</td>
+                <td class="py-2 text-center">
+                  <small>{{ fee.due_date|date:"d M" }}</small>
+                </td>
+                <td class="py-2 text-center">
+                  {% if fee.status == 'overdue' %}
+                  <span class="badge bg-danger">Overdue</span>
+                  {% elif fee.status == 'partial' %}
+                  <span class="badge bg-warning">Partial</span>
+                  {% else %}
+                  <span class="badge bg-secondary">Pending</span>
+                  {% endif %}
+                </td>
+                <td class="py-2 text-end">
+                  <a href="{% url 'custom_admin:collect_fee' fee.id %}" class="btn btn-sm btn-success py-0 px-2">
+                    <i class="ti ti-cash"></i> Collect
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="ti ti-check mb-2" style="font-size: 24px; color: #10b981;"></i>
+          <p class="mb-0" style="font-size: 12px;">No pending fees!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

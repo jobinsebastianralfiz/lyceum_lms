@@ -1,0 +1,68 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Generate Monthly Fees</h4>
+    <small class="text-muted">Generate fee records for all active enrollments</small>
+  </div>
+  <a href="{% url 'custom_admin:tuition_fees_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="ti ti-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Select Period</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Month <span class="text-danger">*</span></label>
+              <select name="month" class="form-select" required>
+                {% for m in months %}
+                <option value="{{ m }}" {% if current_month == m %}selected{% endif %}>
+                  {% if m == 1 %}January{% elif m == 2 %}February{% elif m == 3 %}March{% elif m == 4 %}April{% elif m == 5 %}May{% elif m == 6 %}June{% elif m == 7 %}July{% elif m == 8 %}August{% elif m == 9 %}September{% elif m == 10 %}October{% elif m == 11 %}November{% else %}December{% endif %}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Year <span class="text-danger">*</span></label>
+              <select name="year" class="form-select" required>
+                {% for y in years %}
+                <option value="{{ y }}" {% if current_year == y %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="alert alert-info mt-4 mb-0" style="font-size: 13px;">
+            <i class="ti ti-info-circle me-1"></i>
+            <strong>Note:</strong> This will create fee records for all active enrollments that don't already have a fee record for the selected period.
+            <ul class="mb-0 mt-2">
+              <li>Fee amount will be taken from the enrollment's effective monthly fee</li>
+              <li>Due date will be set to the 10th of the month</li>
+              <li>Existing fee records will not be affected</li>
+            </ul>
+          </div>
+
+          <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-file-plus me-1"></i>Generate Fee Records
+            </button>
+            <a href="{% url 'custom_admin:tuition_fees_list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

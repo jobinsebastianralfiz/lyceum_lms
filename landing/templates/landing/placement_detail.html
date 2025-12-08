@@ -1,0 +1,161 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ placement.student_name }} - {{ placement.company_name }} - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="lm-detail-header">
+  <div class="container">
+    <nav class="lm-breadcrumb">
+      <a href="{% url 'landing:home' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'landing:placements_list' %}">Placements</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ placement.student_name }}</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Placement Content -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <div class="lm-detail-card">
+          <div class="lm-detail-body">
+            <!-- Placement Header -->
+            <div class="lm-placement-detail-header">
+              <div class="lm-placement-detail-student">
+                {% if placement.student_photo %}
+                <img src="{{ placement.student_photo.url }}" alt="{{ placement.student_name }}" class="student-photo-lg">
+                {% else %}
+                <div class="lm-avatar-placeholder-lg">{{ placement.student_name|slice:":1" }}</div>
+                {% endif %}
+                <div class="student-info">
+                  <h1>{{ placement.student_name }}</h1>
+                  <p class="course">{{ placement.course_completed }} • Batch {{ placement.batch_year }}</p>
+                </div>
+              </div>
+
+              {% if placement.company_logo %}
+              <div class="lm-placement-company-logo-lg">
+                <img src="{{ placement.company_logo.url }}" alt="{{ placement.company_name }}">
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Position Info -->
+            <div class="lm-placement-position-detail">
+              <span class="lm-badge lm-badge-primary lm-badge-lg">{{ placement.get_placement_type_display }}</span>
+              <h2>{{ placement.job_title }}</h2>
+              <div class="position-meta">
+                <span><i class="fas fa-building"></i> {{ placement.company_name }}</span>
+                <span><i class="fas fa-map-marker-alt"></i> {{ placement.location }}</span>
+              </div>
+              {% if placement.can_show_package %}
+              <div class="lm-package-highlight">
+                <span class="label">Annual Package</span>
+                <span class="value">{{ placement.package_currency }} {{ placement.package_amount|floatformat:0 }} LPA</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Success Story -->
+            <div class="lm-placement-story">
+              <h3><i class="fas fa-star me-2"></i> Success Story</h3>
+              <p>{{ placement.success_story|linebreaks }}</p>
+            </div>
+
+            <!-- Skills Gained -->
+            {% if placement.skills_gained %}
+            <div class="lm-placement-section">
+              <h3><i class="fas fa-graduation-cap me-2"></i> Skills Gained</h3>
+              <p>{{ placement.skills_gained }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Technologies Used -->
+            {% if placement.technologies_used %}
+            <div class="lm-placement-section">
+              <h3><i class="fas fa-code me-2"></i> Technologies Used</h3>
+              <div class="lm-tech-tags">
+                {% for tech in placement.technologies_used.split %}
+                <span class="lm-tech-tag">{{ tech }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="lm-detail-sidebar">
+          <!-- Quick Info -->
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-info-circle me-2"></i> Quick Info</h4>
+            <ul class="lm-info-list">
+              <li>
+                <span class="label">Placement Type</span>
+                <span class="value">{{ placement.get_placement_type_display }}</span>
+              </li>
+              <li>
+                <span class="label">Company</span>
+                <span class="value">{{ placement.company_name }}</span>
+              </li>
+              <li>
+                <span class="label">Location</span>
+                <span class="value">{{ placement.location }}</span>
+              </li>
+              <li>
+                <span class="label">Course</span>
+                <span class="value">{{ placement.course_completed }}</span>
+              </li>
+              <li>
+                <span class="label">Batch</span>
+                <span class="value">{{ placement.batch_year }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Related Placements -->
+          {% if related_placements %}
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-users me-2"></i> More Success Stories</h4>
+            <div class="lm-related-list">
+              {% for rel in related_placements %}
+              <a href="{% url 'landing:placement_detail' rel.pk %}" class="lm-related-item">
+                <div class="lm-related-avatar">
+                  {% if rel.student_photo %}
+                  <img src="{{ rel.student_photo.url }}" alt="{{ rel.student_name }}">
+                  {% else %}
+                  <div class="lm-avatar-sm">{{ rel.student_name|slice:":1" }}</div>
+                  {% endif %}
+                </div>
+                <div class="lm-related-info">
+                  <h5>{{ rel.student_name }}</h5>
+                  <span>{{ rel.job_title }} at {{ rel.company_name }}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- CTA -->
+          <div class="lm-sidebar-card lm-sidebar-cta">
+            <h4>Be Our Next Success</h4>
+            <p>Start your journey to landing your dream job.</p>
+            <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary">
+              Browse Courses <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

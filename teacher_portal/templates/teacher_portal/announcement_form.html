@@ -1,0 +1,138 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}{% if announcement %}Edit{% else %}Create{% endif %} Announcement - Teacher Portal{% endblock %}
+{% block page_title %}{% if announcement %}Edit{% else %}Create{% endif %} Announcement{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav style="margin-bottom: 20px;">
+  <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
+    <li class="breadcrumb-item"><a href="{% url 'teacher_portal:announcements' %}" style="color: var(--primary);">Announcements</a></li>
+    <li class="breadcrumb-item active" style="color: var(--text-secondary);">{% if announcement %}Edit{% else %}New{% endif %}</li>
+  </ol>
+</nav>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title">
+          <i class="fas fa-{% if announcement %}edit{% else %}plus{% endif %} me-2"></i>
+          {% if announcement %}Edit Announcement{% else %}New Announcement{% endif %}
+        </h3>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" style="font-weight: 500;">Title <span style="color: var(--danger);">*</span></label>
+            <input type="text" name="title" class="form-control tp-input"
+                   value="{{ announcement.title|default:'' }}"
+                   placeholder="Enter announcement title" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" style="font-weight: 500;">Course (Optional)</label>
+            <select name="course" class="form-select tp-input">
+              <option value="">All Courses (General)</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}" {% if announcement.course.id == course.id or request.GET.course == course.id|stringformat:"d" %}selected{% endif %}>
+                  {{ course.title }}
+                </option>
+              {% endfor %}
+            </select>
+            <small style="color: var(--text-secondary);">Leave empty to send to all your students</small>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" style="font-weight: 500;">Expiry Date (Optional)</label>
+            <input type="datetime-local" name="expiry_date" class="form-control tp-input"
+                   value="{{ announcement.expiry_date|date:'Y-m-d\TH:i'|default:'' }}">
+            <small style="color: var(--text-secondary);">Leave empty for no expiry</small>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" style="font-weight: 500;">Content <span style="color: var(--danger);">*</span></label>
+            <textarea name="content" class="form-control tp-input" rows="6"
+                      placeholder="Write your announcement content here..." required>{{ announcement.content|default:'' }}</textarea>
+          </div>
+
+          <div class="col-12">
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input type="checkbox" name="is_pinned" id="is_pinned" class="form-check-input"
+                       {% if announcement.is_pinned %}checked{% endif %}>
+                <label for="is_pinned" class="form-check-label">
+                  <i class="fas fa-thumbtack me-1"></i>Pin this announcement
+                </label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" name="send_notification" id="send_notification" class="form-check-input"
+                       {% if not announcement %}checked{% endif %}>
+                <label for="send_notification" class="form-check-label">
+                  <i class="fas fa-bell me-1"></i>Send notification to students
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <hr style="border-color: var(--border-color);">
+            <div class="d-flex gap-2">
+              <button type="submit" class="tp-btn tp-btn-primary">
+                <i class="fas fa-{% if announcement %}save{% else %}paper-plane{% endif %} me-2"></i>
+                {% if announcement %}Update Announcement{% else %}Publish Announcement{% endif %}
+              </button>
+              <a href="{% url 'teacher_portal:announcements' %}" class="tp-btn tp-btn-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    {% if announcement %}
+    <!-- Preview Section -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-eye me-2"></i>Current Preview</h3>
+      </div>
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <h4 style="font-size: 16px; font-weight: 600; margin: 0;">{{ announcement.title }}</h4>
+          {% if announcement.is_pinned %}
+            <span class="tp-badge tp-badge-warning"><i class="fas fa-thumbtack me-1"></i>Pinned</span>
+          {% endif %}
+        </div>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px; white-space: pre-wrap;">{{ announcement.content }}</p>
+        <small style="color: var(--text-secondary);">
+          Posted {{ announcement.created_at|date:"M d, Y" }} at {{ announcement.created_at|time:"h:i A" }}
+        </small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.tp-input {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.tp-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(42, 182, 115, 0.1);
+}
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+</style>
+{% endblock %}

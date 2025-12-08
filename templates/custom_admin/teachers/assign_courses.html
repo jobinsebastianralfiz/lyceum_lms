@@ -1,0 +1,99 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Assign Courses - {{ teacher.user.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          <i class="ti ti-book me-2"></i>Assign Courses to {{ teacher.user.name }}
+        </h4>
+        <p class="card-subtitle">Select courses this teacher will be able to manage</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:teacher_detail' teacher.id %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Profile
+        </a>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="alert alert-info mb-4">
+        <i class="ti ti-info-circle me-2"></i>
+        Teachers can view student progress, grade assignments, and manage content for assigned courses.
+      </div>
+
+      <div class="row">
+        {% for course in courses %}
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 border {% if course in form.courses.field.initial %}border-primary{% endif %}">
+            <div class="card-body">
+              <div class="form-check">
+                <input type="checkbox"
+                       name="courses"
+                       value="{{ course.id }}"
+                       id="course_{{ course.id }}"
+                       class="form-check-input"
+                       {% if course in form.courses.field.initial %}checked{% endif %}>
+                <label class="form-check-label w-100" for="course_{{ course.id }}">
+                  <div class="d-flex align-items-start">
+                    {% if course.thumbnail %}
+                      <img src="{{ course.thumbnail.url }}" alt="" class="rounded me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                      <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="ti ti-book text-muted"></i>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <div class="fw-medium">{{ course.title }}</div>
+                      <small class="text-muted">{{ course.category.name|default:"Uncategorized" }}</small>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="text-center py-5">
+            <i class="ti ti-book-off fs-1 text-muted mb-2 d-block"></i>
+            <p class="text-muted">No published courses available.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if courses %}
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{% url 'custom_admin:teacher_detail' teacher.id %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-device-floppy me-1"></i>Save Assignments
+        </button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<style>
+.card.border-primary {
+  border-width: 2px !important;
+}
+
+.form-check-input:checked ~ .form-check-label .card {
+  background-color: rgba(93, 135, 255, 0.1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

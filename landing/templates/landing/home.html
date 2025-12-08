@@ -1,613 +1,1472 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Lyceum Academy - #1 Online Learning Platform{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Dark Theme Override */
-body {
-  background: #0F172A !important;
-}
-
-/* Hero Section - Dark with Green Gradient */
-.lyceum-hero {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
-  padding: 120px 0 100px;
-  position: relative;
-  overflow: hidden;
-  border: none !important;
-}
-
-.lyceum-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(42, 182, 115, 0.08) 0%, transparent 50%);
-  z-index: 0;
-}
-
-.lyceum-hero-content {
-  position: relative;
-  z-index: 2;
-}
-
-.lyceum-hero h1 {
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: #F9FAFB;
-  margin-bottom: 25px;
-  line-height: 1.2;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-}
-
-.lyceum-hero .hero-subtitle {
-  font-size: 1.3rem;
-  color: #CBD5E1;
-  margin-bottom: 40px;
-  line-height: 1.7;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.lyceum-hero .hero-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #2AB673 0%, #3DD186 100%);
-  color: white;
-  padding: 10px 25px;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 20px rgba(42, 182, 115, 0.3);
-}
-
-/* Buttons */
-.btn-lyceum-primary {
-  background: #2AB673;
-  color: white;
-  padding: 16px 40px;
-  border-radius: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s ease;
-  border: 2px solid #2AB673;
-  font-size: 1.05rem;
-  box-shadow: 0 4px 20px rgba(42, 182, 115, 0.3);
-}
-
-.btn-lyceum-primary:hover {
-  background: #229959;
-  border-color: #229959;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(42, 182, 115, 0.4);
-  color: white;
-}
-
-.btn-lyceum-secondary {
-  background: transparent;
-  color: #CBD5E1;
-  padding: 16px 40px;
-  border-radius: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s ease;
-  border: 2px solid #374151;
-  margin-left: 15px;
-  font-size: 1.05rem;
-}
-
-.btn-lyceum-secondary:hover {
-  background: #1E293B;
-  border-color: #2AB673;
-  color: #2AB673;
-  transform: translateY(-2px);
-}
-
-/* Section Styling */
-.section-padding {
-  padding: 90px 0;
-  background: #0F172A;
-}
-
-.section-title {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: #F9FAFB;
-  margin-bottom: 20px;
-}
-
-.section-subtitle {
-  color: #2AB673;
-  font-weight: 700;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 15px;
-  display: inline-block;
-}
-
-/* Course Cards - Dark Theme */
-.course-card {
-  background: #1E293B;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border: none !important;
-}
-
-.course-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 40px rgba(42, 182, 115, 0.2);
-  border: none !important;
-}
-
-.course-card-img {
-  height: 240px;
-  background-size: cover;
-  background-position: center;
-  background-color: #334155;
-  position: relative;
-}
-
-.course-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #2AB673;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  box-shadow: 0 4px 15px rgba(42, 182, 115, 0.4);
-}
-
-.course-card-body {
-  padding: 30px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #1E293B;
-}
-
-.course-meta {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 18px;
-  font-size: 0.9rem;
-  color: #94A3B8;
-}
-
-.course-meta i {
-  color: #2AB673;
-}
-
-.course-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #F9FAFB;
-  margin-bottom: 15px;
-  line-height: 1.4;
-  min-height: 70px;
-}
-
-.course-title a {
-  color: #F9FAFB;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.course-title a:hover {
-  color: #2AB673;
-}
-
-.course-description {
-  color: #CBD5E1;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  margin-bottom: 25px;
-  flex: 1;
-}
-
-.course-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 20px;
-  border: none !important;
-}
-
-.course-price {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #2AB673;
-}
-
-.course-category {
-  background: rgba(42, 182, 115, 0.15);
-  color: #3DD186;
-  padding: 6px 14px;
-  border-radius: 18px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: none !important;
-}
-
-/* Features Section */
-.feature-card {
-  background: #1E293B;
-  padding: 40px 30px;
-  border-radius: 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-  border: none !important;
-  height: 100%;
-}
-
-.feature-card:hover {
-  box-shadow: 0 12px 35px rgba(42, 182, 115, 0.15);
-  transform: translateY(-8px);
-  border: none !important;
-}
-
-.feature-icon {
-  width: 90px;
-  height: 90px;
-  background: linear-gradient(135deg, #2AB673 0%, #3DD186 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 25px;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(42, 182, 115, 0.3);
-}
-
-.feature-card:hover .feature-icon {
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 0 12px 35px rgba(42, 182, 115, 0.4);
-}
-
-.feature-icon i {
-  font-size: 2.2rem;
-  color: white;
-}
-
-.feature-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #F9FAFB;
-  margin-bottom: 15px;
-}
-
-.feature-text {
-  color: #CBD5E1;
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-/* Stats Section */
-.stats-section {
-  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-  color: white;
-  padding: 80px 0;
-  border: none !important;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: white;
-  margin-bottom: 15px;
-}
-
-.stat-number span {
-  color: #3DD186;
-}
-
-.stat-label {
-  font-size: 1.2rem;
-  color: #CBD5E1;
-  font-weight: 500;
-}
-
-/* CTA Section */
-.cta-section {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-  padding: 90px 0;
-  text-align: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
-}
-
-.cta-section h2 {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 25px;
-  color: #F9FAFB;
-  position: relative;
-  z-index: 2;
-}
-
-.cta-section p {
-  font-size: 1.3rem;
-  margin-bottom: 40px;
-  color: #CBD5E1;
-  position: relative;
-  z-index: 2;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .lyceum-hero h1 {
-    font-size: 2.2rem;
-  }
-
-  .lyceum-hero .hero-subtitle {
-    font-size: 1.1rem;
-  }
-
-  .section-title {
-    font-size: 2rem;
-  }
-
-  .btn-lyceum-secondary {
-    margin-left: 0;
-    margin-top: 15px;
-  }
-
-  .stat-number {
-    font-size: 2.5rem;
-  }
-
-  .cta-section h2 {
-    font-size: 2rem;
-  }
-}
-</style>
-{% endblock %}
+{% block title %}Lyceum Academy - Transform Your Career with Online Learning{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="lyceum-hero">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-10 mx-auto text-center lyceum-hero-content">
-        <div class="hero-badge">#1 Online Learning Platform</div>
-        <h1>Welcome to Lyceum Academy</h1>
-        <p class="hero-subtitle">
-          Transform your career with industry-leading courses designed by experts.
-          Learn at your own pace with our comprehensive online learning platform.
+<!-- News Ticker -->
+{% if latest_news or upcoming_events %}
+<div class="lm-news-ticker">
+  <div class="news-ticker-label">
+    <i class="fas fa-bolt"></i> Updates
+  </div>
+  <div class="news-ticker-wrapper">
+    <div class="news-ticker-content">
+      {% for event in upcoming_events|slice:":3" %}
+      <a href="{% url 'landing:events_list' %}" class="ticker-item ticker-item-event">
+        <i class="fas fa-calendar-alt"></i>
+        <span>{{ event.title|truncatechars:50 }} - {{ event.event_date|date:"M d" }}</span>
+      </a>
+      {% endfor %}
+      {% for news in latest_news|slice:":3" %}
+      <a href="{% url 'landing:news_detail' news.slug %}" class="ticker-item">
+        <i class="fas fa-newspaper"></i>
+        <span>{{ news.title|truncatechars:50 }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Hero Section - Full Width Banner -->
+<section class="lm-hero lm-hero-fullwidth">
+  {% if hero_banners %}
+  <div class="lm-hero-slider-wrapper">
+    <div class="lm-hero-banner-slider">
+      {% for banner in hero_banners %}
+      <div class="lm-hero-banner-slide {% if not banner.background_image %}lm-hero-default{% endif %}" {% if banner.background_image %}style="background-image: url('{{ banner.background_image.url }}');"{% endif %}>
+        <div class="lm-hero-banner-overlay"></div>
+        <div class="container">
+          <div class="lm-hero-banner-row {% if banner.featured_image %}has-featured-image{% endif %}">
+            <div class="lm-hero-banner-content">
+              <div class="lm-hero-badge">
+                <i class="fas fa-award"></i> #1 Online Learning Platform
+              </div>
+              <h1 style="color: {{ banner.text_color|default:'white' }} !important;">{{ banner.title|safe }}</h1>
+              {% if banner.subtitle %}
+              <p class="lm-hero-subtitle">{{ banner.subtitle }}</p>
+              {% endif %}
+              <div class="lm-hero-actions">
+                {% if banner.cta_text %}
+                <a href="{{ banner.cta_link|default:'/courses/' }}" class="btn-lm btn-lm-primary btn-lm-lg">
+                  {{ banner.cta_text }} <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+                {% else %}
+                <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary btn-lm-lg">
+                  Explore Courses <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+                {% endif %}
+                {% if banner.secondary_cta_text %}
+                <a href="{{ banner.secondary_cta_link|default:'/register/' }}" class="btn-lm btn-lm-secondary btn-lm-lg">
+                  {{ banner.secondary_cta_text }}
+                </a>
+                {% endif %}
+              </div>
+            </div>
+            {% if banner.featured_image %}
+            <div class="lm-hero-featured-image">
+              <img src="{{ banner.featured_image.url }}" alt="{{ banner.title }}">
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <!-- Slider Navigation - Outside slider, JS controls visibility -->
+    <button class="lm-hero-arrow lm-hero-prev"><i class="fas fa-chevron-left"></i></button>
+    <button class="lm-hero-arrow lm-hero-next"><i class="fas fa-chevron-right"></i></button>
+    <div class="lm-hero-banner-dots"></div>
+  </div>
+  {% else %}
+  <!-- Default Hero when no banners -->
+  <div class="lm-hero-banner-slide lm-hero-default">
+    <div class="lm-hero-banner-overlay"></div>
+    <div class="container">
+      <div class="lm-hero-banner-content">
+        <div class="lm-hero-badge">
+          <i class="fas fa-award"></i> #1 Online Learning Platform
+        </div>
+        <h1>Transform Your <span>Career</span> With Industry-Leading Courses</h1>
+        <p class="lm-hero-subtitle">
+          Join thousands of learners who have accelerated their careers with our expert-designed courses.
         </p>
-        <div>
-          <a href="{% url 'landing:courses' %}" class="btn-lyceum-primary">Explore Courses</a>
+        <div class="lm-hero-actions">
+          <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary btn-lm-lg">
+            Explore Courses <i class="fas fa-arrow-right ms-2"></i>
+          </a>
           {% if not user.is_authenticated %}
-          <a href="{% url 'landing:login' %}" class="btn-lyceum-secondary">Get Started</a>
+          <a href="{% url 'landing:register' %}" class="btn-lm btn-lm-secondary btn-lm-lg">
+            Get Started Free
+          </a>
           {% endif %}
         </div>
       </div>
     </div>
   </div>
-</section>
+  {% endif %}
 
-<!-- Features Section -->
-<section class="section-padding" style="background: #0F172A;">
-  <div class="container">
-    <div class="row mb-5">
-      <div class="col-lg-8 mx-auto text-center">
-        <div class="section-subtitle">Why Choose Us</div>
-        <h2 class="section-title">Excellence in Every Aspect</h2>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-chalkboard-teacher"></i>
-          </div>
-          <h3 class="feature-title">Expert Instructors</h3>
-          <p class="feature-text">Learn from industry professionals with years of real-world experience</p>
+  <!-- Hero Highlights -->
+  <div class="lm-hero-highlights-bar">
+    <div class="container">
+      <div class="lm-hero-highlights">
+        <div class="lm-hero-highlight">
+          <i class="fas fa-check-circle"></i>
+          <span>Industry Experts</span>
         </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-laptop-code"></i>
-          </div>
-          <h3 class="feature-title">Hands-On Learning</h3>
-          <p class="feature-text">Practice with real projects and build your portfolio</p>
+        <div class="lm-hero-highlight">
+          <i class="fas fa-check-circle"></i>
+          <span>Flexible Learning</span>
         </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-clock"></i>
-          </div>
-          <h3 class="feature-title">Flexible Schedule</h3>
-          <p class="feature-text">Learn at your own pace, anytime and anywhere</p>
+        <div class="lm-hero-highlight">
+          <i class="fas fa-check-circle"></i>
+          <span>Certified Courses</span>
         </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-certificate"></i>
-          </div>
-          <h3 class="feature-title">Certification</h3>
-          <p class="feature-text">Get recognized certificates upon course completion</p>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-users"></i>
-          </div>
-          <h3 class="feature-title">Community Support</h3>
-          <p class="feature-text">Connect with peers and mentors in our learning community</p>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-briefcase"></i>
-          </div>
-          <h3 class="feature-title">Career Support</h3>
-          <p class="feature-text">Get guidance and support for your career advancement</p>
+        <div class="lm-hero-highlight">
+          <i class="fas fa-check-circle"></i>
+          <span>24/7 Support</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Courses Section -->
-<section class="section-padding" style="background: #0F172A;">
+<!-- News & Events Section - Same on Desktop and Mobile -->
+{% if upcoming_events or latest_news %}
+<section class="lm-news-events-section">
   <div class="container">
-    <div class="row mb-5">
-      <div class="col-lg-8">
-        <div class="section-subtitle">Explore Our Courses</div>
-        <h2 class="section-title">Featured Courses</h2>
-      </div>
-      <div class="col-lg-4 text-lg-end align-self-end">
-        <a href="{% url 'landing:courses' %}" class="btn-lyceum-primary">
-          View All Courses <i class="fas fa-arrow-right ms-2"></i>
-        </a>
-      </div>
+    <div class="lm-news-events-header">
+      <h3><i class="fas fa-newspaper me-2"></i>Latest Updates</h3>
+      <a href="{% url 'landing:news_list' %}" class="view-all-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="lm-news-events-grid">
+      {% for event in upcoming_events|slice:":2" %}
+      <a href="{% url 'landing:events_list' %}" class="lm-news-event-card lm-news-event-card-event">
+        {% if event.featured_image %}
+        <div class="news-event-image">
+          <img src="{{ event.featured_image.url }}" alt="{{ event.title }}">
+        </div>
+        {% else %}
+        <div class="news-event-image news-event-image-placeholder event-placeholder">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        {% endif %}
+        <div class="news-event-content">
+          <span class="news-event-category event-category">{{ event.get_event_type_display }}</span>
+          <h4>{{ event.title|truncatechars:40 }}</h4>
+          <div class="news-event-meta">
+            <i class="far fa-calendar"></i> {{ event.event_date|date:"M d, Y" }}
+            <i class="far fa-clock ms-2"></i> {{ event.start_time|time:"g:i A" }}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+      {% for news in latest_news|slice:":2" %}
+      <a href="{% url 'landing:news_detail' news.slug %}" class="lm-news-event-card">
+        {% if news.featured_image %}
+        <div class="news-event-image">
+          <img src="{{ news.featured_image.url }}" alt="{{ news.title }}">
+        </div>
+        {% else %}
+        <div class="news-event-image news-event-image-placeholder">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        {% endif %}
+        <div class="news-event-content">
+          {% if news.category %}
+          <span class="news-event-category">{{ news.get_category_display }}</span>
+          {% endif %}
+          <h4>{{ news.title|truncatechars:40 }}</h4>
+          <div class="news-event-meta">
+            <i class="far fa-calendar"></i> {{ news.published_at|date:"M d, Y" }}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Featured Courses Section -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">Our Programs</span>
+      <h2 class="lm-section-title">Featured Courses</h2>
+      <p class="lm-section-subtitle">
+        Explore our most popular courses designed by industry experts to help you achieve your career goals.
+      </p>
     </div>
 
-    <div class="row g-4">
+    <div class="lm-courses-grid">
       {% for course in courses %}
-      <div class="col-lg-4 col-md-6">
-        <div class="course-card">
-          <div class="course-card-img"
-               style="background-image: url('{% if course.thumbnail %}{{ course.thumbnail.url }}{% else %}{% static 'landing/assets/img/online-education/course1.jpg' %}{% endif %}');">
-            <div class="course-badge">
+      <div class="lm-course-card">
+        <div class="lm-course-image">
+          {% if course.thumbnail %}
+            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+          {% else %}
+            <img src="{% static 'landing/assets/img/course-placeholder.jpg' %}" alt="{{ course.title }}" onerror="this.style.background='linear-gradient(135deg, #e8f8f0 0%, #f3f4f6 100%)'">
+          {% endif %}
+          <div class="lm-course-badges">
+            {% if not course.allow_public_enrollment %}
+              <span class="lm-badge lm-badge-enquiry" style="background: #ff9800;">Enquire Only</span>
+            {% elif course.is_free_course %}
+              <span class="lm-badge lm-badge-free">Free</span>
+            {% elif forloop.first %}
+              <span class="lm-badge lm-badge-bestseller">Bestseller</span>
+            {% elif forloop.counter == 2 %}
+              <span class="lm-badge lm-badge-popular">Popular</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="lm-course-body">
+          {% if course.category %}
+            <div class="lm-course-category">{{ course.category.name }}</div>
+          {% endif %}
+          <h3 class="lm-course-title">
+            <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
+          </h3>
+          <div class="lm-course-meta">
+            <span class="lm-course-meta-item">
+              <i class="far fa-clock"></i> {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
+            </span>
+            <span class="lm-course-meta-item">
+              <i class="far fa-calendar"></i> {{ course.created_at|date:"M Y" }}
+            </span>
+          </div>
+          <p class="lm-course-description">{{ course.description|truncatechars:120 }}</p>
+          <div class="lm-course-footer">
+            <div class="lm-course-price">
               {% if course.is_free_course %}
                 Free
               {% else %}
                 ₹{{ course.total_price|floatformat:0 }}
               {% endif %}
             </div>
-          </div>
-
-          <div class="course-card-body">
-            <div class="course-meta">
-              <span><i class="far fa-clock"></i> {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}</span>
-              <span><i class="far fa-calendar"></i> {{ course.created_at|date:"M d, Y" }}</span>
-            </div>
-
-            <h3 class="course-title">
-              <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
-            </h3>
-
-            <p class="course-description">{{ course.description|truncatechars:120 }}</p>
-
-            <div class="course-footer">
-              {% if course.category %}
-              <span class="course-category">{{ course.category.name }}</span>
-              {% endif %}
-              <a href="{% url 'landing:course_detail' course.id %}" style="color: #2AB673; text-decoration: none; font-weight: 600;">
-                View Details <i class="fas fa-arrow-right"></i>
-              </a>
-            </div>
+            <a href="{% url 'landing:course_detail' course.id %}" class="lm-course-cta">
+              {% if not course.allow_public_enrollment %}Enquire Now{% else %}View Program{% endif %} <i class="fas fa-arrow-right"></i>
+            </a>
           </div>
         </div>
       </div>
       {% empty %}
       <div class="col-12">
         <div class="text-center py-5">
-          <h3 style="color: #CBD5E1;">No courses available at the moment</h3>
-          <p style="color: #94A3B8;">Check back later for new courses!</p>
+          <i class="fas fa-graduation-cap" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+          <h3 style="color: var(--text-secondary);">No courses available yet</h3>
+          <p style="color: var(--text-muted);">Check back soon for exciting new courses!</p>
         </div>
       </div>
       {% endfor %}
+    </div>
+
+    {% if courses %}
+    <div class="text-center mt-5">
+      <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary btn-lm-lg">
+        View All Courses <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="lm-section lm-section-white" id="about">
+  <div class="container">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">Why Choose Us</span>
+      <h2 class="lm-section-title">Excellence in Every Aspect</h2>
+      <p class="lm-section-subtitle">
+        Discover what makes Lyceum Academy the preferred choice for ambitious learners worldwide.
+      </p>
+    </div>
+
+    <div class="lm-features-grid">
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <h3 class="lm-feature-title">Expert Instructors</h3>
+        <p class="lm-feature-text">Learn from industry professionals with years of real-world experience and a passion for teaching.</p>
+      </div>
+
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-laptop-code"></i>
+        </div>
+        <h3 class="lm-feature-title">Hands-On Projects</h3>
+        <p class="lm-feature-text">Apply your learning through practical projects that build your portfolio and demonstrate your skills.</p>
+      </div>
+
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <h3 class="lm-feature-title">Flexible Learning</h3>
+        <p class="lm-feature-text">Study at your own pace with 24/7 access to course materials from any device, anywhere.</p>
+      </div>
+
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-certificate"></i>
+        </div>
+        <h3 class="lm-feature-title">Certification</h3>
+        <p class="lm-feature-text">Earn industry-recognized certificates upon completion to showcase your achievements.</p>
+      </div>
+
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="lm-feature-title">Community Support</h3>
+        <p class="lm-feature-text">Connect with peers, mentors, and alumni in our vibrant learning community.</p>
+      </div>
+
+      <div class="lm-feature-card">
+        <div class="lm-feature-icon">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <h3 class="lm-feature-title">Career Services</h3>
+        <p class="lm-feature-text">Get personalized career guidance, resume reviews, and interview preparation support.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- Stats Section -->
-<section class="stats-section">
+<section class="lm-stats">
   <div class="container">
+    <div class="lm-stats-grid">
+      <div class="lm-stat-item">
+        <div class="lm-stat-number"><span>{{ courses|length|add:50 }}</span>+</div>
+        <div class="lm-stat-label">Courses Available</div>
+      </div>
+      <div class="lm-stat-item">
+        <div class="lm-stat-number"><span>10</span>K+</div>
+        <div class="lm-stat-label">Active Students</div>
+      </div>
+      <div class="lm-stat-item">
+        <div class="lm-stat-number"><span>50</span>+</div>
+        <div class="lm-stat-label">Expert Instructors</div>
+      </div>
+      <div class="lm-stat-item">
+        <div class="lm-stat-number"><span>95</span>%</div>
+        <div class="lm-stat-label">Success Rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="lm-section lm-section-white">
+  <div class="container">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">How It Works</span>
+      <h2 class="lm-section-title">Your Learning Journey</h2>
+      <p class="lm-section-subtitle">
+        Getting started is simple. Follow these steps to begin your transformation.
+      </p>
+    </div>
+
     <div class="row g-4">
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-number"><span>{{ courses|length|add:50 }}</span>+</div>
-          <div class="stat-label">Courses Available</div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div style="width: 80px; height: 80px; background: var(--primary-subtle); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; font-weight: 800; color: var(--primary);">1</div>
+          <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Choose Your Course</h4>
+          <p style="color: var(--text-secondary);">Browse our catalog and select the course that aligns with your career goals.</p>
         </div>
       </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-number"><span>10</span>K+</div>
-          <div class="stat-label">Active Students</div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div style="width: 80px; height: 80px; background: var(--primary-subtle); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; font-weight: 800; color: var(--primary);">2</div>
+          <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Learn at Your Pace</h4>
+          <p style="color: var(--text-secondary);">Access video lessons, assignments, and resources anytime, anywhere.</p>
         </div>
       </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-number"><span>50</span>+</div>
-          <div class="stat-label">Expert Instructors</div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-item">
-          <div class="stat-number"><span>95</span>%</div>
-          <div class="stat-label">Success Rate</div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div style="width: 80px; height: 80px; background: var(--primary-subtle); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; font-weight: 800; color: var(--primary);">3</div>
+          <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Get Certified</h4>
+          <p style="color: var(--text-secondary);">Complete the course and earn your certificate to showcase your skills.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta-section">
+<!-- Testimonials Section -->
+{% if testimonials %}
+<section class="lm-section lm-section-light">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-8 mx-auto">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">Success Stories</span>
+      <h2 class="lm-section-title">What Our Students Say</h2>
+      <p class="lm-section-subtitle">
+        Hear from our students about their learning journey and career transformation.
+      </p>
+    </div>
+
+    <div class="lm-home-testimonials">
+      {% for testimonial in testimonials %}
+      <div class="lm-home-testimonial-card">
+        <div class="lm-testimonial-rating">
+          {% for i in "12345" %}
+            {% if forloop.counter <= testimonial.overall_rating %}
+            <i class="fas fa-star"></i>
+            {% else %}
+            <i class="far fa-star"></i>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% if testimonial.testimonial_text %}
+        <p class="lm-testimonial-text">"{{ testimonial.testimonial_text|truncatechars:150 }}"</p>
+        {% endif %}
+        <div class="lm-testimonial-author">
+          <div class="lm-testimonial-avatar">
+            {% if testimonial.student_photo %}
+            <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}">
+            {% else %}
+            <div class="lm-avatar-placeholder">{{ testimonial.student_name|slice:":1" }}</div>
+            {% endif %}
+          </div>
+          <div class="lm-testimonial-info">
+            <h4>{{ testimonial.student_name }}</h4>
+            <p>{{ testimonial.course_name }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'landing:testimonials_list' %}" class="btn-lm btn-lm-outline">
+        View All Testimonials <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Placements Section -->
+{% if placements %}
+<section class="lm-section lm-section-white">
+  <div class="container">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">Career Success</span>
+      <h2 class="lm-section-title">Our Students Work At</h2>
+      <p class="lm-section-subtitle">
+        Join the ranks of our successful graduates who landed their dream jobs.
+      </p>
+    </div>
+
+    <div class="lm-home-placements">
+      {% for placement in placements %}
+      <div class="lm-home-placement-card">
+        <div class="lm-placement-top">
+          <div class="lm-placement-student">
+            {% if placement.student_photo %}
+            <img src="{{ placement.student_photo.url }}" alt="{{ placement.student_name }}" class="student-photo">
+            {% else %}
+            <div class="lm-avatar-placeholder">{{ placement.student_name|slice:":1" }}</div>
+            {% endif %}
+          </div>
+          {% if placement.company_logo %}
+          <div class="lm-placement-company-logo">
+            <img src="{{ placement.company_logo.url }}" alt="{{ placement.company_name }}">
+          </div>
+          {% endif %}
+        </div>
+        <div class="lm-placement-info">
+          <h4>{{ placement.student_name }}</h4>
+          <p class="job-title">{{ placement.job_title }}</p>
+          <p class="company"><i class="fas fa-building"></i> {{ placement.company_name }}</p>
+          {% if placement.can_show_package %}
+          <span class="lm-placement-package-badge">{{ placement.package_currency }} {{ placement.package_amount|floatformat:0 }} LPA</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'landing:placements_list' %}" class="btn-lm btn-lm-outline">
+        View All Placements <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Achievements Section -->
+{% if achievements %}
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="lm-section-header">
+      <span class="lm-section-tag">Recognition</span>
+      <h2 class="lm-section-title">Our Achievements</h2>
+      <p class="lm-section-subtitle">
+        Awards and recognitions that reflect our commitment to excellence.
+      </p>
+    </div>
+
+    <div class="lm-home-achievements">
+      {% for achievement in achievements %}
+      <div class="lm-home-achievement-card">
+        <div class="lm-achievement-icon">
+          {% if achievement.badge_icon %}
+          <img src="{{ achievement.badge_icon.url }}" alt="{{ achievement.title }}">
+          {% else %}
+          <i class="fas fa-trophy"></i>
+          {% endif %}
+        </div>
+        <h4>{{ achievement.title }}</h4>
+        <p class="awarded-by">{{ achievement.awarded_by }}</p>
+        <span class="year">{{ achievement.year }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'landing:achievements_list' %}" class="btn-lm btn-lm-outline">
+        View All Achievements <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="lm-cta">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
         <h2>Ready to Start Your Learning Journey?</h2>
-        <p>Join thousands of students who are already transforming their careers with Lyceum Academy</p>
+        <p>Join thousands of learners who are already transforming their careers with Lyceum Academy.</p>
         {% if not user.is_authenticated %}
-        <a href="{% url 'landing:login' %}" class="btn-lyceum-primary">Get Started Today</a>
+          <a href="{% url 'landing:register' %}" class="btn-lm btn-lm-primary btn-lm-lg">
+            Get Started Today <i class="fas fa-arrow-right ms-2"></i>
+          </a>
         {% else %}
-        <a href="{% url 'landing:courses' %}" class="btn-lyceum-primary">Browse Courses</a>
+          <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary btn-lm-lg">
+            Browse Courses <i class="fas fa-arrow-right ms-2"></i>
+          </a>
         {% endif %}
       </div>
     </div>
   </div>
 </section>
+
+<!-- Styles for News Ticker, Full-Width Hero, and News/Events Section -->
+<style>
+  /* News Ticker */
+  .lm-news-ticker {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a9a5f 100%);
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .news-ticker-label {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 6px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    margin-left: 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .news-ticker-wrapper {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 20px;
+  }
+
+  .news-ticker-content {
+    display: flex;
+    animation: ticker-scroll 30s linear infinite;
+    gap: 40px;
+  }
+
+  .news-ticker-content:hover {
+    animation-play-state: paused;
+  }
+
+  .ticker-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 14px;
+    transition: opacity 0.3s;
+  }
+
+  .ticker-item:hover {
+    opacity: 0.8;
+    color: white;
+  }
+
+  .ticker-item i {
+    font-size: 12px;
+  }
+
+  .ticker-item-event i {
+    color: #ffd700;
+  }
+
+  @keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Full Width Hero */
+  .lm-hero.lm-hero-fullwidth {
+    padding: 0;
+    position: relative;
+    background: #0f172a;
+  }
+
+  .lm-hero-slider-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+    overflow: hidden;
+  }
+
+  .lm-hero-banner-slider {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+  }
+
+  .lm-hero-banner-slider .slick-slide {
+    height: auto;
+  }
+
+  .lm-hero-banner-slider .slick-track {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .lm-hero-banner-slider .slick-list {
+    overflow: hidden;
+  }
+
+  .lm-hero-banner-slider .slick-track {
+    display: flex;
+  }
+
+  .lm-hero-banner-slider .slick-slide {
+    float: none;
+    height: auto;
+  }
+
+  .lm-hero-banner-slider .slick-slide > div {
+    height: 100%;
+  }
+
+  .lm-hero-banner-slide {
+    min-height: 520px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .lm-hero-banner-slide.lm-hero-default {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+
+  .lm-hero-banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.7) 50%, rgba(15,23,42,0.4) 100%);
+    z-index: 1;
+  }
+
+  .lm-hero-banner-slide .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  .lm-hero-banner-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    min-height: 520px;
+  }
+
+  .lm-hero-banner-row:not(.has-featured-image) {
+    justify-content: flex-start;
+  }
+
+  .lm-hero-banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 80px 0;
+    max-width: 550px;
+    width: 100%;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .lm-hero-banner-row.has-featured-image .lm-hero-banner-content {
+    max-width: 50%;
+  }
+
+  /* Featured Image on Right Side */
+  .lm-hero-featured-image {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    background: none !important;
+  }
+
+  /* Remove green background from theme CSS */
+  .lm-hero-featured-image::before {
+    display: none !important;
+  }
+
+  .lm-hero-featured-image img {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 12px;
+    max-height: none !important;
+  }
+
+  /* Lighter overlay when featured image is present */
+  .lm-hero-banner-slide:has(.has-featured-image) .lm-hero-banner-overlay {
+    background: linear-gradient(to right, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.6) 40%, rgba(15,23,42,0.3) 100%);
+  }
+
+  .lm-hero-banner-content .lm-hero-badge,
+  .lm-hero-banner-content h1,
+  .lm-hero-banner-content p,
+  .lm-hero-banner-content .lm-hero-actions {
+    text-align: left;
+  }
+
+  .lm-hero-fullwidth .lm-hero-badge {
+    background: rgba(42, 182, 115, 0.15);
+    color: var(--primary);
+    border: 1px solid rgba(42, 182, 115, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .lm-hero-fullwidth h1 {
+    color: white !important;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .lm-hero-fullwidth h1 span {
+    color: var(--primary);
+  }
+
+  .lm-hero-fullwidth .lm-hero-subtitle {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .lm-hero-fullwidth .lm-hero-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .lm-hero-fullwidth .btn-lm-primary {
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(42, 182, 115, 0.35);
+  }
+
+  .lm-hero-fullwidth .btn-lm-secondary {
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.25);
+    padding: 12px 28px;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 8px;
+  }
+
+  .lm-hero-fullwidth .btn-lm-secondary:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  /* Slider Arrow Controls */
+  .lm-hero-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lm-hero-arrow:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .lm-hero-prev {
+    left: 25px;
+  }
+
+  .lm-hero-next {
+    right: 25px;
+  }
+
+  /* Hide slick loading indicator and ajax loader */
+  .slick-loading .slick-list,
+  .lm-hero-banner-slider .slick-list,
+  .lm-hero-slider-wrapper .slick-list {
+    background: none !important;
+    background-image: none !important;
+  }
+
+  .slick-loading .slick-slide {
+    visibility: visible !important;
+  }
+
+  /* Hide any slick default elements */
+  .lm-hero-slider-wrapper .slick-list::before,
+  .lm-hero-slider-wrapper .slick-list::after,
+  .lm-hero-banner-slider::before,
+  .lm-hero-banner-slider::after,
+  .lm-hero-slider-wrapper::before,
+  .lm-hero-slider-wrapper::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+  }
+
+  /* Completely hide slick loader gif */
+  .slick-slider .slick-loading .slick-list {
+    background: transparent url('') !important;
+  }
+
+  /* Override ALL slick default dots styling */
+  .slick-dots {
+    position: static !important;
+    bottom: auto !important;
+  }
+
+  .slick-dots li button:before {
+    display: none !important;
+    content: '' !important;
+    opacity: 0 !important;
+    color: transparent !important;
+  }
+
+  /* Slider Dots Container */
+  .lm-hero-banner-dots {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 999 !important;
+    background: rgba(0,0,0,0.6) !important;
+    padding: 10px 18px !important;
+    border-radius: 25px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .lm-hero-banner-dots ul.slick-dots {
+    display: flex !important;
+    gap: 10px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: static !important;
+    bottom: auto !important;
+    width: auto !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 12px !important;
+    height: 12px !important;
+    display: block !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li.slick-active {
+    width: 28px !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li button {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,0.6) !important;
+    border: none !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    padding: 0 !important;
+    display: block !important;
+    color: transparent !important;
+    outline: none !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li button:before {
+    display: none !important;
+    content: '' !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li button:hover {
+    background: rgba(255,255,255,0.9) !important;
+  }
+
+  .lm-hero-banner-dots .slick-dots li.slick-active button {
+    background: var(--primary) !important;
+    border-radius: 6px !important;
+  }
+
+  /* Hero Highlights Bar */
+  .lm-hero-highlights-bar {
+    background: white;
+    padding: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: relative;
+    z-index: 5;
+  }
+
+  .lm-hero-highlights-bar .lm-hero-highlights {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+
+  .lm-hero-highlights-bar .lm-hero-highlight {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* News & Events Section */
+  .lm-news-events-section {
+    padding: 40px 0;
+    background: var(--bg-light);
+  }
+
+  .lm-news-events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .lm-news-events-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .view-all-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .view-all-link:hover {
+    color: var(--primary-dark);
+  }
+
+  .lm-news-events-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .lm-news-event-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    display: block;
+  }
+
+  .lm-news-event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  }
+
+  .news-event-image {
+    height: 140px;
+    overflow: hidden;
+  }
+
+  .news-event-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .news-event-image-placeholder {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-subtle) 0%, #e8f8f0 100%);
+    color: var(--primary);
+    font-size: 2rem;
+  }
+
+  .news-event-image-placeholder.event-placeholder {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    color: white;
+  }
+
+  .news-event-content {
+    padding: 16px;
+  }
+
+  .news-event-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-subtle);
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .news-event-category.event-category {
+    background: #fff3e0;
+    color: #f57c00;
+  }
+
+  .news-event-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+
+  .news-event-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .news-event-meta i {
+    margin-right: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .lm-news-events-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lm-hero-arrow {
+      width: 42px;
+      height: 42px;
+    }
+
+    .lm-hero-prev {
+      left: 15px;
+    }
+
+    .lm-hero-next {
+      right: 15px;
+    }
+  }
+
+  @media (max-width: 991px) {
+    .lm-hero-slider-wrapper,
+    .lm-hero-banner-slider {
+      min-height: auto;
+    }
+
+    .lm-hero-arrow,
+    .lm-hero-prev,
+    .lm-hero-next {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .lm-hero-banner-slide {
+      min-height: auto !important;
+    }
+
+    .lm-hero-banner-row {
+      flex-direction: column;
+      gap: 15px;
+      min-height: auto;
+      padding: 40px 0 60px;
+    }
+
+    .lm-hero-banner-row:not(.has-featured-image) {
+      padding: 50px 0 70px;
+    }
+
+    .lm-hero-banner-row.has-featured-image .lm-hero-banner-content {
+      max-width: 100%;
+    }
+
+    .lm-hero-banner-content {
+      max-width: 100%;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .lm-hero-banner-content .lm-hero-badge,
+    .lm-hero-banner-content h1,
+    .lm-hero-banner-content p,
+    .lm-hero-banner-content .lm-hero-actions {
+      text-align: center;
+    }
+
+    .lm-hero-banner-content .lm-hero-badge {
+      margin: 0 auto 15px;
+    }
+
+    .lm-hero-banner-content .lm-hero-actions {
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .lm-hero-fullwidth .btn-lm {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .lm-hero-fullwidth .btn-lm-secondary {
+      background: transparent !important;
+      border: 2px solid var(--primary) !important;
+      color: var(--primary) !important;
+      padding: 12px 24px;
+    }
+
+    .lm-hero-featured-image {
+      padding: 15px 20px 0;
+      order: 2;
+    }
+
+    .lm-hero-featured-image img {
+      width: 200px;
+      height: 200px;
+    }
+
+    .lm-hero-banner-dots {
+      bottom: 15px !important;
+      padding: 8px 14px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .lm-news-ticker {
+      padding: 6px 0;
+    }
+
+    .news-ticker-label {
+      padding: 4px 10px;
+      font-size: 10px;
+      margin-left: 8px;
+    }
+
+    .ticker-item {
+      font-size: 12px;
+    }
+
+    .lm-hero-banner-row {
+      padding: 30px 0 50px;
+    }
+
+    .lm-hero-banner-row:not(.has-featured-image) {
+      padding: 40px 0 60px;
+    }
+
+    .lm-hero-banner-content {
+      padding: 0 15px;
+    }
+
+    .lm-hero-fullwidth h1 {
+      font-size: 1.4rem;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .lm-hero-fullwidth .lm-hero-subtitle {
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+
+    .lm-hero-fullwidth .lm-hero-badge {
+      font-size: 10px;
+      padding: 5px 10px;
+      margin-bottom: 12px;
+    }
+
+    .lm-hero-featured-image {
+      padding: 10px 15px 0;
+    }
+
+    .lm-hero-featured-image img {
+      width: 180px;
+      height: 180px;
+    }
+
+    .lm-hero-fullwidth .btn-lm {
+      padding: 12px 20px;
+      font-size: 14px;
+    }
+
+    .lm-hero-highlights-bar {
+      padding: 12px 0;
+    }
+
+    .lm-hero-highlights-bar .lm-hero-highlights {
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .lm-hero-highlight {
+      font-size: 11px;
+    }
+
+    .lm-hero-highlight span {
+      font-size: 11px;
+    }
+
+    .lm-news-events-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .lm-news-events-header h3 {
+      font-size: 1.1rem;
+    }
+
+    .lm-hero-banner-dots {
+      bottom: 12px !important;
+      padding: 8px 12px !important;
+    }
+
+    .lm-hero-banner-dots .slick-dots li button {
+      width: 10px !important;
+      height: 10px !important;
+    }
+
+    .lm-hero-banner-dots .slick-dots li.slick-active button {
+      width: 22px !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .lm-hero-banner-row {
+      padding: 25px 0 45px;
+      gap: 12px;
+    }
+
+    .lm-hero-banner-row:not(.has-featured-image) {
+      padding: 35px 0 55px;
+    }
+
+    .lm-hero-banner-content {
+      padding: 0 15px;
+    }
+
+    .lm-hero-fullwidth h1 {
+      font-size: 1.2rem;
+      line-height: 1.3;
+    }
+
+    .lm-hero-fullwidth .lm-hero-badge {
+      font-size: 9px;
+      padding: 4px 8px;
+      margin-bottom: 10px;
+    }
+
+    .lm-hero-fullwidth .lm-hero-subtitle {
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .lm-hero-fullwidth .btn-lm {
+      padding: 11px 18px;
+      font-size: 13px;
+    }
+
+    .lm-hero-featured-image {
+      padding: 8px 15px 0;
+    }
+
+    .lm-hero-featured-image img {
+      width: 150px;
+      height: 150px;
+    }
+
+    .lm-hero-highlights-bar {
+      padding: 10px 0;
+    }
+
+    .lm-hero-highlights-bar .lm-hero-highlights {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .lm-hero-highlight {
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .lm-hero-highlight i {
+      font-size: 10px;
+    }
+
+    .lm-hero-banner-dots {
+      bottom: 10px !important;
+      padding: 6px 10px !important;
+    }
+
+    .lm-hero-banner-dots .slick-dots li button {
+      width: 8px !important;
+      height: 8px !important;
+    }
+
+    .lm-hero-banner-dots .slick-dots li.slick-active button {
+      width: 16px !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  // Initialize Full Width Hero Banner Slider
+  var $heroSlider = $('.lm-hero-banner-slider');
+  var slideCount = $heroSlider.find('.lm-hero-banner-slide').length;
+  var $dots = $('.lm-hero-banner-dots');
+  var $arrows = $('.lm-hero-arrow');
+
+  console.log('Hero Slider Init - Slides found:', slideCount);
+  console.log('Dots element:', $dots.length);
+  console.log('Arrow elements:', $arrows.length);
+
+  if (slideCount <= 1) {
+    // Hide controls if only 1 slide or no slides
+    $arrows.hide();
+    $dots.hide();
+    console.log('Only 1 or 0 slides, hiding controls');
+  } else if ($heroSlider.length && slideCount > 1) {
+    console.log('Initializing Slick slider with ' + slideCount + ' slides...');
+
+    try {
+      $heroSlider.slick({
+        dots: true,
+        arrows: false,
+        infinite: true,
+        speed: 600,
+        fade: true,
+        cssEase: 'ease-in-out',
+        autoplay: true,
+        autoplaySpeed: 6000,
+        pauseOnHover: true,
+        appendDots: $dots,
+        adaptiveHeight: false
+      });
+
+      console.log('Slick slider initialized successfully');
+
+      // Custom Arrow Controls
+      $('.lm-hero-prev').on('click', function(e) {
+        e.preventDefault();
+        $heroSlider.slick('slickPrev');
+      });
+
+      $('.lm-hero-next').on('click', function(e) {
+        e.preventDefault();
+        $heroSlider.slick('slickNext');
+      });
+    } catch(e) {
+      console.error('Slick slider error:', e);
+    }
+  }
+
+  // Duplicate ticker content for seamless scrolling
+  var tickerContent = $('.news-ticker-content');
+  if (tickerContent.length && tickerContent.children().length > 0) {
+    var clone = tickerContent.html();
+    tickerContent.append(clone);
+  }
+});
+</script>
 {% endblock %}

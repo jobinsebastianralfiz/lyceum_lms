@@ -1,0 +1,65 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}Our Achievements - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="lm-page-header lm-page-header-achievements">
+  <div class="container">
+    <div class="lm-page-header-content">
+      <span class="lm-section-tag">Recognition</span>
+      <h1>Our Achievements</h1>
+      <p>Celebrating milestones, awards, and recognition that reflect our commitment to excellence in education.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Achievements Section -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="lm-filter-tabs mb-4">
+      <a href="{% url 'landing:achievements_list' %}" class="lm-filter-tab {% if not selected_type %}active{% endif %}">All</a>
+      {% for code, name in achievement_types %}
+      <a href="{% url 'landing:achievements_list' %}?type={{ code }}" class="lm-filter-tab {% if selected_type == code %}active{% endif %}">{{ name }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Achievements Grid -->
+    <div class="lm-achievements-grid">
+      {% for achievement in achievements %}
+      <div class="lm-achievement-card {% if achievement.is_featured %}lm-achievement-featured{% endif %}">
+        <div class="lm-achievement-icon">
+          {% if achievement.badge_icon %}
+          <img src="{{ achievement.badge_icon.url }}" alt="{{ achievement.title }}">
+          {% else %}
+          <i class="fas fa-trophy"></i>
+          {% endif %}
+        </div>
+        <div class="lm-achievement-body">
+          <span class="lm-badge lm-badge-gold">{{ achievement.get_achievement_type_display }}</span>
+          <h3>{{ achievement.title }}</h3>
+          <p class="awarded-by">
+            <i class="fas fa-award"></i> {{ achievement.awarded_by }}
+          </p>
+          <p class="year">
+            <i class="far fa-calendar"></i> {{ achievement.year }}
+          </p>
+          <p class="description">{{ achievement.short_description|truncatechars:120 }}</p>
+          <a href="{% url 'landing:achievement_detail' achievement.slug %}" class="lm-achievement-link">
+            Learn More <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="lm-empty-state">
+        <i class="fas fa-trophy"></i>
+        <h3>No Achievements Listed</h3>
+        <p>Check back soon to see our awards and recognitions.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

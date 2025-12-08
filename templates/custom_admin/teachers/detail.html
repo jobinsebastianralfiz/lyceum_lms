@@ -1,0 +1,305 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ teacher.user.name }} - Teacher Details{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center">
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; font-size: 24px;">
+          {{ teacher.user.name|slice:":1"|upper }}
+        </div>
+        <div>
+          <h4 class="card-title mb-0">{{ teacher.user.name }}</h4>
+          <p class="card-subtitle mb-0">{{ teacher.designation|default:"Teacher" }}</p>
+        </div>
+      </div>
+      <div class="ms-auto d-flex gap-2">
+        <a href="{% url 'custom_admin:teachers_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back
+        </a>
+        <a href="{% url 'custom_admin:teacher_edit' teacher.id %}" class="btn btn-primary">
+          <i class="ti ti-edit me-1"></i>Edit
+        </a>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="ti ti-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="{% url 'custom_admin:teacher_assign_courses' teacher.id %}">
+                <i class="ti ti-book me-2"></i>Assign Courses
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'custom_admin:teacher_reset_password' teacher.id %}">
+                <i class="ti ti-key me-2"></i>Reset Password
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'custom_admin:teacher_toggle_status' teacher.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item">
+                  {% if teacher.is_active %}
+                    <i class="ti ti-user-off me-2 text-warning"></i>Deactivate
+                  {% else %}
+                    <i class="ti ti-user-check me-2 text-success"></i>Activate
+                  {% endif %}
+                </button>
+              </form>
+            </li>
+            <li>
+              <a class="dropdown-item text-danger" href="{% url 'custom_admin:teacher_delete' teacher.id %}">
+                <i class="ti ti-trash me-2"></i>Delete Teacher
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mb-4">
+      {% if teacher.is_active and teacher.user.is_active %}
+        <span class="badge bg-success fs-6"><i class="ti ti-check me-1"></i>Active</span>
+      {% else %}
+        <span class="badge bg-danger fs-6"><i class="ti ti-x me-1"></i>Inactive</span>
+      {% endif %}
+      {% if teacher.must_change_password %}
+        <span class="badge bg-warning text-dark fs-6 ms-2">
+          <i class="ti ti-alert-triangle me-1"></i>Password Change Required
+        </span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Profile Information -->
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="ti ti-user me-2"></i>Profile Information</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0">
+          <tr>
+            <td class="text-muted">Employee ID</td>
+            <td><code>{{ teacher.employee_id|default:"-" }}</code></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Email</td>
+            <td><a href="mailto:{{ teacher.user.email }}">{{ teacher.user.email }}</a></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Phone</td>
+            <td>{{ teacher.user.phone_number|default:"-" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Department</td>
+            <td>{{ teacher.department|default:"-" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Experience</td>
+            <td>{{ teacher.experience_years }} years</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Date of Joining</td>
+            <td>{{ teacher.date_of_joining|date:"M d, Y"|default:"-" }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Qualifications -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="ti ti-certificate me-2"></i>Qualifications</h5>
+      </div>
+      <div class="card-body">
+        {% if teacher.qualification %}
+          <p class="mb-2"><strong>Education:</strong></p>
+          <p>{{ teacher.qualification }}</p>
+        {% endif %}
+        {% if teacher.specialization %}
+          <p class="mb-2"><strong>Specialization:</strong></p>
+          <p class="mb-0">{{ teacher.specialization }}</p>
+        {% endif %}
+        {% if not teacher.qualification and not teacher.specialization %}
+          <p class="text-muted mb-0">No qualifications listed.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Bio -->
+    {% if teacher.bio %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="ti ti-article me-2"></i>Biography</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-0">{{ teacher.bio }}</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Right Column -->
+  <div class="col-lg-8">
+    <!-- Assigned Courses -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0"><i class="ti ti-book me-2"></i>Assigned Courses</h5>
+        <a href="{% url 'custom_admin:teacher_assign_courses' teacher.id %}" class="btn btn-sm btn-outline-primary">
+          <i class="ti ti-plus me-1"></i>Manage
+        </a>
+      </div>
+      <div class="card-body">
+        {% if assigned_courses %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Enrolled Students</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for course in assigned_courses %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" alt="" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                      {% else %}
+                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="ti ti-book text-muted"></i>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <div class="fw-medium">{{ course.title }}</div>
+                        <small class="text-muted">{{ course.category.name|default:"Uncategorized" }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ course.enrolled_students }} students</span>
+                  </td>
+                  <td>
+                    {% if course.is_published %}
+                      <span class="badge bg-success">Published</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Draft</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'custom_admin:course_detail' course.id %}" class="btn btn-sm btn-outline-secondary">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-4">
+            <i class="ti ti-book-off fs-1 text-muted mb-2 d-block"></i>
+            <p class="text-muted mb-0">No courses assigned to this teacher.</p>
+            <a href="{% url 'custom_admin:teacher_assign_courses' teacher.id %}" class="btn btn-primary mt-3">
+              <i class="ti ti-plus me-1"></i>Assign Courses
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="ti ti-calendar me-2"></i>Schedule</h5>
+      </div>
+      <div class="card-body">
+        {% if schedules %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Time</th>
+                  <th>Course/Batch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                  <td>{{ schedule.get_day_of_week_display }}</td>
+                  <td>{{ schedule.start_time|time:"h:i A" }} - {{ schedule.end_time|time:"h:i A" }}</td>
+                  <td>
+                    {% if schedule.course %}
+                      {{ schedule.course.title }}
+                    {% elif schedule.batch %}
+                      {{ schedule.batch.name }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0 text-center py-3">No schedule set.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Recent Announcements -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="ti ti-speakerphone me-2"></i>Recent Announcements</h5>
+      </div>
+      <div class="card-body">
+        {% if recent_announcements %}
+          {% for announcement in recent_announcements %}
+            <div class="border-bottom pb-3 mb-3 {% if forloop.last %}border-0 pb-0 mb-0{% endif %}">
+              <h6 class="mb-1">{{ announcement.title }}</h6>
+              <p class="text-muted mb-1 small">{{ announcement.content|truncatewords:30 }}</p>
+              <small class="text-muted">
+                <i class="ti ti-clock me-1"></i>{{ announcement.created_at|date:"M d, Y" }}
+                {% if announcement.course %}
+                  <span class="ms-2"><i class="ti ti-book me-1"></i>{{ announcement.course.title }}</span>
+                {% endif %}
+              </small>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted mb-0 text-center py-3">No announcements.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

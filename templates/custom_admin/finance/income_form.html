@@ -1,0 +1,247 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ page_title }}</h4>
+    <small class="text-muted">{% if income %}Edit income details{% else %}Record new income{% endif %}</small>
+  </div>
+  <a href="{% url 'custom_admin:income_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="ti ti-arrow-left me-1"></i>Back to Income
+  </a>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Basic Information -->
+      <div class="card mb-3">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Income Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <input type="text" name="title" value="{{ income.title }}" class="form-control" required placeholder="e.g., Workshop Registration - John Doe">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Category <span class="text-danger">*</span></label>
+              <select name="category" class="form-select" required>
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if income.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea name="description" rows="2" class="form-control" placeholder="Optional details about this income">{{ income.description }}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Details -->
+      <div class="card mb-3">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Financial Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Amount <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">INR</span>
+                <input type="number" name="amount" value="{{ income.amount }}" step="0.01" class="form-control" required placeholder="0.00">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tax Amount</label>
+              <div class="input-group">
+                <span class="input-group-text">INR</span>
+                <input type="number" name="tax_amount" value="{{ income.tax_amount|default:'0' }}" step="0.01" class="form-control" placeholder="0.00">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Payment Method</label>
+              <select name="payment_method" class="form-select">
+                <option value="">Select Method</option>
+                {% for value, label in payment_methods %}
+                <option value="{{ value }}" {% if income.payment_method == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Payment Reference</label>
+              <input type="text" name="payment_reference" value="{{ income.payment_reference }}" class="form-control" placeholder="Transaction ID or reference number">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Invoice Number</label>
+              <input type="text" name="invoice_number" value="{{ income.invoice_number }}" class="form-control" placeholder="Invoice number (if any)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payer Details -->
+      <div class="card mb-3">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Payer Details</h6>
+          <a href="{% url 'custom_admin:vendor_create' %}" target="_blank" class="btn btn-sm btn-outline-primary">
+            <i class="ti ti-plus me-1"></i>New Payer
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <!-- Saved Payers Dropdown -->
+            <div class="col-12">
+              <label class="form-label">Select Saved Payer</label>
+              <select name="payer" id="payerSelect" class="form-select" onchange="populatePayerDetails(this)">
+                <option value="">-- Select from saved payers or enter manually --</option>
+                {% for p in payers %}
+                <option value="{{ p.id }}"
+                        data-name="{{ p.name }}"
+                        data-email="{{ p.email|default:'' }}"
+                        data-phone="{{ p.phone|default:'' }}"
+                        {% if income.payer_id == p.id %}selected{% endif %}>
+                  {{ p.name }} ({{ p.get_vendor_type_display }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Payer Name</label>
+              <input type="text" name="payer_name" id="payerName" value="{{ income.payer_name }}" class="form-control" placeholder="Name of person/organization">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Payer Email</label>
+              <input type="email" name="payer_email" id="payerEmail" value="{{ income.payer_email }}" class="form-control" placeholder="email@example.com">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Payer Phone</label>
+              <input type="text" name="payer_phone" id="payerPhone" value="{{ income.payer_phone }}" class="form-control" placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" name="save_payer" id="savePayer" class="form-check-input">
+                <label class="form-check-label" for="savePayer">
+                  Save this payer for future use
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attachment -->
+      <div class="card mb-3">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Attachment</h6>
+        </div>
+        <div class="card-body">
+          <label class="form-label">Receipt</label>
+          <input type="file" name="receipt" class="form-control">
+          {% if income.receipt %}
+          <small class="text-muted">Current: <a href="{{ income.receipt.url }}" target="_blank">{{ income.receipt.name }}</a></small>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Status & Date -->
+      <div class="card mb-3">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Status & Date</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if income.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Income Date <span class="text-danger">*</span></label>
+            <input type="date" name="income_date" value="{{ income.income_date|date:'Y-m-d' }}" class="form-control" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card mb-3">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Internal Notes</h6>
+        </div>
+        <div class="card-body">
+          <textarea name="notes" rows="4" class="form-control" placeholder="Any internal notes about this income">{{ income.notes }}</textarea>
+        </div>
+      </div>
+
+      {% if income.is_auto_imported %}
+      <div class="alert alert-info">
+        <i class="ti ti-info-circle me-1"></i>
+        This income was auto-imported from enrollment payments.
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-success">
+          <i class="ti ti-check me-1"></i>{% if income %}Update Income{% else %}Record Income{% endif %}
+        </button>
+        <a href="{% url 'custom_admin:income_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function populatePayerDetails(select) {
+  const option = select.options[select.selectedIndex];
+  const payerName = document.getElementById('payerName');
+  const payerEmail = document.getElementById('payerEmail');
+  const payerPhone = document.getElementById('payerPhone');
+  const savePayer = document.getElementById('savePayer');
+
+  if (option.value) {
+    // Saved payer selected
+    payerName.value = option.dataset.name || '';
+    payerEmail.value = option.dataset.email || '';
+    payerPhone.value = option.dataset.phone || '';
+    payerName.readOnly = true;
+    payerEmail.readOnly = true;
+    payerPhone.readOnly = true;
+    savePayer.checked = false;
+    savePayer.disabled = true;
+  } else {
+    // Manual entry
+    payerName.value = '';
+    payerEmail.value = '';
+    payerPhone.value = '';
+    payerName.readOnly = false;
+    payerEmail.readOnly = false;
+    payerPhone.readOnly = false;
+    savePayer.disabled = false;
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const payerSelect = document.getElementById('payerSelect');
+  if (payerSelect && payerSelect.value) {
+    populatePayerDetails(payerSelect);
+  }
+});
+</script>
+{% endblock %}

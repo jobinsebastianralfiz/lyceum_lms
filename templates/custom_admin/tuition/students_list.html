@@ -1,0 +1,129 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Tuition Students - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Tuition Students</h4>
+    <small class="text-muted">Manage offline tuition students</small>
+  </div>
+  <a href="{% url 'custom_admin:tuition_student_create' %}" class="btn btn-primary btn-sm">
+    <i class="ti ti-user-plus me-1"></i>Add Student
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small mb-1">Search</label>
+        <input type="text" name="search" class="form-control form-control-sm" value="{{ search }}" placeholder="Name, phone, parent...">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small mb-1">Standard</label>
+        <select name="standard" class="form-select form-select-sm">
+          <option value="">All Standards</option>
+          {% for std in standards %}
+          <option value="{{ std.id }}" {% if selected_standard == std.id|stringformat:"s" %}selected{% endif %}>{{ std.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All</option>
+          <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'custom_admin:tuition_students_list' %}" class="btn btn-outline-secondary btn-sm w-100">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Student</th>
+            <th class="py-2">Phone</th>
+            <th class="py-2">Parent</th>
+            <th class="py-2">Standard</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <td class="py-2">
+              <a href="{% url 'custom_admin:tuition_student_detail' student.id %}" class="fw-medium text-decoration-none">
+                {{ student.name }}
+              </a>
+              {% if student.email %}
+              <br><small class="text-muted">{{ student.email }}</small>
+              {% endif %}
+            </td>
+            <td class="py-2">{{ student.phone }}</td>
+            <td class="py-2">
+              {{ student.parent_name }}
+              <br><small class="text-muted">{{ student.parent_phone }}</small>
+            </td>
+            <td class="py-2">{{ student.standard.name|default:'-' }}</td>
+            <td class="py-2 text-center">
+              {% if student.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="py-2 text-end">
+              <a href="{% url 'custom_admin:tuition_student_detail' student.id %}" class="btn btn-sm btn-outline-info py-0 px-2" title="View">
+                <i class="ti ti-eye"></i>
+              </a>
+              <a href="{% url 'custom_admin:tuition_student_edit' student.id %}" class="btn btn-sm btn-outline-primary py-0 px-2" title="Edit">
+                <i class="ti ti-edit"></i>
+              </a>
+              <a href="{% url 'custom_admin:tuition_enrollment_create' %}?student={{ student.id }}" class="btn btn-sm btn-outline-success py-0 px-2" title="Enroll">
+                <i class="ti ti-user-plus"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">
+              No students found. <a href="{% url 'custom_admin:tuition_student_create' %}">Add one now</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% if students.has_other_pages %}
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center mb-0">
+    {% if students.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page={{ students.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_standard %}&standard={{ selected_standard }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Previous</a></li>
+    {% endif %}
+    <li class="page-item active"><span class="page-link">{{ students.number }} of {{ students.paginator.num_pages }}</span></li>
+    {% if students.has_next %}
+    <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_standard %}&standard={{ selected_standard }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

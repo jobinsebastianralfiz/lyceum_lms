@@ -1,0 +1,233 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Banners Management - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-photo me-2"></i>Banners Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+            <a href="{% url 'custom_admin:banner_create' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-plus"></i> Add Banner
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_banners }}</h4>
+                <p class="mb-0 small">Total Banners</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.active_banners }}</h4>
+                <p class="mb-0 small">Active</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.hero_banners }}</h4>
+                <p class="mb-0 small">Hero Banners</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search"
+                       placeholder="Title, subtitle..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Banner Type</label>
+                <select class="form-select form-select-sm" name="banner_type">
+                  <option value="">All Types</option>
+                  {% for type_code, type_name in banner_types %}
+                    <option value="{{ type_code }}" {% if banner_type_filter == type_code %}selected{% endif %}>
+                      {{ type_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                  <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:banners_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Banners Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 60px;">Preview</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for banner in banners %}
+              <tr>
+                <td>
+                  {% if banner.featured_image %}
+                    <img src="{{ banner.featured_image.url }}" alt="{{ banner.title }}"
+                         class="rounded" style="width: 50px; height: 35px; object-fit: cover;">
+                  {% elif banner.background_image %}
+                    <img src="{{ banner.background_image.url }}" alt="{{ banner.title }}"
+                         class="rounded" style="width: 50px; height: 35px; object-fit: cover;">
+                  {% else %}
+                    <div class="bg-primary rounded d-flex align-items-center justify-content-center"
+                         style="width: 50px; height: 35px;">
+                      <i class="ti ti-photo text-white"></i>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div>
+                    <h6 class="mb-1">{{ banner.title|truncatechars:40 }}</h6>
+                    {% if banner.subtitle %}
+                      <p class="small text-muted mb-0">{{ banner.subtitle|truncatechars:60 }}</p>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info-subtle text-info">
+                    {{ banner.get_banner_type_display }}
+                  </span>
+                </td>
+                <td>
+                  {% if banner.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark">{{ banner.priority }}</span>
+                </td>
+                <td>
+                  <div class="small">
+                    {{ banner.created_at|date:"M d, Y" }}<br>
+                    <span class="text-muted">{{ banner.created_at|date:"H:i" }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:banner_edit' banner.id %}" class="btn btn-outline-primary btn-sm" title="Edit">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <form method="POST" action="{% url 'custom_admin:banner_delete' banner.id %}"
+                          style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this banner?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-photo-off fs-2 mb-3 d-block"></i>
+                    <h6>No banners found</h6>
+                    <p class="mb-0">Create your first banner to customize the homepage.</p>
+                    <a href="{% url 'custom_admin:banner_create' %}" class="btn btn-primary btn-sm mt-3">
+                      <i class="ti ti-plus me-1"></i>Create First Banner
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if banners.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ banners.start_index }} to {{ banners.end_index }} of {{ banners.paginator.count }} banners
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if banners.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ banners.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for page_num in banners.paginator.page_range %}
+                {% if page_num == banners.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > banners.number|add:-3 and page_num < banners.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if banners.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ banners.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -5,181 +5,406 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Lyceum Academy Admin{% endblock %}</title>
-  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'images/logos/LOGO.svg' %}" />
+  <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'images/logos/logo.png' %}" />
   <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
   <style>
-    /* Lyceum Dark Theme Variables */
+    /* Lyceum Light Theme Variables */
     :root {
-      --lyceum-green: #2AB673;
-      --lyceum-green-dark: #229959;
-      --lyceum-green-light: #3DD186;
-      --dark-bg: #0F172A;
-      --dark-bg-secondary: #1E293B;
-      --dark-bg-tertiary: #334155;
-      --dark-border: #374151;
-      --text-white: #F9FAFB;
-      --text-gray: #CBD5E1;
-      --text-gray-dark: #94A3B8;
+      --lyceum-green: #1E8F5A;
+      --lyceum-green-dark: #16724A;
+      --lyceum-green-light: #2AB673;
+      --light-bg: #F8FAFC;
+      --light-bg-secondary: #FFFFFF;
+      --light-bg-tertiary: #F1F5F9;
+      --light-border: #E2E8F0;
+      --text-dark: #0F172A;
+      --text-gray: #1E293B;
+      --text-gray-light: #475569;
     }
 
-    /* Global Dark Theme */
+    /* Global Light Theme */
     body {
       margin: 0;
       padding: 0;
-      background: var(--dark-bg) !important;
-      color: var(--text-gray) !important;
+      background: var(--light-bg) !important;
+      color: var(--text-dark) !important;
+      font-size: 13px !important;
     }
 
     #main-wrapper {
       margin-top: 0 !important;
       padding-top: 0 !important;
-      background: var(--dark-bg) !important;
+      background: var(--light-bg) !important;
     }
 
     .page-wrapper {
       margin-top: 0 !important;
       padding-top: 0 !important;
-      background: var(--dark-bg) !important;
+      background: var(--light-bg) !important;
     }
 
     .body-wrapper {
-      background: var(--dark-bg) !important;
+      background: var(--light-bg) !important;
+      margin-left: 280px !important;
+      min-height: 100vh;
     }
 
     .body-wrapper .container-fluid {
-      padding-top: 2rem;
-      padding-bottom: 2rem;
-      background: var(--dark-bg) !important;
+      padding: 1.5rem !important;
+      padding-top: 80px !important;
+      background: var(--light-bg) !important;
     }
 
-    /* Sidebar Dark Theme */
-    .left-sidebar {
+    /* Fix header position */
+    .app-header {
+      position: fixed !important;
       top: 0 !important;
+      left: 280px !important;
+      right: 0 !important;
+      z-index: 1000 !important;
+    }
+
+    /* Sidebar */
+    .left-sidebar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
       height: 100vh !important;
       overflow-y: auto !important;
-      background: var(--dark-bg-secondary) !important;
-      border-right: 1px solid var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border-right: 1px solid var(--light-border) !important;
+      width: 280px !important;
+      z-index: 1001 !important;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
     }
 
     .brand-logo {
-      background: var(--dark-bg-secondary) !important;
-      border-bottom: 1px solid var(--dark-border) !important;
-      padding: 1.5rem !important;
+      background: var(--light-bg-secondary) !important;
+      border-bottom: 1px solid var(--light-border) !important;
+      padding: 12px 16px !important;
+      min-height: 70px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .brand-logo a {
+      display: flex !important;
+      align-items: center !important;
+      text-decoration: none !important;
     }
 
     .brand-logo img {
-      max-height: 50px !important;
-      width: auto !important;
+      height: auto !important;
+      width: 250px !important;
+      max-width: 260px !important;
+    }
+
+    .brand-logo .logo-text {
+      color: var(--lyceum-green) !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      margin-left: 12px !important;
+      letter-spacing: 0.5px;
     }
 
     .sidebar-nav {
-      height: calc(100vh - 80px) !important;
+      height: calc(100vh - 70px) !important;
       overflow-y: auto !important;
-      padding-bottom: 2rem;
-      background: var(--dark-bg-secondary) !important;
+      overflow-x: hidden !important;
+      padding-bottom: 1rem;
+      background: var(--light-bg-secondary) !important;
     }
 
     .sidebar-nav ul {
       height: auto !important;
       max-height: none !important;
+      padding: 0.75rem 0 !important;
     }
 
     .left-sidebar > div {
       height: 100% !important;
       display: flex !important;
       flex-direction: column !important;
-      background: var(--dark-bg-secondary) !important;
+      background: var(--light-bg-secondary) !important;
     }
 
     .sidebar-nav.scroll-sidebar {
       flex: 1 !important;
       overflow-y: auto !important;
+      overflow-x: hidden !important;
     }
 
     /* Sidebar Navigation Items */
     .sidebar-item .sidebar-link {
       color: var(--text-gray) !important;
-      transition: all 0.3s ease;
-    }
-
-    .sidebar-item .sidebar-link:hover {
-      background: var(--dark-bg-tertiary) !important;
-      color: var(--lyceum-green) !important;
-    }
-
-    .sidebar-item .sidebar-link.active {
-      background: var(--lyceum-green) !important;
-      color: white !important;
+      transition: all 0.2s ease;
+      padding: 10px 16px !important;
+      font-size: 13px !important;
+      line-height: 1.4 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: flex !important;
+      align-items: center !important;
+      border-radius: 0 !important;
+      margin: 2px 10px !important;
+      border-radius: 8px !important;
     }
 
     .sidebar-item .sidebar-link i {
+      font-size: 18px !important;
+      width: 20px !important;
+      height: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-right: 10px !important;
+      flex-shrink: 0 !important;
       color: var(--text-gray) !important;
     }
 
-    .sidebar-item .sidebar-link:hover i,
+    .sidebar-item .sidebar-link .hide-menu {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      font-size: 13px !important;
+    }
+
+    .sidebar-item .sidebar-link:hover {
+      background: var(--light-bg-tertiary) !important;
+      color: var(--lyceum-green-dark) !important;
+    }
+
+    .sidebar-item .sidebar-link:hover i {
+      color: var(--lyceum-green-dark) !important;
+    }
+
+    .sidebar-item .sidebar-link.active {
+      background: rgba(30, 143, 90, 0.15) !important;
+      color: var(--lyceum-green-dark) !important;
+    }
+
     .sidebar-item .sidebar-link.active i {
-      color: white !important;
+      color: var(--lyceum-green-dark) !important;
     }
 
     .nav-small-cap {
-      color: var(--lyceum-green) !important;
+      color: var(--text-gray-light) !important;
       text-transform: uppercase;
       font-weight: 600;
-      font-size: 0.75rem;
-      margin-top: 1rem;
+      font-size: 10px !important;
+      letter-spacing: 0.8px;
+      margin-top: 1rem !important;
+      padding: 10px 16px !important;
+      white-space: nowrap !important;
+    }
+
+    .nav-small-cap iconify-icon {
+      display: none !important;
+    }
+
+    /* Expandable Sidebar Sections */
+    .sidebar-section {
+      margin-bottom: 0.25rem;
+    }
+
+    .sidebar-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      color: var(--text-gray-light) !important;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-size: 10px !important;
+      letter-spacing: 0.8px;
+      margin-top: 0.75rem !important;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .sidebar-section-header span {
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-section-header span i {
+      font-size: 14px !important;
+      opacity: 0.7;
+    }
+
+    .sidebar-section-header:hover {
+      background: var(--light-bg-tertiary);
+      color: var(--text-gray) !important;
+    }
+
+    .sidebar-section-header .section-icon {
+      font-size: 14px !important;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-section-header.collapsed .section-icon {
+      transform: rotate(-90deg);
+    }
+
+    .sidebar-section-header:not(.collapsed) .section-icon {
+      transform: rotate(0deg);
+    }
+
+    .sidebar-section-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .sidebar-section-content.collapsed {
+      max-height: 0 !important;
+    }
+
+    .sidebar-section-content ul {
+      padding-top: 4px !important;
     }
 
     .sidebar-divider {
-      background: var(--dark-border) !important;
+      display: none !important;
     }
 
-    /* Header Dark Theme */
+    /* Header */
     .app-header {
-      margin-top: 0 !important;
-      top: 0 !important;
-      background: var(--dark-bg-secondary) !important;
-      border-bottom: 1px solid var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border-bottom: 1px solid var(--light-border) !important;
+      min-height: 70px !important;
+      height: 70px !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .app-header .navbar {
-      background: var(--dark-bg-secondary) !important;
+      background: var(--light-bg-secondary) !important;
+      min-height: 70px !important;
+      height: 70px !important;
+      padding: 0 24px !important;
     }
 
     .app-header .nav-link {
       color: var(--text-gray) !important;
+      padding: 8px 12px !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
     }
 
     .app-header .nav-link:hover {
       color: var(--lyceum-green) !important;
+      background: var(--light-bg-tertiary) !important;
     }
 
-    /* Cards Dark Theme - Aggressive Overrides */
+    .app-header .navbar-nav .nav-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .app-header .page-title-area h5 {
+      color: var(--text-dark) !important;
+      font-weight: 600 !important;
+      margin: 0 !important;
+    }
+
+    /* Student Search Input */
+    .student-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    #studentSearchInput {
+      width: 100% !important;
+      height: 40px !important;
+      padding: 8px 16px 8px 40px !important;
+      border: 2px solid #e2e8f0 !important;
+      border-radius: 10px !important;
+      background: #ffffff !important;
+      font-size: 14px !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #studentSearchInput:focus {
+      border-color: var(--lyceum-green) !important;
+      box-shadow: 0 0 0 4px rgba(30, 143, 90, 0.12), 0 1px 3px rgba(0,0,0,0.06) !important;
+      background: white !important;
+      outline: none !important;
+    }
+
+    #studentSearchInput:hover {
+      border-color: #cbd5e1 !important;
+    }
+
+    #studentSearchInput::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    .header-user-btn {
+      background: var(--light-bg-tertiary) !important;
+      border: 1px solid var(--light-border) !important;
+      border-radius: 50px !important;
+      padding: 6px 16px 6px 6px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .header-user-btn:hover {
+      border-color: var(--lyceum-green) !important;
+      box-shadow: 0 2px 8px rgba(42, 182, 115, 0.15) !important;
+    }
+
+    /* Cards */
     .card,
     div[class*="card"]:not(.card-body):not(.card-header):not(.card-footer) {
-      background: var(--dark-bg-secondary) !important;
-      border: 1px solid var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border: 1px solid var(--light-border) !important;
       color: var(--text-gray) !important;
+      border-radius: 12px !important;
+      margin-bottom: 1.5rem !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    .card-body,
+    .card-body {
+      background: var(--light-bg-secondary) !important;
+      border-color: var(--light-border) !important;
+      color: var(--text-gray) !important;
+      padding: 1.25rem !important;
+    }
+
     .card-header,
     .card-footer {
-      background: var(--dark-bg-secondary) !important;
-      border-color: var(--dark-border) !important;
-      color: var(--text-gray) !important;
+      background: var(--light-bg-tertiary) !important;
+      border-color: var(--light-border) !important;
+      color: var(--text-dark) !important;
+      padding: 1rem 1.25rem !important;
     }
 
-    .card-title,
+    .card-title {
+      color: var(--text-dark) !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      margin-bottom: 0.5rem !important;
+    }
+
     .card-title * {
-      color: var(--text-white) !important;
+      color: var(--text-dark) !important;
     }
 
     .card-subtitle {
-      color: var(--text-gray-dark) !important;
+      color: var(--text-gray-light) !important;
+      font-size: 12px !important;
     }
 
     .card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
-      color: var(--text-white) !important;
+      color: var(--text-dark) !important;
     }
 
     .card p:not(.btn):not(.badge),
@@ -188,35 +413,29 @@
       color: var(--text-gray) !important;
     }
 
-    /* Keep buttons inside cards visible */
-    .card .btn {
-      background: var(--lyceum-green) !important;
-      color: white !important;
-    }
-
-    .card .btn-outline-primary {
-      background: transparent !important;
-      color: var(--lyceum-green) !important;
-    }
-
-    /* Tables Dark Theme - Comprehensive */
+    /* Tables */
     .table,
     table,
     .table-responsive table {
       color: var(--text-gray) !important;
-      border-color: var(--dark-border) !important;
-      background: var(--dark-bg-secondary) !important;
+      border-color: var(--light-border) !important;
+      background: var(--light-bg-secondary) !important;
+      font-size: 13px !important;
     }
 
     .table thead,
     .table thead th,
     table thead,
     table thead th {
-      background: var(--dark-bg-tertiary) !important;
-      background-color: var(--dark-bg-tertiary) !important;
-      color: var(--text-white) !important;
-      border-color: var(--dark-border) !important;
-      padding: 12px 15px !important;
+      background: var(--light-bg-tertiary) !important;
+      background-color: var(--light-bg-tertiary) !important;
+      color: var(--text-dark) !important;
+      border-color: var(--light-border) !important;
+      padding: 12px 16px !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .table tbody,
@@ -225,11 +444,11 @@
     table tbody,
     table tbody tr,
     table tbody td {
-      background: var(--dark-bg-secondary) !important;
-      background-color: var(--dark-bg-secondary) !important;
-      border-color: var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      background-color: var(--light-bg-secondary) !important;
+      border-color: var(--light-border) !important;
       color: var(--text-gray) !important;
-      padding: 12px 15px !important;
+      padding: 12px 16px !important;
     }
 
     .table th,
@@ -238,130 +457,33 @@
     table td {
       background: transparent !important;
       background-color: transparent !important;
-      padding: 12px 15px !important;
-    }
-
-    /* Fix text and elements inside table cells */
-    .table td *,
-    .table th *,
-    table td *,
-    table th * {
-      background: transparent !important;
-      background-color: transparent !important;
-    }
-
-    .table td span,
-    .table td p,
-    .table td div:not(.btn):not(.badge),
-    table td span,
-    table td p,
-    table td div:not(.btn):not(.badge) {
-      background: transparent !important;
-      background-color: transparent !important;
-      color: var(--text-gray) !important;
-    }
-
-    .table th span,
-    .table th p,
-    .table th div,
-    table th span,
-    table th p,
-    table th div {
-      background: transparent !important;
-      background-color: transparent !important;
-      color: var(--text-white) !important;
+      padding: 12px 16px !important;
+      border-color: var(--light-border) !important;
     }
 
     .table tbody tr:hover,
-    .table tbody tr:hover td,
-    .table tbody tr:hover th,
-    table tbody tr:hover,
-    table tbody tr:hover td,
-    table tbody tr:hover th,
-    .table-hover tbody tr:hover,
-    .table-hover tbody tr:hover td,
-    .table-hover tbody tr:hover th,
-    .table > tbody > tr:hover,
-    .table > tbody > tr:hover > td,
-    .table > tbody > tr:hover > th {
-      background-color: rgba(42, 182, 115, 0.2) !important;
-      background: rgba(42, 182, 115, 0.2) !important;
-      color: var(--text-white) !important;
-    }
-
-    .table th,
-    .table td,
-    table th,
-    table td {
-      border-color: var(--dark-border) !important;
-    }
-
-    /* Table striped rows */
-    .table-striped tbody tr:nth-of-type(odd),
-    .table-striped > tbody > tr:nth-of-type(odd) {
-      background: var(--dark-bg-secondary) !important;
-      background-color: var(--dark-bg-secondary) !important;
-    }
-
-    .table-striped tbody tr:nth-of-type(even),
-    .table-striped > tbody > tr:nth-of-type(even) {
-      background: rgba(15, 23, 42, 0.5) !important;
-      background-color: rgba(15, 23, 42, 0.5) !important;
-    }
-
-    /* Force table hover to use green - super aggressive */
-    .table-striped tbody tr:nth-of-type(odd):hover,
-    .table-striped tbody tr:nth-of-type(even):hover,
-    .table-striped > tbody > tr:hover,
-    tbody tr:hover {
-      background: rgba(42, 182, 115, 0.2) !important;
-      background-color: rgba(42, 182, 115, 0.2) !important;
-    }
-
-    /* Override any potential white background on hover */
-    tr:hover,
-    tr:hover *:not(a):not(button):not(input):not(select),
-    .table tr:hover,
-    table tr:hover,
-    tbody > tr:hover {
-      background: rgba(42, 182, 115, 0.25) !important;
-      background-color: rgba(42, 182, 115, 0.25) !important;
+    table tbody tr:hover {
+      background: rgba(42, 182, 115, 0.05) !important;
+      background-color: rgba(42, 182, 115, 0.05) !important;
     }
 
     tr:hover td,
-    tr:hover th,
-    .table tr:hover td,
-    .table tr:hover th {
+    tr:hover th {
       background-color: transparent !important;
       background: transparent !important;
-      color: var(--text-white) !important;
     }
 
-    /* Additional specificity for any Bootstrap table variants */
-    .table-bordered tr:hover,
-    .table-borderless tr:hover,
-    .table-sm tr:hover,
-    .table-responsive tr:hover,
-    .table-responsive table tr:hover,
-    div[class*="table"] tr:hover {
-      background: rgba(42, 182, 115, 0.25) !important;
-      background-color: rgba(42, 182, 115, 0.25) !important;
+    /* Table striped rows */
+    .table-striped tbody tr:nth-of-type(odd) {
+      background: var(--light-bg-secondary) !important;
     }
 
-    /* Kill any white hover effects from Bootstrap */
-    .table > :not(caption) > * > *,
-    .table tbody tr,
-    .table tbody tr td {
-      --bs-table-hover-bg: rgba(42, 182, 115, 0.25) !important;
-      --bs-table-bg: transparent !important;
+    .table-striped tbody tr:nth-of-type(even) {
+      background: var(--light-bg-tertiary) !important;
     }
 
-    /* Force the hover state with higher specificity */
-    body .table tbody tr:hover,
-    body table tbody tr:hover,
-    body .table-hover tbody tr:hover {
-      background: rgba(42, 182, 115, 0.25) !important;
-      background-color: rgba(42, 182, 115, 0.25) !important;
+    .table-striped tbody tr:hover {
+      background: rgba(42, 182, 115, 0.08) !important;
     }
 
     /* Buttons with Lyceum Green */
@@ -379,6 +501,7 @@
     .btn-outline-primary {
       color: var(--lyceum-green) !important;
       border-color: var(--lyceum-green) !important;
+      background: transparent !important;
     }
 
     .btn-outline-primary:hover {
@@ -393,12 +516,8 @@
     .badge.text-bg-primary {
       background: var(--lyceum-green) !important;
       color: white !important;
-      padding: 4px 10px !important;
-    }
-
-    .badge.bg-primary-subtle {
-      background: rgba(42, 182, 115, 0.1) !important;
-      color: var(--lyceum-green) !important;
+      padding: 5px 12px !important;
+      font-weight: 500 !important;
     }
 
     .badge.bg-success,
@@ -427,183 +546,272 @@
 
     .badge.bg-secondary,
     .badge.text-bg-secondary {
-      background: var(--dark-bg-tertiary) !important;
+      background: var(--light-bg-tertiary) !important;
       color: var(--text-gray) !important;
     }
 
-    /* Buttons inside tables */
-    .table .btn,
-    table .btn {
-      padding: 6px 12px !important;
-      margin: 2px !important;
-    }
-
-    .table .btn-sm,
-    table .btn-sm {
-      padding: 4px 8px !important;
-      font-size: 0.875rem !important;
-    }
-
-    /* Forms Dark Theme */
+    /* Forms */
     .form-control,
-    .form-select {
-      background: var(--dark-bg-tertiary) !important;
-      border-color: var(--dark-border) !important;
-      color: var(--text-white) !important;
+    .form-select,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="url"],
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"],
+    input[type="search"],
+    input[type="tel"],
+    textarea,
+    select {
+      background: var(--light-bg-secondary) !important;
+      background-color: var(--light-bg-secondary) !important;
+      border: 1px solid var(--light-border) !important;
+      color: var(--text-dark) !important;
+      border-radius: 8px !important;
+      padding: 10px 14px !important;
     }
 
     .form-control:focus,
-    .form-select:focus {
-      background: var(--dark-bg-tertiary) !important;
+    .form-select:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+      background: var(--light-bg-secondary) !important;
+      background-color: var(--light-bg-secondary) !important;
       border-color: var(--lyceum-green) !important;
-      color: var(--text-white) !important;
-      box-shadow: 0 0 0 0.2rem rgba(42, 182, 115, 0.25) !important;
+      color: var(--text-dark) !important;
+      box-shadow: 0 0 0 3px rgba(42, 182, 115, 0.15) !important;
+      outline: none !important;
     }
 
-    .form-label {
-      color: var(--text-white) !important;
+    .form-control::placeholder,
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--text-gray-light) !important;
     }
 
-    /* Dropdown Menu Dark Theme */
+    .form-label,
+    label,
+    .col-form-label {
+      color: var(--text-dark) !important;
+      font-weight: 500 !important;
+      margin-bottom: 6px !important;
+    }
+
+    .form-text,
+    .help-block,
+    .helptext,
+    small.text-muted {
+      color: var(--text-gray-light) !important;
+    }
+
+    .form-select option,
+    select option {
+      background: var(--light-bg-secondary) !important;
+      color: var(--text-dark) !important;
+    }
+
+    .form-check-input {
+      background-color: var(--light-bg-secondary) !important;
+      border-color: var(--light-border) !important;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--lyceum-green) !important;
+      border-color: var(--lyceum-green) !important;
+    }
+
+    .form-check-label {
+      color: var(--text-gray) !important;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: var(--lyceum-green) !important;
+      color: white !important;
+      border: none !important;
+      padding: 8px 16px !important;
+      border-radius: 6px !important;
+      cursor: pointer !important;
+    }
+
+    /* Dropdown Menu */
     .dropdown-menu {
-      background: var(--dark-bg-secondary) !important;
-      border: 1px solid var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border: 1px solid var(--light-border) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px !important;
     }
 
     .dropdown-item {
       color: var(--text-gray) !important;
+      padding: 10px 16px !important;
     }
 
     .dropdown-item:hover {
-      background: var(--dark-bg-tertiary) !important;
+      background: var(--light-bg-tertiary) !important;
       color: var(--lyceum-green) !important;
     }
 
     /* Alert Messages */
     .alert {
-      border: 1px solid var(--dark-border) !important;
+      border-radius: 8px !important;
+      padding: 12px 16px !important;
     }
 
     .alert-success {
       background: rgba(42, 182, 115, 0.1) !important;
-      color: var(--lyceum-green) !important;
-      border-color: var(--lyceum-green) !important;
+      color: #166534 !important;
+      border-color: rgba(42, 182, 115, 0.3) !important;
     }
 
     .alert-error,
     .alert-danger {
       background: rgba(239, 68, 68, 0.1) !important;
-      color: #ef4444 !important;
-      border-color: #ef4444 !important;
+      color: #b91c1c !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
     }
 
     .alert-warning {
       background: rgba(251, 191, 36, 0.1) !important;
-      color: #fbbf24 !important;
-      border-color: #fbbf24 !important;
+      color: #92400e !important;
+      border-color: rgba(251, 191, 36, 0.3) !important;
     }
 
     .alert-info {
       background: rgba(59, 130, 246, 0.1) !important;
-      color: #3b82f6 !important;
-      border-color: #3b82f6 !important;
+      color: #1e40af !important;
+      border-color: rgba(59, 130, 246, 0.3) !important;
     }
 
-    /* Text Colors - Comprehensive */
+    /* Text Colors */
     h1, h2, h3, h4, h5, h6,
     .h1, .h2, .h3, .h4, .h5, .h6 {
-      color: var(--text-white) !important;
+      color: var(--text-dark) !important;
     }
 
     p, span, label, div, td, th, li {
       color: var(--text-gray) !important;
     }
 
-    a {
+    a:not(.btn) {
       color: var(--lyceum-green) !important;
     }
 
-    a:hover {
-      color: var(--lyceum-green-light) !important;
+    a:not(.btn):hover {
+      color: var(--lyceum-green-dark) !important;
     }
 
-    /* Force white text on dark elements */
+    /* Ensure button text colors are correct */
+    .btn-success {
+      background-color: #2ab673 !important;
+      border-color: #2ab673 !important;
+      color: white !important;
+    }
+
+    .btn-success:hover {
+      background-color: #239b62 !important;
+      border-color: #239b62 !important;
+      color: white !important;
+    }
+
+    .btn-danger {
+      background-color: #ef4444 !important;
+      border-color: #ef4444 !important;
+      color: white !important;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626 !important;
+      border-color: #dc2626 !important;
+      color: white !important;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b !important;
+      border-color: #f59e0b !important;
+      color: white !important;
+    }
+
+    .btn-warning:hover {
+      background-color: #d97706 !important;
+      border-color: #d97706 !important;
+      color: white !important;
+    }
+
+    .btn-info {
+      background-color: #3b82f6 !important;
+      border-color: #3b82f6 !important;
+      color: white !important;
+    }
+
+    .btn-info:hover {
+      background-color: #2563eb !important;
+      border-color: #2563eb !important;
+      color: white !important;
+    }
+
+    .btn-secondary {
+      background-color: #6b7280 !important;
+      border-color: #6b7280 !important;
+      color: white !important;
+    }
+
+    .btn-secondary:hover {
+      background-color: #4b5563 !important;
+      border-color: #4b5563 !important;
+      color: white !important;
+    }
+
     .text-dark,
-    .text-black,
+    .text-black {
+      color: var(--text-dark) !important;
+    }
+
     .text-muted {
-      color: var(--text-gray) !important;
+      color: var(--text-gray-light) !important;
     }
 
     .fw-bold,
     .fw-bolder,
     strong,
     b {
-      color: var(--text-white) !important;
+      color: var(--text-dark) !important;
     }
 
-    /* List groups */
-    .list-group,
-    .list-group-item {
-      background: var(--dark-bg-secondary) !important;
-      border-color: var(--dark-border) !important;
+    dt {
+      color: var(--text-dark) !important;
+      font-weight: 600 !important;
+    }
+
+    dd {
       color: var(--text-gray) !important;
-    }
-
-    .list-group-item:hover {
-      background: var(--dark-bg-tertiary) !important;
-      color: var(--text-white) !important;
-    }
-
-    /* Override any white backgrounds */
-    .bg-white,
-    .bg-light {
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    /* Override text colors */
-    .text-body,
-    .text-body-emphasis {
-      color: var(--text-gray) !important;
-    }
-
-    .text-white {
-      color: var(--text-white) !important;
-    }
-
-    /* Small text */
-    small,
-    .small {
-      color: var(--text-gray-dark) !important;
-    }
-
-    /* Stats and metrics */
-    .fs-1, .fs-2, .fs-3, .fs-4, .fs-5, .fs-6 {
-      color: var(--text-white) !important;
     }
 
     /* Round badges/icons */
     .round-48,
     .round-40,
     .round-8 {
-      background: var(--lyceum-green) !important;
-      color: white !important;
+      background: rgba(42, 182, 115, 0.1) !important;
+      color: var(--lyceum-green) !important;
     }
 
-    /* Hover effects for buttons */
+    /* Buttons */
     .btn {
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
+      border-radius: 8px !important;
     }
 
     .btn-secondary {
-      background: var(--dark-bg-tertiary) !important;
-      border-color: var(--dark-border) !important;
+      background: var(--light-bg-tertiary) !important;
+      border-color: var(--light-border) !important;
       color: var(--text-gray) !important;
     }
 
     .btn-secondary:hover {
-      background: var(--dark-bg-tertiary) !important;
-      border-color: var(--lyceum-green) !important;
-      color: var(--text-white) !important;
+      background: var(--light-border) !important;
+      color: var(--text-dark) !important;
     }
 
     /* Notification Badge */
@@ -611,23 +819,10 @@
       background: var(--lyceum-green) !important;
     }
 
-    /* Breadcrumb */
-    .breadcrumb {
-      background: transparent !important;
-    }
-
-    .breadcrumb-item {
-      color: var(--text-gray) !important;
-    }
-
-    .breadcrumb-item.active {
-      color: var(--text-white) !important;
-    }
-
     /* Pagination */
     .pagination .page-link {
-      background: var(--dark-bg-secondary) !important;
-      border-color: var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border-color: var(--light-border) !important;
       color: var(--text-gray) !important;
     }
 
@@ -640,43 +835,28 @@
     .pagination .page-item.active .page-link {
       background: var(--lyceum-green) !important;
       border-color: var(--lyceum-green) !important;
+      color: white !important;
     }
 
-    /* Modal Dark Theme */
+    /* Modal */
     .modal-content {
-      background: var(--dark-bg-secondary) !important;
-      border: 1px solid var(--dark-border) !important;
+      background: var(--light-bg-secondary) !important;
+      border: 1px solid var(--light-border) !important;
+      border-radius: 12px !important;
     }
 
     .modal-header {
-      border-bottom-color: var(--dark-border) !important;
+      border-bottom-color: var(--light-border) !important;
     }
 
     .modal-footer {
-      border-top-color: var(--dark-border) !important;
-    }
-
-    /* Close Button */
-    .btn-close {
-      filter: invert(1) grayscale(100%) brightness(200%);
-    }
-
-    /* Canvas for charts - keep transparent */
-    canvas {
-      background: transparent !important;
-    }
-
-    /* Icons and SVG - keep visible */
-    .ti,
-    iconify-icon,
-    i[class*="ti-"],
-    svg {
-      color: inherit !important;
+      border-top-color: var(--light-border) !important;
     }
 
     /* Progress bars */
     .progress {
-      background: var(--dark-bg-tertiary) !important;
+      background: var(--light-bg-tertiary) !important;
+      border-radius: 8px !important;
     }
 
     .progress-bar {
@@ -685,7 +865,7 @@
 
     /* Nav tabs */
     .nav-tabs {
-      border-bottom-color: var(--dark-border) !important;
+      border-bottom-color: var(--light-border) !important;
     }
 
     .nav-tabs .nav-link {
@@ -695,75 +875,564 @@
 
     .nav-tabs .nav-link:hover {
       color: var(--lyceum-green) !important;
-      border-color: transparent transparent var(--lyceum-green) !important;
     }
 
     .nav-tabs .nav-link.active {
-      background: var(--dark-bg-secondary) !important;
+      background: var(--light-bg-secondary) !important;
       color: var(--lyceum-green) !important;
-      border-color: var(--dark-border) var(--dark-border) transparent !important;
+      border-color: var(--light-border) var(--light-border) transparent !important;
+    }
+
+    /* List groups */
+    .list-group,
+    .list-group-item {
+      background: var(--light-bg-secondary) !important;
+      border-color: var(--light-border) !important;
+      color: var(--text-gray) !important;
+    }
+
+    .list-group-item:hover {
+      background: var(--light-bg-tertiary) !important;
+    }
+
+    /* Override backgrounds */
+    .bg-white {
+      background: var(--light-bg-secondary) !important;
+    }
+
+    .bg-light {
+      background: var(--light-bg-tertiary) !important;
+    }
+
+    /* Stat cards */
+    .stat-card .card-body {
+      padding: 1rem 1.25rem !important;
+    }
+
+    .stat-card h4 {
+      font-size: 1.5rem !important;
+      color: var(--text-dark) !important;
     }
 
     /* Input groups */
     .input-group-text {
-      background: var(--dark-bg-tertiary) !important;
-      border-color: var(--dark-border) !important;
+      background: var(--light-bg-tertiary) !important;
+      border-color: var(--light-border) !important;
       color: var(--text-gray) !important;
     }
 
-    /* Tooltips */
-    .tooltip-inner {
-      background: var(--dark-bg-tertiary) !important;
-      color: var(--text-white) !important;
+    /* Code blocks */
+    pre, code {
+      background: var(--light-bg-tertiary) !important;
+      color: var(--lyceum-green) !important;
+      border-color: var(--light-border) !important;
     }
 
-    /* Popovers */
-    .popover {
-      background: var(--dark-bg-secondary) !important;
-      border-color: var(--dark-border) !important;
+    /* Table buttons */
+    .table .btn,
+    table .btn {
+      padding: 6px 12px !important;
+      margin: 2px !important;
     }
 
-    .popover-header {
-      background: var(--dark-bg-tertiary) !important;
-      border-bottom-color: var(--dark-border) !important;
-      color: var(--text-white) !important;
+    .table .btn-sm,
+    table .btn-sm {
+      padding: 4px 10px !important;
+      font-size: 12px !important;
     }
 
-    .popover-body {
-      color: var(--text-gray) !important;
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
 
-    /* Fix specific Bootstrap utility classes that might override */
-    [class*="bg-"]:not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info) {
-      background: var(--dark-bg-secondary) !important;
+    ::-webkit-scrollbar-track {
+      background: var(--light-bg-tertiary);
     }
 
-    /* Ensure text in stats cards is visible */
-    .hstack,
-    .vstack {
-      color: var(--text-gray) !important;
+    ::-webkit-scrollbar-thumb {
+      background: var(--light-border);
+      border-radius: 3px;
     }
 
-    .hstack h5,
-    .vstack h5 {
-      color: var(--text-white) !important;
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-gray-light);
+    }
+
+    /* ========== RESPONSIVE STYLES ========== */
+
+    /* Mobile menu toggle button */
+    .sidebartoggler {
+      display: none;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      color: var(--text-dark) !important;
+      background: var(--light-bg-tertiary) !important;
+    }
+
+    .sidebartoggler:hover {
+      background: var(--light-border) !important;
+      color: var(--lyceum-green) !important;
+    }
+
+    /* Large screens (< 1200px) */
+    @media (max-width: 1199.98px) {
+      .sidebartoggler {
+        display: flex !important;
+      }
+
+      .left-sidebar {
+        left: -260px !important;
+        transition: left 0.3s ease !important;
+      }
+
+      .left-sidebar.show-sidebar {
+        left: 0 !important;
+      }
+
+      .body-wrapper {
+        margin-left: 0 !important;
+      }
+
+      .app-header {
+        left: 0 !important;
+      }
+    }
+
+    /* Medium screens / Tablets (< 992px) */
+    @media (max-width: 991.98px) {
+      .body-wrapper .container-fluid {
+        padding: 1rem !important;
+        padding-top: 80px !important;
+      }
+
+      .card {
+        margin-bottom: 1rem !important;
+      }
+
+      .card-body {
+        padding: 1rem !important;
+      }
+
+      /* Stack sidebar columns on tablets */
+      .col-lg-8, .col-lg-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      /* Stack stat cards */
+      .row > [class*="col-lg-3"] {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+      }
+
+      /* Table responsive - force horizontal scroll */
+      .table-responsive {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        -ms-overflow-style: -ms-autohiding-scrollbar !important;
+      }
+
+      .table-responsive > .table {
+        margin-bottom: 0 !important;
+      }
+
+      .table {
+        min-width: 800px !important;
+        white-space: nowrap !important;
+      }
+
+      /* Header row adjustments */
+      .d-flex.align-items-start.justify-content-between {
+        flex-direction: column !important;
+        gap: 1rem !important;
+      }
+
+      .d-flex.align-items-start.justify-content-between .ms-auto {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+
+      .d-flex.align-items-start.justify-content-between .ms-auto .btn {
+        width: 100% !important;
+      }
+    }
+
+    /* Small screens / Mobile (< 768px) */
+    @media (max-width: 767.98px) {
+      .app-header {
+        height: 60px !important;
+        min-height: 60px !important;
+      }
+
+      .app-header .navbar {
+        height: 60px !important;
+        min-height: 60px !important;
+        padding: 0 12px !important;
+      }
+
+      .body-wrapper .container-fluid {
+        padding: 12px !important;
+        padding-top: 72px !important;
+      }
+
+      .page-title-area h5 {
+        font-size: 16px !important;
+      }
+
+      /* Stack ALL columns on mobile */
+      .row > [class*="col-"],
+      .col-lg-8, .col-lg-4, .col-lg-6, .col-lg-3,
+      .col-md-6, .col-md-4, .col-md-3,
+      .col-sm-6, .col-sm-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      /* Cards */
+      .card {
+        border-radius: 8px !important;
+        margin-bottom: 12px !important;
+      }
+
+      .card-body {
+        padding: 12px !important;
+      }
+
+      .card-header,
+      .card-footer {
+        padding: 10px 12px !important;
+      }
+
+      /* Card title with actions - stack them */
+      .card-body > .d-flex:first-child {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+
+      .card-body > .d-flex:first-child > .ms-auto {
+        margin-left: 0 !important;
+      }
+
+      /* Tables - force scroll */
+      .table-responsive {
+        margin: 0 -12px !important;
+        padding: 0 12px !important;
+        width: calc(100% + 24px) !important;
+      }
+
+      .table {
+        min-width: 600px !important;
+      }
+
+      .table th,
+      .table td,
+      table th,
+      table td {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+      }
+
+      .table .btn,
+      table .btn {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+      }
+
+      /* Hide less important columns on mobile */
+      .hide-mobile {
+        display: none !important;
+      }
+
+      /* Search and filter rows */
+      .row.mb-4 > .col-md-6 {
+        margin-bottom: 12px !important;
+      }
+
+      .row.mb-4 > .col-md-6:last-child {
+        text-align: left !important;
+      }
+
+      .row.mb-4 .text-end {
+        text-align: left !important;
+      }
+
+      .row.mb-4 .justify-content-end {
+        justify-content: flex-start !important;
+      }
+
+      /* Forms */
+      .form-control,
+      .form-select,
+      input,
+      textarea,
+      select {
+        font-size: 16px !important;
+        padding: 10px 12px !important;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+      }
+
+      .btn-sm {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+      }
+
+      /* Header user button */
+      .header-user-btn {
+        padding: 4px !important;
+        border-radius: 50% !important;
+      }
+
+      /* Badges - wrap if needed */
+      .badge {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+      }
+
+      .d-flex.gap-2 {
+        flex-wrap: wrap !important;
+      }
+
+      /* Modal */
+      .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+      }
+
+      .modal-content {
+        border-radius: 12px !important;
+      }
+
+      /* List group items */
+      .list-group-item .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+
+      .list-group-item .ms-3,
+      .list-group-item .ms-auto {
+        margin-left: 0 !important;
+        margin-top: 10px !important;
+        width: 100% !important;
+      }
+
+      .list-group-item .d-flex.flex-column.gap-2 {
+        flex-direction: row !important;
+        width: 100% !important;
+      }
+
+      .list-group-item .d-flex.flex-column.gap-2 .btn {
+        flex: 1 !important;
+      }
+
+      /* Stats row in detail pages */
+      .row.text-center .col-3 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+        margin-bottom: 15px !important;
+      }
+
+      /* Tab navigation */
+      .nav-tabs {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      .nav-tabs .nav-item {
+        flex-shrink: 0 !important;
+      }
+
+      .nav-tabs .nav-link {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+      }
+
+      /* Input groups */
+      .input-group {
+        flex-wrap: nowrap !important;
+      }
+
+      /* Dropdown menus */
+      .dropdown-menu {
+        min-width: 200px !important;
+      }
+
+      /* Action buttons at bottom of pages */
+      .d-flex.gap-2 {
+        flex-direction: column !important;
+      }
+
+      .d-flex.gap-2 > .btn {
+        width: 100% !important;
+      }
+
+      /* View Site button in header - hide text */
+      .app-header .btn-outline-primary span {
+        display: none !important;
+      }
+    }
+
+    /* Extra small screens (< 576px) */
+    @media (max-width: 575.98px) {
+      .app-header .navbar {
+        padding: 0 8px !important;
+      }
+
+      .page-title-area h5 {
+        font-size: 14px !important;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .body-wrapper .container-fluid {
+        padding: 8px !important;
+        padding-top: 68px !important;
+      }
+
+      .card-body {
+        padding: 10px !important;
+      }
+
+      .card-title {
+        font-size: 14px !important;
+      }
+
+      /* Compact tables */
+      .table {
+        min-width: 500px !important;
+      }
+
+      .table th,
+      .table td {
+        padding: 6px 8px !important;
+        font-size: 11px !important;
+      }
+
+      /* Action buttons in table - stack vertically */
+      .table .btn-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+      }
+
+      .table .btn-group .btn {
+        width: 100% !important;
+      }
+
+      /* Stats in detail pages */
+      .row.text-center .col-3 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+      }
+
+      .row.text-center h4 {
+        font-size: 1rem !important;
+      }
+
+      /* Hide View Site button completely on very small screens */
+      .app-header .btn-outline-primary {
+        display: none !important;
+      }
+
+      /* Pagination */
+      .pagination {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+      }
+
+      .pagination .page-link {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+
+      /* Badges wrap */
+      .d-flex.gap-2 {
+        gap: 4px !important;
+      }
+
+      /* Form grid fix */
+      .row > .col-md-6,
+      .row > .col-md-4,
+      .row > .col-md-3 {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+      }
+    }
+
+    /* Sidebar overlay for mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+
+    .sidebar-overlay.show {
+      display: block;
+    }
+
+    /* Utility classes for responsive */
+    .d-mobile-none {
+      display: block;
+    }
+
+    .d-mobile-block {
+      display: none;
+    }
+
+    @media (max-width: 767.98px) {
+      .d-mobile-none {
+        display: none !important;
+      }
+
+      .d-mobile-block {
+        display: block !important;
+      }
     }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+  <!-- Sidebar Overlay for Mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
 
     <!-- Sidebar Start -->
-    <aside class="left-sidebar">
+    <aside class="left-sidebar" id="leftSidebar">
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img">
-            <img src="{% load static %}{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy" />
+          <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img d-flex align-items-center">
+            <img src="{% load static %}{% static 'images/logos/LM logo-07.svg' %}" alt="Lyceum Academy" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>
@@ -772,11 +1441,7 @@
         <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
-            <!-- DASHBOARD -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">DASHBOARD</span>
-            </li>
+            <!-- DASHBOARD - Always visible -->
             <li class="sidebar-item">
               <a class="sidebar-link" href="{% url 'custom_admin:dashboard' %}" aria-expanded="false">
                 <i class="ti ti-layout-dashboard"></i>
@@ -784,274 +1449,484 @@
               </a>
             </li>
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.online_courses %}
+            <!-- COURSES & CONTENT - Expandable -->
+            <li class="sidebar-section" data-section="courses">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('courses')">
+                <span><i class="ti ti-book me-2"></i>COURSES & CONTENT</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="courses-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:categories_list' %}" aria-expanded="false">
+                      <i class="ti ti-category"></i>
+                      <span class="hide-menu">Categories</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:courses_list' %}" aria-expanded="false">
+                      <i class="ti ti-book"></i>
+                      <span class="hide-menu">Courses</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:modules_list' %}" aria-expanded="false">
+                      <i class="ti ti-layout-grid"></i>
+                      <span class="hide-menu">Modules</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:video_lessons_list' %}" aria-expanded="false">
+                      <i class="ti ti-video"></i>
+                      <span class="hide-menu">Video Lessons</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:assignments_list' %}" aria-expanded="false">
+                      <i class="ti ti-clipboard-text"></i>
+                      <span class="hide-menu">Assignments</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:quizzes_list' %}" aria-expanded="false">
+                      <i class="ti ti-clipboard-list"></i>
+                      <span class="hide-menu">Quizzes</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:pdf_notes_list' %}" aria-expanded="false">
+                      <i class="ti ti-file-text"></i>
+                      <span class="hide-menu">PDF Notes</span>
+                    </a>
+                  </li>
+                  {% if features.live_sessions %}
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:live_sessions_list' %}" aria-expanded="false">
+                      <i class="ti ti-video-plus"></i>
+                      <span class="hide-menu">Live Sessions</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- COURSES & CONTENT -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">COURSES & CONTENT</span>
+            {% if features.online_enrollment %}
+            <!-- ONLINE STUDENTS - Expandable -->
+            <li class="sidebar-section" data-section="students">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('students')">
+                <span><i class="ti ti-device-laptop me-2"></i>ONLINE STUDENTS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="students-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:enrollments_list' %}" aria-expanded="false">
+                      <i class="ti ti-user-check"></i>
+                      <span class="hide-menu">Enrollments</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:teams_list' %}" aria-expanded="false">
+                      <i class="ti ti-user-circle"></i>
+                      <span class="hide-menu">Teams</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:module_progress_list' %}" aria-expanded="false">
+                      <i class="ti ti-chart-line"></i>
+                      <span class="hide-menu">Student Progress</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:course_enquiries_list' %}" aria-expanded="false">
+                      <i class="ti ti-message-circle"></i>
+                      <span class="hide-menu">Enquiries</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:certificates_list' %}" aria-expanded="false">
+                      <i class="ti ti-certificate"></i>
+                      <span class="hide-menu">Certificates</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:categories_list' %}" aria-expanded="false">
-                <i class="ti ti-category"></i>
-                <span class="hide-menu">Categories</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:courses_list' %}" aria-expanded="false">
-                <i class="ti ti-book"></i>
-                <span class="hide-menu">Courses</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:modules_list' %}" aria-expanded="false">
-                <i class="ti ti-layout-grid"></i>
-                <span class="hide-menu">Modules</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:video_lessons_list' %}" aria-expanded="false">
-                <i class="ti ti-video"></i>
-                <span class="hide-menu">Video Lessons</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:assignments_list' %}" aria-expanded="false">
-                <i class="ti ti-clipboard-text"></i>
-                <span class="hide-menu">Assignments</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:quizzes_list' %}" aria-expanded="false">
-                <i class="ti ti-clipboard-list"></i>
-                <span class="hide-menu">Quizzes</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:pdf_notes_list' %}" aria-expanded="false">
-                <i class="ti ti-file-text"></i>
-                <span class="hide-menu">PDF Notes</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:live_sessions_list' %}" aria-expanded="false">
-                <i class="ti ti-video-plus"></i>
-                <span class="hide-menu">Live Sessions</span>
-              </a>
-            </li>
+            {% endif %}
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.online_courses %}
+            <!-- TEACHER MANAGEMENT - Expandable -->
+            <li class="sidebar-section" data-section="teachers">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('teachers')">
+                <span><i class="ti ti-user-star me-2"></i>TEACHERS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="teachers-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:teachers_list' %}" aria-expanded="false">
+                      <i class="ti ti-users"></i>
+                      <span class="hide-menu">All Teachers</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:teacher_create' %}" aria-expanded="false">
+                      <i class="ti ti-user-plus"></i>
+                      <span class="hide-menu">Add Teacher</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- STUDENTS & ENROLLMENT -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">STUDENTS & ENROLLMENT</span>
+            {% if features.assessments %}
+            <!-- ASSESSMENTS & FEEDBACK - Expandable -->
+            <li class="sidebar-section" data-section="assessments">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('assessments')">
+                <span><i class="ti ti-clipboard-check me-2"></i>ASSESSMENTS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="assessments-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:assignment_submissions_list' %}" aria-expanded="false">
+                      <i class="ti ti-clipboard-check"></i>
+                      <span class="hide-menu">Assignment Submissions</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:quiz_attempts_list' %}" aria-expanded="false">
+                      <i class="ti ti-clipboard-data"></i>
+                      <span class="hide-menu">Quiz Attempts</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:ratings_list' %}" aria-expanded="false">
+                      <i class="ti ti-star"></i>
+                      <span class="hide-menu">Course Ratings</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:reviews_list' %}" aria-expanded="false">
+                      <i class="ti ti-message-circle"></i>
+                      <span class="hide-menu">Course Reviews</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:users_list' %}" aria-expanded="false">
-                <i class="ti ti-users"></i>
-                <span class="hide-menu">All Users</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:teams_list' %}" aria-expanded="false">
-                <i class="ti ti-user-circle"></i>
-                <span class="hide-menu">Teams</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:enrollments_list' %}" aria-expanded="false">
-                <i class="ti ti-user-check"></i>
-                <span class="hide-menu">Enrollments</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:module_progress_list' %}" aria-expanded="false">
-                <i class="ti ti-chart-line"></i>
-                <span class="hide-menu">Student Progress</span>
-              </a>
-            </li>
+            {% endif %}
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.payments %}
+            <!-- PAYMENTS & BILLING - Expandable -->
+            <li class="sidebar-section" data-section="payments">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('payments')">
+                <span><i class="ti ti-currency-rupee me-2"></i>PAYMENTS & BILLING</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="payments-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:payments_list' %}" aria-expanded="false">
+                      <i class="ti ti-currency-rupee"></i>
+                      <span class="hide-menu">Payments</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:installment_plans_list' %}" aria-expanded="false">
+                      <i class="ti ti-calendar-time"></i>
+                      <span class="hide-menu">Installment Plans</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:tax_invoices_list' %}" aria-expanded="false">
+                      <i class="ti ti-file-invoice"></i>
+                      <span class="hide-menu">Tax Invoices</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- ASSESSMENTS & SUBMISSIONS -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">ASSESSMENTS & FEEDBACK</span>
+            {% if features.finance %}
+            <!-- FINANCE MANAGEMENT - Expandable -->
+            <li class="sidebar-section" data-section="finance">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('finance')">
+                <span><i class="ti ti-chart-pie me-2"></i>FINANCE</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="finance-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:finance_dashboard' %}" aria-expanded="false">
+                      <i class="ti ti-dashboard"></i>
+                      <span class="hide-menu">Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:expenses_list' %}" aria-expanded="false">
+                      <i class="ti ti-receipt"></i>
+                      <span class="hide-menu">Expenses</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:income_list' %}" aria-expanded="false">
+                      <i class="ti ti-wallet"></i>
+                      <span class="hide-menu">Income</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:pending_fees_list' %}" aria-expanded="false">
+                      <i class="ti ti-alert-circle"></i>
+                      <span class="hide-menu">Pending Fees</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:monthly_fees_summary' %}" aria-expanded="false">
+                      <i class="ti ti-calendar-stats"></i>
+                      <span class="hide-menu">Monthly Summary</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:vendors_list' %}" aria-expanded="false">
+                      <i class="ti ti-users"></i>
+                      <span class="hide-menu">Vendors & Payers</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:assignment_submissions_list' %}" aria-expanded="false">
-                <i class="ti ti-clipboard-check"></i>
-                <span class="hide-menu">Assignment Submissions</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:quiz_attempts_list' %}" aria-expanded="false">
-                <i class="ti ti-clipboard-data"></i>
-                <span class="hide-menu">Quiz Attempts</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:ratings_list' %}" aria-expanded="false">
-                <i class="ti ti-star"></i>
-                <span class="hide-menu">Course Ratings</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:reviews_list' %}" aria-expanded="false">
-                <i class="ti ti-message-circle"></i>
-                <span class="hide-menu">Course Reviews</span>
-              </a>
-            </li>
+            {% endif %}
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.tuition %}
+            <!-- TUITION MANAGEMENT - Expandable -->
+            <li class="sidebar-section" data-section="tuition">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('tuition')">
+                <span><i class="ti ti-school me-2"></i>TUITION MANAGEMENT</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="tuition-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:tuition_dashboard' %}" aria-expanded="false">
+                      <i class="ti ti-dashboard"></i>
+                      <span class="hide-menu">Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:tuition_students_list' %}" aria-expanded="false">
+                      <i class="ti ti-users"></i>
+                      <span class="hide-menu">Students</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:batches_list' %}" aria-expanded="false">
+                      <i class="ti ti-layout-grid"></i>
+                      <span class="hide-menu">Batches</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:tuition_attendance_list' %}" aria-expanded="false">
+                      <i class="ti ti-clipboard-check"></i>
+                      <span class="hide-menu">Attendance</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:tuition_fees_list' %}" aria-expanded="false">
+                      <i class="ti ti-receipt"></i>
+                      <span class="hide-menu">Fee Collection</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:subjects_list' %}" aria-expanded="false">
+                      <i class="ti ti-book"></i>
+                      <span class="hide-menu">Subjects</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:standards_list' %}" aria-expanded="false">
+                      <i class="ti ti-list-numbers"></i>
+                      <span class="hide-menu">Standards</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- PAYMENTS & BILLING -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">PAYMENTS & BILLING</span>
+            {% if features.notifications %}
+            <!-- COMMUNICATIONS - Expandable -->
+            <li class="sidebar-section" data-section="communications">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('communications')">
+                <span><i class="ti ti-bell me-2"></i>COMMUNICATIONS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="communications-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:notifications_list' %}" aria-expanded="false">
+                      <i class="ti ti-bell"></i>
+                      <span class="hide-menu">Notifications</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:email_templates_list' %}" aria-expanded="false">
+                      <i class="ti ti-mail"></i>
+                      <span class="hide-menu">Email Templates</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:payments_list' %}" aria-expanded="false">
-                <i class="ti ti-currency-rupee"></i>
-                <span class="hide-menu">Payments</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:installment_plans_list' %}" aria-expanded="false">
-                <i class="ti ti-calendar-time"></i>
-                <span class="hide-menu">Installment Plans</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:tax_invoices_list' %}" aria-expanded="false">
-                <i class="ti ti-file-invoice"></i>
-                <span class="hide-menu">Tax Invoices</span>
-              </a>
-            </li>
+            {% endif %}
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.website_content %}
+            <!-- WEBSITE CONTENT - Expandable -->
+            <li class="sidebar-section" data-section="website">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('website')">
+                <span><i class="ti ti-world me-2"></i>WEBSITE CONTENT</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="website-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:content_dashboard' %}" aria-expanded="false">
+                      <i class="ti ti-dashboard"></i>
+                      <span class="hide-menu">Content Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:leads_list' %}" aria-expanded="false">
+                      <i class="ti ti-user-plus"></i>
+                      <span class="hide-menu">Leads Management</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:news_list' %}" aria-expanded="false">
+                      <i class="ti ti-news"></i>
+                      <span class="hide-menu">News</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:placements_list' %}" aria-expanded="false">
+                      <i class="ti ti-briefcase"></i>
+                      <span class="hide-menu">Placements</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:testimonials_list' %}" aria-expanded="false">
+                      <i class="ti ti-message"></i>
+                      <span class="hide-menu">Testimonials</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:banners_list' %}" aria-expanded="false">
+                      <i class="ti ti-photo"></i>
+                      <span class="hide-menu">Banners</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:events_list' %}" aria-expanded="false">
+                      <i class="ti ti-calendar-event"></i>
+                      <span class="hide-menu">Events</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- COMMUNICATIONS -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">COMMUNICATIONS</span>
+            {% if features.youtube %}
+            <!-- INTEGRATIONS - Expandable -->
+            <li class="sidebar-section" data-section="integrations">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('integrations')">
+                <span><i class="ti ti-plug me-2"></i>INTEGRATIONS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="integrations-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:youtube_channel_configs_list' %}" aria-expanded="false">
+                      <i class="ti ti-brand-youtube"></i>
+                      <span class="hide-menu">YouTube Channels</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:youtube_videos_list' %}" aria-expanded="false">
+                      <i class="ti ti-video"></i>
+                      <span class="hide-menu">YouTube Videos</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:notifications_list' %}" aria-expanded="false">
-                <i class="ti ti-bell"></i>
-                <span class="hide-menu">Notifications</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:email_templates_list' %}" aria-expanded="false">
-                <i class="ti ti-mail"></i>
-                <span class="hide-menu">Email Templates</span>
-              </a>
-            </li>
+            {% endif %}
 
-            <li><span class="sidebar-divider lg"></span></li>
+            {% if features.analytics %}
+            <!-- ANALYTICS & MENTORING - Expandable -->
+            <li class="sidebar-section" data-section="analytics">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('analytics')">
+                <span><i class="ti ti-chart-pie me-2"></i>ANALYTICS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="analytics-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="/mentor/" aria-expanded="false">
+                      <i class="ti ti-chart-pie"></i>
+                      <span class="hide-menu">Mentor Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="/mentor/students/" aria-expanded="false">
+                      <i class="ti ti-chart-dots"></i>
+                      <span class="hide-menu">Student Analytics</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="/mentor/alerts/" aria-expanded="false">
+                      <i class="ti ti-alert-triangle"></i>
+                      <span class="hide-menu">Progress Alerts</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
 
-            <!-- WEBSITE CONTENT -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">WEBSITE CONTENT</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:content_dashboard' %}" aria-expanded="false">
-                <i class="ti ti-dashboard"></i>
-                <span class="hide-menu">Content Dashboard</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:leads_list' %}" aria-expanded="false">
-                <i class="ti ti-user-plus"></i>
-                <span class="hide-menu">Leads Management</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:news_list' %}" aria-expanded="false">
-                <i class="ti ti-news"></i>
-                <span class="hide-menu">News</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:placements_list' %}" aria-expanded="false">
-                <i class="ti ti-briefcase"></i>
-                <span class="hide-menu">Placements</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:testimonials_list' %}" aria-expanded="false">
-                <i class="ti ti-message"></i>
-                <span class="hide-menu">Testimonials</span>
-              </a>
-            </li>
-
-            <li><span class="sidebar-divider lg"></span></li>
-
-            <!-- INTEGRATIONS -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">INTEGRATIONS</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:youtube_channel_configs_list' %}" aria-expanded="false">
-                <i class="ti ti-brand-youtube"></i>
-                <span class="hide-menu">YouTube Channels</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:youtube_videos_list' %}" aria-expanded="false">
-                <i class="ti ti-video"></i>
-                <span class="hide-menu">YouTube Videos</span>
-              </a>
-            </li>
-
-            <li><span class="sidebar-divider lg"></span></li>
-
-            <!-- ANALYTICS & MENTORING -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">ANALYTICS & MENTORING</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="/mentor/" aria-expanded="false">
-                <i class="ti ti-chart-pie"></i>
-                <span class="hide-menu">Mentor Dashboard</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="/mentor/students/" aria-expanded="false">
-                <i class="ti ti-chart-dots"></i>
-                <span class="hide-menu">Student Analytics</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="/mentor/alerts/" aria-expanded="false">
-                <i class="ti ti-alert-triangle"></i>
-                <span class="hide-menu">Progress Alerts</span>
-              </a>
-            </li>
-
-            <li><span class="sidebar-divider lg"></span></li>
-
-            <!-- SYSTEM SETTINGS -->
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">SYSTEM SETTINGS</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'custom_admin:settings_list' %}" aria-expanded="false">
-                <i class="ti ti-settings"></i>
-                <span class="hide-menu">System Settings</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="/django-admin/" aria-expanded="false">
-                <i class="ti ti-shield-lock"></i>
-                <span class="hide-menu">Django Admin</span>
-              </a>
+            <!-- SETTINGS - Expandable -->
+            <li class="sidebar-section" data-section="settings">
+              <div class="sidebar-section-header" onclick="toggleSidebarSection('settings')">
+                <span><i class="ti ti-settings me-2"></i>SETTINGS</span>
+                <i class="ti ti-chevron-down section-icon"></i>
+              </div>
+              <div class="sidebar-section-content" id="settings-section">
+                <ul class="ps-0 mb-0">
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:users_list' %}" aria-expanded="false">
+                      <i class="ti ti-users"></i>
+                      <span class="hide-menu">All Users</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:feature_config' %}" aria-expanded="false">
+                      <i class="ti ti-toggle-left"></i>
+                      <span class="hide-menu">Feature Settings</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'custom_admin:settings_list' %}" aria-expanded="false">
+                      <i class="ti ti-settings"></i>
+                      <span class="hide-menu">System Settings</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
         </nav>
@@ -1066,41 +1941,89 @@
       <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
-          <ul class="navbar-nav">
-            <li class="nav-item d-block d-xl-none">
-              <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
-                <i class="ti ti-menu-2"></i>
+          <!-- Left Side: Mobile Toggle + Page Title -->
+          <div class="d-flex align-items-center" style="min-width: 150px;">
+            <a class="nav-link sidebartoggler d-xl-none me-2 p-2" id="headerCollapse" href="javascript:void(0)" style="display: flex !important;">
+              <i class="ti ti-menu-2 fs-4"></i>
+            </a>
+            <div class="page-title-area">
+              <h5>{% block page_title %}Dashboard{% endblock %}</h5>
+            </div>
+          </div>
+
+          <!-- Center: Student Quick Search -->
+          <div class="flex-grow-1 d-flex justify-content-center d-none d-md-flex">
+            <div class="position-relative" style="width: 340px;">
+              <span class="student-search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </svg>
+              </span>
+              <input type="text" id="studentSearchInput"
+                     placeholder="Search students..."
+                     autocomplete="off">
+              <!-- Search Results Dropdown -->
+              <div id="studentSearchResults" class="position-absolute w-100 bg-white rounded-3 shadow-lg mt-1"
+                   style="display: none; z-index: 1050; max-height: 400px; overflow-y: auto; border: 1px solid var(--light-border);">
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side Navigation -->
+          <div class="d-flex align-items-center gap-3">
+            <!-- View Site Button -->
+            <a class="btn btn-outline-primary btn-sm d-none d-md-flex align-items-center gap-2" href="/" target="_blank">
+              <i class="ti ti-external-link"></i>
+              View Site
+            </a>
+
+            <!-- Notifications -->
+            <div class="dropdown">
+              <a class="nav-link position-relative" href="javascript:void(0)" data-bs-toggle="dropdown">
+                <i class="ti ti-bell fs-4"></i>
               </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="javascript:void(0)">
-                <iconify-icon icon="solar:bell-linear" class="fs-6"></iconify-icon>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
-          </ul>
-          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-              <li class="nav-item dropdown">
-                <a class="nav-link" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
-                </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
-                  <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-user fs-6"></i>
-                      <p class="mb-0 fs-3">My Profile</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-mail fs-6"></i>
-                      <p class="mb-0 fs-3">My Account</p>
-                    </a>
-                    <a href="{% url 'custom_admin:logout' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                  </div>
+              <div class="dropdown-menu dropdown-menu-end" style="width: 300px; margin-top: 10px;">
+                <div class="px-3 py-2 border-bottom">
+                  <h6 class="mb-0" style="color: var(--text-dark) !important;">Notifications</h6>
                 </div>
-              </li>
-            </ul>
+                <div class="p-4 text-center">
+                  <i class="ti ti-bell-off fs-1 mb-2" style="color: var(--text-gray-light) !important;"></i>
+                  <p class="mb-0" style="color: var(--text-gray-light) !important;">No new notifications</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Dropdown -->
+            <div class="dropdown">
+              <a class="header-user-btn d-flex align-items-center gap-2 text-decoration-none" href="javascript:void(0)" data-bs-toggle="dropdown">
+                <img src="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" alt="User" width="34" height="34" class="rounded-circle">
+                <div class="d-none d-md-block">
+                  <span class="d-block fw-medium" style="font-size: 13px; color: var(--text-dark) !important; line-height: 1.3;">{{ request.user.name|default:"Admin" }}</span>
+                  <small style="color: var(--text-gray-light) !important; font-size: 11px;">Administrator</small>
+                </div>
+                <i class="ti ti-chevron-down d-none d-md-block" style="color: var(--text-gray) !important;"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end" style="min-width: 220px; margin-top: 10px;">
+                <div class="px-3 py-2 border-bottom">
+                  <p class="mb-0 fw-semibold" style="color: var(--text-dark) !important;">{{ request.user.name|default:"Admin User" }}</p>
+                  <small style="color: var(--text-gray-light) !important;">{{ request.user.email|default:"admin@lyceum.com" }}</small>
+                </div>
+                <a href="javascript:void(0)" class="dropdown-item d-flex align-items-center gap-2 py-2 px-3">
+                  <i class="ti ti-user"></i>
+                  <span>My Profile</span>
+                </a>
+                <a href="{% url 'custom_admin:settings_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2 px-3">
+                  <i class="ti ti-settings"></i>
+                  <span>Settings</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'custom_admin:logout' %}" class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" style="color: #ef4444 !important;">
+                  <i class="ti ti-logout"></i>
+                  <span>Logout</span>
+                </a>
+              </div>
+            </div>
           </div>
         </nav>
       </header>
@@ -1145,14 +2068,275 @@
   <!-- Auto-dismiss messages after 5 seconds -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Auto-dismiss alerts
       const alerts = document.querySelectorAll('.messages-container .alert');
       alerts.forEach(function(alert) {
         setTimeout(function() {
           const bsAlert = new bootstrap.Alert(alert);
           bsAlert.close();
-        }, 5000); // 5 seconds
+        }, 5000);
       });
+
+      // Mobile Sidebar Toggle
+      const sidebar = document.getElementById('leftSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const headerToggle = document.getElementById('headerCollapse');
+      const sidebarClose = document.getElementById('sidebarCollapse');
+
+      function openSidebar() {
+        if (sidebar) {
+          sidebar.classList.add('show-sidebar');
+        }
+        if (overlay) {
+          overlay.classList.add('show');
+        }
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSidebar() {
+        if (sidebar) {
+          sidebar.classList.remove('show-sidebar');
+        }
+        if (overlay) {
+          overlay.classList.remove('show');
+        }
+        document.body.style.overflow = '';
+      }
+
+      // Toggle sidebar from header hamburger
+      if (headerToggle) {
+        headerToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (sidebar && sidebar.classList.contains('show-sidebar')) {
+            closeSidebar();
+          } else {
+            openSidebar();
+          }
+        });
+      }
+
+      // Close sidebar from X button
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', function(e) {
+          e.preventDefault();
+          closeSidebar();
+        });
+      }
+
+      // Close sidebar when clicking overlay
+      if (overlay) {
+        overlay.addEventListener('click', function() {
+          closeSidebar();
+        });
+      }
+
+      // Close sidebar when clicking a link (mobile)
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+      sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (window.innerWidth < 1200) {
+            closeSidebar();
+          }
+        });
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1200) {
+          closeSidebar();
+        }
+      });
+
+      // Scroll to active menu item in sidebar (delayed to allow sidebarmenu.js to set active class)
+      setTimeout(function() {
+        const activeLink = document.querySelector('.sidebar-link.active');
+        if (activeLink) {
+          const sidebarNav = document.querySelector('.sidebar-nav');
+          if (sidebarNav) {
+            activeLink.scrollIntoView({ behavior: 'auto', block: 'center' });
+          }
+
+          // Auto-expand section containing active link
+          const parentSection = activeLink.closest('.sidebar-section');
+          if (parentSection) {
+            const sectionId = parentSection.dataset.section;
+            expandSection(sectionId);
+          }
+        }
+      }, 300);
+
+      // Initialize sidebar sections - collapse all except active
+      initSidebarSections();
     });
+
+    // Sidebar Section Toggle Functions
+    function initSidebarSections() {
+      const sections = document.querySelectorAll('.sidebar-section');
+      const storedSection = localStorage.getItem('activeSidebarSection');
+
+      sections.forEach(function(section) {
+        const sectionId = section.dataset.section;
+        const header = section.querySelector('.sidebar-section-header');
+        const content = document.getElementById(sectionId + '-section');
+        const hasActiveLink = section.querySelector('.sidebar-link.active');
+
+        if (hasActiveLink || storedSection === sectionId) {
+          // Expand this section
+          if (header) header.classList.remove('collapsed');
+          if (content) content.style.maxHeight = content.scrollHeight + 'px';
+        } else {
+          // Collapse this section
+          if (header) header.classList.add('collapsed');
+          if (content) {
+            content.style.maxHeight = '0px';
+            content.classList.add('collapsed');
+          }
+        }
+      });
+    }
+
+    function toggleSidebarSection(sectionId) {
+      const section = document.querySelector('[data-section="' + sectionId + '"]');
+      const header = section.querySelector('.sidebar-section-header');
+      const content = document.getElementById(sectionId + '-section');
+
+      if (header.classList.contains('collapsed')) {
+        // Collapse other sections first
+        collapseAllSections();
+        // Expand this section
+        expandSection(sectionId);
+        localStorage.setItem('activeSidebarSection', sectionId);
+      } else {
+        // Collapse this section
+        collapseSection(sectionId);
+        localStorage.removeItem('activeSidebarSection');
+      }
+    }
+
+    function expandSection(sectionId) {
+      const section = document.querySelector('[data-section="' + sectionId + '"]');
+      if (!section) return;
+
+      const header = section.querySelector('.sidebar-section-header');
+      const content = document.getElementById(sectionId + '-section');
+
+      if (header) header.classList.remove('collapsed');
+      if (content) {
+        content.classList.remove('collapsed');
+        content.style.maxHeight = content.scrollHeight + 'px';
+      }
+    }
+
+    function collapseSection(sectionId) {
+      const section = document.querySelector('[data-section="' + sectionId + '"]');
+      if (!section) return;
+
+      const header = section.querySelector('.sidebar-section-header');
+      const content = document.getElementById(sectionId + '-section');
+
+      if (header) header.classList.add('collapsed');
+      if (content) {
+        content.style.maxHeight = '0px';
+        content.classList.add('collapsed');
+      }
+    }
+
+    function collapseAllSections() {
+      const sections = document.querySelectorAll('.sidebar-section');
+      sections.forEach(function(section) {
+        const sectionId = section.dataset.section;
+        collapseSection(sectionId);
+      });
+    }
+
+    // Student Quick Search
+    (function() {
+      const searchInput = document.getElementById('studentSearchInput');
+      const searchResults = document.getElementById('studentSearchResults');
+
+      if (!searchInput || !searchResults) return;
+
+      let searchTimeout;
+
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+
+        clearTimeout(searchTimeout);
+
+        if (query.length < 2) {
+          searchResults.style.display = 'none';
+          return;
+        }
+
+        searchTimeout = setTimeout(function() {
+          fetch('{% url "custom_admin:student_search_api" %}?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+              if (data.students.length === 0) {
+                searchResults.innerHTML = '<div class="p-3 text-center text-muted"><i class="ti ti-user-off me-1"></i>No students found</div>';
+              } else {
+                let html = '';
+                data.students.forEach(function(student) {
+                  const riskBadge = student.risk_level === 'high' ? '<span class="badge bg-danger ms-1">High Risk</span>' :
+                                   student.risk_level === 'medium' ? '<span class="badge bg-warning ms-1">Medium</span>' : '';
+
+                  html += '<a href="/admin/students/' + student.id + '/profile/" class="d-block p-2 text-decoration-none search-result-item" style="border-bottom: 1px solid var(--light-border);">' +
+                    '<div class="d-flex align-items-center">' +
+                      '<div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 14px;">' +
+                        (student.name ? student.name.charAt(0).toUpperCase() : student.email.charAt(0).toUpperCase()) +
+                      '</div>' +
+                      '<div class="flex-grow-1">' +
+                        '<div class="fw-medium text-dark" style="font-size: 13px;">' + student.name + riskBadge + '</div>' +
+                        '<div class="text-muted" style="font-size: 11px;">' + student.email + '</div>' +
+                        '<div class="text-muted" style="font-size: 11px;">' +
+                          '<span class="me-2"><i class="ti ti-book me-1"></i>' + student.enrollments_count + ' courses</span>' +
+                          (student.phone ? '<span><i class="ti ti-phone me-1"></i>' + student.phone + '</span>' : '') +
+                        '</div>' +
+                      '</div>' +
+                    '</div>' +
+                  '</a>';
+                });
+                searchResults.innerHTML = html;
+              }
+              searchResults.style.display = 'block';
+            })
+            .catch(function(error) {
+              console.error('Search error:', error);
+              searchResults.innerHTML = '<div class="p-3 text-center text-danger">Error searching</div>';
+              searchResults.style.display = 'block';
+            });
+        }, 300);
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.style.display = 'none';
+        }
+      });
+
+      // Handle keyboard navigation
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          searchResults.style.display = 'none';
+          searchInput.blur();
+        }
+      });
+
+      // Hover effect for search results
+      document.addEventListener('mouseover', function(e) {
+        const item = e.target.closest('.search-result-item');
+        if (item) {
+          item.style.backgroundColor = 'var(--light-bg)';
+        }
+      });
+      document.addEventListener('mouseout', function(e) {
+        const item = e.target.closest('.search-result-item');
+        if (item) {
+          item.style.backgroundColor = '';
+        }
+      });
+    })();
   </script>
 
   {% block extra_js %}{% endblock %}

@@ -1,0 +1,403 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Finance Dashboard - LM Academy Admin{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Finance Dashboard</h4>
+    <small class="text-muted">Track income, expenses, and financial health</small>
+  </div>
+  <div class="d-flex gap-2">
+    <form method="POST" action="{% url 'custom_admin:sync_payments' %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary btn-sm">
+        <i class="ti ti-refresh me-1"></i>Sync Payments
+      </button>
+    </form>
+    <a href="{% url 'custom_admin:expense_create' %}" class="btn btn-danger btn-sm text-white">
+      <i class="ti ti-plus me-1"></i>Add Expense
+    </a>
+    <a href="{% url 'custom_admin:income_create' %}" class="btn btn-success btn-sm text-white">
+      <i class="ti ti-plus me-1"></i>Add Income
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row g-2 mb-3">
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(22, 130, 75, 0.15);">
+            <i class="ti ti-currency-rupee" style="color: #16824b;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #16824b !important;">{{ ytd_summary.total_income|floatformat:0|default:"0" }}</h5>
+            <small class="text-muted">Total Revenue</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(185, 28, 28, 0.15);">
+            <i class="ti ti-trending-down" style="color: #b91c1c;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #b91c1c !important;">{{ ytd_summary.total_expense|floatformat:0|default:"0" }}</h5>
+            <small class="text-muted">Total Expenses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(29, 78, 216, 0.15);">
+            <i class="ti ti-chart-bar" style="color: #1d4ed8;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: {% if ytd_summary.net_profit >= 0 %}#16824b{% else %}#b91c1c{% endif %} !important;">
+              {{ ytd_summary.net_profit|floatformat:0|default:"0" }}
+            </h5>
+            <small class="text-muted">Net Profit</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(180, 83, 9, 0.15);">
+            <i class="ti ti-percentage" style="color: #b45309;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #b45309 !important;">{{ ytd_summary.profit_margin|floatformat:1|default:"0" }}%</h5>
+            <small class="text-muted">Profit Margin</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(161, 98, 7, 0.15);">
+            <i class="ti ti-clock" style="color: #a16207;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #a16207 !important;">{{ pending_expenses }}</h5>
+            <small class="text-muted">Pending Expenses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-2">
+    <div class="card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(109, 40, 217, 0.15);">
+            <i class="ti ti-receipt" style="color: #6d28d9;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold" style="color: #6d28d9 !important;">{{ pending_income }}</h5>
+            <small class="text-muted">Pending Income</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-2 mb-3">
+  <!-- Income vs Expenses Trend Chart -->
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <h6 class="card-title mb-0">Income vs Expenses Trend</h6>
+            <small class="text-muted" style="font-size: 11px;">Last 12 months</small>
+          </div>
+          <div class="d-flex gap-3">
+            <span class="d-flex align-items-center" style="font-size: 11px;">
+              <span class="rounded-circle me-1 d-inline-block" style="width: 6px; height: 6px; background: #2ab673;"></span>
+              Income
+            </span>
+            <span class="d-flex align-items-center" style="font-size: 11px;">
+              <span class="rounded-circle me-1 d-inline-block" style="width: 6px; height: 6px; background: #ef4444;"></span>
+              Expenses
+            </span>
+          </div>
+        </div>
+        <div style="height: 250px;">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Breakdown -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <ul class="nav nav-tabs nav-tabs-sm mb-3" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#incomeChart" role="tab">Income</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#expenseChart" role="tab">Expenses</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="incomeChart" role="tabpanel">
+            <div style="height: 200px;">
+              <canvas id="incomePieChart"></canvas>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="expenseChart" role="tabpanel">
+            <div style="height: 200px;">
+              <canvas id="expensePieChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row g-2">
+  <!-- Recent Expenses -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <h6 class="mb-0">Recent Expenses</h6>
+        <a href="{% url 'custom_admin:expenses_list' %}" class="btn btn-link btn-sm p-0">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for expense in recent_expenses %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:expense_detail' expense.id %}" class="text-decoration-none">
+                    {{ expense.title|truncatechars:25 }}
+                  </a>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: {{ expense.category.color }}20; color: {{ expense.category.color }};">
+                    {{ expense.category.name }}
+                  </span>
+                </td>
+                <td class="text-danger fw-bold">{{ expense.total_amount|floatformat:0 }}</td>
+                <td>
+                  {% if expense.status == 'paid' %}
+                  <span class="badge bg-success-subtle text-success">Paid</span>
+                  {% elif expense.status == 'approved' %}
+                  <span class="badge bg-info-subtle text-info">Approved</span>
+                  {% elif expense.status == 'pending' %}
+                  <span class="badge bg-warning-subtle text-warning">Pending</span>
+                  {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">{{ expense.status|title }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No expenses recorded yet</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Income -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <h6 class="mb-0">Recent Income</h6>
+        <a href="{% url 'custom_admin:income_list' %}" class="btn btn-link btn-sm p-0">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for income in recent_income %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:income_detail' income.id %}" class="text-decoration-none">
+                    {{ income.title|truncatechars:25 }}
+                  </a>
+                  {% if income.is_auto_imported %}
+                  <i class="ti ti-refresh text-info" title="Auto-imported from payments"></i>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge" style="background-color: {{ income.category.color }}20; color: {{ income.category.color }};">
+                    {{ income.category.name }}
+                  </span>
+                </td>
+                <td class="text-success fw-bold">{{ income.total_amount|floatformat:0 }}</td>
+                <td>
+                  {% if income.status == 'received' %}
+                  <span class="badge bg-success-subtle text-success">Received</span>
+                  {% elif income.status == 'pending' %}
+                  <span class="badge bg-warning-subtle text-warning">Pending</span>
+                  {% elif income.status == 'partial' %}
+                  <span class="badge bg-info-subtle text-info">Partial</span>
+                  {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">{{ income.status|title }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No income recorded yet</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Trend Chart
+  const trendCtx = document.getElementById('trendChart');
+  if (trendCtx) {
+    new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: {{ trend_labels|safe }},
+        datasets: [{
+          label: 'Income',
+          data: {{ trend_income|safe }},
+          borderColor: '#2ab673',
+          backgroundColor: 'rgba(42, 182, 115, 0.1)',
+          fill: true,
+          tension: 0.4
+        }, {
+          label: 'Expenses',
+          data: {{ trend_expense|safe }},
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  // Income Pie Chart
+  const incomeData = {{ income_by_category|safe }};
+  const incomePieCtx = document.getElementById('incomePieChart');
+  if (incomePieCtx && incomeData.length > 0) {
+    new Chart(incomePieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: incomeData.map(d => d.category__name),
+        datasets: [{
+          data: incomeData.map(d => parseFloat(d.total)),
+          backgroundColor: incomeData.map(d => d.category__color || '#5d87ff'),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  // Expense Pie Chart
+  const expenseData = {{ expense_by_category|safe }};
+  const expensePieCtx = document.getElementById('expensePieChart');
+  if (expensePieCtx && expenseData.length > 0) {
+    new Chart(expensePieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: expenseData.map(d => d.category__name),
+        datasets: [{
+          data: expenseData.map(d => parseFloat(d.total)),
+          backgroundColor: expenseData.map(d => d.category__color || '#ef4444'),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

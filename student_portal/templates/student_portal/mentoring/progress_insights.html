@@ -1,343 +1,658 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Progress Insights - {{ request.user.name }}{% endblock %}
+{% block title %}Progress Insights - LM Academy{% endblock %}
 
 {% block extra_css %}
 <style>
-    .insight-card {
-        border-radius: 15px;
-        transition: transform 0.2s;
+  /* Progress Insights - matching dashboard style */
+  .sp-insights {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .sp-insights * {
+    box-sizing: border-box;
+  }
+
+  /* Page Header */
+  .sp-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .sp-page-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+  }
+
+  .sp-page-title p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .sp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+
+  .sp-btn-outline {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .sp-btn-outline:hover {
+    background: #f9fafb;
+    color: #111827;
+  }
+
+  /* Stats Grid */
+  .sp-stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .sp-stat {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .sp-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin: 0 auto 10px;
+  }
+
+  .sp-stat-icon.blue { background: #dbeafe; color: #2563eb; }
+  .sp-stat-icon.green { background: #d1fae5; color: #059669; }
+  .sp-stat-icon.yellow { background: #fef3c7; color: #d97706; }
+  .sp-stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+  .sp-stat-icon.pink { background: #fce7f3; color: #db2777; }
+  .sp-stat-icon.gray { background: #f3f4f6; color: #6b7280; }
+
+  .sp-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .sp-stat-label {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* Cards */
+  .sp-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .sp-card-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sp-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sp-card-title i {
+    color: var(--primary);
+  }
+
+  .sp-card-body {
+    padding: 16px;
+  }
+
+  /* Course Progress Grid */
+  .sp-course-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .sp-course-card {
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border-left: 3px solid var(--primary);
+  }
+
+  .sp-course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .sp-course-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sp-course-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sp-course-desc {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .sp-course-progress {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .sp-course-progress svg {
+    transform: rotate(-90deg);
+  }
+
+  .sp-course-progress .bg {
+    fill: none;
+    stroke: #e5e7eb;
+    stroke-width: 6;
+  }
+
+  .sp-course-progress .fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+
+  .sp-course-percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .sp-course-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .sp-course-stat {
+    text-align: center;
+    padding: 8px 4px;
+    background: white;
+    border-radius: 6px;
+  }
+
+  .sp-course-stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .sp-course-stat-value.blue { color: #2563eb; }
+  .sp-course-stat-value.green { color: #059669; }
+  .sp-course-stat-value.yellow { color: #d97706; }
+  .sp-course-stat-value.purple { color: #7c3aed; }
+
+  .sp-course-stat-label {
+    font-size: 10px;
+    color: #9ca3af;
+  }
+
+  .sp-course-activity {
+    font-size: 11px;
+    color: #6b7280;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .sp-course-activity i {
+    margin-right: 4px;
+  }
+
+  /* Chart Section */
+  .sp-chart-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sp-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .sp-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .sp-legend-dot.blue { background: #2563eb; }
+  .sp-legend-dot.green { background: #059669; }
+  .sp-legend-dot.yellow { background: #d97706; }
+
+  .sp-chart {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .sp-chart-month {
+    text-align: center;
+  }
+
+  .sp-chart-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+
+  .sp-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 120px;
+    background: #f9fafb;
+    border-radius: 6px;
+    padding: 8px 4px;
+  }
+
+  .sp-bar {
+    width: 100%;
+    max-width: 20px;
+    border-radius: 3px 3px 0 0;
+    transition: opacity 0.2s;
+  }
+
+  .sp-bar:hover {
+    opacity: 0.8;
+  }
+
+  .sp-bar.blue { background: #2563eb; }
+  .sp-bar.green { background: #059669; }
+  .sp-bar.yellow { background: #d97706; }
+
+  .sp-chart-values {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .sp-chart-value {
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .sp-chart-value.blue { color: #2563eb; }
+  .sp-chart-value.green { color: #059669; }
+  .sp-chart-value.yellow { color: #d97706; }
+
+  /* Highlights */
+  .sp-highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .sp-highlight {
+    text-align: center;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  .sp-highlight i {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .sp-highlight i.blue { color: #2563eb; }
+  .sp-highlight i.green { color: #059669; }
+  .sp-highlight i.purple { color: #7c3aed; }
+
+  .sp-highlight h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  .sp-highlight p {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* Empty State */
+  .sp-empty {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .sp-empty i {
+    font-size: 40px;
+    color: #d1d5db;
+    margin-bottom: 12px;
+  }
+
+  .sp-empty h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+
+  .sp-empty p {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 1024px) {
+    .sp-stats {
+      grid-template-columns: repeat(3, 1fr);
     }
-    .insight-card:hover {
-        transform: translateY(-2px);
+
+    .sp-course-grid {
+      grid-template-columns: 1fr;
     }
-    
-    .course-progress-card {
-        border-left: 4px solid #007bff;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  }
+
+  @media screen and (max-width: 768px) {
+    .sp-page-header {
+      flex-direction: column;
+      align-items: stretch;
     }
-    
-    .progress-circle {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: conic-gradient(#28a745 0deg, #28a745 0deg, #e9ecef 0deg, #e9ecef 360deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
+
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
-    
-    .progress-circle::before {
-        content: '';
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: white;
-        position: absolute;
+
+    .sp-chart {
+      grid-template-columns: repeat(3, 1fr);
     }
-    
-    .progress-text {
-        position: relative;
-        z-index: 2;
-        font-weight: bold;
-        font-size: 0.9rem;
+
+    .sp-highlights {
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
-    
-    .chart-container {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+    .sp-course-stats {
+      grid-template-columns: repeat(2, 1fr);
     }
-    
-    .month-bar {
-        height: 200px;
-        display: flex;
-        align-items: end;
-        justify-content: center;
-        position: relative;
-        margin: 0 2px;
+  }
+
+  @media screen and (max-width: 480px) {
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
     }
-    
-    .bar {
-        width: 100%;
-        border-radius: 4px 4px 0 0;
-        transition: all 0.3s ease;
-        cursor: pointer;
+
+    .sp-stat {
+      padding: 12px;
     }
-    
-    .bar:hover {
-        opacity: 0.8;
-        transform: scaleY(1.05);
+
+    .sp-stat-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
     }
-    
-    .videos-bar { background: linear-gradient(to top, #007bff, #0056b3); }
-    .quizzes-bar { background: linear-gradient(to top, #28a745, #1e7e34); }
-    .assignments-bar { background: linear-gradient(to top, #ffc107, #e0a800); }
+
+    .sp-stat-value {
+      font-size: 18px;
+    }
+
+    .sp-chart {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sp-chart-bars {
+      height: 80px;
+    }
+
+    .sp-course-card {
+      padding: 12px;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>Detailed Progress Insights</h2>
-            <p class="text-muted">Deep dive into your learning analytics and performance</p>
-        </div>
-        <div>
-            <a href="{% url 'student_portal:mentoring_dashboard' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-            </a>
-        </div>
+<div class="sp-insights">
+  <!-- Page Header -->
+  <div class="sp-page-header">
+    <div class="sp-page-title">
+      <h1>Progress Insights</h1>
+      <p>Deep dive into your learning analytics</p>
     </div>
+    <a href="{% url 'student_portal:mentoring_dashboard' %}" class="sp-btn sp-btn-outline">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
 
-    <!-- Overall Analytics Summary -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card insight-card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-chart-line me-2"></i>Overall Learning Performance
-                    </h5>
-                    <div class="row text-center">
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-primary">
-                                <i class="fas fa-video fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.total_videos_watched }}</h4>
-                            <small class="text-muted">Videos Completed</small>
-                        </div>
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-success">
-                                <i class="fas fa-clipboard-check fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.total_assignments_submitted }}</h4>
-                            <small class="text-muted">Assignments</small>
-                        </div>
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-warning">
-                                <i class="fas fa-clipboard-list fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.total_quizzes_attempted }}</h4>
-                            <small class="text-muted">Quiz Attempts</small>
-                        </div>
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-info">
-                                <i class="fas fa-percentage fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.avg_quiz_score|floatformat:0 }}%</h4>
-                            <small class="text-muted">Quiz Average</small>
-                        </div>
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-purple">
-                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.modules_completed }}</h4>
-                            <small class="text-muted">Modules Done</small>
-                        </div>
-                        <div class="col-6 col-md-2 mb-3">
-                            <div class="text-dark">
-                                <i class="fas fa-calendar fa-2x mb-2"></i>
-                            </div>
-                            <h4 class="mb-0">{{ analytics.total_login_days|default:"0" }}</h4>
-                            <small class="text-muted">Login Days</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Overall Stats -->
+  <div class="sp-stats">
+    <div class="sp-stat">
+      <div class="sp-stat-icon blue"><i class="fas fa-play-circle"></i></div>
+      <div class="sp-stat-value">{{ analytics.total_videos_watched }}</div>
+      <div class="sp-stat-label">Videos Completed</div>
     </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon green"><i class="fas fa-clipboard-check"></i></div>
+      <div class="sp-stat-value">{{ analytics.total_assignments_submitted }}</div>
+      <div class="sp-stat-label">Assignments</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon yellow"><i class="fas fa-question-circle"></i></div>
+      <div class="sp-stat-value">{{ analytics.total_quizzes_attempted }}</div>
+      <div class="sp-stat-label">Quiz Attempts</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon purple"><i class="fas fa-percentage"></i></div>
+      <div class="sp-stat-value">{{ analytics.avg_quiz_score|floatformat:0 }}%</div>
+      <div class="sp-stat-label">Quiz Average</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon pink"><i class="fas fa-graduation-cap"></i></div>
+      <div class="sp-stat-value">{{ analytics.modules_completed }}</div>
+      <div class="sp-stat-label">Modules Done</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon gray"><i class="fas fa-calendar-check"></i></div>
+      <div class="sp-stat-value">{{ analytics.total_login_days|default:"0" }}</div>
+      <div class="sp-stat-label">Login Days</div>
+    </div>
+  </div>
 
-    <!-- Course-wise Progress -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card insight-card border-0 shadow-sm">
-                <div class="card-header bg-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fas fa-books me-2"></i>Course-wise Progress
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for insight in course_insights %}
-                        <div class="col-lg-6 mb-4">
-                            <div class="card course-progress-card border-0 h-100">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <h6 class="fw-bold mb-1">{{ insight.course.title }}</h6>
-                                            <small class="text-muted">{{ insight.course.description|truncatechars:50 }}</small>
-                                        </div>
-                                        <div class="progress-circle" style="background: conic-gradient(#28a745 {{ insight.completion_degrees }}deg, #e9ecef {{ insight.completion_degrees }}deg);">
-                                            <div class="progress-text">
-                                                {{ insight.completion_percentage|floatformat:0 }}%
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row text-center">
-                                        <div class="col-6 col-md-3 mb-2">
-                                            <div class="small text-primary fw-bold">{{ insight.completed_videos }}</div>
-                                            <div class="small text-muted">of {{ insight.total_videos }} videos</div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-2">
-                                            <div class="small text-success fw-bold">{{ insight.quiz_attempts }}</div>
-                                            <div class="small text-muted">quiz attempts</div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-2">
-                                            <div class="small text-warning fw-bold">{{ insight.avg_quiz_score|floatformat:0 }}%</div>
-                                            <div class="small text-muted">quiz average</div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-2">
-                                            <div class="small text-info fw-bold">{{ insight.assignments_submitted }}</div>
-                                            <div class="small text-muted">assignments</div>
-                                        </div>
-                                    </div>
-                                    
-                                    {% if insight.last_activity %}
-                                    <div class="mt-3 pt-3 border-top">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>Last activity: {{ insight.last_activity.last_watched_at|timesince }} ago
-                                            ({{ insight.last_activity.video_lesson.title|truncatechars:30 }})
-                                        </small>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="col-12 text-center py-4">
-                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No course enrollments yet</h5>
-                            <p class="text-muted">Enroll in courses to see detailed progress insights here.</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Course Progress -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title"><i class="fas fa-book"></i> Course Progress</span>
     </div>
+    <div class="sp-card-body">
+      {% if course_insights %}
+      <div class="sp-course-grid">
+        {% for insight in course_insights %}
+        <div class="sp-course-card">
+          <div class="sp-course-header">
+            <div class="sp-course-info">
+              <div class="sp-course-name">{{ insight.course.title }}</div>
+              <div class="sp-course-desc">{{ insight.course.description|truncatechars:50 }}</div>
+            </div>
+            <div class="sp-course-progress">
+              <svg viewBox="0 0 56 56" width="56" height="56">
+                <circle class="bg" cx="28" cy="28" r="24"></circle>
+                <circle class="fill" cx="28" cy="28" r="24"
+                        stroke-dasharray="{{ insight.completion_percentage|floatformat:0|default:0|add:0|divisibleby:1 }}%, 100%"
+                        style="stroke-dasharray: calc({{ insight.completion_percentage|floatformat:0|default:0 }} * 1.508), 150.8;"></circle>
+              </svg>
+              <div class="sp-course-percent">{{ insight.completion_percentage|floatformat:0 }}%</div>
+            </div>
+          </div>
 
-    <!-- Monthly Progress Chart -->
-    <div class="card insight-card border-0 shadow-sm">
-        <div class="card-header bg-white border-0">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-bar me-2"></i>Monthly Activity Trends
-                </h5>
-                <div class="d-flex gap-3">
-                    <div class="d-flex align-items-center">
-                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #007bff, #0056b3); border-radius: 2px;"></div>
-                        <small class="text-muted">Videos</small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #28a745, #1e7e34); border-radius: 2px;"></div>
-                        <small class="text-muted">Quizzes</small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-2" style="width: 12px; height: 12px; background: linear-gradient(to bottom, #ffc107, #e0a800); border-radius: 2px;"></div>
-                        <small class="text-muted">Assignments</small>
-                    </div>
-                </div>
+          <div class="sp-course-stats">
+            <div class="sp-course-stat">
+              <div class="sp-course-stat-value blue">{{ insight.completed_videos }}/{{ insight.total_videos }}</div>
+              <div class="sp-course-stat-label">Videos</div>
             </div>
+            <div class="sp-course-stat">
+              <div class="sp-course-stat-value green">{{ insight.quiz_attempts }}</div>
+              <div class="sp-course-stat-label">Quizzes</div>
+            </div>
+            <div class="sp-course-stat">
+              <div class="sp-course-stat-value yellow">{{ insight.avg_quiz_score|floatformat:0 }}%</div>
+              <div class="sp-course-stat-label">Quiz Avg</div>
+            </div>
+            <div class="sp-course-stat">
+              <div class="sp-course-stat-value purple">{{ insight.assignments_submitted }}</div>
+              <div class="sp-course-stat-label">Assignments</div>
+            </div>
+          </div>
+
+          {% if insight.last_activity %}
+          <div class="sp-course-activity">
+            <i class="fas fa-clock"></i>Last activity: {{ insight.last_activity.last_watched_at|timesince }} ago
+          </div>
+          {% endif %}
         </div>
-        <div class="card-body">
-            <div class="chart-container">
-                <div class="row">
-                    {% for month in monthly_data %}
-                    <div class="col">
-                        <div class="text-center mb-2">
-                            <small class="text-muted fw-bold">{{ month.month }}</small>
-                        </div>
-                        <div class="month-bar">
-                            <div class="d-flex w-100 align-items-end">
-                                <div class="flex-fill me-1">
-                                    <div class="bar videos-bar" 
-                                         style="height: {{ month.videos_height }}%"
-                                         title="Videos: {{ month.videos }}">
-                                    </div>
-                                </div>
-                                <div class="flex-fill me-1">
-                                    <div class="bar quizzes-bar" 
-                                         style="height: {{ month.quizzes_height }}%"
-                                         title="Quizzes: {{ month.quizzes }}">
-                                    </div>
-                                </div>
-                                <div class="flex-fill">
-                                    <div class="bar assignments-bar" 
-                                         style="height: {{ month.assignments_height }}%"
-                                         title="Assignments: {{ month.assignments }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-2">
-                            <div class="row">
-                                <div class="col-4 px-1">
-                                    <small class="text-primary fw-bold">{{ month.videos }}</small>
-                                </div>
-                                <div class="col-4 px-1">
-                                    <small class="text-success fw-bold">{{ month.quizzes }}</small>
-                                </div>
-                                <div class="col-4 px-1">
-                                    <small class="text-warning fw-bold">{{ month.assignments }}</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <div class="row mt-4 pt-3 border-top">
-                <div class="col-md-4 text-center">
-                    <div class="text-primary">
-                        <i class="fas fa-trending-up fa-2x mb-2"></i>
-                    </div>
-                    <h6>Learning Streak</h6>
-                    <p class="text-muted mb-0">Keep up the great momentum!</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="text-success">
-                        <i class="fas fa-target fa-2x mb-2"></i>
-                    </div>
-                    <h6>Goal Achievement</h6>
-                    <p class="text-muted mb-0">You're on track to meet your goals</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="text-info">
-                        <i class="fas fa-lightbulb fa-2x mb-2"></i>
-                    </div>
-                    <h6>Smart Insights</h6>
-                    <p class="text-muted mb-0">Personalized recommendations available</p>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="sp-empty">
+        <i class="fas fa-book-open"></i>
+        <h4>No course enrollments yet</h4>
+        <p>Enroll in courses to see detailed progress insights here.</p>
+      </div>
+      {% endif %}
     </div>
+  </div>
+
+  <!-- Monthly Activity Chart -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title"><i class="fas fa-chart-bar"></i> Monthly Activity</span>
+      <div class="sp-chart-legend">
+        <div class="sp-legend-item">
+          <div class="sp-legend-dot blue"></div>
+          <span>Videos</span>
+        </div>
+        <div class="sp-legend-item">
+          <div class="sp-legend-dot green"></div>
+          <span>Quizzes</span>
+        </div>
+        <div class="sp-legend-item">
+          <div class="sp-legend-dot yellow"></div>
+          <span>Assignments</span>
+        </div>
+      </div>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart">
+        {% for month in monthly_data %}
+        <div class="sp-chart-month">
+          <div class="sp-chart-label">{{ month.month }}</div>
+          <div class="sp-chart-bars">
+            <div class="sp-bar blue" style="height: {{ month.videos_height }}%;"></div>
+            <div class="sp-bar green" style="height: {{ month.quizzes_height }}%;"></div>
+            <div class="sp-bar yellow" style="height: {{ month.assignments_height }}%;"></div>
+          </div>
+          <div class="sp-chart-values">
+            <span class="sp-chart-value blue">{{ month.videos }}</span>
+            <span class="sp-chart-value green">{{ month.quizzes }}</span>
+            <span class="sp-chart-value yellow">{{ month.assignments }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="sp-highlights">
+        <div class="sp-highlight">
+          <i class="fas fa-chart-line blue"></i>
+          <h4>Learning Streak</h4>
+          <p>Keep up the great momentum!</p>
+        </div>
+        <div class="sp-highlight">
+          <i class="fas fa-bullseye green"></i>
+          <h4>Goal Achievement</h4>
+          <p>You're on track to meet your goals</p>
+        </div>
+        <div class="sp-highlight">
+          <i class="fas fa-lightbulb purple"></i>
+          <h4>Smart Insights</h4>
+          <p>Personalized recommendations available</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add tooltips to bars
-    const bars = document.querySelectorAll('.bar');
-    bars.forEach(bar => {
-        bar.addEventListener('mouseenter', function() {
-            const tooltip = this.getAttribute('title');
-            this.style.position = 'relative';
-        });
-    });
-    
-    // Animate progress circles
-    const progressCircles = document.querySelectorAll('.progress-circle');
-    progressCircles.forEach(circle => {
-        const percentage = circle.querySelector('.progress-text').textContent.replace('%', '');
-        const degrees = (percentage / 100) * 360;
-        circle.style.background = `conic-gradient(#28a745 ${degrees}deg, #e9ecef ${degrees}deg)`;
-    });
-});
-</script>
 {% endblock %}

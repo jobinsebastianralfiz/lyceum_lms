@@ -1,0 +1,345 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Certificate {{ certificate.certificate_number }} - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'custom_admin:certificates_list' %}">Certificates</a></li>
+        <li class="breadcrumb-item active">{{ certificate.certificate_number }}</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:certificate_download' certificate.id %}" class="btn btn-success">
+      <i class="ti ti-download me-1"></i>Download PDF
+    </a>
+    <a href="{% url 'custom_admin:certificate_verify' certificate.verification_code %}" target="_blank" class="btn btn-outline-primary">
+      <i class="ti ti-external-link me-1"></i>View Public Page
+    </a>
+    {% if not certificate.is_revoked %}
+    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#revokeModal">
+      <i class="ti ti-ban me-1"></i>Revoke
+    </button>
+    {% endif %}
+    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+      <i class="ti ti-trash me-1"></i>Delete
+    </button>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Certificate Preview -->
+  <div class="col-lg-8">
+    <div class="card certificate-preview">
+      <div class="card-body p-5 text-center">
+        <!-- Status Badge -->
+        {% if certificate.is_revoked %}
+        <div class="revoked-overlay">
+          <span class="revoked-stamp">REVOKED</span>
+        </div>
+        {% endif %}
+
+        <!-- Certificate Header -->
+        <div class="certificate-header mb-4">
+          <div class="certificate-logo mb-3">
+            <i class="ti ti-certificate" style="font-size: 64px; color: var(--primary-color);"></i>
+          </div>
+          <h2 class="mb-1" style="color: var(--primary-color);">Lyceum Academy</h2>
+          <p class="text-muted mb-0">Learning Management System</p>
+        </div>
+
+        <!-- Certificate Title -->
+        <div class="certificate-title my-4">
+          <h3 class="text-uppercase">{{ certificate.title }}</h3>
+          <p class="text-muted">This is to certify that</p>
+        </div>
+
+        <!-- Student Name -->
+        <div class="student-name my-4">
+          <h2 class="display-5" style="font-family: 'Georgia', serif; color: var(--text-white);">
+            {{ certificate.student.name }}
+          </h2>
+        </div>
+
+        <!-- Course -->
+        <div class="course-info my-4">
+          <p class="text-muted mb-1">has successfully completed</p>
+          <h4 style="color: var(--primary-color);">{{ certificate.course.title }}</h4>
+          {% if certificate.description %}
+          <p class="text-muted small mt-2">{{ certificate.description }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Score/Grade -->
+        {% if certificate.final_score or certificate.grade_display %}
+        <div class="score-info my-4">
+          {% if certificate.final_score %}
+          <span class="badge bg-primary fs-5 me-2">Score: {{ certificate.final_score }}%</span>
+          {% endif %}
+          {% if certificate.grade_display %}
+          <span class="badge bg-success fs-5">Grade: {{ certificate.grade_display }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Dates -->
+        <div class="dates-info my-4">
+          <div class="row justify-content-center">
+            <div class="col-auto">
+              <small class="text-muted d-block">Completed On</small>
+              <strong>{{ certificate.completion_date|date:"F d, Y" }}</strong>
+            </div>
+            <div class="col-auto">
+              <small class="text-muted d-block">Issued On</small>
+              <strong>{{ certificate.issue_date|date:"F d, Y" }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signature -->
+        {% if certificate.signed_by %}
+        <div class="signature-info mt-5">
+          <div class="signature-line mx-auto" style="width: 200px; border-top: 2px solid var(--dark-border);"></div>
+          <p class="mb-0 mt-2">{{ certificate.signed_by }}</p>
+          {% if certificate.signed_by_title %}
+          <small class="text-muted">{{ certificate.signed_by_title }}</small>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Certificate Number -->
+        <div class="certificate-number mt-5">
+          <small class="text-muted">Certificate Number: {{ certificate.certificate_number }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Certificate Details Sidebar -->
+  <div class="col-lg-4">
+    <!-- Status Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">Status</h6>
+      </div>
+      <div class="card-body text-center">
+        {% if certificate.is_revoked %}
+        <div class="mb-3">
+          <i class="ti ti-circle-x text-danger" style="font-size: 48px;"></i>
+        </div>
+        <h5 class="text-danger">Revoked</h5>
+        <p class="text-muted small mb-0">{{ certificate.revoked_at|date:"M d, Y h:i A" }}</p>
+        {% if certificate.revoked_reason %}
+        <p class="text-muted small mt-2">Reason: {{ certificate.revoked_reason }}</p>
+        {% endif %}
+        {% else %}
+        <div class="mb-3">
+          <i class="ti ti-circle-check text-success" style="font-size: 48px;"></i>
+        </div>
+        <h5 class="text-success">Valid</h5>
+        <p class="text-muted small mb-0">This certificate is currently active</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">Details</h6>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Certificate #</dt>
+          <dd class="col-sm-7">{{ certificate.certificate_number }}</dd>
+
+          <dt class="col-sm-5">Type</dt>
+          <dd class="col-sm-7">{{ certificate.get_certificate_type_display }}</dd>
+
+          <dt class="col-sm-5">Student</dt>
+          <dd class="col-sm-7">
+            <a href="{% url 'custom_admin:user_detail' certificate.student.id %}">{{ certificate.student.name }}</a>
+          </dd>
+
+          <dt class="col-sm-5">Course</dt>
+          <dd class="col-sm-7">
+            <a href="{% url 'custom_admin:course_detail' certificate.course.id %}">{{ certificate.course.title|truncatechars:20 }}</a>
+          </dd>
+
+          <dt class="col-sm-5">Completed</dt>
+          <dd class="col-sm-7">{{ certificate.completion_date|date:"M d, Y" }}</dd>
+
+          <dt class="col-sm-5">Issued</dt>
+          <dd class="col-sm-7">{{ certificate.issue_date|date:"M d, Y" }}</dd>
+
+          {% if certificate.final_score %}
+          <dt class="col-sm-5">Score</dt>
+          <dd class="col-sm-7">{{ certificate.final_score }}%</dd>
+          {% endif %}
+
+          {% if certificate.grade_display %}
+          <dt class="col-sm-5">Grade</dt>
+          <dd class="col-sm-7">{{ certificate.grade_display }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    <!-- Verification Card -->
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">Verification</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label small text-muted">Verification Code</label>
+          <div class="input-group">
+            <input type="text" class="form-control form-control-sm" value="{{ certificate.verification_code }}" readonly id="verificationCode">
+            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="copyToClipboard('verificationCode')">
+              <i class="ti ti-copy"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="form-label small text-muted">Public Verification URL</label>
+          <div class="input-group">
+            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{% url 'custom_admin:certificate_verify' certificate.verification_code %}" readonly id="verificationUrl">
+            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="copyToClipboard('verificationUrl')">
+              <i class="ti ti-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Revoke Modal -->
+<div class="modal fade" id="revokeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Revoke Certificate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'custom_admin:certificate_revoke' certificate.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>Are you sure you want to revoke this certificate?</p>
+          <div class="mb-3">
+            <label class="form-label">Reason for revocation</label>
+            <textarea class="form-control" name="reason" rows="3" placeholder="Enter reason..."></textarea>
+          </div>
+          <div class="alert alert-warning mb-0">
+            <i class="ti ti-alert-triangle me-2"></i>
+            This will invalidate the certificate verification.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">Revoke Certificate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Certificate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'custom_admin:certificate_delete' certificate.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>Are you sure you want to permanently delete this certificate?</p>
+          <div class="alert alert-danger mb-0">
+            <i class="ti ti-alert-triangle me-2"></i>
+            This action cannot be undone.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete Certificate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.certificate-preview {
+  background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%) !important;
+  border: 2px solid var(--primary-color) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.certificate-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--primary-color);
+}
+
+.revoked-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  z-index: 10;
+}
+
+.revoked-stamp {
+  font-size: 48px;
+  font-weight: bold;
+  color: rgba(220, 53, 69, 0.3);
+  border: 5px solid rgba(220, 53, 69, 0.3);
+  padding: 10px 30px;
+  text-transform: uppercase;
+}
+
+.form-control {
+  background-color: var(--dark-bg-tertiary) !important;
+  border-color: var(--dark-border) !important;
+  color: var(--text-white) !important;
+}
+
+.form-label {
+  color: var(--text-gray) !important;
+}
+
+dt {
+  color: var(--text-gray) !important;
+}
+
+dd {
+  color: var(--text-white) !important;
+}
+</style>
+
+<script>
+function copyToClipboard(elementId) {
+  const element = document.getElementById(elementId);
+  element.select();
+  document.execCommand('copy');
+
+  // Show feedback
+  const btn = element.nextElementSibling;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="ti ti-check"></i>';
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+  }, 2000);
+}
+</script>
+{% endblock %}

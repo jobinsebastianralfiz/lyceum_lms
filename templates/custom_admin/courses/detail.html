@@ -6,44 +6,45 @@
 
 {% block extra_css %}
 <style>
+/* Light theme compatible styles */
 .course-content-display {
-  background: #f8f9fa;
+  background: var(--light-bg-tertiary, #F1F5F9);
   padding: 20px;
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--light-border, #E2E8F0);
   line-height: 1.6;
-  color: #495057;
+  color: var(--text-gray, #64748B);
   min-height: 100px;
 }
 
 .course-content-display h6 {
-  color: #343a40;
+  color: var(--text-dark, #1E293B);
   font-weight: 600;
   margin-bottom: 15px;
 }
 
 .nav-tabs .nav-link {
   border: none;
-  color: #6c757d;
+  color: var(--text-gray, #64748B);
   background: none;
 }
 
 .nav-tabs .nav-link.active {
-  color: #495057;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-bottom-color: #f8f9fa;
+  color: var(--lyceum-green, #2AB673) !important;
+  background: var(--light-bg-secondary, #FFFFFF) !important;
+  border: 1px solid var(--light-border, #E2E8F0);
+  border-bottom-color: var(--light-bg-secondary, #FFFFFF);
 }
 
 .nav-tabs .nav-link:hover {
-  color: #495057;
-  background: #f8f9fa;
+  color: var(--lyceum-green, #2AB673);
+  background: var(--light-bg-tertiary, #F1F5F9);
 }
 
 .tab-content {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--light-border, #E2E8F0);
   border-top: none;
-  background: white;
+  background: var(--light-bg-secondary, #FFFFFF);
   border-radius: 0 0 8px 8px;
   min-height: 200px;
 }
@@ -57,7 +58,97 @@
 }
 
 .nav-tabs {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--light-border, #E2E8F0);
+}
+
+/* Fix text colors in cards */
+.card-title {
+  color: var(--text-dark, #1E293B) !important;
+}
+
+.card p.text-muted {
+  color: var(--text-gray, #64748B) !important;
+}
+
+/* Stats section */
+.row.text-center h4.fw-bolder {
+  color: var(--text-dark, #1E293B) !important;
+}
+
+/* List group items */
+.list-group-item {
+  background: var(--light-bg-secondary, #FFFFFF) !important;
+  border-color: var(--light-border, #E2E8F0) !important;
+  color: var(--text-gray, #64748B) !important;
+}
+
+.list-group-item h6 {
+  color: var(--text-dark, #1E293B) !important;
+}
+
+/* Table in sidebar */
+.table td {
+  color: var(--text-gray, #64748B) !important;
+}
+
+.table td.text-muted {
+  color: var(--text-gray-light, #94A3B8) !important;
+}
+
+/* Modal fixes */
+.modal-content {
+  background: var(--light-bg-secondary, #FFFFFF) !important;
+  border-color: var(--light-border, #E2E8F0) !important;
+}
+
+.modal-header {
+  border-color: var(--light-border, #E2E8F0) !important;
+}
+
+.modal-header .modal-title {
+  color: var(--text-dark, #1E293B) !important;
+}
+
+.modal-footer {
+  border-color: var(--light-border, #E2E8F0) !important;
+}
+
+.form-label {
+  color: var(--text-dark, #1E293B) !important;
+}
+
+.form-text {
+  color: var(--text-gray-light, #94A3B8) !important;
+}
+
+/* Responsive adjustments for detail page */
+@media (max-width: 767.98px) {
+  .course-content-display {
+    padding: 15px;
+  }
+
+  .row.text-center .col-3 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+    margin-bottom: 15px;
+  }
+
+  .list-group-item .d-flex.align-items-center {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .list-group-item .ms-3 {
+    margin-left: 0 !important;
+    margin-top: 10px !important;
+    display: flex !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .list-group-item .ms-3 .btn {
+    flex: 1 !important;
+  }
 }
 </style>
 {% endblock %}

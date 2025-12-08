@@ -1,0 +1,234 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ batch.name }}</h4>
+    <small class="text-muted">{{ batch.standard.name }} - {{ batch.subject.name }}</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:batch_attendance' batch.id %}" class="btn btn-success btn-sm">
+      <i class="ti ti-clipboard-check me-1"></i>Mark Attendance
+    </a>
+    <a href="{% url 'custom_admin:batch_edit' batch.id %}" class="btn btn-primary btn-sm">
+      <i class="ti ti-edit me-1"></i>Edit
+    </a>
+    <a href="{% url 'custom_admin:batches_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="ti ti-arrow-left me-1"></i>Back
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Batch Info -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Batch Details</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Code</td>
+            <td class="text-end"><code>{{ batch.code }}</code></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Standard</td>
+            <td class="text-end">{{ batch.standard.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Subject</td>
+            <td class="text-end">{{ batch.subject.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Teacher</td>
+            <td class="text-end">{{ batch.teacher.get_full_name|default:batch.teacher.email|default:'-' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Monthly Fee</td>
+            <td class="text-end fw-medium">{{ batch.monthly_fee|floatformat:0 }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Capacity</td>
+            <td class="text-end">{{ batch.current_strength }}/{{ batch.max_students }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Location</td>
+            <td class="text-end">{{ batch.location|default:'-' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Start Date</td>
+            <td class="text-end">{{ batch.start_date|date:"d M Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Status</td>
+            <td class="text-end">
+              {% if batch.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Weekly Schedule</h6>
+      </div>
+      <div class="card-body">
+        {% if batch.schedule %}
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          {% for day, time in batch.schedule.items %}
+          <tr>
+            <td class="text-muted text-capitalize">{{ day }}</td>
+            <td class="text-end">{{ time }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td class="text-center text-muted" colspan="2">No schedule set</td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% else %}
+        <p class="text-muted text-center mb-0">No schedule set</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Quick Stats</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-2 text-center">
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(59, 130, 246, 0.1);">
+              <h4 class="mb-0" style="color: #3b82f6;">{{ batch.current_strength }}</h4>
+              <small class="text-muted">Students</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(16, 185, 129, 0.1);">
+              <h4 class="mb-0" style="color: #10b981;">{{ batch.available_spots }}</h4>
+              <small class="text-muted">Available</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enrolled Students -->
+<div class="card mt-3">
+  <div class="card-header py-2 d-flex justify-content-between align-items-center">
+    <h6 class="mb-0">Enrolled Students ({{ enrollments|length }})</h6>
+    <a href="{% url 'custom_admin:tuition_enrollment_create' %}?batch={{ batch.id }}" class="btn btn-sm btn-primary">
+      <i class="ti ti-plus me-1"></i>Add Student
+    </a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Student</th>
+            <th class="py-2">Phone</th>
+            <th class="py-2">Parent</th>
+            <th class="py-2 text-center">Joined</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for enrollment in enrollments %}
+          <tr>
+            <td class="py-2">
+              <a href="{% url 'custom_admin:tuition_student_detail' enrollment.student.id %}" class="fw-medium text-decoration-none">
+                {{ enrollment.student.name }}
+              </a>
+            </td>
+            <td class="py-2">{{ enrollment.student.phone }}</td>
+            <td class="py-2">{{ enrollment.student.parent_name }}</td>
+            <td class="py-2 text-center">{{ enrollment.start_date|date:"d M Y" }}</td>
+            <td class="py-2 text-center">
+              {% if enrollment.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="py-2 text-end">
+              <a href="{% url 'custom_admin:tuition_enrollment_detail' enrollment.id %}" class="btn btn-sm btn-outline-info py-0 px-2">
+                <i class="ti ti-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">
+              No students enrolled yet
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Attendance -->
+{% if recent_attendance %}
+<div class="card mt-3">
+  <div class="card-header py-2">
+    <h6 class="mb-0">Recent Attendance</h6>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Date</th>
+            <th class="py-2">Student</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for att in recent_attendance %}
+          <tr>
+            <td class="py-2">{{ att.date|date:"d M Y" }}</td>
+            <td class="py-2">{{ att.enrollment.student.name }}</td>
+            <td class="py-2 text-center">
+              {% if att.status == 'present' %}
+              <span class="badge bg-success">Present</span>
+              {% elif att.status == 'absent' %}
+              <span class="badge bg-danger">Absent</span>
+              {% elif att.status == 'late' %}
+              <span class="badge bg-warning">Late</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ att.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="py-2">{{ att.notes|default:'-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

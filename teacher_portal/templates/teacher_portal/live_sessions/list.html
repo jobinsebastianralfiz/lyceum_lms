@@ -1,0 +1,201 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}Live Sessions - Teacher Portal{% endblock %}
+{% block page_title %}Live Sessions{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <p style="color: var(--text-secondary); margin: 0;">View and manage your scheduled live sessions</p>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon red">
+        <i class="fas fa-broadcast-tower"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_live }}</div>
+      <div class="tp-stat-label">Live Now</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_upcoming }}</div>
+      <div class="tp-stat-label">Upcoming Sessions</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_past }}</div>
+      <div class="tp-stat-label">Completed Sessions</div>
+    </div>
+  </div>
+</div>
+
+<!-- Live Now Sessions -->
+{% if live_now %}
+<div class="tp-card mb-4">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title">
+      <i class="fas fa-broadcast-tower me-2" style="color: #ef4444;"></i>
+      Live Now
+      <span class="pulse-dot ms-2"></span>
+    </h3>
+  </div>
+  {% for session in live_now %}
+  <div class="d-flex align-items-center gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}">
+    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-video" style="color: white; font-size: 20px;"></i>
+    </div>
+    <div class="flex-grow-1">
+      <h5 class="mb-1" style="font-weight: 600;">{{ session.title }}</h5>
+      <p class="mb-0" style="color: var(--text-secondary); font-size: 13px;">
+        <i class="fas fa-book me-1"></i> {{ session.course.title|default:"No course" }}
+        <span class="mx-2">|</span>
+        <i class="fas fa-clock me-1"></i> {{ session.duration_minutes }} mins
+      </p>
+    </div>
+    {% if session.meeting_link %}
+    <a href="{{ session.meeting_link }}" target="_blank" class="tp-btn tp-btn-primary">
+      <i class="fas fa-video me-1"></i> Join Now
+    </a>
+    {% endif %}
+    <a href="{% url 'teacher_portal:live_session_detail' session.id %}" class="tp-btn tp-btn-secondary">
+      <i class="fas fa-eye"></i>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Upcoming Sessions -->
+<div class="tp-card mb-4">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title"><i class="fas fa-calendar-alt me-2"></i>Upcoming Sessions</h3>
+  </div>
+  {% if upcoming_sessions %}
+    {% for session in upcoming_sessions %}
+    <div class="d-flex align-items-center gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}">
+      <div style="width: 56px; height: 56px; background: var(--primary-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-calendar-check" style="color: var(--primary); font-size: 20px;"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h5 class="mb-1" style="font-weight: 600;">{{ session.title }}</h5>
+        <p class="mb-0" style="color: var(--text-secondary); font-size: 13px;">
+          <i class="fas fa-book me-1"></i> {{ session.course.title|default:"No course" }}
+          <span class="mx-2">|</span>
+          <i class="fas fa-clock me-1"></i> {{ session.duration_minutes }} mins
+        </p>
+      </div>
+      <div class="text-end">
+        <div style="font-weight: 600; color: var(--primary);">{{ session.scheduled_date|date:"M d, Y" }}</div>
+        <small style="color: var(--text-secondary);">{{ session.scheduled_date|time:"h:i A" }}</small>
+      </div>
+      {% if session.meeting_link %}
+      <a href="{{ session.meeting_link }}" target="_blank" class="tp-btn tp-btn-outline-primary tp-btn-sm">
+        <i class="fas fa-link"></i>
+      </a>
+      {% endif %}
+      <a href="{% url 'teacher_portal:live_session_detail' session.id %}" class="tp-btn tp-btn-secondary tp-btn-sm">
+        <i class="fas fa-eye"></i>
+      </a>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-5" style="color: var(--text-secondary);">
+      <i class="fas fa-calendar-alt" style="font-size: 48px; opacity: 0.3;"></i>
+      <p class="mt-3 mb-0">No upcoming sessions scheduled.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Past Sessions -->
+<div class="tp-card">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title"><i class="fas fa-history me-2"></i>Past Sessions</h3>
+  </div>
+  {% if past_sessions %}
+    {% for session in past_sessions %}
+    <div class="d-flex align-items-center gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}">
+      <div style="width: 48px; height: 48px; background: var(--bg-secondary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h6 class="mb-1" style="font-weight: 500;">{{ session.title }}</h6>
+        <small style="color: var(--text-secondary);">
+          {{ session.course.title|default:"No course" }}
+        </small>
+      </div>
+      <div class="text-end">
+        <small style="color: var(--text-secondary);">{{ session.scheduled_date|date:"M d, Y" }}</small>
+      </div>
+      <span class="tp-badge {% if session.status == 'ended' %}tp-badge-success{% else %}tp-badge-secondary{% endif %}">
+        {{ session.get_status_display }}
+      </span>
+      <a href="{% url 'teacher_portal:live_session_detail' session.id %}" class="tp-btn tp-btn-secondary tp-btn-sm">
+        <i class="fas fa-eye"></i>
+      </a>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if past_sessions.has_other_pages %}
+    <div class="d-flex justify-content-center p-3">
+      <nav>
+        <ul class="pagination mb-0">
+          {% if past_sessions.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ past_sessions.previous_page_number }}">Previous</a>
+          </li>
+          {% endif %}
+
+          <li class="page-item active">
+            <span class="page-link">{{ past_sessions.number }} of {{ past_sessions.paginator.num_pages }}</span>
+          </li>
+
+          {% if past_sessions.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ past_sessions.next_page_number }}">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="text-center py-4" style="color: var(--text-secondary);">
+      <p class="mb-0">No past sessions.</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  background: #ef4444;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.border-bottom {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+</style>
+{% endblock %}

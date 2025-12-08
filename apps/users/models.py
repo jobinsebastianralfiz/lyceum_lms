@@ -10,23 +10,73 @@ class User(AbstractUser):
     ROLE_CHOICES = [
         ('student', 'Student'),
         ('admin', 'Admin'),
+        ('teacher', 'Teacher'),
     ]
-    
+
+    STUDENT_TYPE_CHOICES = [
+        ('online', 'Online Only'),
+        ('offline', 'Offline/Tuition Only'),
+        ('both', 'Both Online & Offline'),
+    ]
+
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=150)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
+    role = models.CharField(max_length=15, choices=ROLE_CHOICES, default='student')
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    # Student-specific fields
+    student_type = models.CharField(
+        max_length=10,
+        choices=STUDENT_TYPE_CHOICES,
+        default='online',
+        help_text="Type of student: online courses, offline tuition, or both"
+    )
+    photo = models.ImageField(
+        upload_to='students/photos/',
+        blank=True,
+        null=True,
+        help_text="Student profile photo"
+    )
+
+    # Parent/Guardian information (for students)
+    parent_name = models.CharField(max_length=150, blank=True, null=True, help_text="Parent/Guardian name")
+    parent_phone = models.CharField(max_length=15, blank=True, null=True, help_text="Parent/Guardian phone")
+    parent_email = models.EmailField(blank=True, null=True, help_text="Parent/Guardian email")
+
+    # Academic information (for offline/tuition students)
+    school_name = models.CharField(max_length=200, blank=True, null=True, help_text="School/College name")
+    standard = models.ForeignKey(
+        'tuition.Standard',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='user_students',
+        help_text="Class/Standard for tuition students"
+    )
+    date_of_birth = models.DateField(blank=True, null=True, help_text="Date of birth")
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
-    
+
     def __str__(self):
         return f"{self.name} ({self.email})"
-    
+
+    @property
+    def is_online_student(self):
+        return self.student_type in ['online', 'both']
+
+    @property
+    def is_offline_student(self):
+        return self.student_type in ['offline', 'both']
+
+    @property
+    def student_type_display(self):
+        return dict(self.STUDENT_TYPE_CHOICES).get(self.student_type, 'Online')
+
     class Meta:
         db_table = 'users'
 

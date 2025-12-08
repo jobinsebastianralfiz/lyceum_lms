@@ -1,0 +1,101 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Collect Payment</h4>
+    <small class="text-muted">{{ fee.enrollment.student.name }} - {{ fee.month_name }} {{ fee.year }}</small>
+  </div>
+  <a href="{% url 'custom_admin:tuition_fee_detail' fee.id %}" class="btn btn-outline-secondary btn-sm">
+    <i class="ti ti-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<div class="row g-3">
+  <!-- Fee Summary -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Fee Summary</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Student</td>
+            <td class="text-end fw-medium">{{ fee.enrollment.student.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Parent</td>
+            <td class="text-end">{{ fee.enrollment.student.parent_name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Period</td>
+            <td class="text-end">{{ fee.month_name }} {{ fee.year }}</td>
+          </tr>
+          <tr class="border-top">
+            <td class="text-muted">Total Amount</td>
+            <td class="text-end">{{ fee.total_amount|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Already Paid</td>
+            <td class="text-end text-success">{{ fee.paid_amount|floatformat:2 }}</td>
+          </tr>
+          <tr class="border-top">
+            <td class="fw-medium">Outstanding</td>
+            <td class="text-end fw-bold text-danger">{{ fee.outstanding|floatformat:2 }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Form -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Payment Details</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Amount to Collect <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">Rs.</span>
+                <input type="number" name="amount" class="form-control" value="{{ fee.outstanding }}" required step="0.01" min="0.01" max="{{ fee.outstanding }}">
+              </div>
+              <small class="text-muted">Max: {{ fee.outstanding|floatformat:2 }}</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Payment Method <span class="text-danger">*</span></label>
+              <select name="payment_method" class="form-select" required>
+                {% for method_val, method_label in payment_methods %}
+                <option value="{{ method_val }}">{{ method_label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Transaction ID</label>
+              <input type="text" name="transaction_id" class="form-control" placeholder="UPI/Bank reference (optional)">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes about this payment"></textarea>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn btn-success">
+              <i class="ti ti-check me-1"></i>Collect Payment
+            </button>
+            <a href="{% url 'custom_admin:tuition_fee_detail' fee.id %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

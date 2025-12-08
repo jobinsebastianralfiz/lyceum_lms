@@ -1,0 +1,245 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}{{ student.name }} - Teacher Portal{% endblock %}
+{% block page_title %}Student Details{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav style="margin-bottom: 20px;">
+  <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
+    <li class="breadcrumb-item"><a href="{% url 'teacher_portal:my_students' %}" style="color: var(--primary);">My Students</a></li>
+    <li class="breadcrumb-item active" style="color: var(--text-secondary);">{{ student.name }}</li>
+  </ol>
+</nav>
+
+<!-- Student Header -->
+<div class="tp-card" style="margin-bottom: 24px;">
+  <div class="d-flex flex-wrap align-items-center gap-4">
+    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 600;">
+      {{ student.name|slice:":1"|upper }}
+    </div>
+    <div class="flex-grow-1">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 4px;">{{ student.name }}</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 8px;">
+        <i class="fas fa-envelope me-2"></i>{{ student.email }}
+        {% if student.phone_number %}
+          <span class="ms-3"><i class="fas fa-phone me-2"></i>{{ student.phone_number }}</span>
+        {% endif %}
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="tp-badge tp-badge-info"><i class="fas fa-book me-1"></i>{{ enrollments|length }} Courses</span>
+        <span class="tp-badge tp-badge-success"><i class="fas fa-calendar me-1"></i>Joined {{ student.date_joined|date:"M Y" }}</span>
+      </div>
+    </div>
+    <div class="d-none d-md-block">
+      <a href="mailto:{{ student.email }}" class="tp-btn tp-btn-secondary">
+        <i class="fas fa-envelope me-2"></i>Send Email
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="tp-stat-value">{{ enrollments|length }}</div>
+      <div class="tp-stat-label">Enrolled Courses</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="tp-stat-value">{{ completed_assignments }}/{{ total_assignments }}</div>
+      <div class="tp-stat-label">Assignments Done</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon orange">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <div class="tp-stat-value">{{ avg_quiz_score|default:0 }}%</div>
+      <div class="tp-stat-label">Avg Quiz Score</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon purple">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_watch_time|default:0 }}h</div>
+      <div class="tp-stat-label">Watch Time</div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Main Content -->
+  <div class="col-lg-8">
+    <!-- Enrolled Courses -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-book me-2"></i>Enrolled Courses</h3>
+      </div>
+      {% if enrollments %}
+        {% for enrollment in enrollments %}
+        <div class="d-flex align-items-center gap-3 {% if not forloop.last %}mb-3 pb-3{% endif %}" style="{% if not forloop.last %}border-bottom: 1px solid var(--border-color);{% endif %}">
+          {% if enrollment.course.thumbnail %}
+            <img src="{{ enrollment.course.thumbnail.url }}" alt="" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px;">
+          {% else %}
+            <div style="width: 80px; height: 60px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-book" style="color: var(--primary);"></i>
+            </div>
+          {% endif %}
+          <div class="flex-grow-1">
+            <div style="font-weight: 500; margin-bottom: 4px;">{{ enrollment.course.title }}</div>
+            <div class="d-flex align-items-center gap-3">
+              <div class="d-flex align-items-center gap-2" style="flex-grow: 1; max-width: 200px;">
+                <div class="tp-progress" style="flex-grow: 1;">
+                  <div class="tp-progress-bar" style="width: {{ enrollment.progress_percentage|default:0 }}%;"></div>
+                </div>
+                <small style="font-weight: 500; color: var(--primary);">{{ enrollment.progress_percentage|default:0 }}%</small>
+              </div>
+              <small style="color: var(--text-secondary);">Enrolled {{ enrollment.enrolled_on|date:"M d, Y" }}</small>
+            </div>
+          </div>
+          <a href="{% url 'teacher_portal:course_detail' enrollment.course.id %}" class="tp-btn tp-btn-secondary tp-btn-sm">
+            <i class="fas fa-eye"></i>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted mb-0">No courses enrolled.</p>
+      {% endif %}
+    </div>
+
+    <!-- Assignment Submissions -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-clipboard-check me-2"></i>Assignment Submissions</h3>
+      </div>
+      {% if submissions %}
+        <div class="table-responsive">
+          <table class="tp-table">
+            <thead>
+              <tr>
+                <th>Assignment</th>
+                <th>Course</th>
+                <th>Submitted</th>
+                <th>Grade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for submission in submissions %}
+              <tr>
+                <td>{{ submission.assignment.title|truncatechars:25 }}</td>
+                <td><small style="color: var(--text-secondary);">{{ submission.assignment.course.title|truncatechars:20 }}</small></td>
+                <td><small>{{ submission.submitted_at|date:"M d, Y" }}</small></td>
+                <td>
+                  {% if submission.score %}
+                    <strong>{{ submission.score }}</strong>/{{ submission.assignment.max_grade|default:100 }}
+                  {% else %}
+                    <span style="color: var(--text-secondary);">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if submission.status == 'graded' %}
+                    <span class="tp-badge tp-badge-success">Graded</span>
+                  {% elif submission.status == 'submitted' %}
+                    <span class="tp-badge tp-badge-warning">Pending</span>
+                  {% else %}
+                    <span class="tp-badge tp-badge-secondary">{{ submission.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4" style="color: var(--text-secondary);">
+          <i class="fas fa-clipboard" style="font-size: 32px; opacity: 0.3;"></i>
+          <p class="mt-2 mb-0">No assignment submissions yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- Quiz Performance -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-question-circle me-2"></i>Quiz Performance</h3>
+      </div>
+      {% if quiz_attempts %}
+        {% for attempt in quiz_attempts %}
+        <div class="d-flex align-items-center justify-content-between {% if not forloop.last %}mb-3 pb-3{% endif %}" style="{% if not forloop.last %}border-bottom: 1px solid var(--border-color);{% endif %}">
+          <div>
+            <div style="font-weight: 500; font-size: 14px;">{{ attempt.quiz.title|truncatechars:25 }}</div>
+            <small style="color: var(--text-secondary);">{{ attempt.completed_at|date:"M d, Y" }}</small>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 18px; font-weight: 600; color: {% if attempt.score_percentage >= 70 %}var(--success){% elif attempt.score_percentage >= 50 %}var(--warning){% else %}var(--danger){% endif %};">
+              {{ attempt.score_percentage|floatformat:0 }}%
+            </div>
+            <small style="color: var(--text-secondary);">{{ attempt.score }}/{{ attempt.quiz.total_marks }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-3" style="color: var(--text-secondary);">
+          <p class="mb-0">No quiz attempts yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Activity Log -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-history me-2"></i>Recent Activity</h3>
+      </div>
+      {% if recent_activity %}
+        {% for activity in recent_activity %}
+        <div class="d-flex gap-3 {% if not forloop.last %}mb-3 pb-3{% endif %}" style="{% if not forloop.last %}border-bottom: 1px solid var(--border-color);{% endif %}">
+          <div style="width: 32px; height: 32px; background: var(--primary-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-{{ activity.icon|default:'circle' }}" style="font-size: 12px; color: var(--primary);"></i>
+          </div>
+          <div>
+            <div style="font-size: 14px;">{{ activity.description }}</div>
+            <small style="color: var(--text-secondary);">{{ activity.timestamp|timesince }} ago</small>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-3" style="color: var(--text-secondary);">
+          <p class="mb-0">No recent activity.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.tp-progress {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tp-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+</style>
+{% endblock %}

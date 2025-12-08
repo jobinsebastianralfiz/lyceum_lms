@@ -1,0 +1,217 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Course Enquiries - Admin{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card mb-0">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.2);">
+            <i class="ti ti-message-circle" style="color: #3b82f6;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ total_enquiries }}</h5>
+            <small class="text-muted">Total</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card mb-0">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.2);">
+            <i class="ti ti-bell" style="color: #ef4444;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ new_enquiries }}</h5>
+            <small class="text-muted">New</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card mb-0">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255, 174, 31, 0.2);">
+            <i class="ti ti-phone" style="color: #ffae1f;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ contacted_enquiries }}</h5>
+            <small class="text-muted">Contacted</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card mb-0">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(42, 182, 115, 0.2);">
+            <i class="ti ti-user-check" style="color: #2AB673;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ enrolled_enquiries }}</h5>
+            <small class="text-muted">Enrolled</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters & Search -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <form method="GET" class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <input type="text" name="search" class="form-control form-control-sm" placeholder="Search by name, email, phone..." value="{{ search_query }}">
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All Status</option>
+          {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="course" class="form-select form-select-sm">
+          <option value="">All Courses</option>
+          {% for course in courses %}
+          <option value="{{ course.id }}" {% if course_filter == course.id|stringformat:"s" %}selected{% endif %}>{{ course.title|truncatechars:30 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-sm btn-primary w-100">
+          <i class="ti ti-search me-1"></i> Filter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Enquiries Table -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Course</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for enquiry in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 12px;">
+                  {{ enquiry.name|slice:":1"|upper }}
+                </div>
+                <div class="ms-2">
+                  <div class="fw-medium">{{ enquiry.name }}</div>
+                  {% if enquiry.current_qualification %}
+                  <small class="text-muted">{{ enquiry.current_qualification }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>
+                <a href="mailto:{{ enquiry.email }}" class="text-decoration-none">{{ enquiry.email }}</a>
+              </div>
+              <small>
+                <a href="tel:{{ enquiry.phone }}" class="text-decoration-none">{{ enquiry.phone }}</a>
+              </small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark">{{ enquiry.course.title|truncatechars:25 }}</span>
+            </td>
+            <td>
+              {% if enquiry.status == 'new' %}
+              <span class="badge bg-danger">New</span>
+              {% elif enquiry.status == 'contacted' %}
+              <span class="badge bg-warning text-dark">Contacted</span>
+              {% elif enquiry.status == 'interested' %}
+              <span class="badge bg-info">Interested</span>
+              {% elif enquiry.status == 'demo_scheduled' %}
+              <span class="badge bg-primary">Demo Scheduled</span>
+              {% elif enquiry.status == 'enrolled' %}
+              <span class="badge bg-success">Enrolled</span>
+              {% elif enquiry.status == 'not_interested' %}
+              <span class="badge bg-secondary">Not Interested</span>
+              {% elif enquiry.status == 'follow_up' %}
+              <span class="badge bg-warning">Follow Up</span>
+              {% else %}
+              <span class="badge bg-light text-dark">{{ enquiry.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <small>{{ enquiry.created_at|date:"M d, Y" }}</small>
+              <br>
+              <small class="text-muted">{{ enquiry.created_at|time:"H:i" }}</small>
+            </td>
+            <td class="text-end">
+              <a href="{% url 'custom_admin:course_enquiry_detail' enquiry.id %}" class="btn btn-sm btn-outline-primary" title="View Details">
+                <i class="ti ti-eye"></i>
+              </a>
+              <a href="https://wa.me/{{ enquiry.phone|cut:'+' }}?text=Hi%20{{ enquiry.name|urlencode }},%20regarding%20your%20enquiry%20about%20{{ enquiry.course.title|urlencode }}" target="_blank" class="btn btn-sm btn-outline-success" title="WhatsApp">
+                <i class="ti ti-brand-whatsapp"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">
+              <i class="ti ti-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+              <p class="mt-2 mb-0">No enquiries found</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-4">
+      <ul class="pagination pagination-sm justify-content-center mb-0">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}&course={{ course_filter }}">Previous</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}&search={{ search_query }}&status={{ status_filter }}&course={{ course_filter }}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}&course={{ course_filter }}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

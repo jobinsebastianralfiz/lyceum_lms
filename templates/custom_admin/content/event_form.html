@@ -1,0 +1,338 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if event %}Edit Event{% else %}Create Event{% endif %} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-calendar-event me-2"></i>
+            {% if event %}Edit Event{% else %}Create New Event{% endif %}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:events_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to Events
+            </a>
+          </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-lg-8">
+              <!-- Event Content -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Event Details</h6>
+
+                  <div class="mb-3">
+                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="title"
+                           value="{% if event %}{{ event.title }}{% endif %}"
+                           placeholder="Enter event title..." required>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Short Description <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="short_description"
+                           value="{% if event %}{{ event.short_description }}{% endif %}"
+                           placeholder="Brief summary for listings..." required>
+                    <div class="form-text">Max 300 characters</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Full Description <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="description" rows="6"
+                              placeholder="Detailed event description..." required>{% if event %}{{ event.description }}{% endif %}</textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Speakers/Hosts</label>
+                    <textarea class="form-control" name="speakers" rows="2"
+                              placeholder="Speaker names and details...">{% if event %}{{ event.speakers }}{% endif %}</textarea>
+                    <div class="form-text">Comma-separated list of speakers</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Date & Time -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Date & Time</h6>
+
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Event Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="event_date"
+                               value="{% if event %}{{ event.event_date|date:'Y-m-d' }}{% endif %}" required>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Start Time <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control" name="start_time"
+                               value="{% if event %}{{ event.start_time|time:'H:i' }}{% endif %}" required>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-control" name="end_time"
+                               value="{% if event.end_time %}{{ event.end_time|time:'H:i' }}{% endif %}">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Timezone</label>
+                    <input type="text" class="form-control" name="timezone"
+                           value="{% if event %}{{ event.timezone }}{% else %}Asia/Kolkata{% endif %}">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Location</h6>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_online" id="isOnline"
+                           {% if event.is_online or not event %}checked{% endif %}>
+                    <label class="form-check-label" for="isOnline">
+                      Online Event
+                    </label>
+                  </div>
+
+                  <div id="onlineFields" class="mb-3">
+                    <label class="form-label">Meeting Link</label>
+                    <input type="url" class="form-control" name="meeting_link"
+                           value="{% if event %}{{ event.meeting_link }}{% endif %}"
+                           placeholder="Zoom/Meet/Teams link...">
+                  </div>
+
+                  <div id="venueFields">
+                    <div class="mb-3">
+                      <label class="form-label">Venue Name</label>
+                      <input type="text" class="form-control" name="venue_name"
+                             value="{% if event %}{{ event.venue_name }}{% endif %}"
+                             placeholder="e.g., Conference Hall A">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Venue Address</label>
+                      <textarea class="form-control" name="venue_address" rows="2"
+                                placeholder="Full address...">{% if event %}{{ event.venue_address }}{% endif %}</textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Registration -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Registration</h6>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="registration_required" id="regRequired"
+                           {% if event.registration_required or not event %}checked{% endif %}>
+                    <label class="form-check-label" for="regRequired">
+                      Registration Required
+                    </label>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">External Registration Link</label>
+                    <input type="url" class="form-control" name="registration_link"
+                           value="{% if event %}{{ event.registration_link }}{% endif %}"
+                           placeholder="External registration URL (optional)">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <!-- Event Settings -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Settings</h6>
+
+                  <div class="mb-3">
+                    <label class="form-label">Event Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="event_type" required>
+                      {% for type_code, type_name in event_types %}
+                        <option value="{{ type_code }}"
+                                {% if event and event.event_type == type_code %}selected{% endif %}>
+                          {{ type_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                      {% for status_code, status_name in event_statuses %}
+                        <option value="{{ status_code }}"
+                                {% if event and event.status == status_code %}selected{% endif %}>
+                          {{ status_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_published" id="isPublished"
+                           {% if event.is_published %}checked{% endif %}>
+                    <label class="form-check-label" for="isPublished">
+                      Published
+                    </label>
+                    <div class="form-text">Make visible on the website</div>
+                  </div>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
+                           {% if event.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                      Featured
+                    </label>
+                    <div class="form-text">Show on homepage</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Images -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Images</h6>
+
+                  {% if event.featured_image %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Image</label>
+                    <div class="d-flex align-items-start gap-3">
+                      <img src="{{ event.featured_image.url }}" alt="{{ event.title }}"
+                           class="rounded" style="max-height: 80px;">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remove_featured_image" id="removeFeatured">
+                        <label class="form-check-label text-danger small" for="removeFeatured">
+                          Remove image
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="mb-3">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" class="form-control form-control-sm" name="featured_image" accept="image/*">
+                    <div class="form-text">Main event image (recommended: 800x450px)</div>
+                  </div>
+
+                  {% if event.thumbnail %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Thumbnail</label>
+                    <div class="d-flex align-items-start gap-3">
+                      <img src="{{ event.thumbnail.url }}" alt="{{ event.title }}"
+                           class="rounded" style="max-height: 60px;">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remove_thumbnail" id="removeThumbnail">
+                        <label class="form-check-label text-danger small" for="removeThumbnail">
+                          Remove
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="mb-3">
+                    <label class="form-label">Thumbnail</label>
+                    <input type="file" class="form-control form-control-sm" name="thumbnail" accept="image/*">
+                    <div class="form-text">Small image for listings</div>
+                  </div>
+                </div>
+              </div>
+
+              {% if event %}
+              <!-- Event Info -->
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Event Info</h6>
+                  <div class="small">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Views:</span>
+                      <span class="fw-medium">{{ event.view_count|default:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Created:</span>
+                      <span class="fw-medium">{{ event.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                      <span class="text-muted">Updated:</span>
+                      <span class="fw-medium">{{ event.updated_at|date:"M d, Y" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'custom_admin:events_list' %}" class="btn btn-outline-secondary">
+                      Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="ti ti-device-floppy me-1"></i>
+                      {% if event %}Update Event{% else %}Create Event{% endif %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Toggle venue/online fields based on checkbox
+document.getElementById('isOnline').addEventListener('change', function() {
+  const onlineFields = document.getElementById('onlineFields');
+  const venueFields = document.getElementById('venueFields');
+
+  if (this.checked) {
+    onlineFields.style.display = 'block';
+    venueFields.style.display = 'none';
+  } else {
+    onlineFields.style.display = 'none';
+    venueFields.style.display = 'block';
+  }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const isOnline = document.getElementById('isOnline');
+  const onlineFields = document.getElementById('onlineFields');
+  const venueFields = document.getElementById('venueFields');
+
+  if (isOnline.checked) {
+    venueFields.style.display = 'none';
+  } else {
+    onlineFields.style.display = 'none';
+  }
+});
+</script>
+{% endblock %}

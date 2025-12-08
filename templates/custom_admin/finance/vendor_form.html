@@ -1,0 +1,162 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ page_title }}</h4>
+    <small class="text-muted">{% if vendor %}Edit vendor details{% else %}Add a new vendor or payer{% endif %}</small>
+  </div>
+  <a href="{% url 'custom_admin:vendors_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="ti ti-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Basic Information -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-user me-2"></i>Basic Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Vendor/Payer Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" value="{{ vendor.name }}" class="form-control" required placeholder="e.g., Acme Corporation">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Type <span class="text-danger">*</span></label>
+              <select name="vendor_type" class="form-select" required>
+                {% for value, label in vendor_types %}
+                <option value="{{ value }}" {% if vendor.vendor_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-address-book me-2"></i>Contact Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" value="{{ vendor.email }}" class="form-control" placeholder="vendor@example.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input type="text" name="phone" value="{{ vendor.phone }}" class="form-control" placeholder="+91 98765 43210">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address</label>
+              <textarea name="address" rows="2" class="form-control" placeholder="Full address">{{ vendor.address }}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Information -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-receipt me-2"></i>Tax Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">GSTIN</label>
+              <input type="text" name="gstin" value="{{ vendor.gstin }}" class="form-control" placeholder="22AAAAA0000A1Z5" maxlength="20">
+              <small class="text-muted">GST Identification Number</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">PAN</label>
+              <input type="text" name="pan" value="{{ vendor.pan }}" class="form-control" placeholder="AAAAA0000A" maxlength="15">
+              <small class="text-muted">Permanent Account Number</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Details -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-building-bank me-2"></i>Bank Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Bank Name</label>
+              <input type="text" name="bank_name" value="{{ vendor.bank_name }}" class="form-control" placeholder="Bank Name">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Account Number</label>
+              <input type="text" name="bank_account" value="{{ vendor.bank_account }}" class="form-control" placeholder="Account Number">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">IFSC Code</label>
+              <input type="text" name="bank_ifsc" value="{{ vendor.bank_ifsc }}" class="form-control" placeholder="IFSC Code">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes & Status -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="ti ti-notes me-2"></i>Additional Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" rows="2" class="form-control" placeholder="Internal notes about this vendor">{{ vendor.notes }}</textarea>
+          </div>
+          {% if vendor %}
+          <div class="form-check form-switch">
+            <input type="checkbox" name="is_active" class="form-check-input" {% if vendor.is_active %}checked{% endif %}>
+            <label class="form-check-label">Active</label>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-check me-1"></i>{% if vendor %}Update{% else %}Create{% endif %} Vendor
+        </button>
+        <a href="{% url 'custom_admin:vendors_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Side Info -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title mb-3"><i class="ti ti-info-circle me-2"></i>About Vendors</h6>
+        <p class="text-muted small mb-3">
+          Vendors/Payers are saved contacts that you can quickly select when adding expenses or income.
+        </p>
+        <h6 class="small fw-bold mb-2">Vendor Types:</h6>
+        <ul class="small text-muted mb-0">
+          <li><strong>Supplier/Vendor</strong> - For expense payees</li>
+          <li><strong>Service Provider</strong> - Consultants, contractors</li>
+          <li><strong>Employee</strong> - Staff members</li>
+          <li><strong>Customer/Payer</strong> - For income sources</li>
+          <li><strong>Partner/Sponsor</strong> - Business partners</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

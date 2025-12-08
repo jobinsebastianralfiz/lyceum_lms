@@ -1,0 +1,156 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}My Courses - Teacher Portal{% endblock %}
+{% block page_title %}My Courses{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <p style="color: var(--text-secondary); margin: 0;">Manage your assigned courses and content</p>
+  </div>
+  <div class="d-flex gap-2">
+    <div class="tp-search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="courseSearch" placeholder="Search courses..." onkeyup="filterCourses()">
+    </div>
+  </div>
+</div>
+
+<!-- Course Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="tp-stat-value">{{ courses|length }}</div>
+      <div class="tp-stat-label">Total Courses</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_students }}</div>
+      <div class="tp-stat-label">Total Students</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon orange">
+        <i class="fas fa-layer-group"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_modules }}</div>
+      <div class="tp-stat-label">Total Modules</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon purple">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_assignments }}</div>
+      <div class="tp-stat-label">Total Assignments</div>
+    </div>
+  </div>
+</div>
+
+<!-- Courses Grid -->
+{% if courses %}
+  <div class="row g-4" id="coursesGrid">
+    {% for course in courses %}
+    <div class="col-md-6 col-lg-4 course-card-item" data-title="{{ course.title|lower }}">
+      <div class="tp-card h-100" style="padding: 0; overflow: hidden;">
+        <!-- Course Thumbnail -->
+        <div style="position: relative;">
+          {% if course.thumbnail %}
+            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" style="width: 100%; height: 160px; object-fit: cover;">
+          {% else %}
+            <div style="width: 100%; height: 160px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-book" style="font-size: 48px; color: rgba(255,255,255,0.3);"></i>
+            </div>
+          {% endif %}
+          {% if course.is_published %}
+            <span class="tp-badge tp-badge-success" style="position: absolute; top: 12px; right: 12px;">Published</span>
+          {% else %}
+            <span class="tp-badge tp-badge-warning" style="position: absolute; top: 12px; right: 12px;">Draft</span>
+          {% endif %}
+        </div>
+
+        <!-- Course Info -->
+        <div style="padding: 16px;">
+          <div style="margin-bottom: 8px;">
+            <span class="tp-badge tp-badge-info">{{ course.category.name|default:"Uncategorized" }}</span>
+            {% if course.level %}
+              <span class="tp-badge tp-badge-secondary ms-1">{{ course.get_level_display }}</span>
+            {% endif %}
+          </div>
+          <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.4;">
+            {{ course.title|truncatechars:50 }}
+          </h4>
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
+            {{ course.description|truncatechars:80 }}
+          </p>
+
+          <!-- Course Stats -->
+          <div class="d-flex gap-3 mb-3" style="font-size: 13px; color: var(--text-secondary);">
+            <div>
+              <i class="fas fa-user-graduate me-1"></i>
+              {{ course.enrollments.count }} Students
+            </div>
+            <div>
+              <i class="fas fa-layer-group me-1"></i>
+              {{ course.modules.count }} Modules
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 16px;">
+            {% if course.price %}₹{{ course.price|floatformat:0 }}{% else %}Free{% endif %}
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2">
+            <a href="{% url 'teacher_portal:course_detail' course.id %}" class="tp-btn tp-btn-primary flex-grow-1">
+              <i class="fas fa-eye me-1"></i> View Details
+            </a>
+            <a href="{% url 'teacher_portal:course_students' course.id %}" class="tp-btn tp-btn-secondary">
+              <i class="fas fa-users"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="tp-card">
+    <div class="text-center py-5">
+      <i class="fas fa-book-open" style="font-size: 64px; color: var(--text-secondary); opacity: 0.3;"></i>
+      <h4 style="margin-top: 20px; color: var(--text-secondary);">No Courses Assigned</h4>
+      <p style="color: var(--text-secondary);">You don't have any courses assigned yet. Contact an administrator to get courses assigned.</p>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterCourses() {
+  const searchTerm = document.getElementById('courseSearch').value.toLowerCase();
+  const courseCards = document.querySelectorAll('.course-card-item');
+
+  courseCards.forEach(card => {
+    const title = card.dataset.title;
+    if (title.includes(searchTerm)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+{% endblock %}

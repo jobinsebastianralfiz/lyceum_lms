@@ -1,0 +1,111 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}Student Testimonials - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="lm-page-header">
+  <div class="container">
+    <div class="lm-page-header-content">
+      <span class="lm-section-tag">Success Stories</span>
+      <h1>Student Testimonials</h1>
+      <p>Hear from our students about their learning journey and career transformation with LM Academy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="lm-filter-tabs mb-4">
+      <a href="{% url 'landing:testimonials_list' %}" class="lm-filter-tab {% if not selected_type %}active{% endif %}">All</a>
+      {% for code, name in testimonial_types %}
+      <a href="{% url 'landing:testimonials_list' %}?type={{ code }}" class="lm-filter-tab {% if selected_type == code %}active{% endif %}">{{ name }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Testimonials Grid -->
+    <div class="lm-testimonials-grid">
+      {% for testimonial in testimonials %}
+      <div class="lm-testimonial-card {% if testimonial.is_featured %}lm-testimonial-featured{% endif %}">
+        {% if testimonial.testimonial_type == 'video_youtube' and testimonial.youtube_video_id %}
+        <div class="lm-testimonial-video">
+          <div class="lm-video-thumbnail" onclick="playVideo(this, '{{ testimonial.youtube_video_id }}')">
+            <img src="{{ testimonial.youtube_thumbnail_url }}" alt="{{ testimonial.student_name }}">
+            <div class="lm-play-button">
+              <i class="fas fa-play"></i>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="lm-testimonial-body">
+          <div class="lm-testimonial-header">
+            <div class="lm-testimonial-avatar">
+              {% if testimonial.student_photo %}
+              <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}">
+              {% else %}
+              <div class="lm-avatar-placeholder">
+                {{ testimonial.student_name|slice:":1" }}
+              </div>
+              {% endif %}
+            </div>
+            <div class="lm-testimonial-info">
+              <h4>{{ testimonial.student_name }}</h4>
+              <p>{{ testimonial.course_name }} • {{ testimonial.batch_year }}</p>
+              {% if testimonial.current_company %}
+              <span class="lm-testimonial-company">
+                <i class="fas fa-briefcase"></i> {{ testimonial.current_position }} at {{ testimonial.current_company }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="lm-testimonial-rating">
+            {% for i in "12345" %}
+              {% if forloop.counter <= testimonial.overall_rating %}
+              <i class="fas fa-star"></i>
+              {% else %}
+              <i class="far fa-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          {% if testimonial.testimonial_text %}
+          <p class="lm-testimonial-text">
+            "{{ testimonial.testimonial_text|truncatechars:200 }}"
+          </p>
+          {% endif %}
+
+          <a href="{% url 'landing:testimonial_detail' testimonial.pk %}" class="lm-testimonial-link">
+            Read Full Story <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="lm-empty-state">
+        <i class="fas fa-comments"></i>
+        <h3>No Testimonials Yet</h3>
+        <p>Check back soon to hear from our amazing students.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function playVideo(element, videoId) {
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('allow', 'autoplay');
+  element.innerHTML = '';
+  element.appendChild(iframe);
+  element.classList.add('playing');
+}
+</script>
+{% endblock %}

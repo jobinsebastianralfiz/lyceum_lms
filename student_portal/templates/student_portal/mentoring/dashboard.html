@@ -1,652 +1,896 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}My Mentoring Journey - {{ student.name }}{% endblock %}
+{% block title %}Mentoring Dashboard - LM Academy{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Modern Card Design */
-    .mentoring-card {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: hidden;
-        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  /* Mentoring Dashboard - matching main dashboard style */
+  .sp-mentoring {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .sp-mentoring * {
+    box-sizing: border-box;
+  }
+
+  /* Page Header */
+  .sp-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .sp-page-title h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+  }
+
+  .sp-page-title p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .sp-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .sp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+
+  .sp-btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .sp-btn-primary:hover {
+    background: var(--primary-dark);
+    color: white;
+  }
+
+  .sp-btn-outline {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .sp-btn-outline:hover {
+    background: #f9fafb;
+    color: #111827;
+  }
+
+  /* Progress Overview */
+  .sp-progress-overview {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    margin-bottom: 24px;
+  }
+
+  .sp-progress-ring {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+
+  .sp-progress-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .sp-progress-ring .bg {
+    fill: none;
+    stroke: #d1d5db;
+    stroke-width: 8;
+  }
+
+  .sp-progress-ring .fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+  }
+
+  .sp-progress-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .sp-progress-value .number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+  }
+
+  .sp-progress-value .label {
+    font-size: 9px;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+
+  .sp-progress-text h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+  }
+
+  .sp-progress-text p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* Stats Grid */
+  .sp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .sp-stat {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .sp-stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .sp-stat-icon.blue { background: #dbeafe; color: #2563eb; }
+  .sp-stat-icon.green { background: #d1fae5; color: #059669; }
+  .sp-stat-icon.yellow { background: #fef3c7; color: #d97706; }
+  .sp-stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+
+  .sp-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .sp-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* Main Layout */
+  .sp-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+  }
+
+  .sp-main, .sp-side {
+    min-width: 0;
+  }
+
+  /* Cards */
+  .sp-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .sp-card-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sp-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sp-card-title i {
+    color: var(--primary);
+  }
+
+  .sp-card-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 4px;
+  }
+
+  .sp-card-link {
+    font-size: 12px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .sp-card-body {
+    padding: 16px;
+  }
+
+  /* Activity Item */
+  .sp-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: inherit;
+    background: #f9fafb;
+  }
+
+  .sp-activity-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-activity-item:hover {
+    background: #f3f4f6;
+  }
+
+  .sp-activity-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .sp-activity-icon.video { background: #dbeafe; color: #2563eb; }
+  .sp-activity-icon.quiz { background: #fef3c7; color: #d97706; }
+  .sp-activity-icon.assignment { background: #d1fae5; color: #059669; }
+
+  .sp-activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sp-activity-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sp-activity-meta {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 6px;
+  }
+
+  .sp-activity-bar {
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .sp-activity-bar .fill {
+    height: 100%;
+    background: var(--primary);
+  }
+
+  /* Session Item */
+  .sp-session-item {
+    padding: 12px;
+    border-left: 3px solid var(--primary);
+    background: #f9fafb;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 10px;
+  }
+
+  .sp-session-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .sp-session-type {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .sp-session-date {
+    font-size: 11px;
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
+
+  .sp-session-mentor {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+
+  .sp-session-mentor i {
+    margin-right: 4px;
+  }
+
+  .sp-session-topics {
+    font-size: 12px;
+    color: #374151;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sp-session-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #059669;
+  }
+
+  .sp-session-actions i {
+    font-size: 10px;
+  }
+
+  /* Tip Item */
+  .sp-tip-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .sp-tip-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-tip-item.warning {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+  }
+
+  .sp-tip-item.info {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+  }
+
+  .sp-tip-item.success {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+  }
+
+  .sp-tip-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .sp-tip-item.warning .sp-tip-icon { color: #f59e0b; }
+  .sp-tip-item.info .sp-tip-icon { color: #3b82f6; }
+  .sp-tip-item.success .sp-tip-icon { color: #22c55e; }
+
+  .sp-tip-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sp-tip-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .sp-tip-text {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* Achievement Badge */
+  .sp-achievement {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .sp-achievement:last-child {
+    margin-bottom: 0;
+  }
+
+  .sp-achievement-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .sp-achievement-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sp-achievement-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .sp-achievement-text {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* Empty State */
+  .sp-empty {
+    text-align: center;
+    padding: 32px 16px;
+  }
+
+  .sp-empty i {
+    font-size: 36px;
+    color: #d1d5db;
+    margin-bottom: 10px;
+  }
+
+  .sp-empty h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .sp-empty p {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 14px;
+  }
+
+  /* Metrics Row */
+  .sp-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .sp-metric {
+    text-align: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  .sp-metric-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .sp-metric-value.green { color: #059669; }
+  .sp-metric-value.blue { color: #2563eb; }
+  .sp-metric-value.yellow { color: #d97706; }
+
+  .sp-metric-label {
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* =====================
+     RESPONSIVE STYLES
+     ===================== */
+
+  @media screen and (max-width: 1024px) {
+    .sp-layout {
+      grid-template-columns: 1fr;
     }
-    
-    .mentoring-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+
+    .sp-stats {
+      grid-template-columns: repeat(4, 1fr);
     }
-    
-    /* Hero Section */
-    .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 24px;
-        color: white;
-        padding: 2.5rem;
-        position: relative;
-        overflow: hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
-    
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
-        animation: float 6s ease-in-out infinite;
+
+    .sp-page-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
     }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
+
+    .sp-header-actions {
+      width: 100%;
     }
-    
-    /* Stats Cards */
-    .stat-card {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0,0,0,0.05);
-        position: relative;
-        overflow: hidden;
+
+    .sp-btn {
+      flex: 1;
     }
-    
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--stat-color);
+
+    .sp-progress-overview {
+      flex-direction: column;
+      text-align: center;
+      gap: 16px;
     }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+
+    .sp-metrics {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
-    
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        color: white;
+
+    .sp-metric {
+      padding: 10px 8px;
     }
-    
-    /* Achievement Badges */
-    .achievement-badge {
-        background: linear-gradient(45deg, #28a745, #20c997);
-        color: white;
-        border-radius: 50px;
-        padding: 1rem 1.5rem;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+
+    .sp-metric-value {
+      font-size: 16px;
     }
-    
-    .achievement-badge:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  }
+
+  @media screen and (max-width: 480px) {
+    .sp-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
     }
-    
-    /* Progress Ring */
-    .progress-ring-container {
-        position: relative;
-        width: 100px;
-        height: 100px;
-        margin: 0 auto;
+
+    .sp-stat {
+      padding: 12px;
     }
-    
-    .progress-ring {
-        width: 100px;
-        height: 100px;
-        transform: rotate(-90deg);
+
+    .sp-stat-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+      margin-bottom: 8px;
     }
-    
-    .progress-ring-bg {
-        fill: none;
-        stroke: #e9ecef;
-        stroke-width: 8;
+
+    .sp-stat-value {
+      font-size: 20px;
     }
-    
-    .progress-ring-fill {
-        fill: none;
-        stroke-width: 8;
-        stroke-linecap: round;
-        transition: stroke-dasharray 1s ease-in-out;
+
+    .sp-header-actions {
+      flex-direction: column;
     }
-    
-    .progress-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        font-weight: 700;
+
+    .sp-btn {
+      width: 100%;
     }
-    
-    /* Session Cards */
-    .session-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        border-left: 4px solid;
-        transition: all 0.3s ease;
-        margin-bottom: 1rem;
+
+    .sp-card-body {
+      padding: 12px;
     }
-    
-    .session-card:hover {
-        transform: translateX(8px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+
+    .sp-progress-ring {
+      width: 70px;
+      height: 70px;
     }
-    
-    /* Activity Cards */
-    .activity-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem;
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
+
+    .sp-progress-value .number {
+      font-size: 16px;
     }
-    
-    .activity-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+    .sp-activity-item {
+      padding: 10px;
+      gap: 10px;
     }
-    
-    .activity-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        color: white;
-        font-size: 1.2rem;
+
+    .sp-activity-icon {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      font-size: 12px;
     }
-    
-    /* Suggestion Cards */
-    .suggestion-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        border-left: 4px solid;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
+
+    .sp-metrics {
+      grid-template-columns: 1fr;
+      gap: 6px;
     }
-    
-    .suggestion-card:hover {
-        transform: translateX(4px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+    .sp-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
     }
-    
-    .suggestion-card.warning { border-left-color: #ffc107; background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%); }
-    .suggestion-card.info { border-left-color: #17a2b8; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); }
-    .suggestion-card.primary { border-left-color: #007bff; background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); }
-    .suggestion-card.success { border-left-color: #28a745; background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%); }
-    
-    /* Modern Buttons */
-    .btn-modern {
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        position: relative;
-        overflow: hidden;
+  }
+
+  @media screen and (max-width: 360px) {
+    .sp-page-title h1 {
+      font-size: 17px;
     }
-    
-    .btn-modern::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s;
+
+    .sp-stat-value {
+      font-size: 18px;
     }
-    
-    .btn-modern:hover::before {
-        left: 100%;
+
+    .sp-btn {
+      font-size: 12px;
+      padding: 10px;
     }
-    
-    /* Responsive Grid */
-    .mentoring-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-    }
-    
-    /* Custom scrollbar */
-    .custom-scroll::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .custom-scroll::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-    
-    .custom-scroll::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-    
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
-    }
-    
-    /* Color Variables */
-    :root {
-        --primary-color: #667eea;
-        --secondary-color: #764ba2;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --info-color: #17a2b8;
-        --danger-color: #dc3545;
-    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid p-4">
-    <!-- Hero Section -->
-    <div class="hero-section mb-4">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <div style="position: relative; z-index: 2;">
-                    <h1 class="display-6 fw-bold mb-2">Welcome to Your Mentoring Journey</h1>
-                    <p class="lead mb-3 opacity-90">Track your progress, celebrate achievements, and unlock your potential with personalized insights</p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'student_portal:mentoring_sessions' %}" class="btn btn-light btn-modern">
-                            <i class="ti ti-history me-2"></i>Session History
-                        </a>
-                        <a href="{% url 'student_portal:mentoring_insights' %}" class="btn btn-outline-light btn-modern">
-                            <i class="ti ti-chart-line me-2"></i>Detailed Insights
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 text-end">
-                <div class="progress-ring-container">
-                    <svg class="progress-ring" viewBox="0 0 120 120">
-                        <circle class="progress-ring-bg" cx="60" cy="60" r="50"></circle>
-                        <circle class="progress-ring-fill" cx="60" cy="60" r="50" 
-                                style="stroke: #ffffff; stroke-dasharray: {{ overall_progress_stroke|default:'0' }}, 314.16;"></circle>
-                    </svg>
-                    <div class="progress-text">
-                        <div class="h3 mb-0">{{ overall_progress|default:'0' }}%</div>
-                        <small class="opacity-75">Overall Progress</small>
-                    </div>
-                </div>
-            </div>
+<div class="sp-mentoring">
+  <!-- Page Header -->
+  <div class="sp-page-header">
+    <div class="sp-page-title">
+      <h1>Mentoring Dashboard</h1>
+      <p>Track your progress and learning journey</p>
+    </div>
+    <div class="sp-header-actions">
+      <a href="{% url 'student_portal:mentoring_sessions' %}" class="sp-btn sp-btn-outline">
+        <i class="fas fa-history"></i> Session History
+      </a>
+      <a href="{% url 'student_portal:mentoring_insights' %}" class="sp-btn sp-btn-primary">
+        <i class="fas fa-chart-line"></i> View Insights
+      </a>
+    </div>
+  </div>
+
+  <!-- Progress Overview -->
+  <div class="sp-progress-overview">
+    <div class="sp-progress-ring">
+      <svg viewBox="0 0 80 80" width="80" height="80">
+        <circle class="bg" cx="40" cy="40" r="34"></circle>
+        <circle class="fill" cx="40" cy="40" r="34"
+                stroke-dasharray="{{ overall_progress_stroke|default:'0' }}, 213.63"></circle>
+      </svg>
+      <div class="sp-progress-value">
+        <div class="number">{{ overall_progress|default:'0' }}%</div>
+        <div class="label">Progress</div>
+      </div>
+    </div>
+    <div class="sp-progress-text">
+      <h3>Your Learning Journey</h3>
+      <p>Keep up the great work! You're making steady progress towards your goals.</p>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="sp-stats">
+    <div class="sp-stat">
+      <div class="sp-stat-icon blue"><i class="fas fa-play-circle"></i></div>
+      <div class="sp-stat-value">{{ study_insights.total_videos_watched|default:'0' }}</div>
+      <div class="sp-stat-label">Videos Watched</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon green"><i class="fas fa-clipboard-check"></i></div>
+      <div class="sp-stat-value">{{ study_insights.total_assignments_submitted|default:'0' }}</div>
+      <div class="sp-stat-label">Assignments</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon yellow"><i class="fas fa-question-circle"></i></div>
+      <div class="sp-stat-value">{{ study_insights.total_quizzes_attempted|default:'0' }}</div>
+      <div class="sp-stat-label">Quizzes</div>
+    </div>
+    <div class="sp-stat">
+      <div class="sp-stat-icon purple"><i class="fas fa-layer-group"></i></div>
+      <div class="sp-stat-value">{{ study_insights.modules_completed|default:'0' }}</div>
+      <div class="sp-stat-label">Modules</div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  {% if achievements %}
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title"><i class="fas fa-trophy"></i> Achievements</span>
+    </div>
+    <div class="sp-card-body">
+      {% for achievement in achievements %}
+      <div class="sp-achievement">
+        <div class="sp-achievement-icon">
+          <i class="{{ achievement.icon }}"></i>
         </div>
+        <div class="sp-achievement-content">
+          <div class="sp-achievement-title">{{ achievement.title }}</div>
+          <div class="sp-achievement-text">{{ achievement.message }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main Layout -->
+  <div class="sp-layout">
+    <!-- Main Column -->
+    <div class="sp-main">
+      <!-- Recent Activity -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title"><i class="fas fa-clock"></i> Recent Activity</span>
+          <a href="{% url 'student_portal:my_courses' %}" class="sp-card-link">View All</a>
+        </div>
+        <div class="sp-card-body">
+          {% if recent_activity %}
+            {% for activity in recent_activity|slice:":6" %}
+            <div class="sp-activity-item">
+              <div class="sp-activity-icon video">
+                <i class="fas fa-play"></i>
+              </div>
+              <div class="sp-activity-content">
+                <div class="sp-activity-title">{{ activity.video_lesson.title }}</div>
+                <div class="sp-activity-meta">{{ activity.last_watched_at|timesince }} ago</div>
+                <div class="sp-activity-bar">
+                  <div class="fill" style="width: {{ activity.completed_percentage|default:0 }}%"></div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="sp-empty">
+              <i class="fas fa-book-open"></i>
+              <h4>No Recent Activity</h4>
+              <p>Start learning to see your progress here</p>
+              <a href="{% url 'student_portal:my_courses' %}" class="sp-btn sp-btn-primary">Browse Courses</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title"><i class="fas fa-chart-bar"></i> Performance</span>
+        </div>
+        <div class="sp-card-body">
+          <div class="sp-metrics">
+            <div class="sp-metric">
+              <div class="sp-metric-value green">{{ study_insights.avg_quiz_score|floatformat:0|default:'0' }}%</div>
+              <div class="sp-metric-label">Avg Quiz Score</div>
+            </div>
+            <div class="sp-metric">
+              <div class="sp-metric-value blue">{{ study_insights.learning_streak|default:'0' }}</div>
+              <div class="sp-metric-label">Day Streak</div>
+            </div>
+            <div class="sp-metric">
+              <div class="sp-metric-value yellow">{{ study_insights.study_hours|default:'0' }}h</div>
+              <div class="sp-metric-label">Study Time</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Achievements & Highlights -->
-    {% if achievements %}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="mentoring-card">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="stat-icon me-3" style="background: linear-gradient(45deg, #28a745, #20c997);">
-                            <i class="ti ti-trophy"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-1 fw-bold">Your Achievements</h4>
-                            <p class="text-muted mb-0">Celebrate your learning milestones</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        {% for achievement in achievements %}
-                        <div class="col-lg-6 mb-3">
-                            <div class="achievement-badge">
-                                <i class="{{ achievement.icon }} fa-2x me-3"></i>
-                                <div class="flex-grow-1">
-                                    <div class="fw-bold fs-6">{{ achievement.title }}</div>
-                                    <small class="opacity-90">{{ achievement.message }}</small>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+    <!-- Side Column -->
+    <div class="sp-side">
+      <!-- Recent Sessions -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title"><i class="fas fa-users"></i> Sessions</span>
+          <span class="sp-card-badge">{{ total_sessions|default:'0' }} total</span>
         </div>
-    </div>
-    {% endif %}
+        <div class="sp-card-body">
+          {% if recent_sessions %}
+            {% for session in recent_sessions %}
+            <div class="sp-session-item">
+              <div class="sp-session-header">
+                <div class="sp-session-type">{{ session.get_session_type_display }}</div>
+                <div class="sp-session-date">{{ session.session_date|date:"M d" }}</div>
+              </div>
+              <div class="sp-session-mentor">
+                <i class="fas fa-user"></i>{{ session.mentor.name|default:session.mentor.username }}
+              </div>
+              <div class="sp-session-topics">{{ session.topics_discussed|truncatechars:80 }}</div>
+              {% if session.action_items %}
+              <div class="sp-session-actions">
+                <i class="fas fa-check-circle"></i> Action items provided
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="sp-empty" style="padding: 24px 12px;">
+              <i class="fas fa-calendar-plus"></i>
+              <h4>No Sessions Yet</h4>
+              <p>Request a mentoring session</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
 
-    <!-- Learning Statistics -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="mentoring-card">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <div>
-                            <h4 class="mb-1 fw-bold">Learning Analytics</h4>
-                            <p class="text-muted mb-0">Your comprehensive progress overview</p>
-                        </div>
-                        <div class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-7">
-                            This Month: {{ current_month_activity|default:'5' }} activities
-                        </div>
-                    </div>
-                    
-                    <!-- Main Stats Grid -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="stat-card" style="--stat-color: #667eea;">
-                                <div class="stat-icon" style="background: linear-gradient(45deg, #667eea, #764ba2);">
-                                    <i class="ti ti-video"></i>
-                                </div>
-                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_videos_watched|default:'0' }}</div>
-                                <p class="text-muted mb-0 small fw-medium">Videos Watched</p>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar" style="background: linear-gradient(45deg, #667eea, #764ba2); width: {{ study_insights.video_progress_percentage|default:'0' }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="stat-card" style="--stat-color: #28a745;">
-                                <div class="stat-icon" style="background: linear-gradient(45deg, #28a745, #20c997);">
-                                    <i class="ti ti-clipboard-check"></i>
-                                </div>
-                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_assignments_submitted|default:'0' }}</div>
-                                <p class="text-muted mb-0 small fw-medium">Assignments</p>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-success" style="width: {{ study_insights.assignment_progress_percentage|default:'0' }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="stat-card" style="--stat-color: #ffc107;">
-                                <div class="stat-icon" style="background: linear-gradient(45deg, #ffc107, #fd7e14);">
-                                    <i class="ti ti-clipboard-list"></i>
-                                </div>
-                                <div class="h2 mb-1 fw-bold">{{ study_insights.total_quizzes_attempted|default:'0' }}</div>
-                                <p class="text-muted mb-0 small fw-medium">Quiz Attempts</p>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-warning" style="width: {{ study_insights.quiz_progress_percentage|default:'0' }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="stat-card" style="--stat-color: #17a2b8;">
-                                <div class="stat-icon" style="background: linear-gradient(45deg, #17a2b8, #6f42c1);">
-                                    <i class="ti ti-award"></i>
-                                </div>
-                                <div class="h2 mb-1 fw-bold">{{ study_insights.modules_completed|default:'0' }}</div>
-                                <p class="text-muted mb-0 small fw-medium">Modules Complete</p>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-info" style="width: {{ study_insights.module_progress_percentage|default:'0' }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Performance Metrics -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-success-subtle rounded-3">
-                                <div class="h4 mb-1 text-success fw-bold">{{ study_insights.avg_quiz_score|floatformat:1|default:'0' }}%</div>
-                                <small class="text-muted fw-medium">Average Quiz Score</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-primary-subtle rounded-3">
-                                <div class="h4 mb-1 text-primary fw-bold">{{ study_insights.learning_streak|default:'0' }}</div>
-                                <small class="text-muted fw-medium">Day Learning Streak</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-warning-subtle rounded-3">
-                                <div class="h4 mb-1 text-warning fw-bold">{{ study_insights.study_hours|default:'0' }}h</div>
-                                <small class="text-muted fw-medium">Total Study Time</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Tips -->
+      {% if suggestions %}
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title"><i class="fas fa-lightbulb"></i> Tips</span>
         </div>
+        <div class="sp-card-body">
+          {% for suggestion in suggestions %}
+          <div class="sp-tip-item {{ suggestion.color }}">
+            <i class="sp-tip-icon {{ suggestion.icon }}"></i>
+            <div class="sp-tip-content">
+              <div class="sp-tip-title">{{ suggestion.title }}</div>
+              <div class="sp-tip-text">{{ suggestion.message }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </div>
-    
-    <!-- Two Column Layout -->
-    <div class="row">
-        <!-- Left Column: Recent Activity -->
-        <div class="col-lg-8 mb-4">
-            <div class="mentoring-card h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <div>
-                            <h5 class="mb-1 fw-bold">Recent Learning Activity</h5>
-                            <p class="text-muted mb-0 small">Your latest progress updates</p>
-                        </div>
-                        <a href="{% url 'student_portal:my_courses' %}" class="btn btn-outline-primary btn-sm btn-modern">
-                            <i class="ti ti-arrow-right me-1"></i>View All
-                        </a>
-                    </div>
-                    
-                    <div class="row g-3">
-                        {% for activity in recent_activity|slice:":6" %}
-                        <div class="col-md-6">
-                            <div class="activity-card">
-                                <div class="activity-icon" style="background: linear-gradient(45deg, #667eea, #764ba2);">
-                                    <i class="ti ti-play"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="fw-semibold mb-1">{{ activity.video_lesson.title|truncatechars:25 }}</div>
-                                    <small class="text-muted">{{ activity.last_watched_at|timesince }} ago</small>
-                                    <div class="progress mt-2" style="height: 6px; border-radius: 10px;">
-                                        <div class="progress-bar" style="background: linear-gradient(45deg, #28a745, #20c997); width: {{ activity.completed_percentage }}%; border-radius: 10px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="col-12">
-                            <div class="text-center py-5">
-                                <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(45deg, #e9ecef, #dee2e6);">
-                                    <i class="ti ti-book text-muted"></i>
-                                </div>
-                                <h6 class="text-muted mb-2">No Recent Activity</h6>
-                                <p class="text-muted mb-3 small">Start learning to see your activity here!</p>
-                                <a href="{% url 'student_portal:my_courses' %}" class="btn btn-primary btn-modern">
-                                    <i class="ti ti-book-open me-2"></i>Browse Courses
-                                </a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column: Sessions & Recommendations -->
-        <div class="col-lg-4">
-            <div class="row">
-                <!-- Recent Sessions -->
-                <div class="col-12 mb-4">
-                    <div class="mentoring-card">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h6 class="mb-0 fw-bold">
-                                    <i class="ti ti-users me-2 text-primary"></i>Recent Sessions
-                                </h6>
-                                <span class="badge bg-info-subtle text-info">{{ total_sessions|default:'0' }} total</span>
-                            </div>
-                            
-                            <div class="custom-scroll" style="max-height: 300px; overflow-y: auto;">
-                                {% for session in recent_sessions %}
-                                <div class="session-card border-left-primary" style="border-left-color: {% cycle '#667eea' '#28a745' '#ffc107' '#17a2b8' %};">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="flex-grow-1">
-                                            <div class="fw-semibold small text-primary">{{ session.get_session_type_display }}</div>
-                                            <div class="text-muted small mb-2">
-                                                <i class="ti ti-user me-1"></i>{{ session.mentor.name|default:session.mentor.username }}
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">{{ session.session_date|date:"M d" }}</small>
-                                    </div>
-                                    
-                                    <p class="small text-dark mb-2">{{ session.topics_discussed|truncatechars:60 }}</p>
-                                    
-                                    {% if session.action_items %}
-                                    <div class="d-flex align-items-center">
-                                        <i class="ti ti-checklist me-2 text-success"></i>
-                                        <small class="text-success fw-medium">Action items provided</small>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% empty %}
-                                <div class="text-center py-4">
-                                    <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(45deg, #e9ecef, #dee2e6); width: 50px; height: 50px;">
-                                        <i class="ti ti-calendar-plus text-muted"></i>
-                                    </div>
-                                    <p class="small text-muted mb-3">No mentoring sessions yet</p>
-                                    <button class="btn btn-outline-primary btn-sm btn-modern">
-                                        <i class="ti ti-plus me-1"></i>Request Session
-                                    </button>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Personalized Tips -->
-                {% if suggestions %}
-                <div class="col-12">
-                    <div class="mentoring-card">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="stat-icon me-3" style="background: linear-gradient(45deg, #ffc107, #fd7e14); width: 40px; height: 40px;">
-                                    <i class="ti ti-bulb"></i>
-                                </div>
-                                <h6 class="mb-0 fw-bold">Personalized Tips</h6>
-                            </div>
-                            
-                            {% for suggestion in suggestions %}
-                            <div class="suggestion-card {{ suggestion.color }}">
-                                <div class="d-flex align-items-start">
-                                    <i class="{{ suggestion.icon }} me-3 mt-1"></i>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-semibold small mb-1">{{ suggestion.title }}</div>
-                                        <div class="small text-muted">{{ suggestion.message }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate progress rings
-    const progressRings = document.querySelectorAll('.progress-ring-fill');
-    progressRings.forEach(ring => {
-        const strokeDashArray = ring.getAttribute('stroke-dasharray');
-        if (strokeDashArray && strokeDashArray !== '0, 314.16') {
-            ring.style.strokeDasharray = '0, 314.16';
-            setTimeout(() => {
-                ring.style.strokeDasharray = strokeDashArray;
-            }, 800);
-        }
-    });
-    
-    // Animate stat cards on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    // Animate cards on load
-    document.querySelectorAll('.mentoring-card, .stat-card').forEach(card => {
-        card.style.opacity = '0.8';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        observer.observe(card);
-    });
-    
-    // Stagger animation for stat cards
-    document.querySelectorAll('.stat-card').forEach((card, index) => {
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 150);
-    });
-    
-    // Add hover effects for interactive elements
-    document.querySelectorAll('.btn-modern').forEach(btn => {
-        btn.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px) scale(1.02)';
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
-    
-    // Animate progress bars
-    setTimeout(() => {
-        document.querySelectorAll('.progress-bar').forEach(bar => {
-            const width = bar.style.width;
-            bar.style.width = '0%';
-            bar.style.transition = 'width 1s ease-in-out';
-            setTimeout(() => {
-                bar.style.width = width;
-            }, 200);
-        });
-    }, 500);
-});
-
-// Add smooth scrolling for internal links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-</script>
 {% endblock %}

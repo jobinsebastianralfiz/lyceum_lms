@@ -1,0 +1,404 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }} - LM Academy{% endblock %}
+{% block description %}{{ news.excerpt|default:news.content|truncatechars:160 }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* News Detail Page Styles */
+.lm-page-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 100px 0 60px;
+  text-align: center;
+}
+
+.lm-page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--white) !important;
+  margin-bottom: 1rem;
+}
+
+.lm-breadcrumb {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.lm-breadcrumb li {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+}
+
+.lm-breadcrumb li a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+.lm-breadcrumb li:not(:last-child)::after {
+  content: '/';
+  margin-left: 0.5rem;
+  opacity: 0.6;
+}
+
+.news-section {
+  padding: 4rem 0;
+  background: var(--bg-light);
+}
+
+.news-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+}
+
+.news-header {
+  margin-bottom: 2rem;
+}
+
+.news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.news-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.news-meta-item i {
+  color: var(--primary);
+}
+
+.news-category {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-subtle);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.news-featured-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+}
+
+.news-content {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.9;
+}
+
+.news-content h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary) !important;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.news-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  margin-top: 1.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.news-content p {
+  margin-bottom: 1.25rem;
+}
+
+.news-content ul, .news-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.news-content li {
+  margin-bottom: 0.5rem;
+}
+
+.news-content a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.news-content a:hover {
+  text-decoration: underline;
+}
+
+.news-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+}
+
+.news-content blockquote {
+  background: var(--primary-subtle);
+  border-left: 4px solid var(--primary);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  font-style: italic;
+}
+
+/* Share Buttons */
+.news-share {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.news-share h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.share-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.share-btn:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* Related News */
+.related-news {
+  margin-top: 4rem;
+}
+
+.related-news h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.related-news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.related-news-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+}
+
+.related-news-item:hover {
+  background: var(--primary-subtle);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.related-news-image {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.related-news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.related-news-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.related-news-placeholder i {
+  font-size: 1.5rem;
+  color: var(--white);
+}
+
+.related-news-content h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.related-news-item:hover .related-news-content h5 {
+  color: var(--primary);
+}
+
+.related-news-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .news-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .lm-page-header h1 {
+    font-size: 2rem;
+  }
+
+  .news-content {
+    font-size: 1rem;
+  }
+
+  .related-news-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="lm-page-header">
+  <div class="container">
+    <h1>{{ news.title }}</h1>
+    <ol class="lm-breadcrumb">
+      <li><a href="{% url 'landing:home' %}">Home</a></li>
+      <li><a href="{% url 'landing:home' %}">News</a></li>
+      <li>{{ news.title|truncatechars:30 }}</li>
+    </ol>
+  </div>
+</div>
+
+<!-- News Content -->
+<section class="news-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <article class="news-card">
+          <!-- News Header -->
+          <div class="news-header">
+            <div class="news-meta">
+              {% if news.category %}
+              <span class="news-category">{{ news.category }}</span>
+              {% endif %}
+              <span class="news-meta-item">
+                <i class="far fa-calendar-alt"></i>
+                {{ news.published_at|date:"F d, Y" }}
+              </span>
+              {% if news.author %}
+              <span class="news-meta-item">
+                <i class="far fa-user"></i>
+                {{ news.author }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Featured Image -->
+          {% if news.featured_image %}
+          <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" class="news-featured-image">
+          {% endif %}
+
+          <!-- News Content -->
+          <div class="news-content">
+            {{ news.content|safe }}
+          </div>
+
+          <!-- Share Buttons -->
+          <div class="news-share">
+            <h4>Share this article</h4>
+            <div class="share-buttons">
+              <a href="https://twitter.com/intent/tweet?text={{ news.title|urlencode }}&url={{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="share-btn" title="Share on Twitter">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="share-btn" title="Share on Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ news.title|urlencode }}" target="_blank" rel="noopener" class="share-btn" title="Share on LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="https://wa.me/?text={{ news.title|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="share-btn" title="Share on WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Related News -->
+        {% if related_news %}
+        <div class="related-news">
+          <h3>Related Articles</h3>
+          <div class="related-news-grid">
+            {% for item in related_news %}
+            <a href="{% url 'landing:news_detail' item.slug %}" class="related-news-item">
+              {% if item.featured_image %}
+              <div class="related-news-image">
+                <img src="{{ item.featured_image.url }}" alt="{{ item.title }}">
+              </div>
+              {% else %}
+              <div class="related-news-placeholder">
+                <i class="fas fa-newspaper"></i>
+              </div>
+              {% endif %}
+              <div class="related-news-content">
+                <h5>{{ item.title|truncatechars:60 }}</h5>
+                <span class="related-news-date">
+                  <i class="far fa-calendar-alt"></i> {{ item.published_at|date:"M d, Y" }}
+                </span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

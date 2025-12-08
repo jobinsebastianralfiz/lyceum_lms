@@ -3,19 +3,25 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Avg, Sum
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
 from drf_spectacular.openapi import OpenApiResponse
 from datetime import timedelta
 
-from .models import Lead, News, Placement, Testimonial, LeadFollowUp
+from .models import Lead, News, Placement, Testimonial, LeadFollowUp, Event, Achievement, Banner, CourseEnquiry
 from .serializers import (
     LeadCreateSerializer, LeadListSerializer, LeadDetailSerializer,
     NewsListSerializer, NewsDetailSerializer, NewsSimpleSerializer,
     PlacementListSerializer, PlacementDetailSerializer, PlacementSimpleSerializer,
     TestimonialListSerializer, TestimonialDetailSerializer, TestimonialSimpleSerializer,
-    ContentStatsSerializer, LeadFollowUpSerializer, StudentLeadStatusSerializer, StudentLeadListSerializer
+    ContentStatsSerializer, LeadFollowUpSerializer, StudentLeadStatusSerializer, StudentLeadListSerializer,
+    # New serializers
+    EventListSerializer, EventDetailSerializer, EventSimpleSerializer,
+    AchievementListSerializer, AchievementDetailSerializer, AchievementSimpleSerializer,
+    BannerSerializer, BannerSimpleSerializer,
+    CourseEnquiryCreateSerializer, CourseEnquiryListSerializer, CourseEnquiryDetailSerializer,
+    StudentCourseEnquirySerializer, DashboardContentSerializer
 )
 
 
@@ -342,9 +348,9 @@ class DashboardContentView(APIView):
         # Basic stats
         total_placements = Placement.objects.filter(is_published=True).count()
         avg_package = Placement.objects.filter(
-            is_published=True, 
+            is_published=True,
             can_show_package=True
-        ).aggregate(avg=models.Avg('package_amount'))['avg'] or 0
+        ).aggregate(avg=Avg('package_amount'))['avg'] or 0
         
         return Response({
             'featured_news': NewsSimpleSerializer(featured_news, many=True).data,
@@ -528,6 +534,333 @@ class MyLeadStatusDetailView(generics.RetrieveAPIView):
     """Get detailed status of a specific lead"""
     serializer_class = StudentLeadStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         return Lead.objects.filter(submitted_by=self.request.user)
+
+
+# ==================== EVENT VIEWS ====================
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="List Events",
+        description="Get upcoming and featured events for mobile app",
+        responses={200: EventListSerializer(many=True)},
+        tags=['Mobile App - Events']
+    )
+)
+class EventListView(generics.ListAPIView):
+    """List published events"""
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['event_type', 'is_featured', 'is_online']
+    search_fields = ['title', 'short_description', 'description', 'venue_name']
+    ordering = ['event_date', 'start_time']
+
+    def get_queryset(self):
+        queryset = Event.objects.filter(
+            is_published=True,
+            status__in=['upcoming', 'ongoing']
+        ).select_related('created_by')
+
+        # Filter by upcoming only if requested
+        upcoming_only = self.request.query_params.get('upcoming', None)
+        if upcoming_only == 'true':
+            queryset = queryset.filter(event_date__gte=timezone.now().date())
+
+        return queryset
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get Event Details",
+        description="Get detailed event information",
+        responses={
+            200: EventDetailSerializer,
+            404: OpenApiResponse(description="Event not found")
+        },
+        tags=['Mobile App - Events']
+    )
+)
+class EventDetailView(generics.RetrieveAPIView):
+    """Get detailed event information"""
+    serializer_class = EventDetailSerializer
+    permission_classes = [permissions.AllowAny]
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Event.objects.filter(
+            is_published=True
+        ).select_related('created_by')
+
+
+# ==================== ACHIEVEMENT VIEWS ====================
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="List Achievements",
+        description="Get academy achievements and milestones",
+        responses={200: AchievementListSerializer(many=True)},
+        tags=['Mobile App - Achievements']
+    )
+)
+class AchievementListView(generics.ListAPIView):
+    """List published achievements"""
+    serializer_class = AchievementListSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['achievement_type', 'is_featured']
+    ordering = ['-achievement_date', '-created_at']
+
+    def get_queryset(self):
+        return Achievement.objects.filter(
+            is_published=True
+        ).select_related('created_by')
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get Achievement Details",
+        description="Get detailed achievement information",
+        responses={
+            200: AchievementDetailSerializer,
+            404: OpenApiResponse(description="Achievement not found")
+        },
+        tags=['Mobile App - Achievements']
+    )
+)
+class AchievementDetailView(generics.RetrieveAPIView):
+    """Get detailed achievement information"""
+    serializer_class = AchievementDetailSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Achievement.objects.filter(
+            is_published=True
+        ).select_related('created_by')
+
+
+# ==================== BANNER VIEWS ====================
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get Active Banners",
+        description="Get currently active banners for home screen",
+        responses={200: BannerSerializer(many=True)},
+        tags=['Mobile App - Banners']
+    )
+)
+class BannerListView(generics.ListAPIView):
+    """List active banners"""
+    serializer_class = BannerSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['banner_type']
+    ordering = ['-priority', '-created_at']
+
+    def get_queryset(self):
+        now = timezone.now()
+        return Banner.objects.filter(
+            is_active=True
+        ).filter(
+            Q(start_date__isnull=True) | Q(start_date__lte=now)
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=now)
+        )
+
+
+# ==================== COURSE ENQUIRY VIEWS ====================
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Submit Course Enquiry",
+        description="Submit an enquiry for courses that require enquiry (enquiry_only type)",
+        request=CourseEnquiryCreateSerializer,
+        responses={
+            201: OpenApiResponse(
+                description="Enquiry submitted successfully",
+                examples=[
+                    OpenApiExample(
+                        'Success Response',
+                        value={
+                            "message": "Thank you for your interest! Our team will contact you within 24 hours.",
+                            "enquiry_id": 123
+                        }
+                    )
+                ]
+            ),
+            400: OpenApiResponse(description="Validation errors")
+        },
+        tags=['Mobile App - Course Enquiry']
+    )
+)
+class CourseEnquiryCreateView(generics.CreateAPIView):
+    """Submit course enquiry"""
+    serializer_class = CourseEnquiryCreateSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        ip_address = self.get_client_ip(request)
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user if request.user.is_authenticated else None
+
+        enquiry = serializer.save(
+            ip_address=ip_address,
+            user_agent=user_agent,
+            source='mobile_app',
+            user=user
+        )
+
+        return Response({
+            'message': 'Thank you for your interest! Our team will contact you within 24 hours.',
+            'enquiry_id': enquiry.id,
+            'can_track': user is not None
+        }, status=status.HTTP_201_CREATED)
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get My Course Enquiries",
+        description="Get course enquiries submitted by the authenticated user",
+        responses={
+            200: StudentCourseEnquirySerializer(many=True),
+            401: OpenApiResponse(description="Authentication required")
+        },
+        tags=['Student - Course Enquiry']
+    )
+)
+class MyCourseEnquiriesView(generics.ListAPIView):
+    """List course enquiries by authenticated user"""
+    serializer_class = StudentCourseEnquirySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return CourseEnquiry.objects.filter(
+            user=self.request.user
+        ).select_related('course').order_by('-created_at')
+
+
+# ==================== ENHANCED DASHBOARD VIEW ====================
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get Enhanced Dashboard Content",
+        description="Get all featured content for mobile app home screen including events, achievements, banners, and learning streak",
+        responses={200: DashboardContentSerializer},
+        tags=['Mobile App - Dashboard']
+    )
+)
+class EnhancedDashboardView(APIView):
+    """Get comprehensive dashboard content for mobile app"""
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        today = timezone.now().date()
+        now = timezone.now()
+
+        # Featured News (latest 3)
+        latest_news = News.objects.filter(
+            is_published=True,
+            published_at__lte=now
+        ).order_by('-published_at')[:3]
+
+        # Latest Placements (latest 5)
+        recent_placements = Placement.objects.filter(
+            is_published=True,
+            consent_given=True,
+            published_at__lte=now
+        ).order_by('-published_at')[:5]
+
+        # Featured Testimonials (latest 5)
+        featured_testimonials = Testimonial.objects.filter(
+            is_published=True,
+            is_featured=True,
+            consent_given=True,
+            published_at__lte=now
+        ).order_by('-published_at')[:5]
+
+        # Upcoming Events (next 5)
+        upcoming_events = Event.objects.filter(
+            is_published=True,
+            status__in=['upcoming', 'ongoing'],
+            event_date__gte=today
+        ).order_by('event_date', 'start_time')[:5]
+
+        # Featured Achievements
+        featured_achievements = Achievement.objects.filter(
+            is_published=True,
+            is_featured=True
+        ).order_by('-achievement_date')[:6]
+
+        # Active Banners
+        active_banners = Banner.objects.filter(
+            is_active=True
+        ).filter(
+            Q(start_date__isnull=True) | Q(start_date__lte=now)
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=now)
+        ).order_by('-priority')[:5]
+
+        # Calculate learning streak for authenticated user
+        learning_streak = 0
+        total_learning_minutes = 0
+
+        if request.user.is_authenticated:
+            from apps.courses.models import StudentProgress, AssignmentSubmission
+            from datetime import timedelta as td
+
+            current_date = today
+            for i in range(365):
+                check_date = current_date - td(days=i)
+                has_activity = StudentProgress.objects.filter(
+                    user=request.user,
+                    last_watched_at__date=check_date
+                ).exists() or AssignmentSubmission.objects.filter(
+                    student=request.user,
+                    created_at__date=check_date
+                ).exists()
+
+                if has_activity:
+                    learning_streak = i + 1
+                elif i > 0:
+                    break
+
+            # Calculate total learning time (approximate from video durations watched)
+            from django.db.models import Sum
+            total_seconds = StudentProgress.objects.filter(
+                user=request.user,
+                completed=True
+            ).aggregate(
+                total=Sum('video_lesson__duration')
+            )['total'] or 0
+            total_learning_minutes = total_seconds // 60
+
+        # Build response
+        response_data = {
+            'latest_news': NewsSimpleSerializer(latest_news, many=True, context={'request': request}).data,
+            'recent_placements': PlacementSimpleSerializer(recent_placements, many=True, context={'request': request}).data,
+            'featured_testimonials': TestimonialSimpleSerializer(featured_testimonials, many=True, context={'request': request}).data,
+            'upcoming_events': EventSimpleSerializer(upcoming_events, many=True, context={'request': request}).data,
+            'featured_achievements': AchievementSimpleSerializer(featured_achievements, many=True, context={'request': request}).data,
+            'active_banners': BannerSimpleSerializer(active_banners, many=True, context={'request': request}).data,
+            'learning_streak': learning_streak,
+            'total_learning_minutes': total_learning_minutes,
+            'total_placements': Placement.objects.filter(is_published=True).count(),
+            'total_testimonials': Testimonial.objects.filter(is_published=True).count(),
+            'total_events': Event.objects.filter(is_published=True, status='upcoming').count(),
+        }
+
+        return Response(response_data)

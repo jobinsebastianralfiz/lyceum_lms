@@ -1,0 +1,318 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Feature Settings - LM Academy Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Reset all Bootstrap form-switch styles */
+  .feature-toggle .form-switch {
+    padding-left: 0 !important;
+  }
+
+  .feature-toggle .form-switch .form-check-input {
+    width: 50px !important;
+    height: 26px !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    cursor: pointer;
+    border: 2px solid #ef4444 !important;
+    border-radius: 26px !important;
+    background-color: #ef4444 !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: left center !important;
+    transition: all 0.3s ease;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    float: none !important;
+  }
+
+  /* Custom toggle knob using box-shadow - OFF state (red) */
+  .feature-toggle .form-switch .form-check-input {
+    box-shadow: inset 20px 0 0 0 white, 0 0 0 0 rgba(239, 68, 68, 0) !important;
+  }
+
+  /* ON state (green) */
+  .feature-toggle .form-switch .form-check-input:checked {
+    background-color: var(--lyceum-green, #1E8F5A) !important;
+    border-color: var(--lyceum-green, #1E8F5A) !important;
+    box-shadow: inset -20px 0 0 0 white, 0 0 0 0 rgba(30, 143, 90, 0) !important;
+  }
+
+  .feature-toggle .form-switch .form-check-input:focus {
+    box-shadow: inset 20px 0 0 0 white, 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+  }
+
+  .feature-toggle .form-switch .form-check-input:checked:focus {
+    box-shadow: inset -20px 0 0 0 white, 0 0 0 3px rgba(30, 143, 90, 0.25) !important;
+  }
+
+  /* Hide any pseudo-elements */
+  .feature-toggle .form-switch .form-check-input::before,
+  .feature-toggle .form-switch .form-check-input::after,
+  .feature-toggle .form-check-input::before,
+  .feature-toggle .form-check-input::after,
+  .feature-card::before,
+  .feature-card::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .feature-toggle .form-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 0 !important;
+    min-height: auto !important;
+  }
+
+  .feature-toggle .form-check-label {
+    margin-bottom: 0;
+    font-size: 14px !important;
+    cursor: pointer;
+    padding-left: 0 !important;
+  }
+
+  .feature-toggle .form-check-label strong {
+    font-weight: 600 !important;
+  }
+
+  .feature-card {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  }
+
+  .feature-card .card-header {
+    background: var(--light-bg-tertiary, #F1F5F9) !important;
+  }
+
+  .feature-card .card-header h6 {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
+
+  .feature-description {
+    font-size: 12px !important;
+    color: var(--text-gray-light, #64748b) !important;
+    margin-top: 4px;
+    margin-left: 62px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-0">Feature Settings</h4>
+    <small class="text-muted">Control which modules are visible in the sidebar</small>
+  </div>
+</div>
+
+<form method="POST">
+  {% csrf_token %}
+
+  <div class="row g-4">
+    <!-- Online Learning -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-book me-2 text-primary"></i>Online Learning</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle mb-3">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="online_courses" name="online_courses" {% if config.enable_online_courses %}checked{% endif %}>
+              <label class="form-check-label" for="online_courses"><strong>Enable Online Courses</strong></label>
+            </div>
+            <div class="feature-description">Courses, Modules, Videos, Quizzes, Assignments, PDF Notes</div>
+          </div>
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="live_sessions" name="live_sessions" {% if config.enable_live_sessions %}checked{% endif %}>
+              <label class="form-check-label" for="live_sessions"><strong>Enable Live Sessions</strong></label>
+            </div>
+            <div class="feature-description">Live video classes and sessions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students & Enrollment -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-users me-2 text-info"></i>Students & Enrollment</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle mb-3">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="online_enrollment" name="online_enrollment" {% if config.enable_online_enrollment %}checked{% endif %}>
+              <label class="form-check-label" for="online_enrollment"><strong>Enable Online Enrollments</strong></label>
+            </div>
+            <div class="feature-description">Course enrollments, student progress tracking</div>
+          </div>
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="certificates" name="certificates" {% if config.enable_certificates %}checked{% endif %}>
+              <label class="form-check-label" for="certificates"><strong>Enable Certificates</strong></label>
+            </div>
+            <div class="feature-description">Course completion certificates</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tuition Management -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-school me-2 text-success"></i>Tuition Management</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="tuition" name="tuition" {% if config.enable_tuition_management %}checked{% endif %}>
+              <label class="form-check-label" for="tuition"><strong>Enable Tuition Management</strong></label>
+            </div>
+            <div class="feature-description">Offline students, batches, attendance, monthly fees</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finance & Payments -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-currency-rupee me-2 text-warning"></i>Finance & Payments</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle mb-3">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="payments" name="payments" {% if config.enable_payments %}checked{% endif %}>
+              <label class="form-check-label" for="payments"><strong>Enable Payments & Billing</strong></label>
+            </div>
+            <div class="feature-description">Payment processing, installments, tax invoices</div>
+          </div>
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="finance" name="finance" {% if config.enable_finance_management %}checked{% endif %}>
+              <label class="form-check-label" for="finance"><strong>Enable Finance Management</strong></label>
+            </div>
+            <div class="feature-description">Expense & income tracking, vendors, reports</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assessments -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-clipboard-check me-2 text-danger"></i>Assessments</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="assessments" name="assessments" {% if config.enable_assessments %}checked{% endif %}>
+              <label class="form-check-label" for="assessments"><strong>Enable Assessments</strong></label>
+            </div>
+            <div class="feature-description">Assignment submissions, quiz attempts, ratings, reviews</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communications -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-bell me-2 text-purple"></i>Communications</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="notifications" name="notifications" {% if config.enable_notifications %}checked{% endif %}>
+              <label class="form-check-label" for="notifications"><strong>Enable Notifications</strong></label>
+            </div>
+            <div class="feature-description">Push notifications, email templates</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Website Content -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-world me-2 text-teal"></i>Website Content</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="website_content" name="website_content" {% if config.enable_website_content %}checked{% endif %}>
+              <label class="form-check-label" for="website_content"><strong>Enable Website Content</strong></label>
+            </div>
+            <div class="feature-description">News, events, testimonials, placements, banners, leads</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integrations -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-plug me-2 text-secondary"></i>Integrations</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="youtube" name="youtube" {% if config.enable_youtube_integration %}checked{% endif %}>
+              <label class="form-check-label" for="youtube"><strong>Enable YouTube Integration</strong></label>
+            </div>
+            <div class="feature-description">YouTube channel sync, video management</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="col-md-6">
+      <div class="card feature-card h-100">
+        <div class="card-header py-3">
+          <h6 class="mb-0"><i class="ti ti-chart-pie me-2 text-primary"></i>Analytics</h6>
+        </div>
+        <div class="card-body">
+          <div class="feature-toggle">
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="analytics" name="analytics" {% if config.enable_analytics %}checked{% endif %}>
+              <label class="form-check-label" for="analytics"><strong>Enable Analytics</strong></label>
+            </div>
+            <div class="feature-description">Mentor dashboard, student analytics, progress alerts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-primary">
+      <i class="ti ti-check me-2"></i>Save Settings
+    </button>
+  </div>
+</form>
+
+{% if config.updated_at %}
+<div class="mt-4 text-muted" style="font-size: 12px;">
+  Last updated: {{ config.updated_at|date:"M d, Y H:i" }}
+  {% if config.updated_by %} by {{ config.updated_by.name|default:config.updated_by.email }}{% endif %}
+</div>
+{% endif %}
+{% endblock %}

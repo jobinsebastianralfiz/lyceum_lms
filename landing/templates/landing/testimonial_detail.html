@@ -1,0 +1,184 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ testimonial.student_name }}'s Story - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="lm-detail-header">
+  <div class="container">
+    <nav class="lm-breadcrumb">
+      <a href="{% url 'landing:home' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'landing:testimonials_list' %}">Testimonials</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ testimonial.student_name }}</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Testimonial Content -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <div class="lm-detail-card">
+          {% if testimonial.testimonial_type == 'video_youtube' and testimonial.youtube_video_id %}
+          <div class="lm-video-embed">
+            <iframe src="{{ testimonial.youtube_embed_url }}" allowfullscreen></iframe>
+          </div>
+          {% endif %}
+
+          <div class="lm-detail-body">
+            <!-- Student Header -->
+            <div class="lm-testimonial-detail-header">
+              <div class="lm-testimonial-avatar-lg">
+                {% if testimonial.student_photo %}
+                <img src="{{ testimonial.student_photo.url }}" alt="{{ testimonial.student_name }}">
+                {% else %}
+                <div class="lm-avatar-placeholder-lg">
+                  {{ testimonial.student_name|slice:":1" }}
+                </div>
+                {% endif %}
+              </div>
+              <div class="lm-testimonial-detail-info">
+                <h1>{{ testimonial.student_name }}</h1>
+                <p class="course">{{ testimonial.course_name }} • Batch {{ testimonial.batch_year }}</p>
+                {% if testimonial.current_company %}
+                <p class="company">
+                  <i class="fas fa-briefcase"></i> {{ testimonial.current_position }} at {{ testimonial.current_company }}
+                </p>
+                {% endif %}
+                <div class="lm-testimonial-rating-lg">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= testimonial.overall_rating %}
+                    <i class="fas fa-star"></i>
+                    {% else %}
+                    <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                  <span>{{ testimonial.overall_rating }}/5 Overall Rating</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial Text -->
+            {% if testimonial.testimonial_text %}
+            <div class="lm-testimonial-quote">
+              <i class="fas fa-quote-left"></i>
+              <p>{{ testimonial.testimonial_text }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Key Learnings -->
+            {% if testimonial.key_learnings %}
+            <div class="lm-testimonial-section">
+              <h3><i class="fas fa-lightbulb me-2"></i> Key Learnings</h3>
+              <p>{{ testimonial.key_learnings }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Career Impact -->
+            {% if testimonial.career_impact %}
+            <div class="lm-testimonial-section">
+              <h3><i class="fas fa-chart-line me-2"></i> Career Impact</h3>
+              <p>{{ testimonial.career_impact }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Recommendation -->
+            {% if testimonial.recommendation %}
+            <div class="lm-testimonial-section">
+              <h3><i class="fas fa-thumbs-up me-2"></i> Recommendation</h3>
+              <p>{{ testimonial.recommendation }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="lm-detail-sidebar">
+          <!-- Ratings Breakdown -->
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-star me-2"></i> Ratings</h4>
+            <div class="lm-ratings-breakdown">
+              <div class="lm-rating-item">
+                <span class="label">Overall</span>
+                <div class="stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= testimonial.overall_rating %}
+                    <i class="fas fa-star"></i>
+                    {% else %}
+                    <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="lm-rating-item">
+                <span class="label">Course Content</span>
+                <div class="stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= testimonial.course_rating %}
+                    <i class="fas fa-star"></i>
+                    {% else %}
+                    <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="lm-rating-item">
+                <span class="label">Instructor</span>
+                <div class="stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= testimonial.instructor_rating %}
+                    <i class="fas fa-star"></i>
+                    {% else %}
+                    <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Testimonials -->
+          {% if related_testimonials %}
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-users me-2"></i> More Stories</h4>
+            <div class="lm-related-list">
+              {% for rel in related_testimonials %}
+              <a href="{% url 'landing:testimonial_detail' rel.pk %}" class="lm-related-item">
+                <div class="lm-related-avatar">
+                  {% if rel.student_photo %}
+                  <img src="{{ rel.student_photo.url }}" alt="{{ rel.student_name }}">
+                  {% else %}
+                  <div class="lm-avatar-sm">{{ rel.student_name|slice:":1" }}</div>
+                  {% endif %}
+                </div>
+                <div class="lm-related-info">
+                  <h5>{{ rel.student_name }}</h5>
+                  <span>{{ rel.course_name }}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- CTA -->
+          <div class="lm-sidebar-card lm-sidebar-cta">
+            <h4>Start Your Journey</h4>
+            <p>Join thousands of successful students who transformed their careers.</p>
+            <a href="{% url 'landing:courses' %}" class="btn-lm btn-lm-primary">
+              Explore Courses <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

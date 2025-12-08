@@ -4,45 +4,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>{% block title %}Student Portal - Lyceum Academy{% endblock %}</title>
+  <title>{% block title %}Student Portal - LM Academy{% endblock %}</title>
 
   <!-- Favicon -->
-  <link rel="shortcut icon" type="image/png" href="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/logos/favicon.png' %}" />
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logos/logo.png' %}" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     /* ========================================
-       MODERN DESIGN SYSTEM
+       DESIGN SYSTEM - BRAND COLORS
        ======================================== */
 
     :root {
-      /* Primary Colors */
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --primary-light: #818cf8;
-      --primary-bg: #eef2ff;
+      /* Brand Colors - Green */
+      --primary: #2AB673;
+      --primary-dark: #229959;
+      --primary-light: #3DD186;
+      --primary-bg: #e8f8f0;
 
-      /* Secondary Colors */
-      --secondary: #8b5cf6;
-      --secondary-dark: #7c3aed;
-      --secondary-light: #a78bfa;
+      /* Secondary */
+      --secondary: #1a1a2e;
 
-      /* Accent Colors */
-      --accent: #10b981;
-      --accent-dark: #059669;
-      --accent-light: #34d399;
-
-      /* Neutral Colors */
+      /* Grays */
       --gray-50: #f9fafb;
       --gray-100: #f3f4f6;
       --gray-200: #e5e7eb;
@@ -54,46 +47,31 @@
       --gray-800: #1f2937;
       --gray-900: #111827;
 
-      /* Semantic Colors */
+      /* Semantic */
       --success: #10b981;
       --warning: #f59e0b;
       --error: #ef4444;
       --info: #3b82f6;
 
-      /* Background Colors */
+      /* Backgrounds */
       --bg-primary: #ffffff;
       --bg-secondary: #f9fafb;
-      --bg-tertiary: #f3f4f6;
 
-      /* Text Colors */
+      /* Text */
       --text-primary: #111827;
       --text-secondary: #6b7280;
       --text-tertiary: #9ca3af;
 
       /* Border */
       --border-color: #e5e7eb;
-      --border-radius: 12px;
-      --border-radius-sm: 8px;
-      --border-radius-lg: 16px;
 
-      /* Shadows */
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
-      /* Spacing */
-      --sidebar-width: 280px;
-      --navbar-height: 70px;
-
-      /* Transitions */
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-fast: all 0.15s ease;
+      /* Layout */
+      --sidebar-width: 260px;
+      --navbar-height: 64px;
     }
 
     /* ========================================
-       RESET & BASE STYLES
+       BASE STYLES
        ======================================== */
 
     * {
@@ -103,36 +81,20 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 15px;
-      line-height: 1.6;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
       color: var(--text-primary);
       background: var(--bg-secondary);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
     a {
       text-decoration: none;
       color: inherit;
-      transition: var(--transition-fast);
-    }
-
-    button {
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      background: none;
-      transition: var(--transition-fast);
-    }
-
-    input, textarea, select {
-      font-family: inherit;
-      font-size: inherit;
     }
 
     /* ========================================
-       LAYOUT STRUCTURE
+       LAYOUT
        ======================================== */
 
     .app-container {
@@ -155,63 +117,49 @@
       display: flex;
       flex-direction: column;
       z-index: 1000;
-      transition: var(--transition);
-      overflow-y: auto;
+      transition: transform 0.3s ease;
     }
 
-    .sidebar::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .sidebar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-      background: var(--gray-300);
-      border-radius: 3px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-      background: var(--gray-400);
-    }
-
-    /* Logo Area */
+    /* Logo */
     .sidebar-logo {
-      padding: 24px 24px 20px;
+      padding: 20px;
       display: flex;
       align-items: center;
       gap: 12px;
       border-bottom: 1px solid var(--border-color);
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     }
 
     .sidebar-logo img {
-      height: 36px;
+      height: 40px;
       width: auto;
-      filter: brightness(0) invert(1);
     }
 
     .sidebar-logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      color: white;
-      letter-spacing: -0.5px;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
     }
 
-    /* Sidebar Navigation */
+    .sidebar-logo-text .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .sidebar-logo-text .brand-tagline {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation */
     .sidebar-nav {
       flex: 1;
-      padding: 20px 12px;
+      padding: 16px 12px;
       overflow-y: auto;
     }
 
     .nav-section {
-      margin-bottom: 32px;
-    }
-
-    .nav-section:last-child {
-      margin-bottom: 0;
+      margin-bottom: 24px;
     }
 
     .nav-section-title {
@@ -228,19 +176,19 @@
     }
 
     .nav-item {
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .nav-link {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 12px;
-      border-radius: var(--border-radius-sm);
+      padding: 10px 12px;
+      border-radius: 8px;
       color: var(--text-secondary);
       font-weight: 500;
-      transition: var(--transition-fast);
-      position: relative;
+      font-size: 14px;
+      transition: all 0.2s ease;
     }
 
     .nav-link:hover {
@@ -254,41 +202,10 @@
       font-weight: 600;
     }
 
-    .nav-link.active::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 3px;
-      height: 24px;
-      background: var(--primary);
-      border-radius: 0 3px 3px 0;
-    }
-
     .nav-icon {
       width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .nav-text {
-      flex: 1;
-      font-size: 14px;
-    }
-
-    .nav-badge {
-      background: var(--error);
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 10px;
-      min-width: 20px;
       text-align: center;
+      font-size: 16px;
     }
 
     /* ========================================
@@ -313,42 +230,42 @@
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
-      padding: 0 32px;
-      gap: 24px;
+      padding: 0 24px;
+      gap: 16px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    /* Mobile Menu Toggle */
     .mobile-menu-toggle {
       display: none;
       width: 40px;
       height: 40px;
       align-items: center;
       justify-content: center;
-      border-radius: var(--border-radius-sm);
+      border-radius: 8px;
       color: var(--text-secondary);
       font-size: 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
     }
 
     .mobile-menu-toggle:hover {
       background: var(--bg-secondary);
-      color: var(--text-primary);
     }
 
-    /* Breadcrumbs */
     .breadcrumbs {
+      flex: 1;
       display: flex;
       align-items: center;
       gap: 8px;
-      flex: 1;
     }
 
     .breadcrumb-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-size: 14px;
       color: var(--text-secondary);
     }
@@ -358,63 +275,58 @@
       font-weight: 600;
     }
 
-    .breadcrumb-separator {
-      color: var(--text-tertiary);
-      font-size: 12px;
-    }
-
-    /* Search Bar */
+    /* Search */
     .navbar-search {
       flex: 1;
-      max-width: 500px;
+      max-width: 400px;
       position: relative;
     }
 
     .search-input {
       width: 100%;
-      padding: 10px 16px 10px 44px;
+      padding: 8px 12px 8px 36px;
       border: 1px solid var(--border-color);
-      border-radius: 24px;
+      border-radius: 8px;
       font-size: 14px;
       background: var(--bg-secondary);
-      transition: var(--transition-fast);
+      color: var(--text-primary);
     }
 
     .search-input:focus {
       outline: none;
       border-color: var(--primary);
       background: var(--bg-primary);
-      box-shadow: 0 0 0 3px var(--primary-bg);
     }
 
     .search-icon {
       position: absolute;
-      left: 16px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-tertiary);
-      font-size: 16px;
-      pointer-events: none;
+      font-size: 14px;
     }
 
     /* Navbar Actions */
     .navbar-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
 
     .navbar-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
+      border-radius: 8px;
       color: var(--text-secondary);
-      font-size: 18px;
+      font-size: 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
       position: relative;
-      transition: var(--transition-fast);
     }
 
     .navbar-btn:hover {
@@ -424,13 +336,12 @@
 
     .navbar-btn-badge {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 6px;
+      right: 6px;
       width: 8px;
       height: 8px;
       background: var(--error);
       border-radius: 50%;
-      border: 2px solid var(--bg-primary);
     }
 
     /* User Menu */
@@ -441,10 +352,12 @@
     .user-menu-toggle {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 6px 12px 6px 6px;
-      border-radius: 24px;
-      transition: var(--transition-fast);
+      gap: 8px;
+      padding: 4px 8px 4px 4px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
     }
 
     .user-menu-toggle:hover {
@@ -452,48 +365,43 @@
     }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .user-name {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--text-primary);
     }
 
     .user-dropdown-icon {
       color: var(--text-tertiary);
       font-size: 12px;
-      transition: transform 0.3s ease;
     }
 
-    .user-menu.dropdown-open .user-dropdown-icon {
-      transform: rotate(180deg);
-    }
-
-    /* Dropdown Menu */
+    /* Dropdown */
     .dropdown-menu {
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-lg);
-      min-width: 240px;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      min-width: 200px;
       opacity: 0;
       visibility: hidden;
       transform: translateY(-10px);
-      transition: var(--transition-fast);
+      transition: all 0.2s ease;
     }
 
     .dropdown-menu.active {
@@ -503,19 +411,17 @@
     }
 
     .dropdown-header {
-      padding: 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .dropdown-user-name {
       font-weight: 600;
-      font-size: 15px;
       color: var(--text-primary);
-      margin-bottom: 4px;
     }
 
     .dropdown-user-email {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-secondary);
     }
 
@@ -526,12 +432,11 @@
     .dropdown-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: var(--border-radius-sm);
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
       color: var(--text-secondary);
       font-size: 14px;
-      transition: var(--transition-fast);
     }
 
     .dropdown-item:hover {
@@ -540,8 +445,7 @@
     }
 
     .dropdown-item i {
-      width: 18px;
-      font-size: 16px;
+      width: 16px;
     }
 
     .dropdown-divider {
@@ -555,7 +459,7 @@
     }
 
     .dropdown-item.danger:hover {
-      background: rgba(239, 68, 68, 0.1);
+      background: #fef2f2;
     }
 
     /* ========================================
@@ -564,78 +468,40 @@
 
     .page-content {
       flex: 1;
-      padding: 32px;
-    }
-
-    .page-header {
-      margin-bottom: 32px;
-    }
-
-    .page-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .page-subtitle {
-      font-size: 15px;
-      color: var(--text-secondary);
+      padding: 24px;
     }
 
     /* ========================================
-       ALERTS & MESSAGES
+       ALERTS
        ======================================== */
 
     .alert {
-      padding: 14px 18px;
-      border-radius: var(--border-radius);
-      margin-bottom: 20px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .alert-success {
       background: #d1fae5;
       color: #065f46;
-      border-left: 4px solid var(--success);
     }
 
     .alert-error {
       background: #fee2e2;
       color: #991b1b;
-      border-left: 4px solid var(--error);
     }
 
     .alert-warning {
       background: #fef3c7;
       color: #92400e;
-      border-left: 4px solid var(--warning);
     }
 
     .alert-info {
       background: #dbeafe;
       color: #1e40af;
-      border-left: 4px solid var(--info);
-    }
-
-    .alert-icon {
-      font-size: 18px;
-      margin-top: 2px;
     }
 
     .alert-content {
@@ -645,13 +511,10 @@
     .alert-close {
       color: inherit;
       opacity: 0.6;
-      font-size: 20px;
-      padding: 0;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background: none;
     }
 
     .alert-close:hover {
@@ -659,7 +522,7 @@
     }
 
     /* ========================================
-       RESPONSIVE DESIGN
+       RESPONSIVE
        ======================================== */
 
     @media (max-width: 1024px) {
@@ -673,48 +536,79 @@
 
       .main-content {
         margin-left: 0;
+        width: 100%;
       }
 
       .mobile-menu-toggle {
         display: flex;
       }
 
-      .navbar {
-        padding: 0 20px;
+      .navbar-search {
+        display: none;
       }
 
-      .navbar-search {
+      .user-name {
         display: none;
       }
 
       .page-content {
         padding: 20px;
       }
-
-      .user-name {
-        display: none;
-      }
     }
 
-    @media (max-width: 640px) {
-      .navbar {
-        padding: 0 16px;
-      }
-
+    @media (max-width: 768px) {
       .page-content {
         padding: 16px;
       }
 
-      .page-title {
-        font-size: 24px;
+      .navbar {
+        padding: 0 12px;
+        height: 56px;
       }
 
       .breadcrumbs {
         display: none;
       }
+
+      .navbar-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .user-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+
+      .user-dropdown-icon {
+        display: none;
+      }
     }
 
-    /* Overlay for mobile sidebar */
+    @media (max-width: 480px) {
+      .page-content {
+        padding: 12px;
+      }
+
+      .navbar {
+        padding: 0 10px;
+        gap: 8px;
+      }
+
+      .mobile-menu-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+
+      .navbar-actions {
+        gap: 4px;
+      }
+    }
+
+    /* Sidebar Overlay */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -724,51 +618,48 @@
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
       z-index: 999;
-      opacity: 0;
-      transition: opacity 0.3s ease;
     }
 
     .sidebar-overlay.active {
       display: block;
-      opacity: 1;
     }
 
-    /* ========================================
-       CUSTOM SCROLLBAR
-       ======================================== */
-
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
+    /* Ensure content doesn't overflow */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
     }
 
-    ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
+    .main-content {
+      overflow-x: hidden;
+      max-width: 100vw;
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: var(--gray-300);
-      border-radius: 5px;
+    .page-content {
+      overflow-x: hidden;
+      width: 100%;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--gray-400);
+    /* Prevent any child from breaking layout */
+    .page-content > * {
+      max-width: 100%;
     }
 
-    /* ========================================
-       UTILITY CLASSES
-       ======================================== */
-
-    .hide-mobile {
-      display: block;
+    /* Responsive images */
+    img {
+      max-width: 100%;
+      height: auto;
     }
 
-    @media (max-width: 1024px) {
-      .hide-mobile {
-        display: none;
+    /* Additional mobile fixes */
+    @media screen and (max-width: 480px) {
+      :root {
+        --navbar-height: 56px;
       }
     }
+  </style>
 
+  <style>
     {% block extra_css %}{% endblock %}
   </style>
 </head>
@@ -778,108 +669,98 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <!-- Logo -->
-        <div class="sidebar-logo">
-          <img src="{% static 'images/logos/logo.svg' %}" alt="Lyceum">
-          <span class="sidebar-logo-text">Lyceum</span>
-        </div>
+        <a href="{% url 'landing:home' %}" class="sidebar-logo">
+          <img src="{% static 'images/logos/logo.png' %}" alt="LM Academy">
+          <div class="sidebar-logo-text">
+            <span class="brand-name">LM Academy</span>
+            <span class="brand-tagline">Student Portal</span>
+          </div>
+        </a>
 
         <!-- Navigation -->
         <nav class="sidebar-nav">
-          <!-- Main Section -->
+          <!-- Main -->
           <div class="nav-section">
             <div class="nav-section-title">Main</div>
             <ul class="nav-items">
               <li class="nav-item">
                 <a href="{% url 'student_portal:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-home"></i></span>
-                  <span class="nav-text">Dashboard</span>
+                  <span>Dashboard</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'student_portal:my_courses' %}" class="nav-link {% if request.resolver_match.url_name == 'my_courses' %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-graduation-cap"></i></span>
-                  <span class="nav-text">My Courses</span>
+                  <span>My Courses</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'student_portal:browse_courses' %}" class="nav-link {% if request.resolver_match.url_name == 'browse_courses' %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-compass"></i></span>
-                  <span class="nav-text">Browse Courses</span>
+                  <span>Browse Courses</span>
                 </a>
               </li>
             </ul>
           </div>
 
-          <!-- Learning Section -->
+          <!-- Learning -->
           <div class="nav-section">
             <div class="nav-section-title">Learning</div>
             <ul class="nav-items">
               <li class="nav-item">
                 <a href="{% url 'student_portal:live_sessions' %}" class="nav-link {% if 'live-sessions' in request.path %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-video"></i></span>
-                  <span class="nav-text">Live Sessions</span>
+                  <span>Live Sessions</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'student_portal:mentoring_dashboard' %}" class="nav-link {% if 'mentoring' in request.path %}active{% endif %}">
-                  <span class="nav-icon"><i class="fas fa-user-friends"></i></span>
-                  <span class="nav-text">Mentoring</span>
+                  <span class="nav-icon"><i class="fas fa-users"></i></span>
+                  <span>Mentoring</span>
                 </a>
               </li>
-            </ul>
-          </div>
-
-          <!-- Progress Section -->
-          <div class="nav-section">
-            <div class="nav-section-title">Progress</div>
-            <ul class="nav-items">
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'student_portal:mentoring_insights' %}" class="nav-link {% if 'insights' in request.path %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                  <span class="nav-text">My Progress</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <span class="nav-icon"><i class="fas fa-certificate"></i></span>
-                  <span class="nav-text">Certificates</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <span class="nav-icon"><i class="fas fa-trophy"></i></span>
-                  <span class="nav-text">Achievements</span>
+                  <span>My Progress</span>
                 </a>
               </li>
             </ul>
           </div>
 
-          <!-- Account Section -->
+          <!-- Account -->
           <div class="nav-section">
             <div class="nav-section-title">Account</div>
             <ul class="nav-items">
               <li class="nav-item">
-                <a href="{% url 'student_portal:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                  <span class="nav-icon"><i class="fas fa-user-circle"></i></span>
-                  <span class="nav-text">Profile</span>
+                <a href="{% url 'student_portal:my_certificates' %}" class="nav-link {% if 'certificate' in request.path %}active{% endif %}">
+                  <span class="nav-icon"><i class="fas fa-certificate"></i></span>
+                  <span>Certificates</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'student_portal:my_payments' %}" class="nav-link {% if 'payment' in request.path %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-credit-card"></i></span>
-                  <span class="nav-text">Payments</span>
+                  <span>Payments</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'student_portal:my_invoices' %}" class="nav-link {% if 'invoice' in request.path %}active{% endif %}">
                   <span class="nav-icon"><i class="fas fa-file-invoice"></i></span>
-                  <span class="nav-text">Invoices</span>
+                  <span>Invoices</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'landing:home' %}" target="_blank" class="nav-link">
-                  <span class="nav-icon"><i class="fas fa-globe"></i></span>
-                  <span class="nav-text">Visit Website</span>
+                <a href="{% url 'student_portal:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                  <span class="nav-icon"><i class="fas fa-user"></i></span>
+                  <span>Profile</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'student_portal:logout' %}" class="nav-link" style="color: var(--error);">
+                  <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                  <span>Logout</span>
                 </a>
               </li>
             </ul>
@@ -887,48 +768,37 @@
         </nav>
       </aside>
 
-      <!-- Sidebar Overlay for Mobile -->
+      <!-- Sidebar Overlay -->
       <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
       <!-- Main Content -->
       <div class="main-content">
         <!-- Top Navbar -->
         <nav class="navbar">
-          <!-- Mobile Menu Toggle -->
           <button class="mobile-menu-toggle" onclick="toggleSidebar()">
             <i class="fas fa-bars"></i>
           </button>
 
-          <!-- Breadcrumbs -->
-          <div class="breadcrumbs hide-mobile">
+          <div class="breadcrumbs">
             {% block breadcrumbs %}
             <div class="breadcrumb-item">
               <i class="fas fa-home"></i>
-              <span>Home</span>
+              <span>Dashboard</span>
             </div>
             {% endblock %}
           </div>
 
-          <!-- Search Bar -->
-          <div class="navbar-search hide-mobile">
+          <div class="navbar-search">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search courses, lessons, assignments...">
+            <input type="text" class="search-input" placeholder="Search...">
           </div>
 
-          <!-- Navbar Actions -->
           <div class="navbar-actions">
-            <!-- Notifications -->
             <button class="navbar-btn" title="Notifications">
               <i class="fas fa-bell"></i>
               <span class="navbar-btn-badge"></span>
             </button>
 
-            <!-- Messages -->
-            <button class="navbar-btn hide-mobile" title="Messages">
-              <i class="fas fa-envelope"></i>
-            </button>
-
-            <!-- User Menu -->
             <div class="user-menu">
               <button class="user-menu-toggle" onclick="toggleUserDropdown()">
                 <div class="user-avatar">{{ user.name|first|upper }}</div>
@@ -936,7 +806,6 @@
                 <i class="fas fa-chevron-down user-dropdown-icon"></i>
               </button>
 
-              <!-- Dropdown Menu -->
               <div class="dropdown-menu" id="userDropdown">
                 <div class="dropdown-header">
                   <div class="dropdown-user-name">{{ user.name }}</div>
@@ -945,15 +814,15 @@
                 <div class="dropdown-items">
                   <a href="{% url 'student_portal:profile' %}" class="dropdown-item">
                     <i class="fas fa-user"></i>
-                    <span>My Profile</span>
+                    <span>Profile</span>
                   </a>
                   <a href="{% url 'student_portal:settings' %}" class="dropdown-item">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                   </a>
-                  <a href="{% url 'student_portal:help_support' %}" class="dropdown-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help & Support</span>
+                  <a href="{% url 'landing:home' %}" class="dropdown-item">
+                    <i class="fas fa-globe"></i>
+                    <span>Visit Website</span>
                   </a>
                   <div class="dropdown-divider"></div>
                   <a href="{% url 'student_portal:logout' %}" class="dropdown-item danger">
@@ -968,13 +837,12 @@
 
         <!-- Page Content -->
         <main class="page-content">
-          <!-- Alert Messages -->
           {% if messages %}
             {% for message in messages %}
               <div class="alert alert-{{ message.tags|default:'info' }}">
-                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} alert-icon"></i>
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
                 <div class="alert-content">{{ message }}</div>
-                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
               </div>
             {% endfor %}
           {% endif %}
@@ -983,72 +851,36 @@
         </main>
       </div>
     {% else %}
-      <!-- Not authenticated content -->
       {% block auth_content %}{% endblock %}
     {% endif %}
   </div>
 
-  <!-- JavaScript -->
   <script>
-    // Toggle Sidebar (Mobile)
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
     }
 
-    // Toggle User Dropdown
     function toggleUserDropdown() {
       const dropdown = document.getElementById('userDropdown');
-      const userMenu = dropdown.closest('.user-menu');
-
       dropdown.classList.toggle('active');
-      userMenu.classList.toggle('dropdown-open');
 
-      // Close when clicking outside
       if (dropdown.classList.contains('active')) {
-        setTimeout(() => {
-          document.addEventListener('click', closeDropdownOutside);
-        }, 0);
-      } else {
-        document.removeEventListener('click', closeDropdownOutside);
+        document.addEventListener('click', closeDropdown);
       }
     }
 
-    function closeDropdownOutside(e) {
+    function closeDropdown(e) {
       const dropdown = document.getElementById('userDropdown');
       const userMenu = dropdown.closest('.user-menu');
-
       if (!userMenu.contains(e.target)) {
         dropdown.classList.remove('active');
-        userMenu.classList.remove('dropdown-open');
-        document.removeEventListener('click', closeDropdownOutside);
+        document.removeEventListener('click', closeDropdown);
       }
     }
-
-    // Auto-hide alerts after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-      const alerts = document.querySelectorAll('.alert');
-      alerts.forEach(alert => {
-        setTimeout(() => {
-          alert.style.opacity = '0';
-          alert.style.transform = 'translateY(-10px)';
-          setTimeout(() => alert.remove(), 300);
-        }, 5000);
-      });
-    });
-
-    // Close sidebar when clicking on a link (mobile)
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth <= 1024) {
-          toggleSidebar();
-        }
-      });
-    });
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

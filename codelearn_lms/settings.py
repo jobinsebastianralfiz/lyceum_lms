@@ -13,8 +13,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security Settings
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Allowed Hosts - Production domain and Railway
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='lmacademy.info,www.lmacademy.info,.lmacademy.info,.railway.app,localhost,127.0.0.1'
+).split(',')
+
+# Site URL
+SITE_URL = config('SITE_URL', default='https://lmacademy.info')
 
 # Firebase Cloud Messaging (FCM) Configuration
 # Legacy approach (deprecated)
@@ -45,6 +53,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    'apps.core',
     'apps.users',
     'apps.courses',
     'apps.payments',
@@ -54,9 +63,13 @@ LOCAL_APPS = [
     'apps.custom_admin',
     'apps.content_management',
     'apps.live_sessions',
+    'apps.finance',
+    'apps.tuition',
+    'apps.teachers',
     'system_settings',
     'landing',
     'student_portal',
+    'teacher_portal',
     'emails',
 ]
 
@@ -64,6 +77,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files for Railway
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -86,6 +100,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'codelearn_lms.context_processors.cloudflare_turnstile',
+                'codelearn_lms.context_processors.feature_config',
             ],
         },
     },
@@ -140,6 +156,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 if (BASE_DIR / 'static').exists():
     STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# WhiteNoise for static file serving in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Media files (User uploads) - Railway volume will be mounted here
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -191,7 +210,10 @@ except:
     FIELD_ENCRYPTION_KEY = base64.urlsafe_b64encode(key_material).decode()
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000').split(',')
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='https://lmacademy.info,https://www.lmacademy.info,http://localhost:3000,http://127.0.0.1:3000'
+).split(',')
 CORS_ALLOW_CREDENTIALS = True
 
 # API Documentation (Spectacular)
@@ -207,12 +229,13 @@ EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.conso
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.sendgrid.net')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='apikey')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@codelearn.com')
 
 # Frontend URL for email links
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8000')
+FRONTEND_URL = config('FRONTEND_URL', default='https://lmacademy.info')
 
 # Celery Configuration
 CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379/0')
@@ -343,12 +366,20 @@ CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_PATH = '/'
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:8001', 'http://127.0.0.1:8001']
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://lmacademy.info,https://www.lmacademy.info,https://*.railway.app,http://localhost:8000,http://127.0.0.1:8000'
+).split(',')
 CSRF_USE_SESSIONS = False
+
+# Set secure cookies in production
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+else:
+    CSRF_COOKIE_SECURE = False
 
 # Custom Settings for LMS
 LMS_SETTINGS = {

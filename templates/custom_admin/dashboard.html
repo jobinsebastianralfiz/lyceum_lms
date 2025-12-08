@@ -1,126 +1,148 @@
 {% extends 'custom_admin/base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - Lyceum Academy Admin{% endblock %}
+{% block title %}Dashboard - LM Academy Admin{% endblock %}
 
 {% block content %}
-<!--  Row 1 -->
-<div class="row">
-  <div class="col-lg-8">
-    <div class="card w-100">
-      <div class="card-body">
-        <div class="d-md-flex align-items-center">
-          <div>
-            <h4 class="card-title">Enrollment Overview</h4>
-            <p class="card-subtitle">
-              Course enrollments vs Revenue
-            </p>
+<!-- Quick Stats Row -->
+<div class="row g-2 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(93, 135, 255, 0.2);">
+            <i class="ti ti-users" style="color: #5d87ff;"></i>
           </div>
-          <div class="ms-auto">
-            <ul class="list-unstyled mb-0">
-              <li class="list-inline-item text-primary">
-                <span class="round-8 text-bg-primary rounded-circle me-1 d-inline-block"></span>
-                Enrollments
-              </li>
-              <li class="list-inline-item text-info">
-                <span class="round-8 text-bg-info rounded-circle me-1 d-inline-block"></span>
-                Revenue
-              </li>
-            </ul>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ total_users }}</h5>
+            <small class="text-muted">Users</small>
           </div>
-        </div>
-        <div id="enrollment-overview" class="mt-4 mx-n6">
-          <canvas id="enrollmentChart" height="100"></canvas>
         </div>
       </div>
     </div>
   </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255, 174, 31, 0.2);">
+            <i class="ti ti-book" style="color: #ffae1f;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ total_courses }}</h5>
+            <small class="text-muted">Courses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(42, 182, 115, 0.2);">
+            <i class="ti ti-user-check" style="color: #2AB673;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">{{ total_enrollments }}</h5>
+            <small class="text-muted">Enrollments</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card mb-0 h-100">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.2);">
+            <i class="ti ti-currency-rupee" style="color: #3b82f6;"></i>
+          </div>
+          <div class="ms-3">
+            <h5 class="mb-0 fw-bold">₹{{ total_revenue|floatformat:0 }}</h5>
+            <small class="text-muted">Revenue</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row g-2">
+  <!-- Chart -->
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <h6 class="card-title mb-0">Enrollment Overview</h6>
+            <small class="text-muted" style="font-size: 11px;">Last 6 months</small>
+          </div>
+          <div class="d-flex gap-3">
+            <span class="d-flex align-items-center" style="font-size: 11px;">
+              <span class="rounded-circle me-1 d-inline-block" style="width: 6px; height: 6px; background: #4facfe;"></span>
+              Enrollments
+            </span>
+            <span class="d-flex align-items-center" style="font-size: 11px;">
+              <span class="rounded-circle me-1 d-inline-block" style="width: 6px; height: 6px; background: #16c098;"></span>
+              Revenue
+            </span>
+          </div>
+        </div>
+        <div style="height: 220px;">
+          <canvas id="enrollmentChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions & Content Summary -->
   <div class="col-lg-4">
-    <div class="card overflow-hidden">
-      <div class="card-body pb-0">
-        <div class="d-flex align-items-start">
-          <div>
-            <h4 class="card-title">Quick Stats</h4>
-            <p class="card-subtitle">Key metrics</p>
-          </div>
-          <div class="ms-auto">
-            <div class="dropdown">
-              <a href="javascript:void(0)" class="text-muted" id="stats-dropdown" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <i class="ti ti-dots fs-7"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="stats-dropdown">
-                <li>
-                  <a class="dropdown-item" href="{% url 'custom_admin:users_list' %}">View All Users</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'custom_admin:courses_list' %}">View All Courses</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'custom_admin:payments_list' %}">View All Payments</a>
-                </li>
-              </ul>
+    <div class="card mb-2">
+      <div class="card-body py-2">
+        <h6 class="card-title mb-2">Quick Actions</h6>
+        <div class="d-grid gap-1">
+          <a href="{% url 'custom_admin:course_create' %}" class="btn btn-sm btn-outline-primary text-start py-1" style="font-size: 12px;">
+            <i class="ti ti-plus me-1"></i>Add Course
+          </a>
+          <a href="{% url 'custom_admin:user_create' %}" class="btn btn-sm btn-outline-primary text-start py-1" style="font-size: 12px;">
+            <i class="ti ti-user-plus me-1"></i>Add User
+          </a>
+          <a href="{% url 'custom_admin:enrollment_create' %}" class="btn btn-sm btn-outline-primary text-start py-1" style="font-size: 12px;">
+            <i class="ti ti-user-check me-1"></i>New Enrollment
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body py-2">
+        <h6 class="card-title mb-2">Content Summary</h6>
+        <div class="row g-2 text-center">
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(42, 182, 115, 0.1);">
+              <div class="fw-bold">{{ total_modules }}</div>
+              <small class="text-muted" style="font-size: 10px;">Modules</small>
             </div>
           </div>
-        </div>
-        <div class="mt-4 pb-3 d-flex align-items-center">
-          <span class="btn btn-primary rounded-circle round-48 hstack justify-content-center">
-            <i class="ti ti-users fs-6"></i>
-          </span>
-          <div class="ms-3">
-            <h5 class="mb-0 fw-bolder fs-4">{{ total_users }}</h5>
-            <span class="text-muted fs-3">Total Users</span>
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(59, 130, 246, 0.1);">
+              <div class="fw-bold">{{ total_video_lessons }}</div>
+              <small class="text-muted" style="font-size: 10px;">Videos</small>
+            </div>
           </div>
-          <div class="ms-auto">
-            <span class="badge bg-primary-subtle text-primary">{{ users_growth }}%</span>
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(255, 174, 31, 0.1);">
+              <div class="fw-bold">{{ total_quizzes|default:0 }}</div>
+              <small class="text-muted" style="font-size: 10px;">Quizzes</small>
+            </div>
           </div>
-        </div>
-        <div class="py-3 d-flex align-items-center">
-          <span class="btn btn-warning rounded-circle round-48 hstack justify-content-center">
-            <i class="ti ti-book fs-6"></i>
-          </span>
-          <div class="ms-3">
-            <h5 class="mb-0 fw-bolder fs-4">{{ total_courses }}</h5>
-            <span class="text-muted fs-3">Active Courses</span>
-          </div>
-          <div class="ms-auto">
-            <span class="badge bg-warning-subtle text-warning">{{ courses_growth }}%</span>
-          </div>
-        </div>
-        <div class="py-3 d-flex align-items-center">
-          <span class="btn btn-success rounded-circle round-48 hstack justify-content-center">
-            <i class="ti ti-user-check fs-6"></i>
-          </span>
-          <div class="ms-3">
-            <h5 class="mb-0 fw-bolder fs-4">{{ total_enrollments }}</h5>
-            <span class="text-muted fs-3">Total Enrollments</span>
-          </div>
-          <div class="ms-auto">
-            <span class="badge bg-success-subtle text-success">{{ enrollments_growth }}%</span>
-          </div>
-        </div>
-        <div class="py-3 d-flex align-items-center">
-          <span class="btn btn-info rounded-circle round-48 hstack justify-content-center">
-            <i class="ti ti-currency-rupee fs-6"></i>
-          </span>
-          <div class="ms-3">
-            <h5 class="mb-0 fw-bolder fs-4">₹{{ total_revenue|floatformat:0 }}</h5>
-            <span class="text-muted fs-3">Total Revenue</span>
-          </div>
-          <div class="ms-auto">
-            <span class="badge bg-info-subtle text-info">{{ revenue_growth }}%</span>
-          </div>
-        </div>
-        <div class="pt-3 mb-7 d-flex align-items-center">
-          <span class="btn btn-warning rounded-circle round-48 hstack justify-content-center">
-            <i class="ti ti-clock fs-6"></i>
-          </span>
-          <div class="ms-3">
-            <h5 class="mb-0 fw-bolder fs-4">₹{{ pending_income|floatformat:0 }}</h5>
-            <span class="text-muted fs-3">Pending Income</span>
-          </div>
-          <div class="ms-auto">
-            <span class="badge bg-warning-subtle text-warning">Pending</span>
+          <div class="col-6">
+            <div class="p-2 rounded" style="background: rgba(239, 68, 68, 0.1);">
+              <div class="fw-bold">{{ total_assignments|default:0 }}</div>
+              <small class="text-muted" style="font-size: 10px;">Assignments</small>
+            </div>
           </div>
         </div>
       </div>
@@ -128,431 +150,42 @@
   </div>
 </div>
 
-<!-- Statistics Cards Row 1 - COURSES -->
-<div class="row mt-4">
-  <div class="col-12 mb-3">
-    <h5 class="text-muted">COURSES Management</h5>
-  </div>
-  <div class="col-sm-6 col-xl-3">
+<!-- Recent Activity Row -->
+<div class="row g-2 mt-2">
+  <!-- Recent Enrollments -->
+  <div class="col-lg-7">
     <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-category fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_categories }}</h4>
-            <span class="text-muted">Categories</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-book fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_courses }}</h4>
-            <span class="text-muted">Courses</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-primary rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-layout-grid fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_modules }}</h4>
-            <span class="text-muted">Modules</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-danger rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-video fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_video_lessons }}</h4>
-            <span class="text-muted">Video Lessons</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Statistics Cards Row 2 - PAYMENTS -->
-<div class="row mt-4">
-  <div class="col-12 mb-3">
-    <h5 class="text-muted">PAYMENTS Management</h5>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-success rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-user-check fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_enrollments }}</h4>
-            <span class="text-muted">Enrollments</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-calendar-time fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_installment_plans }}</h4>
-            <span class="text-muted">Installment Plans</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-currency-rupee fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_payments }}</h4>
-            <span class="text-muted">Payments</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-file-invoice fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_tax_invoices }}</h4>
-            <span class="text-muted">Tax Invoices</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Statistics Cards Row 3 - USERS -->
-<div class="row mt-4">
-  <div class="col-12 mb-3">
-    <h5 class="text-muted">USERS Management</h5>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-primary rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-users fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_users }}</h4>
-            <span class="text-muted">Users</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-success rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-users-group fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_teams }}</h4>
-            <span class="text-muted">Teams</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-user-plus fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_team_memberships }}</h4>
-            <span class="text-muted">Team Memberships</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-bell fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_notifications }}</h4>
-            <span class="text-muted">Notifications</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Statistics Cards Row 4 - MENTORING & ANALYTICS -->
-<div class="row mt-4">
-  <div class="col-12 mb-3">
-    <h5 class="text-muted">MENTORING & ANALYTICS <a href="{% url 'mentor:mentor_dashboard' %}" class="btn btn-primary btn-sm ms-2">View Dashboard</a></h5>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-alert-triangle fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ high_risk_students|default:0 }}</h4>
-            <span class="text-muted">High Risk Students</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-danger rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-users fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ inactive_students|default:0 }}</h4>
-            <span class="text-muted">Inactive Students</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-success rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-user-plus fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ mentor_sessions|default:0 }}</h4>
-            <span class="text-muted">Mentor Sessions</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-bell fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ active_alerts|default:0 }}</h4>
-            <span class="text-muted">Active Alerts</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Statistics Cards Row 5 - YOUTUBE & REVENUE -->
-<div class="row mt-4">
-  <div class="col-12 mb-3">
-    <h5 class="text-muted">YOUTUBE Integration & Revenue</h5>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-danger rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-brand-youtube fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ total_youtube_videos }}</h4>
-            <span class="text-muted">YouTube Videos</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-success rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-currency-rupee fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">₹{{ total_revenue|floatformat:0 }}</h4>
-            <span class="text-muted">Total Revenue</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-warning rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-progress fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ active_enrollments }}</h4>
-            <span class="text-muted">Active Progress</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="me-3">
-            <div class="text-bg-info rounded-circle p-6 d-flex align-items-center justify-content-center">
-              <i class="ti ti-chart-line fs-4"></i>
-            </div>
-          </div>
-          <div>
-            <h4 class="mb-0 fw-bolder">{{ revenue_growth }}%</h4>
-            <span class="text-muted">Growth Rate</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Recent Activities -->
-<div class="row mt-4">
-  <div class="col-lg-8">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <h4 class="card-title">Recent Enrollments</h4>
-            <p class="card-subtitle">Latest course enrollments</p>
-          </div>
-          <div class="ms-auto">
-            <a href="{% url 'custom_admin:enrollments_list' %}" class="btn btn-primary btn-sm">View All</a>
-          </div>
+      <div class="card-body py-2">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="card-title mb-0">Recent Enrollments</h6>
+          <a href="{% url 'custom_admin:enrollments_list' %}" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 11px;">View All</a>
         </div>
         <div class="table-responsive">
-          <table class="table table-hover">
+          <table class="table table-sm mb-0" style="font-size: 12px;">
             <thead>
               <tr>
-                <th scope="col" class="px-0 text-muted">Student</th>
-                <th scope="col" class="px-0 text-muted">Course</th>
-                <th scope="col" class="px-0 text-muted">Status</th>
-                <th scope="col" class="px-0 text-muted text-end">Date</th>
+                <th class="border-0 px-0 py-1">Student</th>
+                <th class="border-0 px-0 py-1">Course</th>
+                <th class="border-0 px-0 py-1 text-end">Date</th>
               </tr>
             </thead>
             <tbody>
               {% for enrollment in recent_enrollments %}
               <tr>
-                <td class="px-0">
+                <td class="px-0 py-1">
                   <div class="d-flex align-items-center">
-                    <img src="{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/images/profile/user-1.jpg' %}" alt="" class="rounded-circle" width="35" height="35">
-                    <div class="ms-3">
-                      <h6 class="mb-0 fw-normal">{{ enrollment.user.get_full_name|default:enrollment.user.username }}</h6>
-                      <span class="text-muted fs-3">{{ enrollment.user.email }}</span>
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 10px;">
+                      {{ enrollment.user.name|default:enrollment.user.email|slice:":1"|upper }}
                     </div>
+                    <span class="ms-2">{{ enrollment.user.name|default:enrollment.user.email|truncatechars:18 }}</span>
                   </div>
                 </td>
-                <td class="px-0">{{ enrollment.course.title }}</td>
-                <td class="px-0">
-                  <span class="badge bg-success">Active</span>
-                </td>
-                <td class="px-0 text-dark fw-medium text-end">
-                  {{ enrollment.enrolled_on|date:"M d, Y" }}
-                </td>
+                <td class="px-0 py-1">{{ enrollment.course.title|truncatechars:22 }}</td>
+                <td class="px-0 py-1 text-end text-muted">{{ enrollment.enrolled_on|date:"M d" }}</td>
               </tr>
               {% empty %}
               <tr>
-                <td colspan="4" class="text-center py-4 text-muted">
-                  <i class="ti ti-user-plus fs-3"></i>
-                  <p class="mt-2">No recent enrollments</p>
-                </td>
+                <td colspan="3" class="text-center py-2 text-muted">No recent enrollments</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -561,43 +194,71 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-4">
+
+  <!-- Recent Payments -->
+  <div class="col-lg-5">
     <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <h4 class="card-title">Recent Payments</h4>
-            <p class="card-subtitle">Latest transactions</p>
+      <div class="card-body py-2">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="card-title mb-0">Recent Payments</h6>
+          <a href="{% url 'custom_admin:payments_list' %}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 11px;">View All</a>
+        </div>
+        {% for payment in recent_payments %}
+        <div class="d-flex align-items-center py-1 {% if not forloop.last %}border-bottom border-secondary{% endif %}" style="font-size: 12px;">
+          <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">
+            <i class="ti ti-currency-rupee" style="font-size: 12px;"></i>
           </div>
-          <div class="ms-auto">
-            <a href="{% url 'custom_admin:payments_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+          <div class="ms-2 flex-grow-1">
+            {% if payment.enrollment %}
+            <div class="fw-medium">{{ payment.enrollment.user.name|default:"User"|truncatechars:15 }}</div>
+            <small class="text-muted" style="font-size: 10px;">{{ payment.enrollment.course.title|truncatechars:18 }}</small>
+            {% else %}
+            <div class="fw-medium">Manual Payment</div>
+            {% endif %}
+          </div>
+          <div class="text-end">
+            <div class="fw-bold">₹{{ payment.amount|floatformat:0 }}</div>
+            <small class="text-muted" style="font-size: 10px;">{{ payment.created_at|date:"M d" }}</small>
           </div>
         </div>
-        <div class="mt-4">
-          {% for payment in recent_payments %}
-          <div class="d-flex align-items-center pb-3">
-            <span class="btn btn-success rounded-circle round-40 hstack justify-content-center">
-              <i class="ti ti-currency-rupee fs-6"></i>
-            </span>
-            <div class="ms-3">
-              {% if payment.enrollment %}
-              <h6 class="mb-0 fw-normal">{{ payment.enrollment.user.name }}</h6>
-              <span class="text-muted fs-3">₹{{ payment.amount }} - {{ payment.enrollment.course.title|truncatechars:25 }}</span>
-              {% else %}
-              <h6 class="mb-0 fw-normal">Manual Payment</h6>
-              <span class="text-muted fs-3">₹{{ payment.amount }}</span>
-              {% endif %}
-            </div>
-            <div class="ms-auto">
-              <span class="text-muted fs-2 d-block">{{ payment.created_at|date:"M d" }}</span>
-            </div>
+        {% empty %}
+        <div class="text-center py-2 text-muted" style="font-size: 12px;">No recent payments</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Secondary Stats Bar -->
+<div class="row g-2 mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between text-center" style="font-size: 11px;">
+          <div>
+            <small class="text-muted d-block">Categories</small>
+            <span class="fw-bold">{{ total_categories }}</span>
           </div>
-          {% empty %}
-          <div class="text-center py-4 text-muted">
-            <i class="ti ti-credit-card fs-3"></i>
-            <p class="mt-2">No recent payments</p>
+          <div>
+            <small class="text-muted d-block">Teams</small>
+            <span class="fw-bold">{{ total_teams }}</span>
           </div>
-          {% endfor %}
+          <div>
+            <small class="text-muted d-block">Payments</small>
+            <span class="fw-bold">{{ total_payments }}</span>
+          </div>
+          <div>
+            <small class="text-muted d-block">Pending</small>
+            <span class="fw-bold text-warning">₹{{ pending_income|floatformat:0 }}</span>
+          </div>
+          <div>
+            <small class="text-muted d-block">High Risk</small>
+            <span class="fw-bold text-danger">{{ high_risk_students|default:0 }}</span>
+          </div>
+          <div>
+            <small class="text-muted d-block">Alerts</small>
+            <span class="fw-bold text-info">{{ active_alerts|default:0 }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -606,10 +267,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Enrollment Overview Chart
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('enrollmentChart').getContext('2d');
-    
+
     const chartData = {
         labels: {{ chart_months|safe }},
         datasets: [{
@@ -631,57 +291,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }]
     };
 
-    const config = {
+    new Chart(ctx, {
         type: 'line',
         data: chartData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: false } },
             scales: {
-                x: {
-                    display: true,
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Enrollments'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false,
-                    },
-                    title: {
-                        display: true,
-                        text: 'Revenue (₹)'
-                    }
-                }
+                x: { display: true, grid: { display: false, color: '#374151' }, ticks: { color: '#94A3B8', font: { size: 10 } } },
+                y: { type: 'linear', display: true, position: 'left', grid: { color: '#374151' }, ticks: { color: '#94A3B8', font: { size: 10 } } },
+                y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#94A3B8', font: { size: 10 } } }
             }
         }
-    };
-
-    new Chart(ctx, config);
+    });
 });
 </script>
 {% endblock %}

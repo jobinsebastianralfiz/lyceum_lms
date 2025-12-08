@@ -1,0 +1,278 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ student.name }}</h4>
+    <small class="text-muted">{{ student.standard.name|default:'No standard assigned' }}</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:tuition_enrollment_create' %}?student={{ student.id }}" class="btn btn-success btn-sm">
+      <i class="ti ti-user-plus me-1"></i>New Enrollment
+    </a>
+    <a href="{% url 'custom_admin:tuition_student_edit' student.id %}" class="btn btn-primary btn-sm">
+      <i class="ti ti-edit me-1"></i>Edit
+    </a>
+    <a href="{% url 'custom_admin:tuition_students_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="ti ti-arrow-left me-1"></i>Back
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Student Info -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Student Details</h6>
+      </div>
+      <div class="card-body text-center">
+        {% if student.photo %}
+        <img src="{{ student.photo.url }}" alt="{{ student.name }}" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+        {% else %}
+        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 100px; height: 100px;">
+          <i class="ti ti-user" style="font-size: 40px; color: #ccc;"></i>
+        </div>
+        {% endif %}
+        <h5 class="mb-1">{{ student.name }}</h5>
+        <p class="text-muted mb-0">{{ student.standard.name|default:'No standard' }}</p>
+      </div>
+      <div class="card-body border-top">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted"><i class="ti ti-phone me-1"></i>Phone</td>
+            <td class="text-end">{{ student.phone }}</td>
+          </tr>
+          {% if student.email %}
+          <tr>
+            <td class="text-muted"><i class="ti ti-mail me-1"></i>Email</td>
+            <td class="text-end">{{ student.email }}</td>
+          </tr>
+          {% endif %}
+          {% if student.school_name %}
+          <tr>
+            <td class="text-muted"><i class="ti ti-school me-1"></i>School</td>
+            <td class="text-end">{{ student.school_name }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td class="text-muted"><i class="ti ti-calendar me-1"></i>Joined</td>
+            <td class="text-end">{{ student.joined_date|date:"d M Y" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Status</td>
+            <td class="text-end">
+              {% if student.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Parent Info -->
+    <div class="card mt-3">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Parent/Guardian</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0" style="font-size: 13px;">
+          <tr>
+            <td class="text-muted">Name</td>
+            <td class="text-end">{{ student.parent_name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Phone</td>
+            <td class="text-end">{{ student.parent_phone }}</td>
+          </tr>
+          {% if student.parent_email %}
+          <tr>
+            <td class="text-muted">Email</td>
+            <td class="text-end">{{ student.parent_email }}</td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    {% if student.address %}
+    <div class="card mt-3">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Address</h6>
+      </div>
+      <div class="card-body" style="font-size: 13px;">
+        {{ student.address|linebreaks }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Enrollments & Fees -->
+  <div class="col-lg-8">
+    <!-- Enrollments -->
+    <div class="card">
+      <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Enrollments ({{ enrollments|length }})</h6>
+        <a href="{% url 'custom_admin:tuition_enrollment_create' %}?student={{ student.id }}" class="btn btn-sm btn-primary py-0 px-2">
+          <i class="ti ti-plus"></i> Add
+        </a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 13px;">
+            <thead class="table-light">
+              <tr>
+                <th class="py-2">Type</th>
+                <th class="py-2">Subject/Batch</th>
+                <th class="py-2 text-end">Fee</th>
+                <th class="py-2 text-center">Status</th>
+                <th class="py-2 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enrollment in enrollments %}
+              <tr>
+                <td class="py-2">
+                  <span class="badge {% if enrollment.mode == 'batch' %}bg-primary{% elif enrollment.mode == 'individual' %}bg-info{% else %}bg-warning{% endif %}">
+                    {{ enrollment.get_mode_display }}
+                  </span>
+                </td>
+                <td class="py-2">
+                  {% if enrollment.batch %}
+                  {{ enrollment.batch.name }}
+                  {% else %}
+                  {{ enrollment.subject.name|default:'-' }}
+                  {% endif %}
+                </td>
+                <td class="py-2 text-end">{{ enrollment.effective_fee|floatformat:0 }}</td>
+                <td class="py-2 text-center">
+                  {% if enrollment.is_active %}
+                  <span class="badge bg-success">Active</span>
+                  {% else %}
+                  <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="py-2 text-end">
+                  <a href="{% url 'custom_admin:tuition_enrollment_detail' enrollment.id %}" class="btn btn-sm btn-outline-info py-0 px-2">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-3 text-muted">No enrollments yet</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fee Records -->
+    <div class="card mt-3">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Recent Fee Records</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 13px;">
+            <thead class="table-light">
+              <tr>
+                <th class="py-2">Period</th>
+                <th class="py-2 text-end">Amount</th>
+                <th class="py-2 text-end">Paid</th>
+                <th class="py-2 text-center">Status</th>
+                <th class="py-2 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fee in fee_records %}
+              <tr>
+                <td class="py-2">{{ fee.month_name }} {{ fee.year }}</td>
+                <td class="py-2 text-end">{{ fee.total_amount|floatformat:0 }}</td>
+                <td class="py-2 text-end">{{ fee.paid_amount|floatformat:0 }}</td>
+                <td class="py-2 text-center">
+                  {% if fee.status == 'paid' %}
+                  <span class="badge bg-success">Paid</span>
+                  {% elif fee.status == 'partial' %}
+                  <span class="badge bg-warning">Partial</span>
+                  {% elif fee.status == 'overdue' %}
+                  <span class="badge bg-danger">Overdue</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ fee.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td class="py-2 text-end">
+                  {% if fee.status != 'paid' %}
+                  <a href="{% url 'custom_admin:collect_fee' fee.id %}" class="btn btn-sm btn-success py-0 px-2">
+                    <i class="ti ti-cash"></i>
+                  </a>
+                  {% endif %}
+                  <a href="{% url 'custom_admin:tuition_fee_detail' fee.id %}" class="btn btn-sm btn-outline-info py-0 px-2">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-3 text-muted">No fee records</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance -->
+    <div class="card mt-3">
+      <div class="card-header py-2">
+        <h6 class="mb-0">Recent Attendance</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size: 13px;">
+            <thead class="table-light">
+              <tr>
+                <th class="py-2">Date</th>
+                <th class="py-2">Batch</th>
+                <th class="py-2 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for att in attendance_records %}
+              <tr>
+                <td class="py-2">{{ att.date|date:"d M Y" }}</td>
+                <td class="py-2">{{ att.batch.name|default:'-' }}</td>
+                <td class="py-2 text-center">
+                  {% if att.status == 'present' %}
+                  <span class="badge bg-success">Present</span>
+                  {% elif att.status == 'absent' %}
+                  <span class="badge bg-danger">Absent</span>
+                  {% elif att.status == 'late' %}
+                  <span class="badge bg-warning">Late</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ att.get_status_display }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="text-center py-3 text-muted">No attendance records</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

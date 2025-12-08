@@ -17,7 +17,10 @@ urlpatterns = [
     
     # Student Portal
     path('student/', include('student_portal.urls')),
-    
+
+    # Teacher Portal
+    path('teacher/', include('teacher_portal.urls')),
+
     # Mentor Dashboard
     path('', include('apps.courses.mentor_urls')),
     
@@ -44,6 +47,7 @@ urlpatterns = [
     path('api/youtube/', include('apps.youtube_integration.urls')),
     path('api/content/', include('apps.content_management.urls')),
     path('api/live-sessions/', include('apps.live_sessions.urls')),
+    path('api/teacher/', include('apps.teachers.urls')),
 ]
 
 # Serve media files in development

@@ -1,0 +1,488 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Teacher Portal - Lyceum Academy{% endblock %}</title>
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logos/logo.png' %}" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2AB673;
+      --primary-dark: #229959;
+      --primary-light: #3DD186;
+      --primary-bg: #e8f8f0;
+      --secondary: #1a1a2e;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9fafb;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --border-color: #e5e7eb;
+      --sidebar-width: 260px;
+      --navbar-height: 64px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .app-container { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-logo {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo img { height: 40px; width: auto; }
+
+    .sidebar-logo-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .sidebar-logo-text .brand-name { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .sidebar-logo-text .brand-tagline { font-size: 11px; color: var(--text-secondary); }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-tertiary);
+      padding: 0 12px 8px;
+    }
+
+    .nav-items { list-style: none; }
+    .nav-item { margin-bottom: 2px; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover { background: var(--primary-bg); color: var(--primary); }
+    .nav-link.active { background: var(--primary-bg); color: var(--primary); font-weight: 600; }
+    .nav-link i { width: 20px; font-size: 16px; }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--gray-50);
+      border-radius: 8px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+
+    .user-details { flex: 1; }
+    .user-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+    .user-role { font-size: 12px; color: var(--text-secondary); }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      height: var(--navbar-height);
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-left { display: flex; align-items: center; gap: 16px; }
+    .mobile-toggle { display: none; background: none; border: none; font-size: 20px; color: var(--text-secondary); cursor: pointer; }
+    .page-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+
+    .page-content { padding: 24px; }
+
+    /* Cards */
+    .tp-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .tp-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .tp-card-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+
+    /* Stats */
+    .tp-stat-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .tp-stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 20px;
+    }
+
+    .tp-stat-icon.green { background: var(--primary-bg); color: var(--primary); }
+    .tp-stat-icon.blue { background: #e0f2fe; color: #0284c7; }
+    .tp-stat-icon.orange { background: #fef3c7; color: #d97706; }
+    .tp-stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+
+    .tp-stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+    .tp-stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+    /* Table */
+    .tp-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tp-table th, .tp-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tp-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .tp-table tr:hover { background: var(--gray-50); }
+
+    /* Buttons */
+    .tp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .tp-btn-primary { background: var(--primary); color: white; }
+    .tp-btn-primary:hover { background: var(--primary-dark); color: white; }
+    .tp-btn-secondary { background: var(--gray-100); color: var(--text-primary); }
+    .tp-btn-secondary:hover { background: var(--gray-200); }
+    .tp-btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* Badge */
+    .tp-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .tp-badge-success { background: #d1fae5; color: #059669; }
+    .tp-badge-warning { background: #fef3c7; color: #d97706; }
+    .tp-badge-error { background: #fee2e2; color: #dc2626; }
+    .tp-badge-info { background: #e0f2fe; color: #0284c7; }
+
+    /* Alerts */
+    .tp-alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tp-alert-success { background: #d1fae5; color: #059669; }
+    .tp-alert-error { background: #fee2e2; color: #dc2626; }
+    .tp-alert-warning { background: #fef3c7; color: #d97706; }
+    .tp-alert-info { background: #e0f2fe; color: #0284c7; }
+
+    /* Mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    @media (max-width: 991px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: block; }
+      .page-content { padding: 16px; }
+    }
+
+    @media (max-width: 576px) {
+      .tp-stat-card { padding: 16px; }
+      .tp-stat-value { font-size: 24px; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <a href="{% url 'teacher_portal:dashboard' %}">
+          <img src="{% static 'images/logos/logo.png' %}" alt="Lyceum Academy">
+        </a>
+        <div class="sidebar-logo-text">
+          <span class="brand-name">Lyceum</span>
+          <span class="brand-tagline">Teacher Portal</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <ul class="nav-items">
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Teaching</div>
+          <ul class="nav-items">
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:my_courses' %}" class="nav-link {% if 'course' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-book"></i>
+                <span>My Courses</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:my_students' %}" class="nav-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i>
+                <span>My Students</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:assignments' %}" class="nav-link {% if 'assignment' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Assignments</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:quizzes' %}" class="nav-link {% if 'quiz' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-question-circle"></i>
+                <span>Quizzes</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Schedule & More</div>
+          <ul class="nav-items">
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:my_schedule' %}" class="nav-link {% if 'schedule' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>My Schedule</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:live_sessions' %}" class="nav-link {% if 'live_session' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-video"></i>
+                <span>Live Sessions</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:announcements' %}" class="nav-link {% if 'announcement' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-bullhorn"></i>
+                <span>Announcements</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'teacher_portal:my_profile' %}" class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-user-cog"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">{{ request.user.name|slice:":1"|upper }}</div>
+          <div class="user-details">
+            <div class="user-name">{{ request.user.name }}</div>
+            <div class="user-role">Teacher</div>
+          </div>
+        </div>
+        <a href="{% url 'teacher_portal:logout' %}" class="tp-btn tp-btn-secondary w-100 mt-3">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="navbar">
+        <div class="navbar-left">
+          <button class="mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+        <div class="navbar-right">
+          <a href="/" class="tp-btn tp-btn-secondary tp-btn-sm" target="_blank">
+            <i class="fas fa-external-link-alt"></i> View Site
+          </a>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <!-- Messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="tp-alert tp-alert-{{ message.tags }}">
+              <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const toggle = document.getElementById('mobileToggle');
+
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

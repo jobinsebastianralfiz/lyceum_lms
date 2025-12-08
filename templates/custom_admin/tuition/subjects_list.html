@@ -1,0 +1,91 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Subjects - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Subjects</h4>
+    <small class="text-muted">Manage subjects for tuition</small>
+  </div>
+  <a href="{% url 'custom_admin:subject_create' %}" class="btn btn-primary btn-sm">
+    <i class="ti ti-plus me-1"></i>Add Subject
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Subject</th>
+            <th class="py-2">Code</th>
+            <th class="py-2">Standards</th>
+            <th class="py-2 text-center">Faculty</th>
+            <th class="py-2 text-center">Batches</th>
+            <th class="py-2 text-center">Individual</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject in subjects %}
+          <tr>
+            <td class="py-2">
+              <div class="d-flex align-items-center">
+                <div class="rounded p-1 me-2" style="background: {{ subject.color }}20;">
+                  <i class="{{ subject.icon }}" style="color: {{ subject.color }};"></i>
+                </div>
+                <span class="fw-medium">{{ subject.name }}</span>
+              </div>
+            </td>
+            <td class="py-2"><code>{{ subject.code }}</code></td>
+            <td class="py-2">
+              {% for std in subject.standards.all|slice:":3" %}
+              <span class="badge bg-light text-dark me-1">{{ std.name }}</span>
+              {% empty %}
+              <span class="text-muted">All</span>
+              {% endfor %}
+              {% if subject.standards.count > 3 %}
+              <span class="badge bg-secondary">+{{ subject.standards.count|add:"-3" }}</span>
+              {% endif %}
+            </td>
+            <td class="py-2 text-center">{{ subject.faculty_members.count }}</td>
+            <td class="py-2 text-center">{{ subject.batch_count }}</td>
+            <td class="py-2 text-center">{{ subject.enrollment_count }}</td>
+            <td class="py-2 text-center">
+              {% if subject.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="py-2 text-end">
+              <a href="{% url 'custom_admin:subject_edit' subject.id %}" class="btn btn-sm btn-outline-primary py-0 px-2" title="Edit">
+                <i class="ti ti-edit"></i>
+              </a>
+              {% if not subject.batch_count and not subject.enrollment_count %}
+              <form method="POST" action="{% url 'custom_admin:subject_delete' subject.id %}" class="d-inline" onsubmit="return confirm('Delete this subject?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-4 text-muted">
+              No subjects found. <a href="{% url 'custom_admin:subject_create' %}">Add one now</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
 from . import rating_views
+from . import finance_views
+from . import tuition_views
+from . import teacher_views
 from apps.content_management import admin_views
+from apps.teachers.urls import admin_teacher_urlpatterns
 
 app_name = 'custom_admin'
 
@@ -187,7 +191,21 @@ urlpatterns = [
 
     # CONTENT MANAGEMENT
     path('content/', admin_views.content_dashboard_view, name='content_dashboard'),
-    
+
+    # COURSE ENQUIRIES MANAGEMENT
+    path('enquiries/', views.course_enquiries_list_view, name='course_enquiries_list'),
+    path('enquiries/<int:enquiry_id>/', views.course_enquiry_detail_view, name='course_enquiry_detail'),
+    path('enquiries/<int:enquiry_id>/delete/', views.course_enquiry_delete_view, name='course_enquiry_delete'),
+
+    # CERTIFICATES
+    path('certificates/', views.certificates_list_view, name='certificates_list'),
+    path('certificates/add/', views.certificate_create_view, name='certificate_create'),
+    path('certificates/<int:certificate_id>/', views.certificate_detail_view, name='certificate_detail'),
+    path('certificates/<int:certificate_id>/download/', views.certificate_download_view, name='certificate_download'),
+    path('certificates/<int:certificate_id>/revoke/', views.certificate_revoke_view, name='certificate_revoke'),
+    path('certificates/<int:certificate_id>/delete/', views.certificate_delete_view, name='certificate_delete'),
+    path('certificates/verify/<str:verification_code>/', views.certificate_verify_view, name='certificate_verify'),
+
     # LEADS MANAGEMENT
     path('content/leads/', admin_views.leads_list_view, name='leads_list'),
     path('content/leads/<int:lead_id>/', admin_views.lead_detail_view, name='lead_detail'),
@@ -209,6 +227,18 @@ urlpatterns = [
     path('content/testimonials/<int:testimonial_id>/delete/', admin_views.testimonial_delete_view, name='testimonial_delete'),
     path('content/testimonials/add/', admin_views.testimonial_create_view, name='testimonial_create'),
 
+    # BANNERS MANAGEMENT
+    path('content/banners/', admin_views.banners_list_view, name='banners_list'),
+    path('content/banners/add/', admin_views.banner_create_view, name='banner_create'),
+    path('content/banners/<int:banner_id>/edit/', admin_views.banner_edit_view, name='banner_edit'),
+    path('content/banners/<int:banner_id>/delete/', admin_views.banner_delete_view, name='banner_delete'),
+
+    # EVENTS MANAGEMENT
+    path('content/events/', admin_views.events_list_view, name='events_list'),
+    path('content/events/add/', admin_views.event_create_view, name='event_create'),
+    path('content/events/<int:event_id>/edit/', admin_views.event_edit_view, name='event_edit'),
+    path('content/events/<int:event_id>/delete/', admin_views.event_delete_view, name='event_delete'),
+
     # LIVE SESSIONS
     path('live-sessions/', views.live_sessions_list_view, name='live_sessions_list'),
     path('live-sessions/add/', views.live_session_create_view, name='live_session_create'),
@@ -221,6 +251,9 @@ urlpatterns = [
     path('live-sessions/<int:session_id>/end/', views.session_end_view, name='session_end'),
     path('live-sessions/<int:session_id>/cancel/', views.session_cancel_view, name='session_cancel'),
     path('live-sessions/<int:session_id>/announcements/add/', views.session_announcement_create_view, name='session_announcement_create'),
+
+    # FEATURE CONFIG
+    path('settings/features/', views.feature_config_view, name='feature_config'),
 
     # SYSTEM SETTINGS
     path('settings/', views.settings_list_view, name='settings_list'),
@@ -239,4 +272,128 @@ urlpatterns = [
     # AJAX ENDPOINTS
     path('get-course-info/<int:course_id>/', views.get_course_info, name='get_course_info'),
     path('get-enrollment-info/<int:enrollment_id>/', views.get_enrollment_info, name='get_enrollment_info'),
+
+    # STUDENT QUICK SEARCH & PROFILE
+    path('api/students/search/', views.student_search_api, name='student_search_api'),
+    path('students/<int:student_id>/profile/', views.student_profile_view, name='student_profile'),
+
+    # FINANCE MANAGEMENT
+    path('finance/', finance_views.finance_dashboard_view, name='finance_dashboard'),
+
+    # Expense Categories
+    path('finance/expense-categories/', finance_views.expense_categories_list_view, name='expense_categories_list'),
+    path('finance/expense-categories/add/', finance_views.expense_category_create_view, name='expense_category_create'),
+    path('finance/expense-categories/<int:category_id>/edit/', finance_views.expense_category_edit_view, name='expense_category_edit'),
+    path('finance/expense-categories/<int:category_id>/delete/', finance_views.expense_category_delete_view, name='expense_category_delete'),
+
+    # Expenses
+    path('finance/expenses/', finance_views.expenses_list_view, name='expenses_list'),
+    path('finance/expenses/add/', finance_views.expense_create_view, name='expense_create'),
+    path('finance/expenses/<int:expense_id>/', finance_views.expense_detail_view, name='expense_detail'),
+    path('finance/expenses/<int:expense_id>/edit/', finance_views.expense_edit_view, name='expense_edit'),
+    path('finance/expenses/<int:expense_id>/delete/', finance_views.expense_delete_view, name='expense_delete'),
+    path('finance/expenses/<int:expense_id>/approve/', finance_views.expense_approve_view, name='expense_approve'),
+
+    # Income Categories
+    path('finance/income-categories/', finance_views.income_categories_list_view, name='income_categories_list'),
+    path('finance/income-categories/add/', finance_views.income_category_create_view, name='income_category_create'),
+    path('finance/income-categories/<int:category_id>/edit/', finance_views.income_category_edit_view, name='income_category_edit'),
+    path('finance/income-categories/<int:category_id>/delete/', finance_views.income_category_delete_view, name='income_category_delete'),
+
+    # Income
+    path('finance/income/', finance_views.income_list_view, name='income_list'),
+    path('finance/income/add/', finance_views.income_create_view, name='income_create'),
+    path('finance/income/<int:income_id>/', finance_views.income_detail_view, name='income_detail'),
+    path('finance/income/<int:income_id>/edit/', finance_views.income_edit_view, name='income_edit'),
+    path('finance/income/<int:income_id>/delete/', finance_views.income_delete_view, name='income_delete'),
+
+    # Finance Sync & Reports
+    path('finance/sync-payments/', finance_views.sync_payments_view, name='sync_payments'),
+    path('finance/api/chart-data/', finance_views.finance_chart_data_api, name='finance_chart_data_api'),
+
+    # Vendors
+    path('finance/vendors/', finance_views.vendors_list_view, name='vendors_list'),
+    path('finance/vendors/add/', finance_views.vendor_create_view, name='vendor_create'),
+    path('finance/vendors/<int:vendor_id>/', finance_views.vendor_detail_view, name='vendor_detail'),
+    path('finance/vendors/<int:vendor_id>/edit/', finance_views.vendor_edit_view, name='vendor_edit'),
+    path('finance/vendors/<int:vendor_id>/delete/', finance_views.vendor_delete_view, name='vendor_delete'),
+    path('finance/api/vendors/search/', finance_views.vendor_search_api, name='vendor_search_api'),
+
+    # Pending Fees (Course Payments)
+    path('finance/pending-fees/', finance_views.pending_fees_list_view, name='pending_fees_list'),
+    path('finance/monthly-summary/', finance_views.monthly_fees_summary_view, name='monthly_fees_summary'),
+    path('finance/payments/<int:payment_id>/collect/', finance_views.collect_payment_view, name='collect_payment'),
+    path('finance/payments/<int:payment_id>/remind/', finance_views.send_payment_reminder_view, name='send_payment_reminder'),
+
+    # ==========================================================================
+    # TUITION MANAGEMENT
+    # ==========================================================================
+
+    # Dashboard
+    path('tuition/', tuition_views.tuition_dashboard_view, name='tuition_dashboard'),
+
+    # Standards
+    path('tuition/standards/', tuition_views.standards_list_view, name='standards_list'),
+    path('tuition/standards/add/', tuition_views.standard_create_view, name='standard_create'),
+    path('tuition/standards/<int:standard_id>/edit/', tuition_views.standard_edit_view, name='standard_edit'),
+    path('tuition/standards/<int:standard_id>/delete/', tuition_views.standard_delete_view, name='standard_delete'),
+
+    # Subjects
+    path('tuition/subjects/', tuition_views.subjects_list_view, name='subjects_list'),
+    path('tuition/subjects/add/', tuition_views.subject_create_view, name='subject_create'),
+    path('tuition/subjects/<int:subject_id>/edit/', tuition_views.subject_edit_view, name='subject_edit'),
+    path('tuition/subjects/<int:subject_id>/delete/', tuition_views.subject_delete_view, name='subject_delete'),
+
+    # Batches
+    path('tuition/batches/', tuition_views.batches_list_view, name='batches_list'),
+    path('tuition/batches/add/', tuition_views.batch_create_view, name='batch_create'),
+    path('tuition/batches/<int:batch_id>/', tuition_views.batch_detail_view, name='batch_detail'),
+    path('tuition/batches/<int:batch_id>/edit/', tuition_views.batch_edit_view, name='batch_edit'),
+    path('tuition/batches/<int:batch_id>/delete/', tuition_views.batch_delete_view, name='batch_delete'),
+    path('tuition/batches/<int:batch_id>/attendance/', tuition_views.batch_attendance_view, name='batch_attendance'),
+
+    # Tuition Students
+    path('tuition/students/', tuition_views.tuition_students_list_view, name='tuition_students_list'),
+    path('tuition/students/add/', tuition_views.tuition_student_create_view, name='tuition_student_create'),
+    path('tuition/students/<int:student_id>/', tuition_views.tuition_student_detail_view, name='tuition_student_detail'),
+    path('tuition/students/<int:student_id>/edit/', tuition_views.tuition_student_edit_view, name='tuition_student_edit'),
+    path('tuition/students/<int:student_id>/delete/', tuition_views.tuition_student_delete_view, name='tuition_student_delete'),
+
+    # Enrollments
+    path('tuition/enrollments/', tuition_views.tuition_enrollments_list_view, name='tuition_enrollments_list'),
+    path('tuition/enrollments/add/', tuition_views.tuition_enrollment_create_view, name='tuition_enrollment_create'),
+    path('tuition/enrollments/<int:enrollment_id>/', tuition_views.tuition_enrollment_detail_view, name='tuition_enrollment_detail'),
+    path('tuition/enrollments/<int:enrollment_id>/edit/', tuition_views.tuition_enrollment_edit_view, name='tuition_enrollment_edit'),
+
+    # Attendance
+    path('tuition/attendance/', tuition_views.tuition_attendance_list_view, name='tuition_attendance_list'),
+    path('tuition/attendance/mark/', tuition_views.mark_attendance_view, name='mark_attendance'),
+
+    # Fees
+    path('tuition/fees/', tuition_views.tuition_fees_list_view, name='tuition_fees_list'),
+    path('tuition/fees/generate/', tuition_views.generate_monthly_fees_view, name='generate_monthly_fees'),
+    path('tuition/fees/<int:fee_id>/', tuition_views.tuition_fee_detail_view, name='tuition_fee_detail'),
+    path('tuition/fees/<int:fee_id>/collect/', tuition_views.collect_fee_view, name='collect_fee'),
+    path('tuition/fees/<int:fee_id>/receipt/', tuition_views.fee_receipt_view, name='fee_receipt'),
+
+    # Tuition API Endpoints
+    path('tuition/api/batch/<int:batch_id>/students/', tuition_views.api_batch_students, name='api_batch_students'),
+    path('tuition/api/student/<int:student_id>/enrollments/', tuition_views.api_student_enrollments, name='api_student_enrollments'),
+    path('tuition/api/mark-overdue/', tuition_views.api_mark_overdue, name='api_mark_overdue'),
+    path('tuition/api/seed-data/', tuition_views.api_seed_data, name='api_seed_data'),
+
+    # ==========================================================================
+    # TEACHER MANAGEMENT (LMS Online Teachers)
+    # ==========================================================================
+    path('teachers/', teacher_views.teachers_list_view, name='teachers_list'),
+    path('teachers/add/', teacher_views.teacher_create_view, name='teacher_create'),
+    path('teachers/<int:teacher_id>/', teacher_views.teacher_detail_view, name='teacher_detail'),
+    path('teachers/<int:teacher_id>/edit/', teacher_views.teacher_edit_view, name='teacher_edit'),
+    path('teachers/<int:teacher_id>/delete/', teacher_views.teacher_delete_view, name='teacher_delete'),
+    path('teachers/<int:teacher_id>/assign-courses/', teacher_views.teacher_assign_courses_view, name='teacher_assign_courses'),
+    path('teachers/<int:teacher_id>/reset-password/', teacher_views.teacher_reset_password_view, name='teacher_reset_password'),
+    path('teachers/<int:teacher_id>/toggle-status/', teacher_views.teacher_toggle_status_view, name='teacher_toggle_status'),
 ]
+
+# Add teacher management API URLs (REST API endpoints)
+urlpatterns += admin_teacher_urlpatterns

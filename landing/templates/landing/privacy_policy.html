@@ -1,162 +1,143 @@
 {% extends 'landing/base.html' %}
 {% load static %}
 
-{% block title %}Privacy Policy - Lyceum Academy{% endblock %}
+{% block title %}Privacy Policy - LM Academy{% endblock %}
 
 {% block extra_css %}
 <style>
-/* Dark Theme for Policy Pages */
-.policy-hero {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-  padding: 150px 0 80px;
-  position: relative;
-  overflow: hidden;
-  border: none !important;
-}
-
-.policy-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(42, 182, 115, 0.1) 0%, transparent 70%);
-}
-
-.policy-hero-content {
-  position: relative;
-  z-index: 2;
+/* Policy Page Styles */
+.lm-page-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 100px 0 60px;
   text-align: center;
 }
 
-.policy-hero h1 {
-  font-size: 3rem;
+.lm-page-header h1 {
+  font-size: 2.5rem;
   font-weight: 800;
-  color: #F9FAFB;
-  margin-bottom: 20px;
+  color: var(--white) !important;
+  margin-bottom: 1rem;
 }
 
-.policy-hero .breadcrumb {
-  background: transparent;
-  padding: 0;
-  margin: 0;
+.lm-breadcrumb {
+  display: flex;
   justify-content: center;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
 }
 
-.policy-hero .breadcrumb-item {
-  color: #CBD5E1;
+.lm-breadcrumb li {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
 }
 
-.policy-hero .breadcrumb-item a {
-  color: #2AB673;
+.lm-breadcrumb li a {
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
 }
 
-.policy-hero .breadcrumb-item + .breadcrumb-item::before {
-  color: #CBD5E1;
+.lm-breadcrumb li:not(:last-child)::after {
+  content: '/';
+  margin-left: 0.5rem;
+  opacity: 0.6;
 }
 
-.policy-content {
-  background: #0F172A;
-  padding: 80px 0;
+.policy-section {
+  padding: 4rem 0;
+  background: var(--bg-light);
 }
 
 .policy-card {
-  background: #1E293B;
-  border-radius: 16px;
-  padding: 50px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-  border: none !important;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
 }
 
 .policy-card h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
-  color: #F9FAFB;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #334155;
+  color: var(--text-primary) !important;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-light);
 }
 
 .policy-card h3 {
-  font-size: 1.8rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #2AB673;
-  margin-top: 40px;
-  margin-bottom: 20px;
+  color: var(--primary) !important;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
 .policy-card p {
-  color: #CBD5E1;
-  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
   line-height: 1.8;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
 .policy-card ul, .policy-card ol {
-  color: #CBD5E1;
-  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
   line-height: 1.8;
-  margin-bottom: 25px;
-  padding-left: 30px;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
 }
 
 .policy-card li {
-  margin-bottom: 12px;
-  color: #CBD5E1;
+  margin-bottom: 0.5rem;
 }
 
 .policy-card strong {
-  color: #F9FAFB;
-  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.policy-meta {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
-  .policy-hero h1 {
-    font-size: 2rem;
-  }
-
   .policy-card {
-    padding: 30px 20px;
+    padding: 2rem 1.5rem;
   }
 
-  .policy-card h2 {
-    font-size: 1.8rem;
-  }
-
-  .policy-card h3 {
-    font-size: 1.4rem;
+  .lm-page-header h1 {
+    font-size: 2rem;
   }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="policy-hero">
+<!-- Page Header -->
+<div class="lm-page-header">
   <div class="container">
-    <div class="policy-hero-content">
-      <h1>Privacy Policy</h1>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'landing:home' %}">Home</a></li>
-          <li class="breadcrumb-item active">Privacy Policy</li>
-        </ol>
-      </nav>
-    </div>
+    <h1>Privacy Policy</h1>
+    <ol class="lm-breadcrumb">
+      <li><a href="{% url 'landing:home' %}">Home</a></li>
+      <li>Privacy Policy</li>
+    </ol>
   </div>
-</section>
+</div>
 
-<!-- Content Section -->
-<section class="policy-content">
+<!-- Policy Content -->
+<section class="policy-section">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-10 offset-lg-1">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
         <div class="policy-card">
           <h2>Privacy Policy</h2>
 
-          <p>At Lyceum Academy, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our learning management platform.</p>
+          <p>At LM Academy, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our learning management platform.</p>
 
           <h3>Information We Collect</h3>
           <p>We collect information you provide directly to us, such as when you create an account, enroll in courses, or contact us for support. This may include:</p>
@@ -217,12 +198,11 @@
 
           <h3>Contact Us</h3>
           <p>If you have any questions about this Privacy Policy or our data practices, please contact us at:</p>
-          <p><strong>Email:</strong> privacy@lyceumacademy.com<br>
-          <strong>Address:</strong> Lyceum Academy, [Your Address]</p>
+          <p><strong>Email:</strong> privacy@lmacademy.com</p>
 
-          <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; color: #94A3B8; font-size: 0.9rem;">
+          <div class="policy-meta">
             <strong>Last Updated:</strong> January 2025
-          </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,122 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Tuition Attendance - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Tuition Attendance</h4>
+    <small class="text-muted">View and manage attendance records</small>
+  </div>
+  <a href="{% url 'custom_admin:mark_attendance' %}" class="btn btn-primary btn-sm">
+    <i class="ti ti-clipboard-check me-1"></i>Mark Attendance
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small mb-1">Date</label>
+        <input type="date" name="date" class="form-control form-control-sm" value="{{ selected_date }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small mb-1">Batch</label>
+        <select name="batch" class="form-select form-select-sm">
+          <option value="">All Batches</option>
+          {% for batch in batches %}
+          <option value="{{ batch.id }}" {% if selected_batch == batch.id|stringformat:"s" %}selected{% endif %}>{{ batch.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for status_val, status_label in status_choices %}
+          <option value="{{ status_val }}" {% if selected_status == status_val %}selected{% endif %}>{{ status_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'custom_admin:tuition_attendance_list' %}" class="btn btn-outline-secondary btn-sm w-100">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Date</th>
+            <th class="py-2">Student</th>
+            <th class="py-2">Batch</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2">Time</th>
+            <th class="py-2">Marked By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for att in attendance %}
+          <tr>
+            <td class="py-2">{{ att.date|date:"d M Y" }}</td>
+            <td class="py-2">
+              <a href="{% url 'custom_admin:tuition_student_detail' att.enrollment.student.id %}" class="text-decoration-none">
+                {{ att.enrollment.student.name }}
+              </a>
+            </td>
+            <td class="py-2">{{ att.batch.name|default:'-' }}</td>
+            <td class="py-2 text-center">
+              {% if att.status == 'present' %}
+              <span class="badge bg-success">Present</span>
+              {% elif att.status == 'absent' %}
+              <span class="badge bg-danger">Absent</span>
+              {% elif att.status == 'late' %}
+              <span class="badge bg-warning">Late</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ att.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="py-2">
+              {% if att.check_in_time %}{{ att.check_in_time|time:"H:i" }}{% endif %}
+              {% if att.check_out_time %} - {{ att.check_out_time|time:"H:i" }}{% endif %}
+              {% if not att.check_in_time and not att.check_out_time %}-{% endif %}
+            </td>
+            <td class="py-2">{{ att.marked_by.get_full_name|default:att.marked_by.email|default:'-' }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">
+              No attendance records found
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% if attendance.has_other_pages %}
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center mb-0">
+    {% if attendance.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page={{ attendance.previous_page_number }}{% if selected_date %}&date={{ selected_date }}{% endif %}{% if selected_batch %}&batch={{ selected_batch }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Previous</a></li>
+    {% endif %}
+    <li class="page-item active"><span class="page-link">{{ attendance.number }} of {{ attendance.paginator.num_pages }}</span></li>
+    {% if attendance.has_next %}
+    <li class="page-item"><a class="page-link" href="?page={{ attendance.next_page_number }}{% if selected_date %}&date={{ selected_date }}{% endif %}{% if selected_batch %}&batch={{ selected_batch }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}Placements & Success Stories - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="lm-page-header lm-page-header-placements">
+  <div class="container">
+    <div class="lm-page-header-content">
+      <span class="lm-section-tag">Career Success</span>
+      <h1>Placements & Success Stories</h1>
+      <p>Discover how our students landed their dream jobs at top companies after completing their courses.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Placements Section -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="lm-filter-tabs mb-4">
+      <a href="{% url 'landing:placements_list' %}" class="lm-filter-tab {% if not selected_type %}active{% endif %}">All</a>
+      {% for code, name in placement_types %}
+      <a href="{% url 'landing:placements_list' %}?type={{ code }}" class="lm-filter-tab {% if selected_type == code %}active{% endif %}">{{ name }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Placements Grid -->
+    <div class="lm-placements-grid">
+      {% for placement in placements %}
+      <div class="lm-placement-card {% if placement.is_featured %}lm-placement-featured{% endif %}">
+        <div class="lm-placement-header">
+          <div class="lm-placement-student">
+            {% if placement.student_photo %}
+            <img src="{{ placement.student_photo.url }}" alt="{{ placement.student_name }}" class="student-photo">
+            {% else %}
+            <div class="lm-avatar-placeholder">{{ placement.student_name|slice:":1" }}</div>
+            {% endif %}
+            <div class="student-info">
+              <h4>{{ placement.student_name }}</h4>
+              <p>{{ placement.course_completed }} • {{ placement.batch_year }}</p>
+            </div>
+          </div>
+          {% if placement.company_logo %}
+          <div class="lm-placement-company-logo">
+            <img src="{{ placement.company_logo.url }}" alt="{{ placement.company_name }}">
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="lm-placement-body">
+          <div class="lm-placement-position">
+            <span class="lm-badge lm-badge-primary">{{ placement.get_placement_type_display }}</span>
+            <h3>{{ placement.job_title }}</h3>
+            <p class="company-name">
+              <i class="fas fa-building"></i> {{ placement.company_name }}
+            </p>
+            <p class="location">
+              <i class="fas fa-map-marker-alt"></i> {{ placement.location }}
+            </p>
+          </div>
+
+          {% if placement.can_show_package %}
+          <div class="lm-placement-package">
+            <span class="package-label">Package</span>
+            <span class="package-value">{{ placement.package_currency }} {{ placement.package_amount|floatformat:0 }} LPA</span>
+          </div>
+          {% endif %}
+
+          <p class="lm-placement-excerpt">{{ placement.success_story|truncatechars:150 }}</p>
+
+          <a href="{% url 'landing:placement_detail' placement.pk %}" class="lm-placement-link">
+            Read Full Story <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="lm-empty-state">
+        <i class="fas fa-briefcase"></i>
+        <h3>No Placements Yet</h3>
+        <p>Check back soon to see our students' success stories.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Monthly Fees Summary - Finance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-0">Monthly Fees Summary</h4>
+    <small class="text-muted">Fee collection summary for {{ month_name }} {{ selected_year }}</small>
+  </div>
+  <div>
+    <a href="{% url 'custom_admin:pending_fees_list' %}" class="btn btn-outline-primary">
+      <i class="ti ti-list me-1"></i> View All Pending
+    </a>
+  </div>
+</div>
+
+<!-- Month/Year Filter -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Month</label>
+        <select name="month" class="form-select">
+          {% for num, name in months %}
+          <option value="{{ num }}" {% if selected_month == num %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Year</label>
+        <select name="year" class="form-select">
+          {% for y in years %}
+          <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-search me-1"></i>View Summary
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Overall Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-primary-subtle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="ti ti-currency-rupee text-primary fs-4"></i>
+        </div>
+        <h6 class="text-muted mb-1">Total Due</h6>
+        <h4 class="mb-0">₹{{ overall_totals.total_due|floatformat:0|default:"0" }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-success-subtle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="ti ti-check text-success fs-4"></i>
+        </div>
+        <h6 class="text-muted mb-1">Collected</h6>
+        <h4 class="mb-0 text-success">₹{{ overall_totals.total_collected|floatformat:0|default:"0" }}</h4>
+        <small class="text-muted">{{ overall_totals.completed_count|default:0 }} payments</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-warning-subtle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="ti ti-clock text-warning fs-4"></i>
+        </div>
+        <h6 class="text-muted mb-1">Pending</h6>
+        <h4 class="mb-0 text-warning">₹{{ overall_totals.total_pending|floatformat:0|default:"0" }}</h4>
+        <small class="text-muted">{{ overall_totals.pending_count|default:0 }} payments</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-danger-subtle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="ti ti-alert-circle text-danger fs-4"></i>
+        </div>
+        <h6 class="text-muted mb-1">Overdue</h6>
+        <h4 class="mb-0 text-danger">₹{{ overall_totals.total_overdue|floatformat:0|default:"0" }}</h4>
+        <small class="text-muted">{{ overall_totals.overdue_count|default:0 }} payments</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Collection Rate Progress -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="mb-0">Collection Rate</h6>
+      <span class="fw-bold {% if collection_rate >= 80 %}text-success{% elif collection_rate >= 50 %}text-warning{% else %}text-danger{% endif %}">
+        {{ collection_rate }}%
+      </span>
+    </div>
+    <div class="progress" style="height: 10px;">
+      <div class="progress-bar {% if collection_rate >= 80 %}bg-success{% elif collection_rate >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+           role="progressbar" style="width: {{ collection_rate }}%"></div>
+    </div>
+    <small class="text-muted mt-1 d-block">
+      ₹{{ overall_totals.total_collected|floatformat:0|default:"0" }} collected out of ₹{{ overall_totals.total_due|floatformat:0|default:"0" }} due
+    </small>
+  </div>
+</div>
+
+<!-- Course-wise Summary -->
+<div class="card">
+  <div class="card-header py-3">
+    <h6 class="mb-0"><i class="ti ti-book me-2"></i>Course-wise Summary</h6>
+  </div>
+  <div class="card-body">
+    {% if course_summary %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Course</th>
+            <th class="text-center">Total Due</th>
+            <th class="text-center">Collected</th>
+            <th class="text-center">Pending</th>
+            <th class="text-center">Overdue</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in course_summary %}
+          <tr>
+            <td>
+              <strong>{{ course.enrollment__course__title|default:"Unknown Course" }}</strong>
+            </td>
+            <td class="text-center">
+              <span class="fw-medium">₹{{ course.total_due|floatformat:0|default:"0" }}</span>
+            </td>
+            <td class="text-center">
+              <span class="text-success">₹{{ course.completed_amount|floatformat:0|default:"0" }}</span>
+              <br><small class="text-muted">{{ course.completed_count|default:0 }} paid</small>
+            </td>
+            <td class="text-center">
+              <span class="text-warning">₹{{ course.pending_amount|floatformat:0|default:"0" }}</span>
+              <br><small class="text-muted">{{ course.pending_count|default:0 }} pending</small>
+            </td>
+            <td class="text-center">
+              <span class="text-danger">₹{{ course.overdue_amount|floatformat:0|default:"0" }}</span>
+              <br><small class="text-muted">{{ course.overdue_count|default:0 }} overdue</small>
+            </td>
+            <td class="text-end">
+              <a href="{% url 'custom_admin:pending_fees_list' %}?course={{ course.enrollment__course__id }}&month={{ selected_month }}&year={{ selected_year }}"
+                 class="btn btn-sm btn-outline-primary">
+                <i class="ti ti-eye me-1"></i>View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="ti ti-calendar-off text-muted" style="font-size: 48px;"></i>
+      <h5 class="mt-3">No Fees Due</h5>
+      <p class="text-muted">No payments scheduled for {{ month_name }} {{ selected_year }}</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

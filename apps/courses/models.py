@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 class Category(models.Model):
@@ -16,6 +17,13 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 class Course(models.Model):
+    # Enrollment Type Choices
+    ENROLLMENT_TYPE_CHOICES = [
+        ('online_purchase', 'Online Purchase'),  # Can buy from website/app
+        ('admin_only', 'Admin Enrollment Only'),  # Only admin can enroll
+        ('enquiry_only', 'Enquiry Only'),  # Information only, leads to enquiry form
+    ]
+
     # Many-to-many with Module through CourseModule
     modules = models.ManyToManyField('Module', through='CourseModule', related_name='module_courses')
 
@@ -30,7 +38,31 @@ class Course(models.Model):
     curriculum = models.TextField(blank=True, null=True, help_text="Detailed curriculum outline - what topics will be covered")
     what_you_will_learn = models.TextField(blank=True, null=True, help_text="Learning outcomes - what students will achieve after completing the course")
     is_published = models.BooleanField(default=False)
+
+    # Enrollment settings
+    enrollment_type = models.CharField(
+        max_length=20,
+        choices=ENROLLMENT_TYPE_CHOICES,
+        default='online_purchase',
+        help_text="How students can enroll in this course"
+    )
     allow_public_enrollment = models.BooleanField(default=True, help_text="Allow students to enroll via app/API. If False, only admin can enroll students.")
+
+    # Duration and schedule info (for enquiry courses)
+    duration = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., '6 months', '12 weeks'")
+    start_date = models.DateField(blank=True, null=True, help_text="Next batch start date")
+    batch_info = models.CharField(max_length=200, blank=True, null=True, help_text="e.g., 'Weekend Batch', 'Weekday Evening'")
+
+    # Teacher assignment
+    teacher = models.ForeignKey(
+        'teachers.TeacherProfile',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='teaching_courses',
+        help_text="Primary teacher/instructor for this course"
+    )
+
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_courses')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,7 +106,27 @@ class Course(models.Model):
         if self.is_free_course:
             return "Free"
         return f"₹{self.total_price:.2f}"
-    
+
+    @property
+    def can_purchase_online(self):
+        """Check if course can be purchased online"""
+        return self.enrollment_type == 'online_purchase' and self.allow_public_enrollment
+
+    @property
+    def is_admin_only(self):
+        """Check if course requires admin enrollment"""
+        return self.enrollment_type == 'admin_only' or not self.allow_public_enrollment
+
+    @property
+    def is_enquiry_only(self):
+        """Check if course is enquiry/information only"""
+        return self.enrollment_type == 'enquiry_only'
+
+    @property
+    def enrollment_type_display(self):
+        """Get human-readable enrollment type"""
+        return dict(self.ENROLLMENT_TYPE_CHOICES).get(self.enrollment_type, self.enrollment_type)
+
     class Meta:
         db_table = 'courses'
         ordering = ['-created_at']
@@ -1163,7 +1215,363 @@ class MentorSession(models.Model):
     
     def __str__(self):
         return f"Session: {self.mentor.name} -> {self.student.name} ({self.session_date.date()})"
-    
+
     class Meta:
         db_table = 'mentor_sessions'
         ordering = ['-session_date']
+
+
+class Certificate(models.Model):
+    """
+    Certificates issued to students upon course completion.
+    Supports PDF generation and verification.
+    """
+    CERTIFICATE_TYPES = [
+        ('completion', 'Course Completion'),
+        ('excellence', 'Excellence Award'),
+        ('participation', 'Participation'),
+    ]
+
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='certificates'
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='certificates'
+    )
+    enrollment = models.OneToOneField(
+        'payments.Enrollment',
+        on_delete=models.CASCADE,
+        related_name='certificate',
+        null=True,
+        blank=True
+    )
+
+    # Certificate details
+    certificate_number = models.CharField(max_length=50, unique=True)
+    certificate_type = models.CharField(
+        max_length=20,
+        choices=CERTIFICATE_TYPES,
+        default='completion'
+    )
+    title = models.CharField(
+        max_length=200,
+        help_text="Title displayed on certificate (e.g., 'Certificate of Completion')"
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Additional text to display on certificate"
+    )
+
+    # Completion info
+    completion_date = models.DateField(help_text="Date when course was completed")
+    issue_date = models.DateField(auto_now_add=True)
+
+    # Score/Grade (optional)
+    final_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Final score percentage (if applicable)"
+    )
+    grade = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Grade (e.g., A+, A, B+, etc.)"
+    )
+
+    # Verification
+    verification_code = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="Unique code for certificate verification"
+    )
+    verification_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="Full URL for certificate verification"
+    )
+
+    # PDF Storage
+    pdf_file = models.FileField(
+        upload_to='certificates/',
+        blank=True,
+        null=True,
+        help_text="Generated PDF certificate"
+    )
+
+    # Status
+    is_revoked = models.BooleanField(
+        default=False,
+        help_text="Set to True if certificate is revoked"
+    )
+    revoked_reason = models.TextField(blank=True, null=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    # Signature
+    signed_by = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Name of person who signed the certificate"
+    )
+    signed_by_title = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Title of person who signed (e.g., 'Director of Training')"
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'certificates'
+        ordering = ['-issue_date']
+        # Note: unique_together removed - validation in save() ensures only one ACTIVE certificate per student-course
+
+    def __str__(self):
+        return f"{self.certificate_number} - {self.student.name} - {self.course.title}"
+
+    def save(self, *args, **kwargs):
+        # Check if an active certificate already exists for this student-course combination
+        if not self.pk:  # Only check on creation
+            existing_active = Certificate.objects.filter(
+                student=self.student,
+                course=self.course,
+                is_revoked=False
+            ).exists()
+            if existing_active:
+                raise ValidationError(
+                    f'An active certificate already exists for this student in this course. '
+                    f'Please revoke the existing certificate before issuing a new one.'
+                )
+
+        if not self.certificate_number:
+            self.certificate_number = self.generate_certificate_number()
+        if not self.verification_code:
+            self.verification_code = self.generate_verification_code()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_certificate_number():
+        """Generate a unique certificate number like LMS-2025-000001"""
+        import uuid
+        from datetime import date
+        year = date.today().year
+        unique_part = str(uuid.uuid4().hex)[:6].upper()
+        # Get count of certificates this year
+        year_count = Certificate.objects.filter(
+            created_at__year=year
+        ).count() + 1
+        return f"LMS-{year}-{year_count:06d}"
+
+    @staticmethod
+    def generate_verification_code():
+        """Generate a unique verification code"""
+        import uuid
+        import hashlib
+        unique_string = str(uuid.uuid4())
+        return hashlib.sha256(unique_string.encode()).hexdigest()[:32].upper()
+
+    def revoke(self, reason=''):
+        """Revoke this certificate"""
+        self.is_revoked = True
+        self.revoked_reason = reason
+        self.revoked_at = timezone.now()
+        self.save()
+
+    @property
+    def is_valid(self):
+        """Check if certificate is valid (not revoked)"""
+        return not self.is_revoked
+
+    @property
+    def grade_display(self):
+        """Get grade based on final score if not manually set"""
+        if self.grade:
+            return self.grade
+        if self.final_score is None:
+            return None
+        score = float(self.final_score)
+        if score >= 90:
+            return 'A+'
+        elif score >= 85:
+            return 'A'
+        elif score >= 80:
+            return 'B+'
+        elif score >= 75:
+            return 'B'
+        elif score >= 70:
+            return 'C+'
+        elif score >= 65:
+            return 'C'
+        elif score >= 60:
+            return 'D'
+        else:
+            return 'F'
+
+
+class DailyStreak(models.Model):
+    """Track daily learning streaks for students"""
+    student = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='daily_streak'
+    )
+
+    # Streak data
+    current_streak = models.PositiveIntegerField(default=0, help_text="Current consecutive days streak")
+    longest_streak = models.PositiveIntegerField(default=0, help_text="Longest streak ever achieved")
+    total_active_days = models.PositiveIntegerField(default=0, help_text="Total days with learning activity")
+
+    # Streak tracking
+    streak_start_date = models.DateField(null=True, blank=True, help_text="Start date of current streak")
+    last_activity_date = models.DateField(null=True, blank=True, help_text="Last date with activity")
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'daily_streaks'
+        verbose_name = 'Daily Streak'
+        verbose_name_plural = 'Daily Streaks'
+
+    def __str__(self):
+        return f"{self.student.name} - {self.current_streak} days streak"
+
+    def record_activity(self):
+        """Record activity for today and update streak"""
+        from datetime import timedelta
+        today = timezone.now().date()
+
+        # If already recorded today, just return
+        if self.last_activity_date == today:
+            return self.current_streak
+
+        # Check if streak continues (yesterday or today is first day)
+        if self.last_activity_date is None:
+            # First activity ever
+            self.current_streak = 1
+            self.streak_start_date = today
+            self.total_active_days = 1
+        elif self.last_activity_date == today - timedelta(days=1):
+            # Streak continues (yesterday was active)
+            self.current_streak += 1
+        else:
+            # Streak broken - start new streak
+            self.current_streak = 1
+            self.streak_start_date = today
+            self.total_active_days += 1
+
+        # Update longest streak if current is higher
+        if self.current_streak > self.longest_streak:
+            self.longest_streak = self.current_streak
+
+        self.last_activity_date = today
+        self.save()
+
+        # Record in daily activity log
+        DailyActivity.objects.get_or_create(
+            student=self.student,
+            activity_date=today,
+            defaults={'activities_count': 1}
+        )
+
+        return self.current_streak
+
+    def check_streak_status(self):
+        """Check if streak is still valid (called on login or API access)"""
+        from datetime import timedelta
+        today = timezone.now().date()
+
+        if self.last_activity_date is None:
+            return 0
+
+        days_since_activity = (today - self.last_activity_date).days
+
+        if days_since_activity > 1:
+            # Streak is broken (more than 1 day gap)
+            self.current_streak = 0
+            self.streak_start_date = None
+            self.save()
+
+        return self.current_streak
+
+    @classmethod
+    def get_or_create_for_user(cls, user):
+        """Get or create streak record for user"""
+        streak, created = cls.objects.get_or_create(student=user)
+        if not created:
+            streak.check_streak_status()
+        return streak
+
+
+class DailyActivity(models.Model):
+    """Log daily activity for streak tracking and analytics"""
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='daily_activities'
+    )
+    activity_date = models.DateField()
+
+    # Activity counts
+    activities_count = models.PositiveIntegerField(default=0, help_text="Total activities on this day")
+    videos_watched = models.PositiveIntegerField(default=0)
+    quizzes_attempted = models.PositiveIntegerField(default=0)
+    assignments_submitted = models.PositiveIntegerField(default=0)
+    learning_minutes = models.PositiveIntegerField(default=0, help_text="Total learning time in minutes")
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'daily_activities'
+        unique_together = ['student', 'activity_date']
+        ordering = ['-activity_date']
+        verbose_name = 'Daily Activity'
+        verbose_name_plural = 'Daily Activities'
+
+    def __str__(self):
+        return f"{self.student.name} - {self.activity_date}"
+
+    @classmethod
+    def record_activity(cls, user, activity_type='general', minutes=0):
+        """Record an activity and update streak"""
+        today = timezone.now().date()
+
+        # Get or create today's activity record
+        activity, created = cls.objects.get_or_create(
+            student=user,
+            activity_date=today,
+            defaults={'activities_count': 0}
+        )
+
+        # Update activity counts
+        activity.activities_count += 1
+        activity.learning_minutes += minutes
+
+        if activity_type == 'video':
+            activity.videos_watched += 1
+        elif activity_type == 'quiz':
+            activity.quizzes_attempted += 1
+        elif activity_type == 'assignment':
+            activity.assignments_submitted += 1
+
+        activity.save()
+
+        # Update streak
+        streak = DailyStreak.get_or_create_for_user(user)
+        streak.record_activity()
+
+        return activity

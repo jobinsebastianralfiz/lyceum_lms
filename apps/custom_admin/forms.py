@@ -7,6 +7,8 @@ from apps.youtube_integration.models import YouTubeChannelConfig, YouTubeVideo
 from apps.payments.models import Enrollment, InstallmentPlan, Payment
 from apps.courses.models import Course, Module, VideoLesson, Assignment, Quiz, QuizQuestion, QuizChoice
 from apps.live_sessions.models import LiveSession, SessionParticipant, SessionResource, SessionAnnouncement
+from apps.teachers.models import TeacherProfile
+from apps.tuition.models import Subject as TuitionSubject
 
 class CustomUserCreationForm(UserCreationForm):
     """Custom form for creating new users"""
@@ -1672,3 +1674,639 @@ class PDFNoteForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class TeacherCreationForm(forms.Form):
+    """Form for creating a new teacher (User + TeacherProfile in one step)"""
+
+    # User fields
+    name = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter full name'
+        }),
+        help_text='Full name of the teacher'
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter email address'
+        }),
+        help_text='Email address (will be used for login)'
+    )
+
+    phone_number = forms.CharField(
+        max_length=15,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter phone number'
+        }),
+        help_text='Phone number'
+    )
+
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter password'
+        }),
+        help_text='Password for the teacher account'
+    )
+
+    # TeacherProfile fields
+    employee_id = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Auto-generated if empty'
+        }),
+        help_text='Unique employee identifier (auto-generated if left blank)'
+    )
+
+    designation = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., Senior Instructor'
+        }),
+        help_text='Job title/designation'
+    )
+
+    department = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., Computer Science'
+        }),
+        help_text='Department or subject area'
+    )
+
+    qualification = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'e.g., M.Tech, B.Ed'
+        }),
+        help_text='Educational qualifications'
+    )
+
+    specialization = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'e.g., Python, Web Development'
+        }),
+        help_text='Areas of expertise'
+    )
+
+    experience_years = forms.IntegerField(
+        min_value=0,
+        initial=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '0'
+        }),
+        help_text='Years of teaching experience'
+    )
+
+    bio = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Short biography'
+        }),
+        help_text='Brief bio displayed on teacher profile'
+    )
+
+    date_of_joining = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        help_text='Employment start date'
+    )
+
+    assigned_courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.filter(is_published=True),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'size': '6'
+        }),
+        help_text='Courses this teacher can manage'
+    )
+
+    # Teaching mode flags
+    can_teach_online = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Can teach online courses'
+    )
+
+    can_teach_offline = forms.BooleanField(
+        initial=False,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Can teach offline tuition batches'
+    )
+
+    # Tuition subjects
+    tuition_subjects = forms.ModelMultipleChoiceField(
+        queryset=TuitionSubject.objects.filter(is_active=True),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'size': '5'
+        }),
+        help_text='Subjects this teacher can teach for offline tuition'
+    )
+
+    # Additional contact
+    alternate_phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Alternate phone number'
+        }),
+        help_text='Alternate contact number'
+    )
+
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'Enter residential address'
+        }),
+        help_text='Residential address'
+    )
+
+    # Bank details
+    bank_name = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Bank name'
+        }),
+        help_text='Bank name for salary payment'
+    )
+
+    account_number = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Account number'
+        }),
+        help_text='Bank account number'
+    )
+
+    ifsc_code = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'IFSC code'
+        }),
+        help_text='Bank IFSC code'
+    )
+
+    upi_id = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'UPI ID'
+        }),
+        help_text='UPI ID for payments'
+    )
+
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'Internal notes about the teacher'
+        }),
+        help_text='Internal notes (not visible to teacher)'
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('A user with this email already exists.')
+        return email
+
+    def clean_employee_id(self):
+        employee_id = self.cleaned_data.get('employee_id')
+        if employee_id and TeacherProfile.objects.filter(employee_id=employee_id).exists():
+            raise ValidationError('This employee ID is already in use.')
+        return employee_id
+
+    def save(self):
+        data = self.cleaned_data
+
+        # Create User
+        user = User.objects.create_user(
+            email=data['email'],
+            username=data['email'],
+            name=data['name'],
+            password=data['password'],
+            phone_number=data.get('phone_number', ''),
+            role='teacher',
+            is_active=True
+        )
+
+        # Create TeacherProfile with all fields including tuition-related ones
+        profile = TeacherProfile.objects.create(
+            user=user,
+            employee_id=data.get('employee_id') or None,
+            designation=data.get('designation', ''),
+            department=data.get('department', ''),
+            qualification=data.get('qualification', ''),
+            specialization=data.get('specialization', ''),
+            experience_years=data.get('experience_years', 0),
+            bio=data.get('bio', ''),
+            date_of_joining=data.get('date_of_joining'),
+            must_change_password=True,
+            is_active=True,
+            # Teaching mode flags
+            can_teach_online=data.get('can_teach_online', True),
+            can_teach_offline=data.get('can_teach_offline', False),
+            # Additional contact
+            alternate_phone=data.get('alternate_phone', ''),
+            address=data.get('address', ''),
+            # Bank details
+            bank_name=data.get('bank_name', ''),
+            account_number=data.get('account_number', ''),
+            ifsc_code=data.get('ifsc_code', ''),
+            upi_id=data.get('upi_id', ''),
+            # Notes
+            notes=data.get('notes', ''),
+        )
+
+        # Assign online courses
+        if data.get('assigned_courses'):
+            profile.assigned_courses.set(data['assigned_courses'])
+
+        # Assign tuition subjects
+        if data.get('tuition_subjects'):
+            profile.tuition_subjects.set(data['tuition_subjects'])
+
+        return profile
+
+
+class TeacherProfileEditForm(forms.ModelForm):
+    """Form for editing an existing teacher's profile"""
+
+    # User fields (read from related user)
+    name = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter full name'
+        }),
+        help_text='Full name of the teacher'
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter email address'
+        }),
+        help_text='Email address (used for login)'
+    )
+
+    phone_number = forms.CharField(
+        max_length=15,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter phone number'
+        }),
+        help_text='Phone number'
+    )
+
+    is_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Whether this teacher account is active'
+    )
+
+    # TeacherProfile fields
+    employee_id = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Employee ID'
+        }),
+        help_text='Unique employee identifier'
+    )
+
+    designation = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., Senior Instructor'
+        }),
+        help_text='Job title/designation'
+    )
+
+    department = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., Computer Science'
+        }),
+        help_text='Department or subject area'
+    )
+
+    qualification = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'e.g., M.Tech, B.Ed'
+        }),
+        help_text='Educational qualifications'
+    )
+
+    specialization = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'e.g., Python, Web Development'
+        }),
+        help_text='Areas of expertise'
+    )
+
+    experience_years = forms.IntegerField(
+        min_value=0,
+        initial=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '0'
+        }),
+        help_text='Years of teaching experience'
+    )
+
+    bio = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Short biography'
+        }),
+        help_text='Brief bio displayed on teacher profile'
+    )
+
+    date_of_joining = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        help_text='Employment start date'
+    )
+
+    assigned_courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.filter(is_published=True),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'size': '6'
+        }),
+        help_text='Courses this teacher can manage'
+    )
+
+    # Teaching mode flags
+    can_teach_online = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Can teach online courses'
+    )
+
+    can_teach_offline = forms.BooleanField(
+        initial=False,
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Can teach offline tuition batches'
+    )
+
+    # Tuition subjects
+    tuition_subjects = forms.ModelMultipleChoiceField(
+        queryset=TuitionSubject.objects.filter(is_active=True),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'size': '5'
+        }),
+        help_text='Subjects this teacher can teach for offline tuition'
+    )
+
+    # Additional contact
+    alternate_phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Alternate phone number'
+        }),
+        help_text='Alternate contact number'
+    )
+
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'Enter residential address'
+        }),
+        help_text='Residential address'
+    )
+
+    # Bank details
+    bank_name = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Bank name'
+        }),
+        help_text='Bank name for salary payment'
+    )
+
+    account_number = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Account number'
+        }),
+        help_text='Bank account number'
+    )
+
+    ifsc_code = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'IFSC code'
+        }),
+        help_text='Bank IFSC code'
+    )
+
+    upi_id = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'UPI ID'
+        }),
+        help_text='UPI ID for payments'
+    )
+
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 2,
+            'placeholder': 'Internal notes about the teacher'
+        }),
+        help_text='Internal notes (not visible to teacher)'
+    )
+
+    class Meta:
+        model = TeacherProfile
+        fields = ('employee_id', 'designation', 'department', 'qualification',
+                  'specialization', 'experience_years', 'bio', 'date_of_joining',
+                  'can_teach_online', 'can_teach_offline', 'alternate_phone', 'address',
+                  'bank_name', 'account_number', 'ifsc_code', 'upi_id', 'notes')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate user fields from related user
+        if self.instance and self.instance.pk:
+            user = self.instance.user
+            self.fields['name'].initial = user.name
+            self.fields['email'].initial = user.email
+            self.fields['phone_number'].initial = user.phone_number
+            self.fields['is_active'].initial = user.is_active
+            self.fields['assigned_courses'].initial = self.instance.assigned_courses.all()
+            # Tuition fields
+            self.fields['can_teach_online'].initial = self.instance.can_teach_online
+            self.fields['can_teach_offline'].initial = self.instance.can_teach_offline
+            self.fields['tuition_subjects'].initial = self.instance.tuition_subjects.all()
+            self.fields['alternate_phone'].initial = self.instance.alternate_phone
+            self.fields['address'].initial = self.instance.address
+            self.fields['bank_name'].initial = self.instance.bank_name
+            self.fields['account_number'].initial = self.instance.account_number
+            self.fields['ifsc_code'].initial = self.instance.ifsc_code
+            self.fields['upi_id'].initial = self.instance.upi_id
+            self.fields['notes'].initial = self.instance.notes
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(pk=self.instance.user.pk).exists():
+            raise ValidationError('A user with this email already exists.')
+        return email
+
+    def clean_employee_id(self):
+        employee_id = self.cleaned_data.get('employee_id')
+        if employee_id and TeacherProfile.objects.filter(employee_id=employee_id).exclude(pk=self.instance.pk).exists():
+            raise ValidationError('This employee ID is already in use.')
+        return employee_id
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+
+        # Update user fields
+        user = profile.user
+        user.name = self.cleaned_data['name']
+        user.email = self.cleaned_data['email']
+        user.phone_number = self.cleaned_data.get('phone_number', '')
+        user.is_active = self.cleaned_data.get('is_active', True)
+
+        # Update tuition-specific fields
+        profile.can_teach_online = self.cleaned_data.get('can_teach_online', True)
+        profile.can_teach_offline = self.cleaned_data.get('can_teach_offline', False)
+        profile.alternate_phone = self.cleaned_data.get('alternate_phone', '')
+        profile.address = self.cleaned_data.get('address', '')
+        profile.bank_name = self.cleaned_data.get('bank_name', '')
+        profile.account_number = self.cleaned_data.get('account_number', '')
+        profile.ifsc_code = self.cleaned_data.get('ifsc_code', '')
+        profile.upi_id = self.cleaned_data.get('upi_id', '')
+        profile.notes = self.cleaned_data.get('notes', '')
+
+        if commit:
+            user.save()
+            profile.save()
+
+            # Update assigned courses
+            if 'assigned_courses' in self.cleaned_data:
+                profile.assigned_courses.set(self.cleaned_data['assigned_courses'])
+
+            # Update tuition subjects
+            if 'tuition_subjects' in self.cleaned_data:
+                profile.tuition_subjects.set(self.cleaned_data['tuition_subjects'])
+
+        return profile
+
+
+class TeacherCourseAssignmentForm(forms.Form):
+    """Form for assigning courses to a teacher"""
+
+    courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.filter(is_published=True),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Select courses to assign to this teacher'
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.teacher_profile = kwargs.pop('teacher_profile', None)
+        super().__init__(*args, **kwargs)
+
+        if self.teacher_profile:
+            self.fields['courses'].initial = self.teacher_profile.assigned_courses.all()
+
+    def save(self):
+        if self.teacher_profile:
+            self.teacher_profile.assigned_courses.set(self.cleaned_data['courses'])
+            return self.teacher_profile
+        return None

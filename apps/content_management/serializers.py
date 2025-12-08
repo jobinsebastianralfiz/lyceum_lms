@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Lead, News, Placement, Testimonial, LeadFollowUp
+from .models import Lead, News, Placement, Testimonial, LeadFollowUp, Event, Achievement, Banner, CourseEnquiry
 
 
 class LeadCreateSerializer(serializers.ModelSerializer):
@@ -334,3 +334,349 @@ class ContentStatsSerializer(serializers.Serializer):
     total_placements = serializers.IntegerField()
     total_testimonials = serializers.IntegerField()
     featured_content = serializers.IntegerField()
+
+
+# ==================== EVENT SERIALIZERS ====================
+
+class EventListSerializer(serializers.ModelSerializer):
+    """Serializer for listing events in mobile app"""
+    event_type_display = serializers.CharField(source='get_event_type_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    is_upcoming = serializers.BooleanField(read_only=True)
+    days_until_event = serializers.SerializerMethodField()
+    featured_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Event
+        fields = [
+            'id', 'title', 'slug', 'short_description', 'event_type', 'event_type_display',
+            'featured_image', 'featured_image_url', 'event_date', 'start_time', 'end_time',
+            'timezone', 'is_online', 'venue_name', 'venue_address',
+            'registration_required', 'max_attendees',
+            'is_featured', 'status', 'status_display', 'is_upcoming',
+            'days_until_event', 'published_at'
+        ]
+
+    def get_days_until_event(self, obj):
+        if hasattr(obj, 'is_upcoming') and obj.is_upcoming:
+            delta = obj.event_date - timezone.now().date()
+            return delta.days
+        return None
+
+    def get_featured_image_url(self, obj):
+        if obj.featured_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.featured_image.url)
+            return obj.featured_image.url
+        return None
+
+
+class EventDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for event pages"""
+    event_type_display = serializers.CharField(source='get_event_type_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    is_upcoming = serializers.BooleanField(read_only=True)
+    featured_image_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    created_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Event
+        exclude = ['created_by', 'meeting_password']
+
+    def get_featured_image_url(self, obj):
+        if obj.featured_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.featured_image.url)
+            return obj.featured_image.url
+        return None
+
+    def get_thumbnail_url(self, obj):
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+
+    def get_created_by_name(self, obj):
+        if obj.created_by:
+            return obj.created_by.name if hasattr(obj.created_by, 'name') else obj.created_by.username
+        return None
+
+
+class EventSimpleSerializer(serializers.ModelSerializer):
+    """Minimal event data for dashboard/cards"""
+    event_type_display = serializers.CharField(source='get_event_type_display', read_only=True)
+
+    class Meta:
+        model = Event
+        fields = ['id', 'title', 'event_type', 'event_type_display', 'event_date', 'start_time', 'is_online']
+
+
+# ==================== ACHIEVEMENT SERIALIZERS ====================
+
+class AchievementListSerializer(serializers.ModelSerializer):
+    """Serializer for listing achievements"""
+    achievement_type_display = serializers.CharField(source='get_achievement_type_display', read_only=True)
+    badge_icon_url = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Achievement
+        fields = [
+            'id', 'title', 'slug', 'short_description', 'achievement_type', 'achievement_type_display',
+            'badge_icon', 'badge_icon_url', 'image', 'image_url', 'awarded_by',
+            'achievement_date', 'year', 'category', 'is_featured'
+        ]
+
+    def get_badge_icon_url(self, obj):
+        if obj.badge_icon:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.badge_icon.url)
+            return obj.badge_icon.url
+        return None
+
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+
+class AchievementDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for achievements"""
+    achievement_type_display = serializers.CharField(source='get_achievement_type_display', read_only=True)
+    badge_icon_url = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    certificate_url = serializers.SerializerMethodField()
+    created_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Achievement
+        exclude = ['created_by']
+
+    def get_badge_icon_url(self, obj):
+        if obj.badge_icon:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.badge_icon.url)
+            return obj.badge_icon.url
+        return None
+
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+    def get_certificate_url(self, obj):
+        if obj.certificate:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.certificate.url)
+            return obj.certificate.url
+        return None
+
+    def get_created_by_name(self, obj):
+        if obj.created_by:
+            return obj.created_by.name if hasattr(obj.created_by, 'name') else obj.created_by.username
+        return None
+
+
+class AchievementSimpleSerializer(serializers.ModelSerializer):
+    """Minimal achievement data for dashboard stats"""
+    class Meta:
+        model = Achievement
+        fields = ['id', 'title', 'year', 'badge_icon', 'awarded_by']
+
+
+# ==================== BANNER SERIALIZERS ====================
+
+class BannerSerializer(serializers.ModelSerializer):
+    """Serializer for banners/hero sections"""
+    banner_type_display = serializers.CharField(source='get_banner_type_display', read_only=True)
+    is_currently_active = serializers.SerializerMethodField()
+    background_image_url = serializers.SerializerMethodField()
+    featured_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Banner
+        fields = [
+            'id', 'title', 'subtitle', 'description', 'banner_type', 'banner_type_display',
+            'background_image', 'background_image_url', 'featured_image', 'featured_image_url',
+            'text_color', 'overlay_opacity', 'cta_text', 'cta_link',
+            'secondary_cta_text', 'secondary_cta_link', 'priority', 'is_active',
+            'is_currently_active', 'start_date', 'end_date',
+            'stat_1_value', 'stat_1_label', 'stat_2_value', 'stat_2_label',
+            'stat_3_value', 'stat_3_label'
+        ]
+
+    def get_is_currently_active(self, obj):
+        if not obj.is_active:
+            return False
+        now = timezone.now()
+        if obj.start_date and now < obj.start_date:
+            return False
+        if obj.end_date and now > obj.end_date:
+            return False
+        return True
+
+    def get_background_image_url(self, obj):
+        if obj.background_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.background_image.url)
+            return obj.background_image.url
+        return None
+
+    def get_featured_image_url(self, obj):
+        if obj.featured_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.featured_image.url)
+            return obj.featured_image.url
+        return None
+
+
+class BannerSimpleSerializer(serializers.ModelSerializer):
+    """Minimal banner data"""
+    background_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Banner
+        fields = ['id', 'title', 'subtitle', 'background_image_url', 'cta_text', 'cta_link']
+
+    def get_background_image_url(self, obj):
+        if obj.background_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.background_image.url)
+            return obj.background_image.url
+        return None
+
+
+# ==================== COURSE ENQUIRY SERIALIZERS ====================
+
+class CourseEnquiryCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating course enquiries from mobile app"""
+
+    class Meta:
+        model = CourseEnquiry
+        fields = [
+            'course', 'name', 'email', 'phone', 'current_qualification',
+            'work_experience', 'current_company', 'preferred_batch',
+            'preferred_contact_time', 'message'
+        ]
+
+    def validate(self, data):
+        course = data.get('course')
+        if course:
+            # Check if course is published
+            if not course.is_published:
+                raise serializers.ValidationError({
+                    'course': 'This course is not available for enquiries.'
+                })
+
+            # Allow enquiries for:
+            # 1. 'enquiry_only' courses
+            # 2. 'admin_only' courses
+            # 3. Any course with allow_public_enrollment=False (admin-only enrollment)
+            # 'online_purchase' courses with public enrollment should use direct enrollment
+            allowed_types = ['enquiry_only', 'admin_only']
+            is_admin_only_enrollment = not getattr(course, 'allow_public_enrollment', True)
+
+            if hasattr(course, 'enrollment_type') and course.enrollment_type not in allowed_types and not is_admin_only_enrollment:
+                raise serializers.ValidationError({
+                    'course': 'This course is available for direct enrollment. Please enroll directly.'
+                })
+        return data
+
+
+class CourseEnquiryListSerializer(serializers.ModelSerializer):
+    """Serializer for listing course enquiries"""
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    assigned_to_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseEnquiry
+        fields = [
+            'id', 'course', 'course_title', 'name', 'email', 'phone',
+            'status', 'status_display', 'assigned_to_name', 'created_at'
+        ]
+
+    def get_assigned_to_name(self, obj):
+        if obj.assigned_to:
+            return obj.assigned_to.name if hasattr(obj.assigned_to, 'name') else obj.assigned_to.username
+        return None
+
+
+class CourseEnquiryDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for course enquiries"""
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    source_display = serializers.CharField(source='get_source_display', read_only=True)
+    assigned_to_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseEnquiry
+        exclude = ['assigned_to', 'ip_address', 'user_agent']
+
+    def get_assigned_to_name(self, obj):
+        if obj.assigned_to:
+            return obj.assigned_to.name if hasattr(obj.assigned_to, 'name') else obj.assigned_to.username
+        return None
+
+
+class StudentCourseEnquirySerializer(serializers.ModelSerializer):
+    """Serializer for students to view their course enquiries"""
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        model = CourseEnquiry
+        fields = [
+            'id', 'course', 'course_title', 'name', 'email', 'phone',
+            'status', 'status_display', 'message', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['__all__']
+
+
+# ==================== ENHANCED DASHBOARD SERIALIZER ====================
+
+class DashboardContentSerializer(serializers.Serializer):
+    """Enhanced dashboard content for mobile app with all content types"""
+    # News
+    latest_news = NewsSimpleSerializer(many=True)
+
+    # Placements
+    recent_placements = PlacementSimpleSerializer(many=True)
+
+    # Testimonials
+    featured_testimonials = TestimonialSimpleSerializer(many=True)
+
+    # Events (NEW)
+    upcoming_events = EventSimpleSerializer(many=True)
+
+    # Achievements (NEW)
+    featured_achievements = AchievementSimpleSerializer(many=True)
+
+    # Banners (NEW)
+    active_banners = BannerSimpleSerializer(many=True)
+
+    # User stats (NEW)
+    learning_streak = serializers.IntegerField(default=0)
+    total_learning_minutes = serializers.IntegerField(default=0)
+
+    # Summary counts
+    total_placements = serializers.IntegerField()
+    total_testimonials = serializers.IntegerField()
+    total_events = serializers.IntegerField(default=0)

@@ -339,6 +339,210 @@ class Testimonial(models.Model):
         ]
 
 
+class Banner(models.Model):
+    """Model for dynamic hero/banner content on landing page"""
+    BANNER_TYPE_CHOICES = [
+        ('hero', 'Main Hero Banner'),
+        ('promo', 'Promotional Banner'),
+        ('announcement', 'Announcement Banner'),
+        ('seasonal', 'Seasonal/Holiday Banner'),
+    ]
+
+    # Basic Information
+    title = models.CharField(max_length=100, help_text="Main heading text")
+    subtitle = models.CharField(max_length=200, blank=True, null=True, help_text="Secondary heading text")
+    description = models.TextField(blank=True, null=True, help_text="Supporting text/description")
+
+    # Call to Action
+    cta_text = models.CharField(max_length=50, blank=True, null=True, help_text="Button text (e.g., 'Explore Courses')")
+    cta_link = models.CharField(max_length=200, blank=True, null=True, help_text="Button link URL or path")
+    secondary_cta_text = models.CharField(max_length=50, blank=True, null=True, help_text="Secondary button text")
+    secondary_cta_link = models.CharField(max_length=200, blank=True, null=True, help_text="Secondary button link")
+
+    # Media
+    background_image = models.ImageField(upload_to='banners/backgrounds/', blank=True, null=True)
+    featured_image = models.ImageField(upload_to='banners/featured/', blank=True, null=True, help_text="Image displayed on the right side")
+
+    # Styling
+    banner_type = models.CharField(max_length=20, choices=BANNER_TYPE_CHOICES, default='hero')
+    text_color = models.CharField(max_length=20, default='white', help_text="Text color (e.g., 'white', '#ffffff')")
+    overlay_opacity = models.DecimalField(max_digits=3, decimal_places=2, default=0.5, help_text="Background overlay opacity (0-1)")
+
+    # Stats/Highlights (shown in hero section)
+    stat_1_value = models.CharField(max_length=20, blank=True, null=True, help_text="e.g., '500+'")
+    stat_1_label = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., 'Students Enrolled'")
+    stat_2_value = models.CharField(max_length=20, blank=True, null=True)
+    stat_2_label = models.CharField(max_length=50, blank=True, null=True)
+    stat_3_value = models.CharField(max_length=20, blank=True, null=True)
+    stat_3_label = models.CharField(max_length=50, blank=True, null=True)
+
+    # Scheduling
+    is_active = models.BooleanField(default=True)
+    start_date = models.DateTimeField(null=True, blank=True, help_text="When to start showing this banner")
+    end_date = models.DateTimeField(null=True, blank=True, help_text="When to stop showing this banner")
+    priority = models.IntegerField(default=0, help_text="Higher priority banners show first")
+
+    # Tracking
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_banners')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.banner_type})"
+
+    class Meta:
+        ordering = ['-priority', '-created_at']
+        indexes = [
+            models.Index(fields=['is_active', 'banner_type']),
+            models.Index(fields=['priority']),
+        ]
+
+
+class Event(models.Model):
+    """Model for events and webinars"""
+    EVENT_TYPE_CHOICES = [
+        ('webinar', 'Webinar'),
+        ('workshop', 'Workshop'),
+        ('seminar', 'Seminar'),
+        ('hackathon', 'Hackathon'),
+        ('meetup', 'Meetup'),
+        ('conference', 'Conference'),
+        ('open_day', 'Open Day'),
+        ('other', 'Other'),
+    ]
+
+    STATUS_CHOICES = [
+        ('upcoming', 'Upcoming'),
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('postponed', 'Postponed'),
+    ]
+
+    # Basic Information
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField()
+    short_description = models.CharField(max_length=300, help_text="Brief summary for cards/lists")
+
+    # Event Details
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
+
+    # Date & Time
+    event_date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField(null=True, blank=True)
+    timezone = models.CharField(max_length=50, default='Asia/Kolkata')
+
+    # Location (for physical events)
+    is_online = models.BooleanField(default=True)
+    venue_name = models.CharField(max_length=200, blank=True, null=True)
+    venue_address = models.TextField(blank=True, null=True)
+    map_link = models.URLField(blank=True, null=True)
+
+    # Online Event Details
+    meeting_link = models.URLField(blank=True, null=True, help_text="Zoom/Meet/Teams link")
+    meeting_password = models.CharField(max_length=50, blank=True, null=True)
+
+    # Media
+    featured_image = models.ImageField(upload_to='events/images/', blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='events/thumbnails/', blank=True, null=True)
+
+    # Registration
+    registration_required = models.BooleanField(default=True)
+    registration_link = models.URLField(blank=True, null=True)
+    max_attendees = models.PositiveIntegerField(null=True, blank=True)
+    registration_deadline = models.DateTimeField(null=True, blank=True)
+
+    # Speakers/Hosts
+    speakers = models.TextField(blank=True, null=True, help_text="Speaker names and details (comma-separated or JSON)")
+
+    # Publishing
+    is_published = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False, help_text="Show on homepage")
+    published_at = models.DateTimeField(null=True, blank=True)
+
+    # SEO
+    meta_title = models.CharField(max_length=60, blank=True, null=True)
+    meta_description = models.CharField(max_length=160, blank=True, null=True)
+
+    # Tracking
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_events')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    view_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.title} - {self.event_date}"
+
+    @property
+    def is_upcoming(self):
+        from django.utils import timezone
+        return self.event_date >= timezone.now().date() and self.status == 'upcoming'
+
+    class Meta:
+        ordering = ['event_date', 'start_time']
+        indexes = [
+            models.Index(fields=['is_published', 'event_date']),
+            models.Index(fields=['status']),
+            models.Index(fields=['is_featured']),
+            models.Index(fields=['event_type']),
+        ]
+
+
+class Achievement(models.Model):
+    """Model for academy achievements and milestones"""
+    ACHIEVEMENT_TYPE_CHOICES = [
+        ('award', 'Award'),
+        ('recognition', 'Recognition'),
+        ('milestone', 'Milestone'),
+        ('partnership', 'Partnership'),
+        ('accreditation', 'Accreditation'),
+        ('ranking', 'Ranking'),
+    ]
+
+    # Basic Information
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField()
+    short_description = models.CharField(max_length=300, help_text="Brief summary for cards/lists")
+
+    # Achievement Details
+    achievement_type = models.CharField(max_length=20, choices=ACHIEVEMENT_TYPE_CHOICES)
+    awarded_by = models.CharField(max_length=200, help_text="Organization that gave the award/recognition")
+    achievement_date = models.DateField()
+
+    # Media
+    image = models.ImageField(upload_to='achievements/images/', blank=True, null=True)
+    badge_icon = models.ImageField(upload_to='achievements/badges/', blank=True, null=True)
+    certificate = models.FileField(upload_to='achievements/certificates/', blank=True, null=True)
+
+    # Additional Info
+    year = models.CharField(max_length=4)
+    category = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., 'Education', 'Technology'")
+
+    # Publishing
+    is_published = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False, help_text="Show on homepage")
+
+    # Tracking
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_achievements')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.year})"
+
+    class Meta:
+        ordering = ['-achievement_date', '-created_at']
+        indexes = [
+            models.Index(fields=['is_published']),
+            models.Index(fields=['is_featured']),
+            models.Index(fields=['achievement_type']),
+        ]
+
+
 class LeadFollowUp(models.Model):
     """Track follow-up activities for leads"""
     FOLLOW_UP_TYPE_CHOICES = [
@@ -348,7 +552,7 @@ class LeadFollowUp(models.Model):
         ('meeting', 'Meeting'),
         ('demo', 'Demo Session'),
     ]
-    
+
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='follow_ups')
     follow_up_type = models.CharField(max_length=20, choices=FOLLOW_UP_TYPE_CHOICES)
     notes = models.TextField()
@@ -356,9 +560,99 @@ class LeadFollowUp(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follow_ups_created')
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.lead.name} - {self.follow_up_type} on {self.scheduled_at.date()}"
-    
+
     class Meta:
         ordering = ['-scheduled_at']
+
+
+class CourseEnquiry(models.Model):
+    """Model for course enquiries/leads from information-only courses"""
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('contacted', 'Contacted'),
+        ('interested', 'Interested'),
+        ('demo_scheduled', 'Demo Scheduled'),
+        ('enrolled', 'Enrolled'),
+        ('not_interested', 'Not Interested'),
+        ('follow_up', 'Follow Up Required'),
+    ]
+
+    SOURCE_CHOICES = [
+        ('website', 'Website'),
+        ('mobile_app', 'Mobile App'),
+        ('referral', 'Referral'),
+        ('social_media', 'Social Media'),
+        ('google_ads', 'Google Ads'),
+        ('other', 'Other'),
+    ]
+
+    # Course reference
+    course = models.ForeignKey(
+        'courses.Course',
+        on_delete=models.CASCADE,
+        related_name='enquiries'
+    )
+
+    # Contact Information
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(
+        max_length=15,
+        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter a valid phone number.')]
+    )
+
+    # Enquiry Details
+    message = models.TextField(blank=True, null=True, help_text="User's message or query")
+    preferred_batch = models.CharField(max_length=100, blank=True, null=True, help_text="Preferred batch timing")
+    preferred_contact_time = models.CharField(max_length=100, blank=True, null=True)
+
+    # Background
+    current_qualification = models.CharField(max_length=200, blank=True, null=True)
+    work_experience = models.CharField(max_length=100, blank=True, null=True)
+    current_company = models.CharField(max_length=200, blank=True, null=True)
+
+    # Lead Management
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='website')
+    assigned_to = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_course_enquiries'
+    )
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes")
+
+    # If user is registered
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='course_enquiries'
+    )
+
+    # Tracking
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, null=True)
+    utm_source = models.CharField(max_length=100, blank=True, null=True)
+    utm_medium = models.CharField(max_length=100, blank=True, null=True)
+    utm_campaign = models.CharField(max_length=100, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.course.title} ({self.status})"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = "Course Enquiries"
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['course']),
+            models.Index(fields=['created_at']),
+        ]

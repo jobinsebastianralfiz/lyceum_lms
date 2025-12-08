@@ -1,0 +1,154 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Event Detail Header -->
+<section class="lm-detail-header">
+  <div class="container">
+    <nav class="lm-breadcrumb">
+      <a href="{% url 'landing:home' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'landing:events_list' %}">Events</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ event.title|truncatechars:30 }}</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Event Content -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <div class="lm-detail-card">
+          {% if event.featured_image %}
+          <div class="lm-detail-image">
+            <img src="{{ event.featured_image.url }}" alt="{{ event.title }}">
+          </div>
+          {% endif %}
+
+          <div class="lm-detail-body">
+            <div class="lm-detail-meta">
+              <span class="lm-badge lm-badge-primary">{{ event.get_event_type_display }}</span>
+              <span class="lm-badge lm-badge-{{ event.status }}">{{ event.get_status_display }}</span>
+            </div>
+
+            <h1 class="lm-detail-title">{{ event.title }}</h1>
+
+            <div class="lm-event-info-grid">
+              <div class="lm-event-info-item">
+                <i class="far fa-calendar"></i>
+                <div>
+                  <strong>Date</strong>
+                  <span>{{ event.event_date|date:"l, F d, Y" }}</span>
+                </div>
+              </div>
+              <div class="lm-event-info-item">
+                <i class="far fa-clock"></i>
+                <div>
+                  <strong>Time</strong>
+                  <span>{{ event.start_time|time:"g:i A" }}{% if event.end_time %} - {{ event.end_time|time:"g:i A" }}{% endif %}</span>
+                </div>
+              </div>
+              <div class="lm-event-info-item">
+                {% if event.is_online %}
+                <i class="fas fa-video"></i>
+                <div>
+                  <strong>Location</strong>
+                  <span>Online Event</span>
+                </div>
+                {% else %}
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <strong>Venue</strong>
+                  <span>{{ event.venue_name }}</span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="lm-detail-content">
+              {{ event.description|linebreaks }}
+            </div>
+
+            {% if event.speakers %}
+            <div class="lm-event-speakers mt-4">
+              <h3><i class="fas fa-user-tie me-2"></i> Speakers</h3>
+              <p>{{ event.speakers }}</p>
+            </div>
+            {% endif %}
+
+            {% if event.is_upcoming and event.registration_required %}
+            <div class="lm-event-cta mt-4">
+              {% if event.registration_link %}
+              <a href="{{ event.registration_link }}" class="btn-lm btn-lm-primary btn-lm-lg" target="_blank">
+                <i class="fas fa-user-plus me-2"></i> Register Now
+              </a>
+              {% elif event.meeting_link %}
+              <a href="{{ event.meeting_link }}" class="btn-lm btn-lm-primary btn-lm-lg" target="_blank">
+                <i class="fas fa-video me-2"></i> Join Meeting
+              </a>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="lm-detail-sidebar">
+          <!-- Event Quick Info -->
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-info-circle me-2"></i> Event Details</h4>
+            <ul class="lm-info-list">
+              <li>
+                <span class="label">Event Type</span>
+                <span class="value">{{ event.get_event_type_display }}</span>
+              </li>
+              <li>
+                <span class="label">Status</span>
+                <span class="value">{{ event.get_status_display }}</span>
+              </li>
+              <li>
+                <span class="label">Timezone</span>
+                <span class="value">{{ event.timezone }}</span>
+              </li>
+              {% if event.max_attendees %}
+              <li>
+                <span class="label">Max Attendees</span>
+                <span class="value">{{ event.max_attendees }}</span>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Related Events -->
+          {% if related_events %}
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-calendar-alt me-2"></i> Related Events</h4>
+            <div class="lm-related-list">
+              {% for rel_event in related_events %}
+              <a href="{% url 'landing:event_detail' rel_event.slug %}" class="lm-related-item">
+                <div class="lm-related-date">
+                  <span class="day">{{ rel_event.event_date|date:"d" }}</span>
+                  <span class="month">{{ rel_event.event_date|date:"M" }}</span>
+                </div>
+                <div class="lm-related-info">
+                  <h5>{{ rel_event.title|truncatechars:40 }}</h5>
+                  <span>{{ rel_event.get_event_type_display }}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

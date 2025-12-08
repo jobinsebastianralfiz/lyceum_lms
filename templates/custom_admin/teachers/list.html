@@ -1,0 +1,182 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Teachers - CodeLearn LMS Admin{% endblock %}
+
+{% block page_title %}Teachers{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          <i class="ti ti-users me-2"></i>Teacher Management
+        </h4>
+        <p class="card-subtitle">Manage teachers and their course assignments</p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:teacher_create' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Add Teacher
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+      <div class="col-md-3 col-6">
+        <div class="card border mb-0">
+          <div class="card-body text-center py-3">
+            <h3 class="mb-1" style="color: var(--lyceum-green);">{{ total_teachers }}</h3>
+            <small class="text-muted">Total Teachers</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card border mb-0">
+          <div class="card-body text-center py-3">
+            <h3 class="mb-1" style="color: #10b981;">{{ active_teachers }}</h3>
+            <small class="text-muted">Active Teachers</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <form method="get" class="d-flex gap-2">
+          <input type="text" name="search" class="form-control" placeholder="Search by name, email, employee ID..." value="{{ search_query }}">
+          <select name="status" class="form-select" style="width: auto;">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+          </select>
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="ti ti-search"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Teachers Table -->
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Teacher</th>
+            <th>Employee ID</th>
+            <th>Designation</th>
+            <th>Department</th>
+            <th>Courses</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for teacher in teachers %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 14px;">
+                  {{ teacher.user.name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div class="fw-medium">{{ teacher.user.name }}</div>
+                  <small class="text-muted">{{ teacher.user.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if teacher.employee_id %}
+                <code>{{ teacher.employee_id }}</code>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>{{ teacher.designation|default:"-" }}</td>
+            <td>{{ teacher.department|default:"-" }}</td>
+            <td>
+              <span class="badge bg-info">{{ teacher.courses_count }} courses</span>
+            </td>
+            <td>
+              {% if teacher.is_active and teacher.user.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group">
+                <a href="{% url 'custom_admin:teacher_detail' teacher.id %}" class="btn btn-sm btn-outline-primary" title="View Details">
+                  <i class="ti ti-eye"></i>
+                </a>
+                <a href="{% url 'custom_admin:teacher_edit' teacher.id %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                  <i class="ti ti-edit"></i>
+                </a>
+                <a href="{% url 'custom_admin:teacher_assign_courses' teacher.id %}" class="btn btn-sm btn-outline-info" title="Assign Courses">
+                  <i class="ti ti-book"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <i class="ti ti-users-off fs-1 text-muted mb-2 d-block"></i>
+              <p class="mb-0 text-muted">No teachers found.</p>
+              <a href="{% url 'custom_admin:teacher_create' %}" class="btn btn-primary mt-3">
+                <i class="ti ti-plus me-1"></i>Add First Teacher
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if teachers.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if teachers.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+              <i class="ti ti-chevrons-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ teachers.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in teachers.paginator.page_range %}
+          {% if teachers.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+          {% elif num > teachers.number|add:'-3' and num < teachers.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if teachers.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ teachers.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ teachers.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+              <i class="ti ti-chevrons-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

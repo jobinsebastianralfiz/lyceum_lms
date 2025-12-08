@@ -61,7 +61,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Documentation (temporary/local)
+# Documentation (exclude all markdown files from git)
+*.md
 *.md.backup
 *_OLD.md
 *_BACKUP.md

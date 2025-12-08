@@ -1,0 +1,226 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Issue Certificate - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="card-title mb-0">Issue New Certificate</h4>
+            <p class="card-subtitle">Create and issue a certificate to a student</p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'custom_admin:certificates_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>Back
+            </a>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- Student & Course Selection -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted mb-3"><i class="ti ti-user me-2"></i>Student & Course</h6>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="student" class="form-label">Student <span class="text-danger">*</span></label>
+                <select class="form-select" id="student" name="student" required>
+                  <option value="">Select a student</option>
+                  {% for student in students %}
+                    <option value="{{ student.id }}">{{ student.name }} ({{ student.email }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="course" class="form-label">Course <span class="text-danger">*</span></label>
+                <select class="form-select" id="course" name="course" required>
+                  <option value="">Select a course</option>
+                  {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certificate Details -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted mb-3"><i class="ti ti-certificate me-2"></i>Certificate Details</h6>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="certificate_type" class="form-label">Certificate Type</label>
+                <select class="form-select" id="certificate_type" name="certificate_type">
+                  {% for value, label in certificate_types %}
+                    <option value="{{ value }}" {% if value == 'completion' %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="title" class="form-label">Certificate Title</label>
+                <input type="text" class="form-control" id="title" name="title"
+                       value="Certificate of Completion" placeholder="e.g., Certificate of Completion">
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="description" class="form-label">Description (Optional)</label>
+                <textarea class="form-control" id="description" name="description" rows="2"
+                          placeholder="Additional text to display on the certificate"></textarea>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="completion_date" class="form-label">Completion Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="completion_date" name="completion_date"
+                       value="{% now 'Y-m-d' %}" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Score & Grade (Optional) -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted mb-3"><i class="ti ti-chart-bar me-2"></i>Score & Grade (Optional)</h6>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="final_score" class="form-label">Final Score (%)</label>
+                <input type="number" class="form-control" id="final_score" name="final_score"
+                       min="0" max="100" step="0.01" placeholder="e.g., 85.5">
+                <div class="form-text">Leave empty if not applicable</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="grade" class="form-label">Grade</label>
+                <select class="form-select" id="grade" name="grade">
+                  <option value="">Auto (based on score)</option>
+                  <option value="A+">A+</option>
+                  <option value="A">A</option>
+                  <option value="B+">B+</option>
+                  <option value="B">B</option>
+                  <option value="C+">C+</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="Pass">Pass</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Signature -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted mb-3"><i class="ti ti-signature me-2"></i>Signature</h6>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="signed_by" class="form-label">Signed By</label>
+                <input type="text" class="form-control" id="signed_by" name="signed_by"
+                       placeholder="e.g., Dr. John Smith">
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="signed_by_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="signed_by_title" name="signed_by_title"
+                       placeholder="e.g., Director of Training">
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'custom_admin:certificates_list' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-certificate me-1"></i>Issue Certificate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Dark Theme Form Styling */
+.form-control,
+.form-select {
+  background-color: var(--dark-bg-tertiary, #334155) !important;
+  border-color: var(--dark-border, #475569) !important;
+  color: var(--text-white, #F9FAFB) !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-gray, #94A3B8) !important;
+  opacity: 1 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--dark-bg-tertiary, #334155) !important;
+  border-color: var(--primary-color, #2AB673) !important;
+  color: var(--text-white, #F9FAFB) !important;
+  box-shadow: 0 0 0 0.2rem rgba(42, 182, 115, 0.25) !important;
+}
+
+.form-select option {
+  background-color: var(--dark-bg-secondary, #1E293B);
+  color: var(--text-white, #F9FAFB);
+}
+
+.form-label {
+  color: var(--text-white, #F9FAFB) !important;
+}
+
+.form-text {
+  color: var(--text-gray, #94A3B8) !important;
+}
+
+.card {
+  background-color: var(--dark-bg-secondary, #1E293B) !important;
+  border-color: var(--dark-border, #475569) !important;
+}
+
+.card-title {
+  color: var(--text-white, #F9FAFB) !important;
+}
+
+.card-subtitle {
+  color: var(--text-gray, #94A3B8) !important;
+}
+
+h6.text-muted {
+  color: var(--text-gray, #94A3B8) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}My Students - Teacher Portal{% endblock %}
+{% block page_title %}My Students{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <p style="color: var(--text-secondary); margin: 0;">Students enrolled in your courses</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <div class="tp-search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="studentSearch" placeholder="Search students..." onkeyup="filterStudents()">
+    </div>
+    <select class="tp-select" id="courseFilter" onchange="filterByCourse()">
+      <option value="">All Courses</option>
+      {% for course in courses %}
+        <option value="{{ course.id }}" {% if selected_course == course.id %}selected{% endif %}>{{ course.title|truncatechars:30 }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- Student Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_students }}</div>
+      <div class="tp-stat-label">Total Students</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="tp-stat-value">{{ active_students }}</div>
+      <div class="tp-stat-label">Active This Week</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon orange">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="tp-stat-value">{{ avg_progress }}%</div>
+      <div class="tp-stat-label">Avg Progress</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon purple">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="tp-stat-value">{{ new_enrollments }}</div>
+      <div class="tp-stat-label">New This Month</div>
+    </div>
+  </div>
+</div>
+
+<!-- Students Table -->
+<div class="tp-card">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title"><i class="fas fa-users me-2"></i>Students List</h3>
+    <span class="tp-badge tp-badge-info">{{ enrollments|length }} students</span>
+  </div>
+  {% if enrollments %}
+    <div class="table-responsive">
+      <table class="tp-table" id="studentsTable">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Enrolled</th>
+            <th>Progress</th>
+            <th>Last Active</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for enrollment in enrollments %}
+          <tr class="student-row" data-name="{{ enrollment.user.name|lower }}" data-course="{{ enrollment.course.id }}">
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                  {{ enrollment.user.name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div style="font-weight: 500;">{{ enrollment.user.name }}</div>
+                  <small style="color: var(--text-secondary);">{{ enrollment.user.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="tp-badge tp-badge-info">{{ enrollment.course.title|truncatechars:20 }}</span>
+            </td>
+            <td>
+              <small style="color: var(--text-secondary);">{{ enrollment.enrolled_on|date:"M d, Y" }}</small>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="tp-progress" style="width: 80px;">
+                  <div class="tp-progress-bar" style="width: {{ enrollment.progress_percentage|default:0 }}%;"></div>
+                </div>
+                <small style="font-weight: 500;">{{ enrollment.progress_percentage|default:0 }}%</small>
+              </div>
+            </td>
+            <td>
+              <small style="color: var(--text-secondary);">
+                {% if enrollment.last_accessed %}
+                  {{ enrollment.last_accessed|timesince }} ago
+                {% else %}
+                  Never
+                {% endif %}
+              </small>
+            </td>
+            <td>
+              {% if enrollment.is_active %}
+                <span class="tp-badge tp-badge-success">Active</span>
+              {% else %}
+                <span class="tp-badge tp-badge-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'teacher_portal:student_detail' enrollment.user.id %}" class="tp-btn tp-btn-primary tp-btn-sm">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-users" style="font-size: 64px; color: var(--text-secondary); opacity: 0.3;"></i>
+      <h4 style="margin-top: 20px; color: var(--text-secondary);">No Students Yet</h4>
+      <p style="color: var(--text-secondary);">No students have enrolled in your courses yet.</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.tp-progress {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tp-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.tp-select {
+  padding: 8px 32px 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+.tp-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterStudents() {
+  const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+  const courseFilter = document.getElementById('courseFilter').value;
+  const rows = document.querySelectorAll('.student-row');
+
+  rows.forEach(row => {
+    const name = row.dataset.name;
+    const course = row.dataset.course;
+    const matchesSearch = name.includes(searchTerm);
+    const matchesCourse = !courseFilter || course === courseFilter;
+
+    if (matchesSearch && matchesCourse) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+function filterByCourse() {
+  filterStudents();
+}
+</script>
+{% endblock %}

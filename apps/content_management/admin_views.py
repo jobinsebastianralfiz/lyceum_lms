@@ -8,7 +8,7 @@ from django.utils.text import slugify
 from django.http import JsonResponse
 from datetime import timedelta
 
-from .models import Lead, News, Placement, Testimonial, LeadFollowUp
+from .models import Lead, News, Placement, Testimonial, LeadFollowUp, Banner, Event
 from .serializers import LeadDetailSerializer
 from apps.users.models import User
 
@@ -653,3 +653,364 @@ def content_dashboard_view(request):
     }
     
     return render(request, 'custom_admin/content/dashboard.html', context)
+
+
+# BANNER MANAGEMENT VIEWS
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def banners_list_view(request):
+    """List all banners"""
+    search_query = request.GET.get('search', '')
+    banner_type_filter = request.GET.get('banner_type', '')
+    status_filter = request.GET.get('status', '')
+
+    banners = Banner.objects.select_related('created_by').order_by('-priority', '-created_at')
+
+    # Apply filters
+    if search_query:
+        banners = banners.filter(
+            Q(title__icontains=search_query) |
+            Q(subtitle__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    if banner_type_filter:
+        banners = banners.filter(banner_type=banner_type_filter)
+
+    if status_filter:
+        if status_filter == 'active':
+            banners = banners.filter(is_active=True)
+        elif status_filter == 'inactive':
+            banners = banners.filter(is_active=False)
+
+    # Pagination
+    paginator = Paginator(banners, 20)
+    page_number = request.GET.get('page')
+    banners_page = paginator.get_page(page_number)
+
+    # Statistics
+    stats = {
+        'total_banners': Banner.objects.count(),
+        'active_banners': Banner.objects.filter(is_active=True).count(),
+        'hero_banners': Banner.objects.filter(banner_type='hero', is_active=True).count(),
+    }
+
+    context = {
+        'banners': banners_page,
+        'search_query': search_query,
+        'banner_type_filter': banner_type_filter,
+        'status_filter': status_filter,
+        'stats': stats,
+        'banner_types': Banner.BANNER_TYPE_CHOICES,
+    }
+
+    return render(request, 'custom_admin/content/banners_list.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def banner_create_view(request):
+    """Create new banner"""
+    if request.method == 'POST':
+        banner = Banner.objects.create(
+            title=request.POST.get('title'),
+            subtitle=request.POST.get('subtitle', ''),
+            description=request.POST.get('description', ''),
+            cta_text=request.POST.get('cta_text', ''),
+            cta_link=request.POST.get('cta_link', ''),
+            secondary_cta_text=request.POST.get('secondary_cta_text', ''),
+            secondary_cta_link=request.POST.get('secondary_cta_link', ''),
+            banner_type=request.POST.get('banner_type', 'hero'),
+            text_color=request.POST.get('text_color', 'white'),
+            overlay_opacity=float(request.POST.get('overlay_opacity', 0.5)),
+            stat_1_value=request.POST.get('stat_1_value', ''),
+            stat_1_label=request.POST.get('stat_1_label', ''),
+            stat_2_value=request.POST.get('stat_2_value', ''),
+            stat_2_label=request.POST.get('stat_2_label', ''),
+            stat_3_value=request.POST.get('stat_3_value', ''),
+            stat_3_label=request.POST.get('stat_3_label', ''),
+            is_active=request.POST.get('is_active') == 'on',
+            priority=int(request.POST.get('priority', 0)),
+            created_by=request.user,
+        )
+
+        # Handle file uploads
+        if request.FILES.get('background_image'):
+            banner.background_image = request.FILES['background_image']
+        if request.FILES.get('featured_image'):
+            banner.featured_image = request.FILES['featured_image']
+        banner.save()
+
+        messages.success(request, 'Banner created successfully.')
+        return redirect('custom_admin:banners_list')
+
+    context = {
+        'banner_types': Banner.BANNER_TYPE_CHOICES,
+    }
+
+    return render(request, 'custom_admin/content/banner_form.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def banner_edit_view(request, banner_id):
+    """Edit banner"""
+    banner = get_object_or_404(Banner, id=banner_id)
+
+    if request.method == 'POST':
+        banner.title = request.POST.get('title', banner.title)
+        banner.subtitle = request.POST.get('subtitle', banner.subtitle)
+        banner.description = request.POST.get('description', banner.description)
+        banner.cta_text = request.POST.get('cta_text', banner.cta_text)
+        banner.cta_link = request.POST.get('cta_link', banner.cta_link)
+        banner.secondary_cta_text = request.POST.get('secondary_cta_text', banner.secondary_cta_text)
+        banner.secondary_cta_link = request.POST.get('secondary_cta_link', banner.secondary_cta_link)
+        banner.banner_type = request.POST.get('banner_type', banner.banner_type)
+        banner.text_color = request.POST.get('text_color', banner.text_color)
+        banner.overlay_opacity = float(request.POST.get('overlay_opacity', banner.overlay_opacity))
+        banner.stat_1_value = request.POST.get('stat_1_value', banner.stat_1_value)
+        banner.stat_1_label = request.POST.get('stat_1_label', banner.stat_1_label)
+        banner.stat_2_value = request.POST.get('stat_2_value', banner.stat_2_value)
+        banner.stat_2_label = request.POST.get('stat_2_label', banner.stat_2_label)
+        banner.stat_3_value = request.POST.get('stat_3_value', banner.stat_3_value)
+        banner.stat_3_label = request.POST.get('stat_3_label', banner.stat_3_label)
+        banner.is_active = request.POST.get('is_active') == 'on'
+        banner.priority = int(request.POST.get('priority', banner.priority))
+
+        # Handle image removal
+        if request.POST.get('remove_background_image'):
+            if banner.background_image:
+                banner.background_image.delete(save=False)
+                banner.background_image = None
+        elif request.FILES.get('background_image'):
+            banner.background_image = request.FILES['background_image']
+
+        if request.POST.get('remove_featured_image'):
+            if banner.featured_image:
+                banner.featured_image.delete(save=False)
+                banner.featured_image = None
+        elif request.FILES.get('featured_image'):
+            banner.featured_image = request.FILES['featured_image']
+
+        banner.save()
+
+        messages.success(request, 'Banner updated successfully.')
+        return redirect('custom_admin:banners_list')
+
+    context = {
+        'banner': banner,
+        'banner_types': Banner.BANNER_TYPE_CHOICES,
+        'is_edit': True,
+    }
+
+    return render(request, 'custom_admin/content/banner_form.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def banner_delete_view(request, banner_id):
+    """Delete banner"""
+    banner = get_object_or_404(Banner, id=banner_id)
+
+    if request.method == 'POST':
+        banner_title = banner.title
+        banner.delete()
+        messages.success(request, f'Banner "{banner_title}" deleted successfully!')
+        return redirect('custom_admin:banners_list')
+
+    return redirect('custom_admin:banners_list')
+
+
+# EVENT MANAGEMENT VIEWS
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def events_list_view(request):
+    """List all events"""
+    search_query = request.GET.get('search', '')
+    event_type_filter = request.GET.get('event_type', '')
+    status_filter = request.GET.get('status', '')
+
+    events = Event.objects.select_related('created_by').order_by('-event_date')
+
+    # Apply filters
+    if search_query:
+        events = events.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(venue_name__icontains=search_query)
+        )
+
+    if event_type_filter:
+        events = events.filter(event_type=event_type_filter)
+
+    if status_filter:
+        if status_filter == 'published':
+            events = events.filter(is_published=True)
+        elif status_filter == 'draft':
+            events = events.filter(is_published=False)
+        elif status_filter == 'upcoming':
+            events = events.filter(status='upcoming')
+
+    # Pagination
+    paginator = Paginator(events, 20)
+    page_number = request.GET.get('page')
+    events_page = paginator.get_page(page_number)
+
+    # Statistics
+    stats = {
+        'total_events': Event.objects.count(),
+        'published_events': Event.objects.filter(is_published=True).count(),
+        'upcoming_events': Event.objects.filter(status='upcoming').count(),
+        'featured_events': Event.objects.filter(is_featured=True).count(),
+    }
+
+    context = {
+        'events': events_page,
+        'search_query': search_query,
+        'event_type_filter': event_type_filter,
+        'status_filter': status_filter,
+        'stats': stats,
+        'event_types': Event.EVENT_TYPE_CHOICES,
+        'event_statuses': Event.STATUS_CHOICES,
+    }
+
+    return render(request, 'custom_admin/content/events_list.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def event_create_view(request):
+    """Create new event"""
+    if request.method == 'POST':
+        title = request.POST.get('title')
+
+        # Create slug
+        slug = slugify(title)
+        original_slug = slug
+        counter = 1
+        while Event.objects.filter(slug=slug).exists():
+            slug = f"{original_slug}-{counter}"
+            counter += 1
+
+        event = Event.objects.create(
+            title=title,
+            slug=slug,
+            description=request.POST.get('description', ''),
+            short_description=request.POST.get('short_description', ''),
+            event_type=request.POST.get('event_type'),
+            status=request.POST.get('status', 'upcoming'),
+            event_date=request.POST.get('event_date'),
+            start_time=request.POST.get('start_time'),
+            end_time=request.POST.get('end_time') or None,
+            timezone=request.POST.get('timezone', 'Asia/Kolkata'),
+            is_online=request.POST.get('is_online') == 'on',
+            venue_name=request.POST.get('venue_name', ''),
+            venue_address=request.POST.get('venue_address', ''),
+            meeting_link=request.POST.get('meeting_link', ''),
+            registration_required=request.POST.get('registration_required') == 'on',
+            registration_link=request.POST.get('registration_link', ''),
+            speakers=request.POST.get('speakers', ''),
+            is_published=request.POST.get('is_published') == 'on',
+            is_featured=request.POST.get('is_featured') == 'on',
+            created_by=request.user,
+            published_at=timezone.now() if request.POST.get('is_published') == 'on' else None
+        )
+
+        # Handle file uploads
+        if request.FILES.get('featured_image'):
+            event.featured_image = request.FILES['featured_image']
+        if request.FILES.get('thumbnail'):
+            event.thumbnail = request.FILES['thumbnail']
+        event.save()
+
+        messages.success(request, 'Event created successfully.')
+        return redirect('custom_admin:events_list')
+
+    context = {
+        'event_types': Event.EVENT_TYPE_CHOICES,
+        'event_statuses': Event.STATUS_CHOICES,
+    }
+
+    return render(request, 'custom_admin/content/event_form.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def event_edit_view(request, event_id):
+    """Edit event"""
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        event.title = request.POST.get('title', event.title)
+        event.description = request.POST.get('description', event.description)
+        event.short_description = request.POST.get('short_description', event.short_description)
+        event.event_type = request.POST.get('event_type', event.event_type)
+        event.status = request.POST.get('status', event.status)
+        event.event_date = request.POST.get('event_date', event.event_date)
+        event.start_time = request.POST.get('start_time', event.start_time)
+        event.end_time = request.POST.get('end_time') or None
+        event.timezone = request.POST.get('timezone', event.timezone)
+        event.is_online = request.POST.get('is_online') == 'on'
+        event.venue_name = request.POST.get('venue_name', event.venue_name)
+        event.venue_address = request.POST.get('venue_address', event.venue_address)
+        event.meeting_link = request.POST.get('meeting_link', event.meeting_link)
+        event.registration_required = request.POST.get('registration_required') == 'on'
+        event.registration_link = request.POST.get('registration_link', event.registration_link)
+        event.speakers = request.POST.get('speakers', event.speakers)
+        event.is_published = request.POST.get('is_published') == 'on'
+        event.is_featured = request.POST.get('is_featured') == 'on'
+
+        # Update slug if title changed
+        original_title = Event.objects.get(id=event_id).title
+        if event.title != original_title:
+            slug = slugify(event.title)
+            original_slug = slug
+            counter = 1
+            while Event.objects.filter(slug=slug).exclude(id=event_id).exists():
+                slug = f"{original_slug}-{counter}"
+                counter += 1
+            event.slug = slug
+
+        # Handle image removal
+        if request.POST.get('remove_featured_image'):
+            if event.featured_image:
+                event.featured_image.delete(save=False)
+                event.featured_image = None
+        elif request.FILES.get('featured_image'):
+            event.featured_image = request.FILES['featured_image']
+
+        if request.POST.get('remove_thumbnail'):
+            if event.thumbnail:
+                event.thumbnail.delete(save=False)
+                event.thumbnail = None
+        elif request.FILES.get('thumbnail'):
+            event.thumbnail = request.FILES['thumbnail']
+
+        # Set published_at if publishing for first time
+        if event.is_published and not event.published_at:
+            event.published_at = timezone.now()
+        elif not event.is_published:
+            event.published_at = None
+
+        event.save()
+
+        messages.success(request, 'Event updated successfully.')
+        return redirect('custom_admin:events_list')
+
+    context = {
+        'event': event,
+        'event_types': Event.EVENT_TYPE_CHOICES,
+        'event_statuses': Event.STATUS_CHOICES,
+        'is_edit': True,
+    }
+
+    return render(request, 'custom_admin/content/event_form.html', context)
+
+
+@user_passes_test(is_staff_user, login_url='/admin/login/')
+def event_delete_view(request, event_id):
+    """Delete event"""
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        event_title = event.title
+        event.delete()
+        messages.success(request, f'Event "{event_title}" deleted successfully!')
+        return redirect('custom_admin:events_list')
+
+    return redirect('custom_admin:events_list')

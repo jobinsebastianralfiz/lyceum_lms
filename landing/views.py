@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, models
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -124,16 +124,85 @@ class PublicUserRegistrationForm(UserCreationForm):
 
 
 def home(request):
-    """Landing page view with featured courses"""
+    """Landing page view with featured courses, dynamic banner, news and events"""
+    from apps.content_management.models import News, Banner, Event, Testimonial, Placement, Achievement
+    from django.utils import timezone
+
     courses = Course.objects.filter(
-        is_published=True, 
-        allow_public_enrollment=True
-    ).order_by('-created_at')[:6]  # Get featured courses
-    
+        is_published=True
+    ).order_by('-created_at')[:6]  # Get featured courses (includes enquiry-only)
+
+    # Get latest published news
+    latest_news = News.objects.filter(
+        is_published=True
+    ).order_by('-published_at', '-created_at')[:3]
+
+    # Get active HERO banners only (within date range, ordered by priority)
+    now = timezone.now()
+    hero_banners = Banner.objects.filter(
+        is_active=True,
+        banner_type='hero'  # Only hero type banners
+    ).filter(
+        # Check start_date: either null or in the past
+        models.Q(start_date__isnull=True) | models.Q(start_date__lte=now)
+    ).filter(
+        # Check end_date: either null or in the future
+        models.Q(end_date__isnull=True) | models.Q(end_date__gte=now)
+    ).order_by('-priority', '-created_at')[:5]  # Max 5 banners
+
+    # For backwards compatibility
+    hero_banner = hero_banners.first() if hero_banners else None
+
+    # Get upcoming events
+    upcoming_events = Event.objects.filter(
+        is_published=True,
+        status='upcoming',
+        event_date__gte=timezone.now().date()
+    ).order_by('event_date', 'start_time')[:3]
+
+    # Get featured testimonials
+    featured_testimonials = Testimonial.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-published_at')[:4]
+
+    # Get featured placements
+    featured_placements = Placement.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-published_at')[:4]
+
+    # Get featured achievements
+    featured_achievements = Achievement.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-achievement_date')[:4]
+
     context = {
         'courses': courses,
+        'latest_news': latest_news,
+        'hero_banners': hero_banners,
+        'hero_banner': hero_banner,
+        'upcoming_events': upcoming_events,
+        'testimonials': featured_testimonials,
+        'placements': featured_placements,
+        'achievements': featured_achievements,
     }
     return render(request, 'landing/home.html', context)
+
+def news_detail(request, slug):
+    """News article detail page view"""
+    from apps.content_management.models import News
+
+    news = get_object_or_404(News, slug=slug, is_published=True)
+
+    # Get related news (same category or recent news)
+    related_news = News.objects.filter(
+        is_published=True
+    ).exclude(id=news.id).order_by('-published_at', '-created_at')[:3]
+
+    context = {
+        'news': news,
+        'related_news': related_news,
+    }
+    return render(request, 'landing/news_detail.html', context)
 
 def privacy_policy(request):
     """Privacy policy page view"""
@@ -233,7 +302,12 @@ def login_view(request):
     """User login view"""
     if request.user.is_authenticated:
         # Redirect authenticated users to appropriate dashboard
-        if request.user.is_staff:
+        user_role = getattr(request.user, 'role', None)
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('custom_admin:dashboard')
+        elif user_role == 'teacher':
+            return redirect('teacher_portal:dashboard')
+        elif user_role == 'admin':
             return redirect('custom_admin:dashboard')
         else:
             return redirect('student_portal:dashboard')
@@ -280,8 +354,17 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
 
-            # Redirect based on user type
-            if user.is_staff:
+            # Redirect based on user role/type
+            user_role = getattr(user, 'role', None)
+
+            if user.is_staff or user.is_superuser:
+                messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
+                return redirect('custom_admin:dashboard')
+            elif user_role == 'teacher':
+                # Teachers go to teacher portal
+                messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
+                return redirect('teacher_portal:dashboard')
+            elif user_role == 'admin':
                 messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
                 return redirect('custom_admin:dashboard')
             else:
@@ -297,15 +380,13 @@ def login_view(request):
 
 
 def courses(request):
-    """Public courses listing page with categories"""
+    """Public courses listing page with categories (includes enquiry-only courses)"""
     courses = Course.objects.filter(
-        is_published=True,
-        allow_public_enrollment=True
+        is_published=True
     ).select_related('category').order_by('-created_at')
-    
+
     categories = Category.objects.filter(
-        courses__is_published=True,
-        courses__allow_public_enrollment=True
+        courses__is_published=True
     ).distinct().order_by('name')
     
     context = {
@@ -315,12 +396,11 @@ def courses(request):
     return render(request, 'landing/courses.html', context)
 
 def course_detail(request, course_id):
-    """Public course detail page for enrollment"""
+    """Public course detail page for enrollment or enquiry"""
     course = get_object_or_404(
-        Course, 
-        id=course_id, 
-        is_published=True, 
-        allow_public_enrollment=True
+        Course,
+        id=course_id,
+        is_published=True
     )
     
     # Check if user is already enrolled
@@ -355,19 +435,31 @@ def enroll_course(request, course_id):
     print(f"Is authenticated: {request.user.is_authenticated}")
     print(f"Request method: {request.method}")
     print(f"Course ID: {course_id}")
-    
+
     # Check authentication first
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to enroll in a course.')
         return redirect('landing:login')
-    
+
     try:
         course = get_object_or_404(
-            Course, 
-            id=course_id, 
-            is_published=True, 
-            allow_public_enrollment=True
+            Course,
+            id=course_id,
+            is_published=True
         )
+
+        # Check enrollment type - only allow online_purchase courses
+        if course.is_enquiry_only:
+            messages.info(request, 'This course requires an enquiry. Please fill out the enquiry form to learn more.')
+            return redirect('landing:course_detail', course_id=course.id)
+
+        if course.is_admin_only:
+            messages.info(request, 'This course requires admin enrollment. Please contact us for more information.')
+            return redirect('landing:course_detail', course_id=course.id)
+
+        if not course.can_purchase_online:
+            messages.error(request, 'This course is not available for online enrollment.')
+            return redirect('landing:course_detail', course_id=course.id)
         
         # Debug logging
         print(f"DEBUG: User {request.user.email} attempting to enroll in course {course.title}")
@@ -665,3 +757,291 @@ def refund_policy(request):
 def cancellation_policy(request):
     """Cancellation policy page view"""
     return render(request, 'landing/cancellation_policy.html')
+
+
+# ============ NEWS VIEWS ============
+def news_list(request):
+    """News listing page with all published news"""
+    from apps.content_management.models import News
+
+    news_items = News.objects.filter(
+        is_published=True
+    ).order_by('-published_at', '-created_at')
+
+    # Get categories for filtering
+    categories = News.CATEGORY_CHOICES
+
+    # Filter by category if provided
+    category = request.GET.get('category')
+    if category:
+        news_items = news_items.filter(category=category)
+
+    context = {
+        'news_items': news_items,
+        'categories': categories,
+        'selected_category': category,
+    }
+    return render(request, 'landing/news_list.html', context)
+
+
+# ============ EVENT VIEWS ============
+def events_list(request):
+    """Events listing page with upcoming and past events"""
+    from apps.content_management.models import Event
+
+    # Get upcoming events
+    upcoming_events = Event.objects.filter(
+        is_published=True,
+        status='upcoming',
+        event_date__gte=timezone.now().date()
+    ).order_by('event_date', 'start_time')
+
+    # Get past events
+    past_events = Event.objects.filter(
+        is_published=True,
+        event_date__lt=timezone.now().date()
+    ).order_by('-event_date')[:10]
+
+    # Get event types for filtering
+    event_types = Event.EVENT_TYPE_CHOICES
+
+    # Filter by type if provided
+    event_type = request.GET.get('type')
+    if event_type:
+        upcoming_events = upcoming_events.filter(event_type=event_type)
+        past_events = past_events.filter(event_type=event_type)
+
+    context = {
+        'upcoming_events': upcoming_events,
+        'past_events': past_events,
+        'event_types': event_types,
+        'selected_type': event_type,
+    }
+    return render(request, 'landing/events_list.html', context)
+
+
+def event_detail(request, slug):
+    """Event detail page"""
+    from apps.content_management.models import Event
+
+    event = get_object_or_404(Event, slug=slug, is_published=True)
+
+    # Increment view count
+    event.view_count += 1
+    event.save(update_fields=['view_count'])
+
+    # Get related events
+    related_events = Event.objects.filter(
+        is_published=True,
+        event_type=event.event_type
+    ).exclude(id=event.id).order_by('event_date')[:3]
+
+    context = {
+        'event': event,
+        'related_events': related_events,
+    }
+    return render(request, 'landing/event_detail.html', context)
+
+
+# ============ TESTIMONIAL VIEWS ============
+def testimonials_list(request):
+    """Testimonials listing page"""
+    from apps.content_management.models import Testimonial
+
+    testimonials = Testimonial.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-published_at', '-created_at')
+
+    # Filter by type if provided
+    testimonial_type = request.GET.get('type')
+    if testimonial_type:
+        testimonials = testimonials.filter(testimonial_type=testimonial_type)
+
+    context = {
+        'testimonials': testimonials,
+        'testimonial_types': Testimonial.TESTIMONIAL_TYPE_CHOICES,
+        'selected_type': testimonial_type,
+    }
+    return render(request, 'landing/testimonials_list.html', context)
+
+
+def testimonial_detail(request, pk):
+    """Testimonial detail page"""
+    from apps.content_management.models import Testimonial
+
+    testimonial = get_object_or_404(Testimonial, pk=pk, is_published=True)
+
+    # Get related testimonials
+    related = Testimonial.objects.filter(
+        is_published=True
+    ).exclude(id=testimonial.id).order_by('-published_at')[:3]
+
+    context = {
+        'testimonial': testimonial,
+        'related_testimonials': related,
+    }
+    return render(request, 'landing/testimonial_detail.html', context)
+
+
+# ============ PLACEMENT VIEWS ============
+def placements_list(request):
+    """Placements listing page - success stories"""
+    from apps.content_management.models import Placement
+
+    placements = Placement.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-published_at', '-created_at')
+
+    # Filter by type if provided
+    placement_type = request.GET.get('type')
+    if placement_type:
+        placements = placements.filter(placement_type=placement_type)
+
+    context = {
+        'placements': placements,
+        'placement_types': Placement.PLACEMENT_TYPE_CHOICES,
+        'selected_type': placement_type,
+    }
+    return render(request, 'landing/placements_list.html', context)
+
+
+def placement_detail(request, pk):
+    """Placement detail page - success story"""
+    from apps.content_management.models import Placement
+
+    placement = get_object_or_404(Placement, pk=pk, is_published=True)
+
+    # Get related placements
+    related = Placement.objects.filter(
+        is_published=True
+    ).exclude(id=placement.id).order_by('-published_at')[:3]
+
+    context = {
+        'placement': placement,
+        'related_placements': related,
+    }
+    return render(request, 'landing/placement_detail.html', context)
+
+
+# ============ ACHIEVEMENT VIEWS ============
+def achievements_list(request):
+    """Achievements listing page"""
+    from apps.content_management.models import Achievement
+
+    achievements = Achievement.objects.filter(
+        is_published=True
+    ).order_by('-is_featured', '-achievement_date')
+
+    # Filter by type if provided
+    achievement_type = request.GET.get('type')
+    if achievement_type:
+        achievements = achievements.filter(achievement_type=achievement_type)
+
+    context = {
+        'achievements': achievements,
+        'achievement_types': Achievement.ACHIEVEMENT_TYPE_CHOICES,
+        'selected_type': achievement_type,
+    }
+    return render(request, 'landing/achievements_list.html', context)
+
+
+def achievement_detail(request, slug):
+    """Achievement detail page"""
+    from apps.content_management.models import Achievement
+
+    achievement = get_object_or_404(Achievement, slug=slug, is_published=True)
+
+    # Get related achievements
+    related = Achievement.objects.filter(
+        is_published=True
+    ).exclude(id=achievement.id).order_by('-achievement_date')[:3]
+
+    context = {
+        'achievement': achievement,
+        'related_achievements': related,
+    }
+    return render(request, 'landing/achievement_detail.html', context)
+
+
+# ============ COURSE ENQUIRY ============
+def course_enquiry(request, course_id):
+    """Handle course enquiry form submission"""
+    from apps.content_management.models import CourseEnquiry
+    from django.contrib import messages
+    from django.conf import settings
+    import requests
+
+    course = get_object_or_404(Course, id=course_id, is_published=True)
+
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('landing:course_detail', course_id=course_id)
+
+    # Verify Cloudflare Turnstile
+    turnstile_token = request.POST.get('cf-turnstile-response', '')
+    turnstile_secret = getattr(settings, 'CLOUDFLARE_TURNSTILE_SECRET_KEY', '')
+
+    if turnstile_secret:  # Only verify if secret key is configured
+        try:
+            verify_response = requests.post(
+                settings.CLOUDFLARE_TURNSTILE_VERIFY_URL,
+                data={
+                    'secret': turnstile_secret,
+                    'response': turnstile_token,
+                    'remoteip': request.META.get('REMOTE_ADDR', '')
+                },
+                timeout=10
+            )
+            result = verify_response.json()
+            if not result.get('success', False):
+                messages.error(request, 'Security verification failed. Please try again.')
+                return redirect('landing:course_detail', course_id=course_id)
+        except Exception as e:
+            # Log error but don't block submission if Turnstile is down
+            print(f"Turnstile verification error: {e}")
+
+    # Get form data
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    phone = request.POST.get('phone', '').strip()
+    message_text = request.POST.get('message', '').strip()
+    current_qualification = request.POST.get('current_qualification', '').strip()
+    work_experience = request.POST.get('work_experience', '').strip()
+    preferred_batch = request.POST.get('preferred_batch', '').strip()
+
+    # Validate required fields
+    if not name or not email or not phone:
+        messages.error(request, 'Please fill in all required fields.')
+        return redirect('landing:course_detail', course_id=course_id)
+
+    # Get client IP
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    # Create the enquiry
+    enquiry = CourseEnquiry.objects.create(
+        course=course,
+        name=name,
+        email=email,
+        phone=phone,
+        message=message_text,
+        current_qualification=current_qualification,
+        work_experience=work_experience,
+        preferred_batch=preferred_batch,
+        source='website',
+        user=request.user if request.user.is_authenticated else None,
+        ip_address=ip,
+        user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+        utm_source=request.GET.get('utm_source', ''),
+        utm_medium=request.GET.get('utm_medium', ''),
+        utm_campaign=request.GET.get('utm_campaign', ''),
+    )
+
+    messages.success(
+        request,
+        f'Thank you for your enquiry about "{course.title}"! Our team will contact you within 24 hours.'
+    )
+    return redirect('landing:course_detail', course_id=course_id)

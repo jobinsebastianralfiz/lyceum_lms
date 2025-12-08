@@ -15,13 +15,15 @@ from apps.users.models import User, Team, TeamMembership
 from apps.courses.models import (
     Course, Module, VideoLesson, Category,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer, ModuleProgress, StudentAnalytics, ProgressAlert, MentorSession
+    QuizAttempt, QuizAnswer, ModuleProgress, StudentAnalytics, ProgressAlert, MentorSession,
+    Certificate
 )
 from apps.payments.models import Enrollment, Payment, InstallmentPlan, TaxInvoice
 from apps.youtube_integration.models import YouTubeVideo, YouTubeChannelConfig
-from apps.notifications.models import Notification
+from apps.notifications.models import Notification, EmailTemplate
 from apps.ratings.models import CourseRating, CourseReview, ReviewHelpful
 from apps.live_sessions.models import LiveSession, SessionParticipant, SessionResource, SessionAnnouncement
+from apps.teachers.models import TeacherProfile
 from .forms import (CustomVideoLessonForm, CustomAssignmentForm, CustomQuizQuestionForm,
                    CustomQuizChoiceForm, CustomQuizQuestionWithChoicesForm, CustomLiveSessionForm,
                    SessionParticipantForm, BulkAssignParticipantsForm, SessionAnnouncementForm)
@@ -29,7 +31,14 @@ from .quiz_reset_views import quiz_attempt_reset_view, quiz_attempt_delete_view
 
 
 def is_staff_user(user):
-    return user.is_authenticated and user.is_staff
+    """Check if user has staff-level access (staff, superuser, teacher, or admin role)"""
+    if not user.is_authenticated:
+        return False
+    if user.is_staff or user.is_superuser:
+        return True
+    # Allow teachers and admin role users to access
+    user_role = getattr(user, 'role', None)
+    return user_role in ['teacher', 'admin']
 
 
 @user_passes_test(is_staff_user)
@@ -557,7 +566,8 @@ def category_delete_view(request, category_id):
 def course_create_view(request):
     """Create a new course"""
     categories = Category.objects.all()
-    
+    teachers = TeacherProfile.objects.filter(is_active=True).select_related('user').order_by('user__name')
+
     if request.method == 'POST':
         try:
             # Get form data
@@ -571,22 +581,29 @@ def course_create_view(request):
             preview_video = request.POST.get('preview_video')
             is_published = request.POST.get('is_published') == 'on'
             allow_public_enrollment = request.POST.get('allow_public_enrollment') == 'on'
-            
+            teacher_id = request.POST.get('teacher')
+
             # Validate required fields
             if not all([title, description, category_id]):
                 messages.error(request, 'Please fill in all required fields.')
                 return render(request, 'custom_admin/courses/form.html', {
                     'title': 'Add Course',
                     'is_edit': False,
-                    'categories': categories
+                    'categories': categories,
+                    'teachers': teachers
                 })
-            
+
             # Get category
             category = get_object_or_404(Category, id=category_id)
-            
+
+            # Get teacher if selected
+            teacher = None
+            if teacher_id:
+                teacher = TeacherProfile.objects.filter(id=teacher_id).first()
+
             # Handle file upload
             thumbnail = request.FILES.get('thumbnail')
-            
+
             # Create course
             course = Course.objects.create(
                 title=title,
@@ -600,19 +617,21 @@ def course_create_view(request):
                 preview_video=preview_video,
                 is_published=is_published,
                 allow_public_enrollment=allow_public_enrollment,
+                teacher=teacher,
                 created_by=request.user
             )
-            
+
             messages.success(request, f'Course "{course.title}" created successfully.')
             return redirect('custom_admin:course_detail', course_id=course.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error creating course: {str(e)}')
-    
+
     return render(request, 'custom_admin/courses/form.html', {
         'title': 'Add Course',
         'is_edit': False,
-        'categories': categories
+        'categories': categories,
+        'teachers': teachers
     })
 
 @user_passes_test(is_staff_user)
@@ -620,7 +639,8 @@ def course_edit_view(request, course_id):
     """Edit a course"""
     course = get_object_or_404(Course, id=course_id)
     categories = Category.objects.all()
-    
+    teachers = TeacherProfile.objects.filter(is_active=True).select_related('user').order_by('user__name')
+
     if request.method == 'POST':
         try:
             # Get form data
@@ -634,7 +654,8 @@ def course_edit_view(request, course_id):
             preview_video = request.POST.get('preview_video')
             is_published = request.POST.get('is_published') == 'on'
             allow_public_enrollment = request.POST.get('allow_public_enrollment') == 'on'
-            
+            teacher_id = request.POST.get('teacher')
+
             # Validate required fields
             if not all([title, description, category_id]):
                 messages.error(request, 'Please fill in all required fields.')
@@ -642,12 +663,18 @@ def course_edit_view(request, course_id):
                     'course': course,
                     'title': 'Edit Course',
                     'is_edit': True,
-                    'categories': categories
+                    'categories': categories,
+                    'teachers': teachers
                 })
-            
+
             # Get category
             category = get_object_or_404(Category, id=category_id)
-            
+
+            # Get teacher if selected
+            teacher = None
+            if teacher_id:
+                teacher = TeacherProfile.objects.filter(id=teacher_id).first()
+
             # Update course fields
             course.title = title
             course.description = description
@@ -659,25 +686,27 @@ def course_edit_view(request, course_id):
             course.preview_video = preview_video
             course.is_published = is_published
             course.allow_public_enrollment = allow_public_enrollment
-            
+            course.teacher = teacher
+
             # Handle file upload
             thumbnail = request.FILES.get('thumbnail')
             if thumbnail:
                 course.thumbnail = thumbnail
-            
+
             course.save()
-            
+
             messages.success(request, f'Course "{course.title}" updated successfully.')
             return redirect('custom_admin:course_detail', course_id=course.id)
-            
+
         except Exception as e:
             messages.error(request, f'Error updating course: {str(e)}')
-    
+
     return render(request, 'custom_admin/courses/form.html', {
         'course': course,
         'title': 'Edit Course',
         'is_edit': True,
-        'categories': categories
+        'categories': categories,
+        'teachers': teachers
     })
 
 @user_passes_test(is_staff_user)
@@ -1311,10 +1340,29 @@ def video_lesson_delete_view(request, lesson_id):
 @user_passes_test(is_staff_user)
 def email_templates_list_view(request):
     """List email templates"""
-    # Placeholder - implement when EmailTemplate model exists
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+
+    templates = EmailTemplate.objects.all().order_by('-updated_at')
+
+    if search_query:
+        templates = templates.filter(
+            Q(name__icontains=search_query) |
+            Q(subject__icontains=search_query)
+        )
+
+    if status_filter == 'active':
+        templates = templates.filter(is_active=True)
+    elif status_filter == 'inactive':
+        templates = templates.filter(is_active=False)
+
+    paginator = Paginator(templates, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'custom_admin/email_templates/list.html', {
-        'page_obj': None,
-        'search_query': ''
+        'page_obj': page_obj,
+        'search_query': search_query
     })
 
 @user_passes_test(is_staff_user)
@@ -1342,23 +1390,44 @@ def email_template_delete_view(request, template_id):
 def notifications_list_view(request):
     """List notifications"""
     search_query = request.GET.get('search', '')
+    type_filter = request.GET.get('type', '')
+    status_filter = request.GET.get('status', '')
+
     notifications = Notification.objects.select_related('user').order_by('-created_at')
-    
+
     if search_query:
         notifications = notifications.filter(
             Q(title__icontains=search_query) |
             Q(user__name__icontains=search_query)
         )
-    
+
+    if type_filter:
+        notifications = notifications.filter(notification_type=type_filter)
+
+    if status_filter == 'read':
+        notifications = notifications.filter(read=True)
+    elif status_filter == 'unread':
+        notifications = notifications.filter(read=False)
+
+    # Calculate stats
+    all_notifications = Notification.objects.all()
+    stats = {
+        'total': all_notifications.count(),
+        'unread': all_notifications.filter(read=False).count(),
+        'email_sent': all_notifications.filter(email_sent=True).count(),
+        'push_sent': all_notifications.filter(push_sent=True).count(),
+    }
+
     paginator = Paginator(notifications, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
+        'stats': stats,
     }
-    
+
     return render(request, 'custom_admin/notifications/list.html', context)
 
 @user_passes_test(is_staff_user)
@@ -4019,6 +4088,47 @@ def module_reorder_quizzes_view(request, module_id):
 
 
 # ==============================================================================
+# FEATURE CONFIGURATION VIEW
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def feature_config_view(request):
+    """Manage feature toggles for the LMS"""
+    from apps.core.models import FeatureConfig
+    from django.core.cache import cache
+
+    config = FeatureConfig.get_config()
+
+    if request.method == 'POST':
+        # Update config based on form data
+        config.enable_online_courses = request.POST.get('online_courses') == 'on'
+        config.enable_live_sessions = request.POST.get('live_sessions') == 'on'
+        config.enable_online_enrollment = request.POST.get('online_enrollment') == 'on'
+        config.enable_certificates = request.POST.get('certificates') == 'on'
+        config.enable_tuition_management = request.POST.get('tuition') == 'on'
+        config.enable_finance_management = request.POST.get('finance') == 'on'
+        config.enable_payments = request.POST.get('payments') == 'on'
+        config.enable_assessments = request.POST.get('assessments') == 'on'
+        config.enable_notifications = request.POST.get('notifications') == 'on'
+        config.enable_website_content = request.POST.get('website_content') == 'on'
+        config.enable_youtube_integration = request.POST.get('youtube') == 'on'
+        config.enable_analytics = request.POST.get('analytics') == 'on'
+        config.updated_by = request.user
+        config.save()
+
+        # Clear cache
+        cache.delete('feature_config')
+
+        messages.success(request, 'Feature settings updated successfully!')
+        return redirect('custom_admin:feature_config')
+
+    context = {
+        'config': config,
+    }
+    return render(request, 'custom_admin/settings/feature_config.html', context)
+
+
+# ==============================================================================
 # SYSTEM SETTINGS MANAGEMENT VIEWS
 # ==============================================================================
 
@@ -4458,3 +4568,511 @@ def pdf_note_delete_view(request, pdf_id):
         return redirect('custom_admin:pdf_notes_list')
 
     return redirect('custom_admin:pdf_notes_list')
+
+
+# ==========================================
+# COURSE ENQUIRIES MANAGEMENT
+# ==========================================
+
+@user_passes_test(is_staff_user)
+def course_enquiries_list_view(request):
+    """List all course enquiries"""
+    from apps.content_management.models import CourseEnquiry
+    
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    course_filter = request.GET.get('course', '')
+    
+    enquiries = CourseEnquiry.objects.select_related('course', 'user', 'assigned_to').order_by('-created_at')
+    
+    if search_query:
+        enquiries = enquiries.filter(
+            Q(name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone__icontains=search_query) |
+            Q(course__title__icontains=search_query)
+        )
+    
+    if status_filter:
+        enquiries = enquiries.filter(status=status_filter)
+    
+    if course_filter:
+        enquiries = enquiries.filter(course_id=course_filter)
+    
+    # Get status choices and courses for filters
+    status_choices = CourseEnquiry.STATUS_CHOICES
+    courses = Course.objects.filter(is_published=True).order_by('title')
+    
+    # Stats
+    total_enquiries = enquiries.count()
+    new_enquiries = enquiries.filter(status='new').count()
+    contacted_enquiries = enquiries.filter(status='contacted').count()
+    enrolled_enquiries = enquiries.filter(status='enrolled').count()
+    
+    paginator = Paginator(enquiries, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'course_filter': course_filter,
+        'status_choices': status_choices,
+        'courses': courses,
+        'total_enquiries': total_enquiries,
+        'new_enquiries': new_enquiries,
+        'contacted_enquiries': contacted_enquiries,
+        'enrolled_enquiries': enrolled_enquiries,
+    }
+    
+    return render(request, 'custom_admin/enquiries/list.html', context)
+
+
+@user_passes_test(is_staff_user)
+def course_enquiry_detail_view(request, enquiry_id):
+    """View and update enquiry details"""
+    from apps.content_management.models import CourseEnquiry
+    
+    enquiry = get_object_or_404(CourseEnquiry.objects.select_related('course', 'user', 'assigned_to'), id=enquiry_id)
+    
+    if request.method == 'POST':
+        # Update enquiry status and notes
+        new_status = request.POST.get('status')
+        notes = request.POST.get('notes', '')
+        assigned_to_id = request.POST.get('assigned_to')
+        
+        if new_status:
+            enquiry.status = new_status
+        enquiry.notes = notes
+        
+        if assigned_to_id:
+            enquiry.assigned_to_id = assigned_to_id
+        else:
+            enquiry.assigned_to = None
+            
+        enquiry.save()
+        messages.success(request, f'Enquiry from "{enquiry.name}" updated successfully.')
+        return redirect('custom_admin:course_enquiry_detail', enquiry_id=enquiry.id)
+    
+    # Get staff users for assignment
+    staff_users = User.objects.filter(is_staff=True).order_by('first_name', 'username')
+    status_choices = CourseEnquiry.STATUS_CHOICES
+    
+    context = {
+        'enquiry': enquiry,
+        'staff_users': staff_users,
+        'status_choices': status_choices,
+    }
+    
+    return render(request, 'custom_admin/enquiries/detail.html', context)
+
+
+@user_passes_test(is_staff_user)
+def course_enquiry_delete_view(request, enquiry_id):
+    """Delete an enquiry"""
+    from apps.content_management.models import CourseEnquiry
+
+    enquiry = get_object_or_404(CourseEnquiry, id=enquiry_id)
+
+    if request.method == 'POST':
+        name = enquiry.name
+        enquiry.delete()
+        messages.success(request, f'Enquiry from "{name}" deleted successfully.')
+        return redirect('custom_admin:course_enquiries_list')
+
+    return redirect('custom_admin:course_enquiries_list')
+
+
+# ==============================================================================
+# CERTIFICATE VIEWS
+# ==============================================================================
+
+@user_passes_test(is_staff_user)
+def certificates_list_view(request):
+    """List all certificates with search and filters"""
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    course_filter = request.GET.get('course', '')
+
+    certificates = Certificate.objects.select_related('student', 'course').order_by('-issue_date')
+
+    if search_query:
+        certificates = certificates.filter(
+            Q(certificate_number__icontains=search_query) |
+            Q(student__name__icontains=search_query) |
+            Q(student__email__icontains=search_query) |
+            Q(course__title__icontains=search_query)
+        )
+
+    if status_filter == 'valid':
+        certificates = certificates.filter(is_revoked=False)
+    elif status_filter == 'revoked':
+        certificates = certificates.filter(is_revoked=True)
+
+    if course_filter:
+        certificates = certificates.filter(course_id=course_filter)
+
+    # Stats
+    all_certs = Certificate.objects.all()
+    stats = {
+        'total': all_certs.count(),
+        'valid': all_certs.filter(is_revoked=False).count(),
+        'revoked': all_certs.filter(is_revoked=True).count(),
+        'this_month': all_certs.filter(issue_date__month=timezone.now().month, issue_date__year=timezone.now().year).count(),
+    }
+
+    # Get courses for filter dropdown
+    courses = Course.objects.filter(is_published=True).order_by('title')
+
+    paginator = Paginator(certificates, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'stats': stats,
+        'courses': courses,
+    }
+
+    return render(request, 'custom_admin/certificates/list.html', context)
+
+
+@user_passes_test(is_staff_user)
+def certificate_create_view(request):
+    """Create/Issue a new certificate"""
+    if request.method == 'POST':
+        student_id = request.POST.get('student')
+        course_id = request.POST.get('course')
+        certificate_type = request.POST.get('certificate_type', 'completion')
+        title = request.POST.get('title', 'Certificate of Completion')
+        description = request.POST.get('description', '')
+        completion_date = request.POST.get('completion_date')
+        final_score = request.POST.get('final_score') or None
+        grade = request.POST.get('grade', '')
+        signed_by = request.POST.get('signed_by', '')
+        signed_by_title = request.POST.get('signed_by_title', '')
+
+        # Validate
+        if not student_id or not course_id:
+            messages.error(request, 'Student and Course are required.')
+            return redirect('custom_admin:certificate_create')
+
+        student = get_object_or_404(User, id=student_id)
+        course = get_object_or_404(Course, id=course_id)
+
+        # Check if an active (non-revoked) certificate already exists
+        existing_certificate = Certificate.objects.filter(
+            student=student,
+            course=course,
+            is_revoked=False
+        ).first()
+
+        if existing_certificate:
+            messages.error(
+                request,
+                f'An active certificate ({existing_certificate.certificate_number}) already exists for {student.name} in {course.title}. '
+                f'Please revoke the existing certificate before issuing a new one.'
+            )
+            return redirect('custom_admin:certificate_detail', certificate_id=existing_certificate.id)
+
+        # Get enrollment if exists
+        enrollment = Enrollment.objects.filter(
+            course=course,
+            user=student
+        ).first()
+
+        try:
+            certificate = Certificate.objects.create(
+                student=student,
+                course=course,
+                enrollment=enrollment,
+                certificate_type=certificate_type,
+                title=title,
+                description=description,
+                completion_date=completion_date or timezone.now().date(),
+                final_score=final_score,
+                grade=grade,
+                signed_by=signed_by,
+                signed_by_title=signed_by_title,
+            )
+
+            # Generate and save PDF
+            try:
+                from apps.courses.certificate_generator import generate_certificate_pdf
+                from django.core.files.base import ContentFile
+
+                pdf_buffer = generate_certificate_pdf(certificate)
+                pdf_filename = f"certificate_{certificate.certificate_number}.pdf"
+                certificate.pdf_file.save(pdf_filename, ContentFile(pdf_buffer.getvalue()), save=True)
+            except Exception as pdf_error:
+                # Log but don't fail - certificate is created, PDF can be regenerated
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to generate PDF for certificate {certificate.id}: {pdf_error}")
+
+            messages.success(request, f'Certificate {certificate.certificate_number} issued successfully!')
+            return redirect('custom_admin:certificate_detail', certificate_id=certificate.id)
+        except Exception as e:
+            messages.error(request, f'Error creating certificate: {str(e)}')
+
+    # Get data for form
+    students = User.objects.filter(is_active=True, role='student').order_by('name')
+    courses = Course.objects.filter(is_published=True).order_by('title')
+
+    context = {
+        'students': students,
+        'courses': courses,
+        'certificate_types': Certificate.CERTIFICATE_TYPES,
+    }
+
+    return render(request, 'custom_admin/certificates/form.html', context)
+
+
+@user_passes_test(is_staff_user)
+def certificate_detail_view(request, certificate_id):
+    """View certificate details"""
+    certificate = get_object_or_404(
+        Certificate.objects.select_related('student', 'course', 'enrollment'),
+        id=certificate_id
+    )
+
+    context = {
+        'certificate': certificate,
+    }
+
+    return render(request, 'custom_admin/certificates/detail.html', context)
+
+
+@user_passes_test(is_staff_user)
+def certificate_download_view(request, certificate_id):
+    """Download certificate as PDF"""
+    from django.http import HttpResponse
+    from apps.courses.certificate_generator import generate_certificate_pdf
+
+    certificate = get_object_or_404(
+        Certificate.objects.select_related('course', 'student'),
+        id=certificate_id
+    )
+
+    # Generate PDF
+    pdf_buffer = generate_certificate_pdf(certificate)
+
+    # Create response
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+
+    # Generate filename
+    student_name = certificate.student.name or certificate.student.email
+    safe_name = "".join(c for c in student_name if c.isalnum() or c in (' ', '-', '_')).strip()
+    safe_course = "".join(c for c in certificate.course.title if c.isalnum() or c in (' ', '-', '_')).strip()
+    filename = f"Certificate_{safe_name}_{safe_course}.pdf"
+
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
+
+
+@user_passes_test(is_staff_user)
+def certificate_revoke_view(request, certificate_id):
+    """Revoke a certificate"""
+    certificate = get_object_or_404(Certificate, id=certificate_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '')
+        certificate.revoke(reason=reason)
+        messages.success(request, f'Certificate {certificate.certificate_number} has been revoked.')
+        return redirect('custom_admin:certificate_detail', certificate_id=certificate.id)
+
+    return redirect('custom_admin:certificate_detail', certificate_id=certificate.id)
+
+
+@user_passes_test(is_staff_user)
+def certificate_delete_view(request, certificate_id):
+    """Delete a certificate"""
+    certificate = get_object_or_404(Certificate, id=certificate_id)
+
+    if request.method == 'POST':
+        cert_number = certificate.certificate_number
+        certificate.delete()
+        messages.success(request, f'Certificate {cert_number} deleted successfully.')
+        return redirect('custom_admin:certificates_list')
+
+    return redirect('custom_admin:certificates_list')
+
+
+def certificate_verify_view(request, verification_code):
+    """Public verification page for certificates"""
+    certificate = get_object_or_404(Certificate, verification_code=verification_code)
+
+    context = {
+        'certificate': certificate,
+        'is_valid': certificate.is_valid,
+    }
+
+    return render(request, 'custom_admin/certificates/verify.html', context)
+
+
+# =============================================================================
+# STUDENT QUICK SEARCH & PROFILE
+# =============================================================================
+
+@user_passes_test(is_staff_user)
+def student_search_api(request):
+    """API endpoint for student quick search with autocomplete"""
+    query = request.GET.get('q', '').strip()
+
+    # Base queryset - only students
+    students = User.objects.filter(role='student')
+
+    if query:
+        students = students.filter(
+            Q(name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone_number__icontains=query)
+        )
+
+    # Annotate with enrollment count and get analytics
+    students = students.annotate(
+        enrollments_count=Count('enrollments')
+    ).select_related('analytics')[:10]
+
+    results = []
+    for student in students:
+        # Get risk level from analytics if exists
+        risk_level = None
+        if hasattr(student, 'analytics') and student.analytics:
+            risk_level = student.analytics.risk_level
+
+        results.append({
+            'id': student.id,
+            'name': student.name or student.email,
+            'email': student.email,
+            'phone': student.phone_number or '',
+            'enrollments_count': student.enrollments_count,
+            'risk_level': risk_level,
+        })
+
+    return JsonResponse({'students': results})
+
+
+@user_passes_test(is_staff_user)
+def student_profile_view(request, student_id):
+    """Comprehensive student profile page with all related data"""
+    from apps.courses.models import StudentProgress
+
+    # Get the student
+    student = get_object_or_404(User, id=student_id, role='student')
+
+    # Get enrollments with related data
+    enrollments = Enrollment.objects.filter(user=student).select_related(
+        'team', 'installment_plan_details'
+    ).prefetch_related('payments', 'tax_invoices').order_by('-enrolled_on')
+
+    # Calculate enrollment summaries
+    enrollment_data = []
+    total_paid = 0
+    total_outstanding = 0
+
+    for enrollment in enrollments:
+        paid = enrollment.payments.filter(status='completed').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        outstanding = enrollment.outstanding_amount
+
+        total_paid += paid
+        total_outstanding += outstanding
+
+        # Get course progress for this enrollment
+        progress_percent = 0
+        video_progress = StudentProgress.objects.filter(
+            user=student, course=enrollment.course
+        )
+        if video_progress.exists():
+            total_videos = video_progress.count()
+            completed_count = video_progress.filter(completed=True).count()
+            progress_percent = int((completed_count / total_videos) * 100) if total_videos > 0 else 0
+
+        enrollment_data.append({
+            'enrollment': enrollment,
+            'paid': paid,
+            'outstanding': outstanding,
+            'progress': progress_percent,
+        })
+
+    # Get all payments for this student
+    all_payments = Payment.objects.filter(
+        enrollment__user=student
+    ).select_related('enrollment').order_by('-created_at')
+
+    # Get pending payments
+    pending_payments = all_payments.filter(status__in=['pending', 'overdue'])
+
+    # Get module progress
+    module_progress = ModuleProgress.objects.filter(
+        student=student
+    ).select_related('module').order_by('-updated_at')
+
+    # Get video progress
+    video_progress = StudentProgress.objects.filter(
+        user=student
+    ).select_related('video_lesson').order_by('-last_watched_at')
+
+    # Get analytics
+    analytics = None
+    try:
+        analytics = StudentAnalytics.objects.get(student=student)
+    except StudentAnalytics.DoesNotExist:
+        pass
+
+    # Get alerts
+    alerts = ProgressAlert.objects.filter(student=student).order_by('-created_at')
+    active_alerts = alerts.filter(is_resolved=False)
+    resolved_alerts = alerts.filter(is_resolved=True)
+
+    # Get mentor sessions
+    mentor_sessions = MentorSession.objects.filter(
+        student=student
+    ).select_related('mentor').order_by('-session_date')
+
+    # Get certificates
+    certificates = Certificate.objects.filter(
+        student=student
+    ).order_by('-issue_date')
+
+    # Get tax invoices
+    tax_invoices = TaxInvoice.objects.filter(
+        enrollment__user=student
+    ).select_related('enrollment').order_by('-created_at')
+
+    # Calculate quiz and assignment stats
+    quiz_attempts = QuizAttempt.objects.filter(student=student)
+    quiz_count = quiz_attempts.count()
+    quiz_avg_score = quiz_attempts.aggregate(avg=Sum('score'))['avg'] or 0
+    if quiz_count > 0:
+        quiz_avg_score = quiz_avg_score / quiz_count
+
+    assignment_submissions = AssignmentSubmission.objects.filter(student=student)
+    assignment_count = assignment_submissions.count()
+
+    context = {
+        'student': student,
+        'enrollment_data': enrollment_data,
+        'total_enrollments': enrollments.count(),
+        'total_paid': total_paid,
+        'total_outstanding': total_outstanding,
+        'all_payments': all_payments[:20],  # Last 20 payments
+        'pending_payments': pending_payments,
+        'module_progress': module_progress[:20],
+        'video_progress': video_progress[:20],
+        'analytics': analytics,
+        'active_alerts': active_alerts,
+        'resolved_alerts': resolved_alerts[:10],
+        'mentor_sessions': mentor_sessions,
+        'certificates': certificates,
+        'tax_invoices': tax_invoices,
+        'quiz_count': quiz_count,
+        'quiz_avg_score': quiz_avg_score,
+        'assignment_count': assignment_count,
+    }
+
+    return render(request, 'custom_admin/students/profile.html', context)

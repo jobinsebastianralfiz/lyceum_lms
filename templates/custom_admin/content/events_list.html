@@ -1,0 +1,255 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Events Management - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-calendar-event me-2"></i>Events Management
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:content_dashboard' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Dashboard
+            </a>
+            <a href="{% url 'custom_admin:event_create' %}" class="btn btn-primary btn-sm">
+              <i class="ti ti-plus"></i> Add Event
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-primary text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.total_events }}</h4>
+                <p class="mb-0 small">Total Events</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.published_events }}</h4>
+                <p class="mb-0 small">Published</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.upcoming_events }}</h4>
+                <p class="mb-0 small">Upcoming</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center py-3">
+                <h4 class="fw-bold mb-1">{{ stats.featured_events }}</h4>
+                <p class="mb-0 small">Featured</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card border-light mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label small">Search</label>
+                <input type="text" class="form-control form-control-sm" name="search"
+                       placeholder="Title, description..." value="{{ search_query }}">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Event Type</label>
+                <select class="form-select form-select-sm" name="event_type">
+                  <option value="">All Types</option>
+                  {% for type_code, type_name in event_types %}
+                    <option value="{{ type_code }}" {% if event_type_filter == type_code %}selected{% endif %}>
+                      {{ type_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                  <option value="">All Status</option>
+                  <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                  <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                  <option value="upcoming" {% if status_filter == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="ti ti-search"></i> Filter
+                  </button>
+                  <a href="{% url 'custom_admin:events_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-x"></i> Clear
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Events Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 50px;">Image</th>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in events %}
+              <tr>
+                <td>
+                  {% if event.featured_image %}
+                    <img src="{{ event.featured_image.url }}" alt="{{ event.title }}"
+                         class="rounded" style="width: 45px; height: 45px; object-fit: cover;">
+                  {% else %}
+                    <div class="bg-info rounded d-flex align-items-center justify-content-center"
+                         style="width: 45px; height: 45px;">
+                      <i class="ti ti-calendar-event text-white"></i>
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div>
+                    <h6 class="mb-1">{{ event.title|truncatechars:45 }}</h6>
+                    {% if event.short_description %}
+                      <p class="small text-muted mb-0">{{ event.short_description|truncatechars:70 }}</p>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary">
+                    {{ event.get_event_type_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="small">
+                    <strong>{{ event.event_date|date:"M d, Y" }}</strong><br>
+                    <span class="text-muted">{{ event.start_time|time:"g:i A" }}{% if event.end_time %} - {{ event.end_time|time:"g:i A" }}{% endif %}</span>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <span class="badge {% if event.status == 'upcoming' %}bg-success{% elif event.status == 'ongoing' %}bg-info{% elif event.status == 'completed' %}bg-secondary{% elif event.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                      {{ event.get_status_display }}
+                    </span>
+                    {% if event.is_published %}
+                      <span class="badge bg-success-subtle text-success ms-1">Published</span>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary ms-1">Draft</span>
+                    {% endif %}
+                    {% if event.is_featured %}
+                      <span class="badge bg-warning ms-1">Featured</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if event.is_online %}
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="ti ti-video me-1"></i>Online
+                    </span>
+                  {% else %}
+                    <span class="badge bg-dark-subtle text-dark">
+                      <i class="ti ti-map-pin me-1"></i>{{ event.venue_name|truncatechars:20|default:"In-Person" }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'custom_admin:event_edit' event.id %}" class="btn btn-outline-primary btn-sm" title="Edit">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <form method="POST" action="{% url 'custom_admin:event_delete' event.id %}"
+                          style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">
+                    <i class="ti ti-calendar-off fs-2 mb-3 d-block"></i>
+                    <h6>No events found</h6>
+                    <p class="mb-0">Create your first event to engage your audience.</p>
+                    <a href="{% url 'custom_admin:event_create' %}" class="btn btn-primary btn-sm mt-3">
+                      <i class="ti ti-plus me-1"></i>Create First Event
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if events.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="small text-muted">
+            Showing {{ events.start_index }} to {{ events.end_index }} of {{ events.paginator.count }} events
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if events.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ events.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for page_num in events.paginator.page_range %}
+                {% if page_num == events.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                  </li>
+                {% elif page_num > events.number|add:-3 and page_num < events.number|add:3 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if events.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ events.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="ti ti-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

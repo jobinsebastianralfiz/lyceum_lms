@@ -1,438 +1,46 @@
 {% load static %}
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html lang="en">
 
 <head>
-  <!-- Meta Tags -->
   <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="Lyceum">
-  
-  <!-- Site Title -->
+  <meta name="author" content="Lyceum Academy">
+
   <title>{% block title %}Lyceum Academy - Excellence in Online Education{% endblock %}</title>
   <meta name="description" content="{% block description %}Lyceum Academy is a premier online learning institution delivering world-class education through cutting-edge technology.{% endblock %}">
-  
-  <!-- CSS Files -->
-  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/fontawesome.min.css' %}">
-  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/lightgallery.min.css' %}">
-  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/slick.css' %}">
-  <link rel="stylesheet" href="{% static 'landing/assets/css/plugins/animate.css' %}">
-  <link rel="stylesheet" href="{% static 'landing/assets/css/style.css' %}">
-  <!-- Theme Style -->
-  <link rel="stylesheet" href="{% static 'landing/assets/css/theme_8.css' %}">
 
-  <!-- Lyceum Custom Styles - Dark Theme -->
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logos/logo.png' %}">
+
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- Slick Slider CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+
+  <!-- LM Theme CSS -->
+  <link rel="stylesheet" href="{% static 'landing/assets/css/lm-theme.css' %}">
+
+  <!-- Page Body Padding for Fixed Header -->
   <style>
-    /* Dark Theme Color Variables */
-    :root {
-      --lyceum-green: #2AB673;
-      --lyceum-green-dark: #229959;
-      --lyceum-green-light: #3DD186;
-      --dark-bg: #0F172A;
-      --dark-bg-secondary: #1E293B;
-      --dark-bg-tertiary: #334155;
-      --dark-border: #374151;
-      --text-white: #F9FAFB;
-      --text-gray: #CBD5E1;
-      --text-gray-dark: #94A3B8;
-    }
-
-    /* Global Dark Theme */
     body {
-      background: var(--dark-bg) !important;
-      color: var(--text-gray) !important;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      color: var(--text-white) !important;
-    }
-
-    /* Override any white backgrounds */
-    .cs-white_bg,
-    .cs-white,
-    .cs-light_bg {
-      background: transparent !important;
-    }
-
-    /* Ensure all containers have dark theme */
-    .container,
-    .container-fluid {
-      background: transparent !important;
-    }
-
-    /* Remove all outlines and borders */
-    section,
-    .section,
-    .section-padding,
-    .cs-hero,
-    .lyceum-hero,
-    .feature-card,
-    .course-card,
-    .stats-section,
-    .cta-section,
-    .content-card,
-    div[class*="section"] {
-      outline: none !important;
-      border: none !important;
-    }
-
-    /* Remove borders from rows and columns */
-    .row,
-    .col,
-    [class*="col-"] {
-      outline: none !important;
-      border: none !important;
-    }
-
-    /* Override accent colors */
-    .cs-accent_bg,
-    .cs-toolbox_btn.cs-accent_bg {
-      background-color: var(--lyceum-green) !important;
-      border-color: var(--lyceum-green) !important;
-    }
-
-    .cs-accent_color {
-      color: var(--lyceum-green) !important;
-      background-color: transparent !important;
-    }
-
-    .cs-accent_bg_2_hover:hover {
-      background-color: var(--lyceum-green-dark) !important;
-    }
-
-    /* Modern Dark Navigation Bar */
-    .cs-site_header,
-    .cs-site_header *,
-    .cs-main_header,
-    .cs-main_header *,
-    .cs-main_header_in {
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    .cs-site_header {
-      box-shadow: 0 2px 30px rgba(0, 0, 0, 0.5) !important;
-      border: none !important;
-      padding: 0 !important;
-      z-index: 9999 !important;
-      position: fixed !important;
-      top: 0 !important;
-      left: 0;
-      right: 0;
-      width: 100%;
-      backdrop-filter: blur(10px);
-    }
-
-    .cs-sticky-header.cs-gescout_sticky {
-      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5) !important;
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    .cs-nav,
-    .cs-nav_list,
-    .cs-main_header_left,
-    .cs-main_header_center,
-    .cs-main_header_right,
-    .cs-toolbox {
-      background: transparent !important;
-    }
-
-    /* Add spacing for fixed header */
-    body {
-      padding-top: 85px !important;
-    }
-
-    /* Logo Styling */
-    .cs-site_branding {
-      height: auto !important;
-      display: inline-flex;
-      align-items: center;
-      padding: 10px 0;
-    }
-
-    .cs-site_branding img {
-      max-height: 55px !important;
-      height: 55px !important;
-      width: auto !important;
-      transition: all 0.3s ease;
-    }
-
-    .cs-site_branding:hover img {
-      transform: scale(1.05);
-    }
-
-    /* Main Header Layout */
-    .cs-main_header {
-      padding: 0 !important;
-    }
-
-    .cs-main_header_in {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 0;
-      gap: 40px;
-    }
-
-    .cs-main_header_left {
-      flex: 0 0 auto;
-    }
-
-    .cs-main_header_center {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
-
-    .cs-main_header_right {
-      flex: 0 0 auto;
-    }
-
-    /* Modern Navigation Menu */
-    .cs-nav {
-      display: flex;
-      align-items: center;
-    }
-
-    .cs-nav_list {
-      display: flex;
-      align-items: center;
-      gap: 35px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .cs-nav_list li {
-      margin: 0;
-      position: relative;
-    }
-
-    .cs-nav_list a {
-      font-weight: 500;
-      font-size: 1rem;
-      color: var(--text-gray) !important;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      padding: 8px 0;
-      display: inline-block;
-      position: relative;
-    }
-
-    .cs-nav_list a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--lyceum-green);
-      transition: width 0.3s ease;
-    }
-
-    .cs-nav_list a:hover {
-      color: var(--lyceum-green) !important;
-    }
-
-    .cs-nav_list a:hover::after {
-      width: 100%;
-    }
-
-    /* Sign In Button */
-    .cs-toolbox_btn {
-      background: var(--lyceum-green) !important;
-      color: white !important;
-      padding: 12px 30px !important;
-      border-radius: 8px !important;
-      font-weight: 600 !important;
-      font-size: 0.95rem !important;
-      transition: all 0.3s ease !important;
-      border: 2px solid var(--lyceum-green) !important;
-      text-decoration: none !important;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cs-toolbox_btn:hover {
-      background: var(--lyceum-green-dark) !important;
-      border-color: var(--lyceum-green-dark) !important;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(42, 182, 115, 0.3);
-    }
-
-    .cs-btn_text {
-      color: white !important;
-      background: transparent !important;
-    }
-
-    /* Mobile Menu Toggle */
-    .cs-toggle_btn,
-    .cs-munu_toggle,
-    .cs-munu_dropdown_toggle {
-      display: none;
-      background: transparent !important;
-      border: none !important;
-      color: white !important;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .cs-munu_toggle span,
-    .cs-munu_toggle span::before,
-    .cs-munu_toggle span::after {
-      background: white !important;
-    }
-
-    /* Mobile menu icon bars */
-    .cs-toggle_btn span,
-    .cs-toggle_btn::before,
-    .cs-toggle_btn::after {
-      background: white !important;
-    }
-
-    /* Close icon */
-    .cs-gescout_close {
-      color: white !important;
-    }
-
-    .cs-gescout_close::before,
-    .cs-gescout_close::after {
-      background: white !important;
-    }
-
-    /* Mobile Menu Dropdown */
-    .cs-nav.cs-active {
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    .cs-nav_list.cs-active {
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    /* Responsive */
-    @media (max-width: 991px) {
-      body {
-        padding-top: 75px !important;
-      }
-
-      .cs-main_header_in {
-        gap: 20px;
-      }
-
-      .cs-nav_list {
-        gap: 25px;
-      }
-
-      .cs-site_branding img {
-        max-height: 50px !important;
-        height: 50px !important;
-      }
-
-      .cs-munu_toggle {
-        display: block !important;
-      }
+      padding-top: 72px;
     }
 
     @media (max-width: 768px) {
       body {
-        padding-top: 70px !important;
+        padding-top: 64px;
       }
-
-      .cs-main_header_center {
-        position: relative;
-      }
-
-      .cs-nav {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--dark-bg-secondary) !important;
-        padding: 20px;
-      }
-
-      .cs-nav_list {
-        flex-direction: column;
-        gap: 15px !important;
-      }
-
-      .cs-nav_list li {
-        width: 100%;
-        text-align: center;
-      }
-
-      .cs-site_branding img {
-        max-height: 45px !important;
-        height: 45px !important;
-      }
-
-      .cs-toolbox_btn {
-        padding: 10px 20px !important;
-        font-size: 0.9rem !important;
-      }
-
-      .cs-munu_toggle {
-        display: block !important;
-      }
-    }
-
-    /* Footer styling */
-    .cs-footer,
-    .cs-footer *,
-    .cs-footer_item,
-    .cs-footer_item * {
-      background: var(--dark-bg-secondary) !important;
-    }
-
-    .cs-footer {
-      border: none !important;
-      color: var(--text-gray) !important;
-    }
-
-    .cs-footer h3, .cs-footer h4, .cs-footer h5 {
-      color: var(--text-white) !important;
-    }
-
-    .cs-footer a {
-      color: var(--text-gray) !important;
-      transition: color 0.3s ease;
-    }
-
-    .cs-footer a:hover {
-      color: var(--lyceum-green) !important;
-    }
-
-    .cs-footer_item .cs-logo_img img {
-      max-width: 180px !important;
-    }
-
-    .cs-footer ul,
-    .cs-footer li,
-    .cs-footer p,
-    .cs-footer div {
-      background: transparent !important;
-    }
-
-    .cs-bottom_footer,
-    .cs-bottom_footer * {
-      border: none !important;
-      background: var(--dark-bg) !important;
-    }
-
-    .cs-copyright {
-      color: var(--text-gray-dark) !important;
-    }
-
-    .cs-text_widget {
-      background: transparent !important;
-    }
-
-    /* Button hover effects */
-    .cs-btn:hover {
-      transform: translateY(-2px);
-      transition: all 0.3s ease;
     }
   </style>
 
@@ -440,194 +48,392 @@
 </head>
 
 <body>
-  <!-- Start Preloader -->
-  <div class="cs-preloader cs-accent_color cs-white_bg">
-    <div class="cs-preloader_bg cs-center cs-accent_8_bg_2">
-      <div class="cs-preloader_in cs-accent_15_border">
-        <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy" style="max-width: 200px;">
-      </div>
-    </div>
+  <!-- Preloader -->
+  <div class="lm-preloader" id="preloader">
+    <div class="lm-spinner"></div>
   </div>
-  <!-- End Preloader -->
 
-  <!-- Start Header Section -->
-  <header class="cs-site_header cs-style1 cs-type4 cs-sticky-header cs-primary_font">
-    <div class="cs-main_header">
-      <div class="container">
-        <div class="cs-main_header_in">
-          <div class="cs-main_header_left">
-            <a class="cs-site_branding" href="{% url 'landing:home' %}">
-              <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
-            </a>
-          </div>
-          <div class="cs-main_header_center">
-            <div class="cs-nav">
-              <ul class="cs-nav_list">
-                <li><a href="{% url 'landing:home' %}">Home</a></li>
-                <li><a href="{% url 'landing:courses' %}">Courses</a></li>
-                <li><a href="{% url 'landing:home' %}#about">About</a></li>
-                <li><a href="{% url 'landing:contact' %}">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="cs-main_header_right">
-            {% if user.is_authenticated %}
-              <div class="cs-toolbox">
-                {% if user.is_staff %}
-                  <a href="{% url 'custom_admin:dashboard' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
-                    <span class="cs-btn_text">Admin Panel</span>
-                  </a>
-                {% else %}
-                  <a href="{% url 'student_portal:dashboard' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
-                    <span class="cs-btn_text">Dashboard</span>
-                  </a>
-                {% endif %}
-              </div>
+  <!-- Header -->
+  <header class="lm-header" id="header">
+    <div class="container">
+      <nav class="lm-nav">
+        <!-- Logo -->
+        <a href="{% url 'landing:home' %}" class="lm-logo" style="display: flex; align-items: center; text-decoration: none;">
+          <img src="{% static 'images/logos/LM logo-07.svg' %}" alt="LM Academy" style="width: 250px; height: auto;">
+        </a>
+
+        <!-- Navigation Menu -->
+        <ul class="lm-nav-menu">
+          <li><a href="{% url 'landing:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+          <li><a href="{% url 'landing:courses' %}" class="{% if request.resolver_match.url_name == 'courses' %}active{% endif %}">Courses</a></li>
+          <li class="lm-nav-dropdown">
+            <a href="#" class="lm-nav-dropdown-toggle">Success Stories <i class="fas fa-chevron-down"></i></a>
+            <ul class="lm-nav-dropdown-menu">
+              <li><a href="{% url 'landing:testimonials_list' %}"><i class="fas fa-comments"></i> Testimonials</a></li>
+              <li><a href="{% url 'landing:placements_list' %}"><i class="fas fa-briefcase"></i> Placements</a></li>
+              <li><a href="{% url 'landing:achievements_list' %}"><i class="fas fa-trophy"></i> Achievements</a></li>
+            </ul>
+          </li>
+          <li class="lm-nav-dropdown">
+            <a href="#" class="lm-nav-dropdown-toggle">Updates <i class="fas fa-chevron-down"></i></a>
+            <ul class="lm-nav-dropdown-menu">
+              <li><a href="{% url 'landing:news_list' %}"><i class="fas fa-newspaper"></i> News</a></li>
+              <li><a href="{% url 'landing:events_list' %}"><i class="fas fa-calendar-alt"></i> Events</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'landing:home' %}#about">About</a></li>
+          <li><a href="{% url 'landing:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
+        </ul>
+
+        <!-- Actions -->
+        <div class="lm-nav-actions">
+          {% if user.is_authenticated %}
+            {% if user.is_staff %}
+              <a href="{% url 'custom_admin:dashboard' %}" class="btn-lm btn-lm-primary">
+                <i class="fas fa-cog"></i> Admin Panel
+              </a>
             {% else %}
-              <div class="cs-toolbox">
-                <a href="{% url 'landing:login' %}" class="cs-toolbox_btn cs-accent_bg cs-white_hover cs-accent_bg_2_hover">
-                  <span class="cs-btn_text">Sign In</span>
-                </a>
-              </div>
+              <a href="{% url 'student_portal:dashboard' %}" class="btn-lm btn-lm-primary">
+                <i class="fas fa-th-large"></i> Dashboard
+              </a>
             {% endif %}
-          </div>
+          {% else %}
+            <a href="{% url 'landing:login' %}" class="btn-lm btn-lm-outline">Sign In</a>
+            <a href="{% url 'landing:register' %}" class="btn-lm btn-lm-primary">Get Started</a>
+          {% endif %}
+
+          <!-- Mobile Menu Toggle -->
+          <button class="mobile-menu-toggle d-lg-none" id="mobileMenuToggle">
+            <i class="fas fa-bars" style="font-size: 24px; color: var(--text-primary);"></i>
+          </button>
         </div>
+      </nav>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-nav-menu" id="mobileNavMenu" style="display: none;">
+      <div class="container">
+        <ul class="mobile-nav-list">
+          <li><a href="{% url 'landing:home' %}">Home</a></li>
+          <li><a href="{% url 'landing:courses' %}">Courses</a></li>
+          <li class="mobile-nav-section">Success Stories</li>
+          <li><a href="{% url 'landing:testimonials_list' %}"><i class="fas fa-comments"></i> Testimonials</a></li>
+          <li><a href="{% url 'landing:placements_list' %}"><i class="fas fa-briefcase"></i> Placements</a></li>
+          <li><a href="{% url 'landing:achievements_list' %}"><i class="fas fa-trophy"></i> Achievements</a></li>
+          <li class="mobile-nav-section">Updates</li>
+          <li><a href="{% url 'landing:news_list' %}"><i class="fas fa-newspaper"></i> News</a></li>
+          <li><a href="{% url 'landing:events_list' %}"><i class="fas fa-calendar-alt"></i> Events</a></li>
+          <li><a href="{% url 'landing:home' %}#about">About</a></li>
+          <li><a href="{% url 'landing:contact' %}">Contact</a></li>
+          {% if not user.is_authenticated %}
+            <li><a href="{% url 'landing:login' %}">Sign In</a></li>
+            <li><a href="{% url 'landing:register' %}" class="btn-lm btn-lm-primary" style="margin-top: 10px;">Get Started</a></li>
+          {% endif %}
+        </ul>
       </div>
     </div>
   </header>
-  <!-- End Header Section -->
 
-  {% block content %}
-  {% endblock %}
+  <!-- Main Content -->
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
 
-  <!-- Start Footer -->
-  <footer class="cs-footer cs-style1 cs-accent_5_bg">
-    <div class="cs-height_135 cs-height_lg_80"></div>
+  <!-- Footer -->
+  <footer class="lm-footer">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-3 col-sm-6">
-          <div class="cs-footer_item">
-            <div class="cs-text_widget">
-              <div class="cs-logo cs-accent_color cs-mb_25">
-                <div class="cs-logo_in">
-                  <div class="cs-logo_img">
-                    <img src="{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
-                  </div>
-                </div>
-              </div>
-              <div class="cs-m0">
-                <p>Lyceum Academy - Empowering learners worldwide with world-class education and cutting-edge technology.</p>
-              </div>
-            </div>
+      <div class="lm-footer-grid">
+        <!-- Brand Column -->
+        <div class="lm-footer-brand">
+          <div class="lm-footer-logo" style="margin-bottom: 1rem;">
+            <img src="{% static 'images/logos/footer_logo.png' %}" alt="LM Academy" style="width: 120px; height: auto;">
+          </div>
+          <p>LM Academy is a premier online learning institution delivering world-class education through cutting-edge technology. Transform your career with our expert-led courses.</p>
+          <div class="lm-footer-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
           </div>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="cs-footer_item">
-            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Platform</h2>
-            <ul class="cs-menu_widget cs-style1 cs-accent_color cs-mp0">
-              <li><a href="{% url 'landing:home' %}">Home</a></li>
-              <li><a href="{% url 'landing:courses' %}">Courses</a></li>
-              <li><a href="{% url 'landing:home' %}#about">About</a></li>
-              <li><a href="{% url 'landing:contact' %}">Contact</a></li>
-            </ul>
-          </div>
+
+        <!-- Platform Links -->
+        <div class="lm-footer-column">
+          <h4>Platform</h4>
+          <ul class="lm-footer-links">
+            <li><a href="{% url 'landing:home' %}">Home</a></li>
+            <li><a href="{% url 'landing:courses' %}">All Courses</a></li>
+            <li><a href="{% url 'landing:home' %}#about">About Us</a></li>
+            <li><a href="{% url 'landing:contact' %}">Contact Us</a></li>
+          </ul>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="cs-footer_item">
-            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Legal</h2>
-            <ul class="cs-menu_widget cs-style1 cs-accent_color cs-mp0">
-              <li><a href="{% url 'landing:privacy_policy' %}">Privacy Policy</a></li>
-              <li><a href="{% url 'landing:terms_conditions' %}">Terms & Conditions</a></li>
-              <li><a href="{% url 'landing:refund_policy' %}">Refund Policy</a></li>
-              <li><a href="{% url 'landing:cancellation_policy' %}">Cancellation Policy</a></li>
-            </ul>
-          </div>
+
+        <!-- Support Links -->
+        <div class="lm-footer-column">
+          <h4>Support</h4>
+          <ul class="lm-footer-links">
+            <li><a href="{% url 'landing:contact' %}">Help Center</a></li>
+            <li><a href="{% url 'landing:contact' %}">FAQs</a></li>
+            <li><a href="{% url 'landing:contact' %}">Contact Support</a></li>
+          </ul>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="cs-footer_item">
-            <h2 class="cs-widget_title cs-accent_color cs-medium cs-font_20 cs-font_18_sm">Connect</h2>
-            <div class="cs-social_btns cs-style1">
-              <a href="#" class="cs-center">
-                <i class="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" class="cs-center">
-                <i class="fab fa-twitter"></i>
-              </a>
-              <a href="#" class="cs-center">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="#" class="cs-center">
-                <i class="fab fa-linkedin-in"></i>
-              </a>
-            </div>
-          </div>
+
+        <!-- Legal Links -->
+        <div class="lm-footer-column">
+          <h4>Legal</h4>
+          <ul class="lm-footer-links">
+            <li><a href="{% url 'landing:privacy_policy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'landing:terms_conditions' %}">Terms & Conditions</a></li>
+            <li><a href="{% url 'landing:refund_policy' %}">Refund Policy</a></li>
+            <li><a href="{% url 'landing:cancellation_policy' %}">Cancellation Policy</a></li>
+          </ul>
         </div>
       </div>
-    </div>
-    <div class="cs-height_135 cs-height_lg_80"></div>
-    <div class="container">
-      <div class="cs-bottom_footer">
-        <div class="cs-bottom_footer_left">
-          <div class="cs-copyright">© 2024 Lyceum Academy. All rights reserved.</div>
-        </div>
 
+      <!-- Footer Bottom -->
+      <div class="lm-footer-bottom">
+        <div class="lm-footer-copyright">
+          &copy; 2024 LM Academy. All rights reserved.
+        </div>
+        <div class="lm-footer-legal-links">
+          <a href="{% url 'landing:privacy_policy' %}" style="color: var(--gray-500); font-size: 0.875rem; margin-left: 1rem;">Privacy</a>
+          <a href="{% url 'landing:terms_conditions' %}" style="color: var(--gray-500); font-size: 0.875rem; margin-left: 1rem;">Terms</a>
+        </div>
       </div>
     </div>
   </footer>
-  <!-- End Footer -->
 
   <!-- Scripts -->
-  <script src="{% static 'landing/assets/js/plugins/jquery-3.6.0.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/plugins/isotope.pkg.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/plugins/jquery.slick.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/plugins/jquery.counter.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/plugins/lightgallery.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/plugins/wow.min.js' %}"></script>
-  <script src="{% static 'landing/assets/js/main.js' %}"></script>
-  
-  <!-- Handle anchor links from other pages -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
   <script>
-  $(document).ready(function() {
-    // Check if there's a hash in the URL when page loads
-    if (window.location.hash) {
-      var hash = window.location.hash;
-      
-      // If we're on a page that doesn't have the target section, redirect to home page with hash
-      if ((hash === '#about' || hash === '#contact') && window.location.pathname !== '/') {
-        // If we're not on the home page, go to home page with the hash
-        window.location.href = '/' + hash;
-        return;
+    // Hide preloader
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(function() {
+          preloader.style.display = 'none';
+        }, 300);
       }
-      
-      // If we're on the home page and have a valid hash, scroll to it
+    });
+
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+      const header = document.getElementById('header');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileNavMenu = document.getElementById('mobileNavMenu');
+
+    if (mobileMenuToggle && mobileNavMenu) {
+      mobileMenuToggle.addEventListener('click', function() {
+        if (mobileNavMenu.style.display === 'none') {
+          mobileNavMenu.style.display = 'block';
+        } else {
+          mobileNavMenu.style.display = 'none';
+        }
+      });
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const target = this.getAttribute('href');
+        if (target !== '#' && document.querySelector(target)) {
+          e.preventDefault();
+          document.querySelector(target).scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Handle hash on page load
+    if (window.location.hash) {
       setTimeout(function() {
-        if ($(hash).length > 0) {
-          $('html, body').animate({
-            scrollTop: $(hash).offset().top - 100
-          }, 800);
+        const element = document.querySelector(window.location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 500);
     }
-    
-    // Handle clicks on anchor links
-    $('a[href^="#"]').on('click', function(e) {
-      var target = $(this).attr('href');
-      
-      // If the target section doesn't exist on current page
-      if ($(target).length === 0) {
-        // Don't prevent default - let it navigate normally
-        return true;
-      }
-      
-      // If target exists on current page, smooth scroll
-      e.preventDefault();
-      $('html, body').animate({
-        scrollTop: $(target).offset().top - 100
-      }, 800);
-    });
-  });
   </script>
-  
+
+  <!-- Mobile Menu Styles -->
+  <style>
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    .mobile-nav-menu {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: var(--bg-white);
+      border-top: 1px solid var(--border-light);
+      padding: 15px 0;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      max-height: calc(100vh - 72px);
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-menu {
+        top: 64px;
+        max-height: calc(100vh - 64px);
+      }
+    }
+
+    .mobile-nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mobile-nav-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .mobile-nav-list li:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-nav-list a {
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 16px;
+      text-decoration: none;
+      display: block;
+      padding: 4px 0;
+    }
+
+    .mobile-nav-list a:hover {
+      color: var(--primary);
+    }
+
+    .mobile-nav-list .mobile-nav-section {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding-top: 16px;
+      border-bottom: none;
+    }
+
+    @media (max-width: 991px) {
+      .lm-nav-menu {
+        display: none;
+      }
+
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .lm-nav-actions .btn-lm-outline,
+      .lm-nav-actions .btn-lm-primary:not([href*="dashboard"]):not([href*="admin"]) {
+        display: none;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .mobile-nav-menu {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/919876543210?text=Hi%2C%20I%27m%20interested%20in%20learning%20more%20about%20your%20courses"
+     target="_blank"
+     rel="noopener"
+     class="whatsapp-float"
+     title="Chat with us on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <style>
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      z-index: 9999;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .whatsapp-float:hover {
+      background: #128C7E;
+      color: white;
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.5);
+    }
+
+    .whatsapp-float i {
+      animation: whatsapp-pulse 2s infinite;
+    }
+
+    @keyframes whatsapp-pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .whatsapp-float {
+        bottom: 20px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        font-size: 28px;
+      }
+    }
+  </style>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>

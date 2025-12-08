@@ -1,0 +1,126 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}{{ achievement.title }} - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="lm-detail-header">
+  <div class="container">
+    <nav class="lm-breadcrumb">
+      <a href="{% url 'landing:home' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'landing:achievements_list' %}">Achievements</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ achievement.title|truncatechars:30 }}</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Achievement Content -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <div class="lm-detail-card">
+          {% if achievement.image %}
+          <div class="lm-detail-image">
+            <img src="{{ achievement.image.url }}" alt="{{ achievement.title }}">
+          </div>
+          {% endif %}
+
+          <div class="lm-detail-body">
+            <div class="lm-achievement-detail-header">
+              <div class="lm-achievement-icon-lg">
+                {% if achievement.badge_icon %}
+                <img src="{{ achievement.badge_icon.url }}" alt="{{ achievement.title }}">
+                {% else %}
+                <i class="fas fa-trophy"></i>
+                {% endif %}
+              </div>
+              <div class="lm-achievement-detail-info">
+                <span class="lm-badge lm-badge-gold lm-badge-lg">{{ achievement.get_achievement_type_display }}</span>
+                <h1>{{ achievement.title }}</h1>
+                <p class="awarded-by">
+                  <i class="fas fa-award"></i> Awarded by {{ achievement.awarded_by }}
+                </p>
+                <p class="date">
+                  <i class="far fa-calendar"></i> {{ achievement.achievement_date|date:"F Y" }}
+                </p>
+              </div>
+            </div>
+
+            <div class="lm-achievement-description">
+              {{ achievement.description|linebreaks }}
+            </div>
+
+            {% if achievement.certificate %}
+            <div class="lm-achievement-certificate mt-4">
+              <h3><i class="fas fa-file-certificate me-2"></i> Certificate</h3>
+              <a href="{{ achievement.certificate.url }}" class="btn-lm btn-lm-outline" target="_blank">
+                <i class="fas fa-download me-2"></i> View Certificate
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="lm-detail-sidebar">
+          <!-- Quick Info -->
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-info-circle me-2"></i> Achievement Details</h4>
+            <ul class="lm-info-list">
+              <li>
+                <span class="label">Type</span>
+                <span class="value">{{ achievement.get_achievement_type_display }}</span>
+              </li>
+              <li>
+                <span class="label">Awarded By</span>
+                <span class="value">{{ achievement.awarded_by }}</span>
+              </li>
+              <li>
+                <span class="label">Year</span>
+                <span class="value">{{ achievement.year }}</span>
+              </li>
+              {% if achievement.category %}
+              <li>
+                <span class="label">Category</span>
+                <span class="value">{{ achievement.category }}</span>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Related Achievements -->
+          {% if related_achievements %}
+          <div class="lm-sidebar-card">
+            <h4><i class="fas fa-trophy me-2"></i> More Achievements</h4>
+            <div class="lm-related-list">
+              {% for rel in related_achievements %}
+              <a href="{% url 'landing:achievement_detail' rel.slug %}" class="lm-related-item">
+                <div class="lm-related-icon">
+                  {% if rel.badge_icon %}
+                  <img src="{{ rel.badge_icon.url }}" alt="{{ rel.title }}">
+                  {% else %}
+                  <i class="fas fa-trophy"></i>
+                  {% endif %}
+                </div>
+                <div class="lm-related-info">
+                  <h5>{{ rel.title|truncatechars:35 }}</h5>
+                  <span>{{ rel.year }}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

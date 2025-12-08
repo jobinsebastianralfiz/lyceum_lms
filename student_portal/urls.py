@@ -54,4 +54,9 @@ urlpatterns = [
     # Settings and Help
     path('settings/', views.settings, name='settings'),
     path('help/', views.help_support, name='help_support'),
+
+    # Certificates
+    path('certificates/', views.my_certificates, name='my_certificates'),
+    path('certificates/<int:certificate_id>/', views.certificate_view, name='certificate_view'),
+    path('certificates/<int:certificate_id>/download/', views.certificate_download, name='certificate_download'),
 ]

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate - {{ student_name }}</title>
+    <style type="text/css">
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+
+        .certificate-container {
+            width: 277mm;
+            height: 190mm;
+            margin: 10mm;
+            padding: 0;
+            border: 4px solid #2AB673;
+            position: relative;
+        }
+
+        .inner-border {
+            border: 2px solid #D4AF37;
+            margin: 6px;
+            padding: 15px 25px;
+            height: 172mm;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+        }
+
+        .institution-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a365d;
+            letter-spacing: 3px;
+            margin: 8px 0 5px 0;
+        }
+
+        .tagline {
+            font-size: 11px;
+            color: #666666;
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* Separator */
+        .separator {
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .separator-line {
+            display: inline-block;
+            width: 80px;
+            height: 1px;
+            background-color: #D4AF37;
+            vertical-align: middle;
+        }
+
+        .separator-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border: 1px solid #D4AF37;
+            border-radius: 50%;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+
+        /* Title */
+        .certificate-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a365d;
+            text-align: center;
+            letter-spacing: 3px;
+            margin: 5px 0 15px 0;
+        }
+
+        /* Content */
+        .content {
+            text-align: center;
+        }
+
+        .certify-text {
+            font-size: 13px;
+            color: #666666;
+            font-style: italic;
+            margin: 8px 0;
+        }
+
+        .student-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a365d;
+            margin: 10px 0 5px 0;
+        }
+
+        .name-line {
+            width: 300px;
+            height: 2px;
+            background-color: #D4AF37;
+            margin: 0 auto 12px auto;
+        }
+
+        .completed-text {
+            font-size: 13px;
+            color: #666666;
+            font-style: italic;
+            margin: 8px 0;
+        }
+
+        .course-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2AB673;
+            margin: 10px 0;
+        }
+
+        .description {
+            font-size: 10px;
+            color: #888888;
+            margin: 5px 0;
+        }
+
+        /* Achievement */
+        .achievement-section {
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .achievement-box {
+            display: inline-block;
+            border: 1px solid #2AB673;
+            background-color: #f8f9fa;
+            padding: 6px 18px;
+            margin: 0 10px;
+            border-radius: 4px;
+        }
+
+        .achievement-label {
+            font-size: 8px;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .achievement-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2AB673;
+        }
+
+        /* Footer */
+        .footer-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #cccccc;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .footer-table td {
+            vertical-align: top;
+            padding: 5px;
+        }
+
+        .date-section {
+            text-align: left;
+            width: 25%;
+        }
+
+        .date-label {
+            font-size: 8px;
+            color: #888888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .date-value {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333333;
+            margin-top: 2px;
+        }
+
+        .cert-info-section {
+            text-align: center;
+            width: 30%;
+        }
+
+        .cert-number {
+            font-size: 9px;
+            color: #666666;
+        }
+
+        .verification-code {
+            font-size: 7px;
+            color: #888888;
+            margin-top: 2px;
+        }
+
+        .website {
+            font-size: 7px;
+            color: #999999;
+            margin-top: 3px;
+        }
+
+        .signature-section {
+            text-align: center;
+            width: 25%;
+        }
+
+        .signature-label {
+            font-size: 7px;
+            color: #888888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .signature-line-container {
+            width: 120px;
+            height: 1px;
+            background-color: #333333;
+            margin: 8px auto 5px auto;
+        }
+
+        .signer-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        .signer-title {
+            font-size: 9px;
+            color: #666666;
+        }
+
+        .qr-section {
+            text-align: center;
+            width: 20%;
+        }
+
+        .qr-img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .qr-label {
+            font-size: 7px;
+            color: #888888;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="inner-border">
+            <!-- Header -->
+            <div class="header">
+                {% if logo_base64 %}
+                <img src="data:image/png;base64,{{ logo_base64 }}" class="logo-img" alt="Logo">
+                {% endif %}
+                <div class="institution-name">LYCEUM ACADEMY</div>
+                <p class="tagline">Excellence in Learning</p>
+            </div>
+
+            <!-- Separator -->
+            <div class="separator">
+                <span class="separator-line"></span>
+                <span class="separator-dot"></span>
+                <span class="separator-line"></span>
+            </div>
+
+            <!-- Title -->
+            <div class="certificate-title">CERTIFICATE OF {{ certificate_type|upper }}</div>
+
+            <!-- Content -->
+            <div class="content">
+                <p class="certify-text">This is to certify that</p>
+                <div class="student-name">{{ student_name }}</div>
+                <div class="name-line"></div>
+                <p class="completed-text">has successfully completed the course</p>
+                <div class="course-title">{{ course_title }}</div>
+                {% if description %}
+                <p class="description">{{ description }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Achievement -->
+            {% if final_score or grade %}
+            <div class="achievement-section">
+                {% if final_score %}
+                <span class="achievement-box">
+                    <span class="achievement-label">Score</span><br>
+                    <span class="achievement-value">{{ final_score }}%</span>
+                </span>
+                {% endif %}
+                {% if grade %}
+                <span class="achievement-box">
+                    <span class="achievement-label">Grade</span><br>
+                    <span class="achievement-value">{{ grade }}</span>
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="footer-section">
+                <table class="footer-table">
+                    <tr>
+                        <!-- Dates -->
+                        <td class="date-section">
+                            <div class="date-label">Date of Completion</div>
+                            <div class="date-value">{{ completion_date }}</div>
+                            <div style="margin-top: 8px;">
+                                <div class="date-label">Date of Issue</div>
+                                <div class="date-value">{{ issue_date }}</div>
+                            </div>
+                        </td>
+
+                        <!-- Certificate Info -->
+                        <td class="cert-info-section">
+                            <div class="cert-number">Certificate No: {{ certificate_number }}</div>
+                            <div class="verification-code">Verification Code: {{ verification_code }}</div>
+                            <div class="website">www.lyceumacademy.com</div>
+                        </td>
+
+                        <!-- Signature -->
+                        {% if signed_by %}
+                        <td class="signature-section">
+                            <div class="signature-label">Authorized Signature</div>
+                            <div class="signature-line-container"></div>
+                            <div class="signer-name">{{ signed_by }}</div>
+                            {% if signed_by_title %}
+                            <div class="signer-title">{{ signed_by_title }}</div>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+
+                        <!-- QR Code -->
+                        <td class="qr-section">
+                            <img src="data:image/png;base64,{{ qr_code_base64 }}" class="qr-img" alt="QR Code">
+                            <div class="qr-label">Scan to Verify</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

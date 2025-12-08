@@ -1,0 +1,180 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Tuition Fees - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Tuition Fee Collection</h4>
+    <small class="text-muted">Manage monthly fee records</small>
+  </div>
+  <a href="{% url 'custom_admin:generate_monthly_fees' %}" class="btn btn-primary btn-sm">
+    <i class="ti ti-plus me-1"></i>Generate Fees
+  </a>
+</div>
+
+<!-- Summary Cards -->
+{% if summary.total %}
+<div class="row g-2 mb-3">
+  <div class="col-4">
+    <div class="card mb-0">
+      <div class="card-body py-2 text-center">
+        <h5 class="mb-0 text-primary">{{ summary.total|floatformat:0 }}</h5>
+        <small class="text-muted">Total Amount</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card mb-0">
+      <div class="card-body py-2 text-center">
+        <h5 class="mb-0 text-success">{{ summary.collected|floatformat:0 }}</h5>
+        <small class="text-muted">Collected</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card mb-0">
+      <div class="card-body py-2 text-center">
+        <h5 class="mb-0 text-warning">{{ summary.pending|floatformat:0 }}</h5>
+        <small class="text-muted">Pending</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small mb-1">Search</label>
+        <input type="text" name="search" class="form-control form-control-sm" value="{{ search }}" placeholder="Student name or phone">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1">Month</label>
+        <select name="month" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for m in months %}
+          <option value="{{ m }}" {% if selected_month == m|stringformat:"s" %}selected{% endif %}>
+            {% if m == 1 %}Jan{% elif m == 2 %}Feb{% elif m == 3 %}Mar{% elif m == 4 %}Apr{% elif m == 5 %}May{% elif m == 6 %}Jun{% elif m == 7 %}Jul{% elif m == 8 %}Aug{% elif m == 9 %}Sep{% elif m == 10 %}Oct{% elif m == 11 %}Nov{% else %}Dec{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1">Year</label>
+        <select name="year" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for y in years %}
+          <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for status_val, status_label in status_choices %}
+          <option value="{{ status_val }}" {% if selected_status == status_val %}selected{% endif %}>{{ status_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'custom_admin:tuition_fees_list' %}" class="btn btn-outline-secondary btn-sm w-100">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" style="font-size: 13px;">
+        <thead class="table-light">
+          <tr>
+            <th class="py-2">Student</th>
+            <th class="py-2">Period</th>
+            <th class="py-2 text-end">Amount</th>
+            <th class="py-2 text-end">Paid</th>
+            <th class="py-2 text-center">Due Date</th>
+            <th class="py-2 text-center">Status</th>
+            <th class="py-2 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fee in fees %}
+          <tr>
+            <td class="py-2">
+              <a href="{% url 'custom_admin:tuition_student_detail' fee.enrollment.student.id %}" class="fw-medium text-decoration-none">
+                {{ fee.enrollment.student.name }}
+              </a>
+              {% if fee.enrollment.batch %}
+              <br><small class="text-muted">{{ fee.enrollment.batch.name }}</small>
+              {% endif %}
+            </td>
+            <td class="py-2">{{ fee.month_name }} {{ fee.year }}</td>
+            <td class="py-2 text-end">{{ fee.total_amount|floatformat:0 }}</td>
+            <td class="py-2 text-end">{{ fee.paid_amount|floatformat:0 }}</td>
+            <td class="py-2 text-center">{{ fee.due_date|date:"d M" }}</td>
+            <td class="py-2 text-center">
+              {% if fee.status == 'paid' %}
+              <span class="badge bg-success">Paid</span>
+              {% elif fee.status == 'partial' %}
+              <span class="badge bg-warning">Partial</span>
+              {% elif fee.status == 'overdue' %}
+              <span class="badge bg-danger">Overdue</span>
+              {% elif fee.status == 'waived' %}
+              <span class="badge bg-secondary">Waived</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ fee.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="py-2 text-end">
+              {% if fee.status != 'paid' and fee.status != 'waived' %}
+              <a href="{% url 'custom_admin:collect_fee' fee.id %}" class="btn btn-sm btn-success py-0 px-2" title="Collect">
+                <i class="ti ti-cash"></i>
+              </a>
+              {% endif %}
+              <a href="{% url 'custom_admin:tuition_fee_detail' fee.id %}" class="btn btn-sm btn-outline-info py-0 px-2" title="View">
+                <i class="ti ti-eye"></i>
+              </a>
+              {% if fee.status == 'paid' and fee.receipt_number %}
+              <a href="{% url 'custom_admin:fee_receipt' fee.id %}" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Receipt" target="_blank">
+                <i class="ti ti-printer"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              No fee records found
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% if fees.has_other_pages %}
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center mb-0">
+    {% if fees.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page={{ fees.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Previous</a></li>
+    {% endif %}
+    <li class="page-item active"><span class="page-link">{{ fees.number }} of {{ fees.paginator.num_pages }}</span></li>
+    {% if fees.has_next %}
+    <li class="page-item"><a class="page-link" href="?page={{ fees.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

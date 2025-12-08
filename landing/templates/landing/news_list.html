@@ -1,0 +1,67 @@
+{% extends 'landing/base.html' %}
+{% load static %}
+
+{% block title %}News & Updates - LM Academy{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="lm-page-header">
+  <div class="container">
+    <div class="lm-page-header-content">
+      <span class="lm-section-tag">Stay Informed</span>
+      <h1>News & Updates</h1>
+      <p>Stay up to date with the latest news, announcements, and updates from LM Academy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- News List Section -->
+<section class="lm-section lm-section-light">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="lm-filter-tabs mb-4">
+      <a href="{% url 'landing:news_list' %}" class="lm-filter-tab {% if not selected_category %}active{% endif %}">All</a>
+      {% for code, name in categories %}
+      <a href="{% url 'landing:news_list' %}?category={{ code }}" class="lm-filter-tab {% if selected_category == code %}active{% endif %}">{{ name }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- News Grid -->
+    <div class="lm-news-grid">
+      {% for news in news_items %}
+      <article class="lm-news-card">
+        <div class="lm-news-card-image">
+          {% if news.featured_image %}
+          <img src="{{ news.featured_image.url }}" alt="{{ news.title }}">
+          {% else %}
+          <div class="lm-news-card-placeholder">
+            <i class="fas fa-newspaper"></i>
+          </div>
+          {% endif %}
+          <span class="lm-news-card-category">{{ news.get_category_display }}</span>
+        </div>
+        <div class="lm-news-card-body">
+          <div class="lm-news-card-meta">
+            <span><i class="far fa-calendar"></i> {{ news.published_at|date:"M d, Y" }}</span>
+            <span><i class="far fa-eye"></i> {{ news.view_count }} views</span>
+          </div>
+          <h3 class="lm-news-card-title">
+            <a href="{% url 'landing:news_detail' news.slug %}">{{ news.title }}</a>
+          </h3>
+          <p class="lm-news-card-excerpt">{{ news.excerpt|truncatechars:120 }}</p>
+          <a href="{% url 'landing:news_detail' news.slug %}" class="lm-news-card-link">
+            Read More <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </article>
+      {% empty %}
+      <div class="lm-empty-state">
+        <i class="fas fa-newspaper"></i>
+        <h3>No News Available</h3>
+        <p>Check back soon for the latest updates and announcements.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

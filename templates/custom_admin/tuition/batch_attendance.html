@@ -1,0 +1,128 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ batch.name }}</h4>
+    <small class="text-muted">Attendance for {{ attendance_date }}</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'custom_admin:batch_detail' batch.id %}" class="btn btn-outline-secondary btn-sm">
+      <i class="ti ti-arrow-left me-1"></i>Back to Batch
+    </a>
+  </div>
+</div>
+
+<!-- Date Selection -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label class="form-label small mb-0">Date:</label>
+      </div>
+      <div class="col-md-3">
+        <input type="date" name="date" class="form-control form-control-sm" value="{{ attendance_date }}" onchange="this.form.submit()">
+      </div>
+      <div class="col-auto">
+        <a href="?date={{ attendance_date|add_days:-1 }}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-chevron-left"></i> Prev
+        </a>
+        <a href="?date={{ attendance_date|add_days:1 }}" class="btn btn-outline-secondary btn-sm">
+          Next <i class="ti ti-chevron-right"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Attendance Form -->
+<form method="POST">
+  {% csrf_token %}
+
+  <div class="card">
+    <div class="card-header py-2 d-flex justify-content-between align-items-center">
+      <h6 class="mb-0">
+        <i class="ti ti-clipboard-check me-1"></i>
+        {{ enrollments|length }} Students
+      </h6>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-outline-success" onclick="markAll('present')">All Present</button>
+        <button type="button" class="btn btn-outline-danger" onclick="markAll('absent')">All Absent</button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0" style="font-size: 13px;">
+          <thead class="table-light">
+            <tr>
+              <th class="py-2" style="width: 30%;">Student</th>
+              <th class="py-2 text-center" style="width: 30%;">Status</th>
+              <th class="py-2" style="width: 15%;">Check-in</th>
+              <th class="py-2" style="width: 15%;">Check-out</th>
+              <th class="py-2" style="width: 10%;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enrollment in enrollments %}
+            {% with att=existing_attendance|get_item:enrollment.id %}
+            <tr>
+              <td class="py-2">
+                <span class="fw-medium">{{ enrollment.student.name }}</span>
+                <br><small class="text-muted">{{ enrollment.student.phone }}</small>
+              </td>
+              <td class="py-2 text-center">
+                <div class="btn-group btn-group-sm status-group" role="group">
+                  {% for status_val, status_label in status_choices %}
+                  <input type="radio" class="btn-check status-radio" name="status_{{ enrollment.id }}" value="{{ status_val }}" id="status_{{ enrollment.id }}_{{ status_val }}"
+                    {% if att and att.status == status_val %}checked{% elif not att and status_val == 'present' %}checked{% endif %}>
+                  <label class="btn btn-outline-{% if status_val == 'present' %}success{% elif status_val == 'absent' %}danger{% elif status_val == 'late' %}warning{% else %}secondary{% endif %}" for="status_{{ enrollment.id }}_{{ status_val }}">
+                    {{ status_label }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </td>
+              <td class="py-2">
+                <input type="time" name="check_in_{{ enrollment.id }}" class="form-control form-control-sm" value="{{ att.check_in_time|time:'H:i'|default:'' }}">
+              </td>
+              <td class="py-2">
+                <input type="time" name="check_out_{{ enrollment.id }}" class="form-control form-control-sm" value="{{ att.check_out_time|time:'H:i'|default:'' }}">
+              </td>
+              <td class="py-2">
+                <input type="text" name="notes_{{ enrollment.id }}" class="form-control form-control-sm" value="{{ att.notes|default:'' }}" placeholder="...">
+              </td>
+            </tr>
+            {% endwith %}
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">No students enrolled in this batch</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% if enrollments %}
+  <div class="mt-3">
+    <button type="submit" class="btn btn-primary">
+      <i class="ti ti-check me-1"></i>Save Attendance
+    </button>
+    <a href="{% url 'custom_admin:batch_detail' batch.id %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function markAll(status) {
+  document.querySelectorAll('.status-radio[value="' + status + '"]').forEach(function(radio) {
+    radio.checked = true;
+  });
+}
+</script>
+{% endblock %}

@@ -3,8 +3,37 @@ from drf_spectacular.utils import extend_schema_field
 from .models import (
     Category, Course, Module, VideoLesson, StudentProgress,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer, ModuleProgress, PDFNote
+    QuizAttempt, QuizAnswer, ModuleProgress, PDFNote, Certificate,
+    DailyStreak, DailyActivity
 )
+
+
+class InstructorSerializer(serializers.Serializer):
+    """
+    Serializer for instructor/teacher info displayed on courses.
+    """
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
+    designation = serializers.CharField(read_only=True)
+    specialization = serializers.CharField(read_only=True)
+    bio = serializers.CharField(read_only=True)
+    experience_years = serializers.IntegerField(read_only=True)
+    qualification = serializers.CharField(read_only=True)
+
+    @extend_schema_field(serializers.CharField)
+    def get_name(self, obj):
+        return obj.user.name if obj and obj.user else None
+
+    @extend_schema_field(serializers.CharField)
+    def get_photo_url(self, obj):
+        if obj and obj.profile_photo:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_photo.url)
+            return obj.profile_photo.url
+        return None
+
 
 class CategorySerializer(serializers.ModelSerializer):
     """
@@ -255,7 +284,8 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 class CourseListSerializer(serializers.ModelSerializer):
     """
-    Serializer for course list view
+    Serializer for course list view.
+    Includes enrollment type fields for Flutter app to determine how to display courses.
     """
     category_name = serializers.CharField(source='category.name', read_only=True)
     price_display = serializers.CharField(read_only=True)
@@ -269,15 +299,33 @@ class CourseListSerializer(serializers.ModelSerializer):
     enrolled_count = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
-    
+    instructor = serializers.SerializerMethodField()
+
+    # New enrollment type fields
+    enrollment_type = serializers.CharField(read_only=True)
+    enrollment_type_display = serializers.CharField(read_only=True)
+    can_purchase_online = serializers.BooleanField(read_only=True)
+    is_enquiry_only = serializers.BooleanField(read_only=True)
+    is_admin_only = serializers.BooleanField(read_only=True)
+
+    # Schedule/batch info fields
+    course_duration = serializers.CharField(source='duration', read_only=True)
+    start_date = serializers.DateField(read_only=True)
+    batch_info = serializers.CharField(read_only=True)
+
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'curriculum', 'what_you_will_learn', 
-            'category_name', 'price', 'tax_rate', 'price_display', 'total_price_display', 
-            'is_free_course', 'thumbnail', 'thumbnail_url', 'preview_video', 
-            'preview_video_url', 'is_enrolled', 'module_count', 'total_lessons', 
-            'allow_public_enrollment', 'rating', 'enrolled_count', 'level', 'duration', 'created_at'
+            'id', 'title', 'description', 'curriculum', 'what_you_will_learn',
+            'category_name', 'price', 'tax_rate', 'price_display', 'total_price_display',
+            'is_free_course', 'thumbnail', 'thumbnail_url', 'preview_video',
+            'preview_video_url', 'is_enrolled', 'module_count', 'total_lessons',
+            'allow_public_enrollment', 'rating', 'enrolled_count', 'level', 'duration',
+            'instructor',
+            # New fields
+            'enrollment_type', 'enrollment_type_display', 'can_purchase_online',
+            'is_enquiry_only', 'is_admin_only', 'course_duration', 'start_date', 'batch_info',
+            'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
@@ -362,7 +410,7 @@ class CourseListSerializer(serializers.ModelSerializer):
         """Get total course duration in minutes"""
         total_duration = 0
         modules = obj.modules.all()
-        
+
         for module in modules:
             # Add module estimated duration if available
             if hasattr(module, 'duration_minutes') and module.duration_minutes:
@@ -374,12 +422,34 @@ class CourseListSerializer(serializers.ModelSerializer):
                     lesson = video_link.video_lesson
                     if lesson.duration:  # duration in seconds
                         total_duration += lesson.duration // 60  # convert to minutes
-        
+
         return total_duration if total_duration > 0 else None
+
+    @extend_schema_field(InstructorSerializer)
+    def get_instructor(self, obj):
+        """Get instructor info - teacher if assigned, otherwise fallback to created_by"""
+        # First try to get the assigned teacher
+        if obj.teacher:
+            return InstructorSerializer(obj.teacher, context=self.context).data
+
+        # Fallback: create basic instructor info from created_by
+        if obj.created_by:
+            return {
+                'id': None,
+                'name': obj.created_by.name if hasattr(obj.created_by, 'name') else obj.created_by.username,
+                'photo_url': None,
+                'designation': 'Instructor',
+                'specialization': None,
+                'bio': None,
+                'experience_years': None,
+                'qualification': None,
+            }
+        return None
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     """
-    Serializer for detailed course view
+    Serializer for detailed course view.
+    Includes full enrollment type information and schedule details.
     """
     category = CategorySerializer(read_only=True)
     modules = serializers.SerializerMethodField()
@@ -397,6 +467,19 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     enrolled_count = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
+    instructor = serializers.SerializerMethodField()
+
+    # Enrollment type fields
+    enrollment_type = serializers.CharField(read_only=True)
+    enrollment_type_display = serializers.CharField(read_only=True)
+    can_purchase_online = serializers.BooleanField(read_only=True)
+    is_enquiry_only = serializers.BooleanField(read_only=True)
+    is_admin_only = serializers.BooleanField(read_only=True)
+
+    # Schedule/batch info fields
+    course_duration = serializers.CharField(source='duration', read_only=True)
+    start_date = serializers.DateField(read_only=True)
+    batch_info = serializers.CharField(read_only=True)
 
     class Meta:
         model = Course
@@ -407,7 +490,11 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'preview_video_url', 'is_published', 'allow_public_enrollment',
             'created_by_name', 'modules', 'assignments', 'quizzes', 'pdf_notes',
             'is_enrolled', 'enrollment_info', 'rating', 'enrolled_count',
-            'level', 'duration', 'created_at'
+            'level', 'duration', 'instructor',
+            # New enrollment type fields
+            'enrollment_type', 'enrollment_type_display', 'can_purchase_online',
+            'is_enquiry_only', 'is_admin_only', 'course_duration', 'start_date', 'batch_info',
+            'created_at'
         ]
     
     @extend_schema_field(serializers.BooleanField)
@@ -598,6 +685,27 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                         total_duration += lesson.duration // 60  # convert to minutes
         
         return total_duration if total_duration > 0 else None
+
+    @extend_schema_field(InstructorSerializer)
+    def get_instructor(self, obj):
+        """Get instructor info - teacher if assigned, otherwise fallback to created_by"""
+        # First try to get the assigned teacher
+        if obj.teacher:
+            return InstructorSerializer(obj.teacher, context=self.context).data
+
+        # Fallback: create basic instructor info from created_by
+        if obj.created_by:
+            return {
+                'id': None,
+                'name': obj.created_by.name if hasattr(obj.created_by, 'name') else obj.created_by.username,
+                'photo_url': None,
+                'designation': 'Instructor',
+                'specialization': None,
+                'bio': None,
+                'experience_years': None,
+                'qualification': None,
+            }
+        return None
 
 class StudentProgressSerializer(serializers.ModelSerializer):
     """
@@ -1025,3 +1133,274 @@ class ModuleProgressSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.CharField)
     def get_student_name(self, obj):
         return obj.student.name if hasattr(obj.student, 'name') else obj.student.username
+
+
+# ==================== CERTIFICATE SERIALIZERS ====================
+
+class CertificateListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing student certificates.
+    Used in Flutter app for displaying certificate cards.
+    """
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_thumbnail = serializers.SerializerMethodField()
+    student_name = serializers.CharField(source='student.name', read_only=True)
+    certificate_type_display = serializers.CharField(source='get_certificate_type_display', read_only=True)
+    pdf_url = serializers.SerializerMethodField()
+    is_valid = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Certificate
+        fields = [
+            'id', 'certificate_number', 'certificate_type', 'certificate_type_display',
+            'title', 'course_title', 'course_thumbnail', 'student_name',
+            'completion_date', 'issue_date', 'final_score', 'grade',
+            'verification_code', 'pdf_url', 'is_valid', 'is_revoked'
+        ]
+
+    @extend_schema_field(serializers.CharField)
+    def get_course_thumbnail(self, obj):
+        if obj.course.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.course.thumbnail.url)
+            return obj.course.thumbnail.url
+        return None
+
+    @extend_schema_field(serializers.CharField)
+    def get_pdf_url(self, obj):
+        # Generate PDF if it doesn't exist
+        if not obj.pdf_file:
+            try:
+                from apps.courses.certificate_generator import generate_certificate_pdf
+                from django.core.files.base import ContentFile
+
+                pdf_buffer = generate_certificate_pdf(obj)
+                pdf_filename = f"certificate_{obj.certificate_number}.pdf"
+                obj.pdf_file.save(pdf_filename, ContentFile(pdf_buffer.getvalue()), save=True)
+            except Exception:
+                return None
+
+        if obj.pdf_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.pdf_file.url)
+            return obj.pdf_file.url
+        return None
+
+    @extend_schema_field(serializers.BooleanField)
+    def get_is_valid(self, obj):
+        return not obj.is_revoked
+
+
+class CertificateDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for individual certificate view.
+    Includes full course info and verification details.
+    """
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_description = serializers.CharField(source='course.description', read_only=True)
+    course_thumbnail = serializers.SerializerMethodField()
+    student_name = serializers.CharField(source='student.name', read_only=True)
+    student_email = serializers.CharField(source='student.email', read_only=True)
+    certificate_type_display = serializers.CharField(source='get_certificate_type_display', read_only=True)
+    pdf_url = serializers.SerializerMethodField()
+    is_valid = serializers.SerializerMethodField()
+    verification_status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Certificate
+        fields = [
+            'id', 'certificate_number', 'certificate_type', 'certificate_type_display',
+            'title', 'description', 'course', 'course_title', 'course_description',
+            'course_thumbnail', 'student_name', 'student_email',
+            'completion_date', 'issue_date', 'final_score', 'grade',
+            'verification_code', 'verification_url', 'pdf_url',
+            'signed_by', 'signed_by_title',
+            'is_valid', 'is_revoked', 'revoked_reason', 'revoked_at',
+            'verification_status', 'created_at'
+        ]
+
+    @extend_schema_field(serializers.CharField)
+    def get_course_thumbnail(self, obj):
+        if obj.course.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.course.thumbnail.url)
+            return obj.course.thumbnail.url
+        return None
+
+    @extend_schema_field(serializers.CharField)
+    def get_pdf_url(self, obj):
+        # Generate PDF if it doesn't exist
+        if not obj.pdf_file:
+            try:
+                from apps.courses.certificate_generator import generate_certificate_pdf
+                from django.core.files.base import ContentFile
+
+                pdf_buffer = generate_certificate_pdf(obj)
+                pdf_filename = f"certificate_{obj.certificate_number}.pdf"
+                obj.pdf_file.save(pdf_filename, ContentFile(pdf_buffer.getvalue()), save=True)
+            except Exception:
+                return None
+
+        if obj.pdf_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.pdf_file.url)
+            return obj.pdf_file.url
+        return None
+
+    @extend_schema_field(serializers.BooleanField)
+    def get_is_valid(self, obj):
+        return not obj.is_revoked
+
+    @extend_schema_field(serializers.DictField)
+    def get_verification_status(self, obj):
+        return {
+            'is_valid': not obj.is_revoked,
+            'status': 'revoked' if obj.is_revoked else 'valid',
+            'message': obj.revoked_reason if obj.is_revoked else 'This certificate is valid and verified.',
+            'verified_at': obj.updated_at
+        }
+
+
+class CertificateVerificationSerializer(serializers.Serializer):
+    """
+    Serializer for certificate verification response.
+    Used when verifying a certificate by code.
+    """
+    is_valid = serializers.BooleanField()
+    status = serializers.CharField()
+    message = serializers.CharField()
+
+    # Certificate info (only if valid)
+    certificate_number = serializers.CharField(required=False)
+    student_name = serializers.CharField(required=False)
+    course_title = serializers.CharField(required=False)
+    completion_date = serializers.DateField(required=False)
+    issue_date = serializers.DateField(required=False)
+    certificate_type = serializers.CharField(required=False)
+    grade = serializers.CharField(required=False, allow_null=True)
+    signed_by = serializers.CharField(required=False, allow_null=True)
+    signed_by_title = serializers.CharField(required=False, allow_null=True)
+
+
+class CertificateSimpleSerializer(serializers.ModelSerializer):
+    """
+    Minimal certificate data for dashboard/lists.
+    """
+    course_title = serializers.CharField(source='course.title', read_only=True)
+
+    class Meta:
+        model = Certificate
+        fields = [
+            'id', 'certificate_number', 'course_title', 'issue_date', 'is_revoked'
+        ]
+
+
+# ==================== STREAK SERIALIZERS ====================
+
+class DailyStreakSerializer(serializers.ModelSerializer):
+    """
+    Serializer for student daily streak data.
+    Used for retrieving and displaying streak information.
+    """
+    student_name = serializers.CharField(source='student.name', read_only=True)
+    is_active_today = serializers.SerializerMethodField()
+    streak_status = serializers.SerializerMethodField()
+    days_since_last_activity = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DailyStreak
+        fields = [
+            'id', 'student_name', 'current_streak', 'longest_streak',
+            'total_active_days', 'streak_start_date', 'last_activity_date',
+            'is_active_today', 'streak_status', 'days_since_last_activity',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'student_name', 'created_at', 'updated_at']
+
+    @extend_schema_field(serializers.BooleanField)
+    def get_is_active_today(self, obj):
+        from django.utils import timezone
+        today = timezone.now().date()
+        return obj.last_activity_date == today
+
+    @extend_schema_field(serializers.CharField)
+    def get_streak_status(self, obj):
+        from django.utils import timezone
+        from datetime import timedelta
+        today = timezone.now().date()
+
+        if obj.last_activity_date is None:
+            return 'no_activity'
+        elif obj.last_activity_date == today:
+            return 'active'
+        elif obj.last_activity_date == today - timedelta(days=1):
+            return 'at_risk'  # Streak will break if no activity today
+        else:
+            return 'broken'
+
+    @extend_schema_field(serializers.IntegerField)
+    def get_days_since_last_activity(self, obj):
+        from django.utils import timezone
+        if obj.last_activity_date is None:
+            return None
+        return (timezone.now().date() - obj.last_activity_date).days
+
+
+class DailyActivitySerializer(serializers.ModelSerializer):
+    """
+    Serializer for daily activity logs.
+    """
+    class Meta:
+        model = DailyActivity
+        fields = [
+            'id', 'activity_date', 'activities_count', 'videos_watched',
+            'quizzes_attempted', 'assignments_submitted', 'learning_minutes',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class DailyActivitySummarySerializer(serializers.Serializer):
+    """
+    Serializer for weekly/monthly activity summary.
+    """
+    date = serializers.DateField()
+    activities_count = serializers.IntegerField()
+    videos_watched = serializers.IntegerField()
+    quizzes_attempted = serializers.IntegerField()
+    assignments_submitted = serializers.IntegerField()
+    learning_minutes = serializers.IntegerField()
+    has_activity = serializers.BooleanField()
+
+
+class RecordActivitySerializer(serializers.Serializer):
+    """
+    Serializer for recording a new activity.
+    """
+    activity_type = serializers.ChoiceField(
+        choices=['video', 'quiz', 'assignment', 'general'],
+        default='general',
+        help_text="Type of activity being recorded"
+    )
+    minutes = serializers.IntegerField(
+        default=0,
+        min_value=0,
+        help_text="Learning time in minutes (optional)"
+    )
+
+
+class StreakResponseSerializer(serializers.Serializer):
+    """
+    Response serializer for streak operations.
+    """
+    success = serializers.BooleanField()
+    message = serializers.CharField()
+    current_streak = serializers.IntegerField()
+    longest_streak = serializers.IntegerField()
+    total_active_days = serializers.IntegerField()
+    is_active_today = serializers.BooleanField()
+    streak_status = serializers.CharField()

@@ -1,0 +1,708 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ student.name|default:student.email }} - Student Profile{% endblock %}
+
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<!-- Student Header Card -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 32px;">
+          {{ student.name|default:student.email|slice:":1"|upper }}
+        </div>
+      </div>
+      <div class="col">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <h4 class="mb-0">{{ student.name|default:"No Name" }}</h4>
+          {% if student.role %}
+          <span class="badge bg-primary">{{ student.role|title }}</span>
+          {% endif %}
+          {% if student.is_active %}
+          <span class="badge bg-success">Active</span>
+          {% else %}
+          <span class="badge bg-danger">Inactive</span>
+          {% endif %}
+          {% if analytics and analytics.risk_level == 'high' %}
+          <span class="badge bg-danger"><i class="ti ti-alert-triangle me-1"></i>High Risk</span>
+          {% elif analytics and analytics.risk_level == 'medium' %}
+          <span class="badge bg-warning"><i class="ti ti-alert-circle me-1"></i>Medium Risk</span>
+          {% endif %}
+        </div>
+        <div class="text-muted mb-2">
+          <span class="me-3"><i class="ti ti-mail me-1"></i>{{ student.email }}</span>
+          {% if student.phone_number %}
+          <span class="me-3"><i class="ti ti-phone me-1"></i>{{ student.phone_number }}</span>
+          {% endif %}
+        </div>
+        <div class="text-muted" style="font-size: 12px;">
+          <span class="me-3"><i class="ti ti-calendar me-1"></i>Joined: {{ student.date_joined|date:"M d, Y" }}</span>
+          {% if student.last_login %}
+          <span><i class="ti ti-clock me-1"></i>Last Login: {{ student.last_login|date:"M d, Y h:i A" }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="d-flex gap-2">
+          <a href="{% url 'custom_admin:user_edit' student.id %}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-edit me-1"></i>Edit
+          </a>
+          <a href="mailto:{{ student.email }}" class="btn btn-outline-secondary btn-sm">
+            <i class="ti ti-mail me-1"></i>Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-primary-subtle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+          <i class="ti ti-book text-primary fs-5"></i>
+        </div>
+        <h5 class="mb-0">{{ total_enrollments }}</h5>
+        <small class="text-muted">Enrollments</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-success-subtle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+          <i class="ti ti-currency-rupee text-success fs-5"></i>
+        </div>
+        <h5 class="mb-0 text-success">{{ total_paid|floatformat:0 }}</h5>
+        <small class="text-muted">Total Paid</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-danger-subtle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+          <i class="ti ti-alert-circle text-danger fs-5"></i>
+        </div>
+        <h5 class="mb-0 text-danger">{{ total_outstanding|floatformat:0 }}</h5>
+        <small class="text-muted">Outstanding</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="rounded-circle bg-info-subtle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+          <i class="ti ti-certificate text-info fs-5"></i>
+        </div>
+        <h5 class="mb-0">{{ certificates|length }}</h5>
+        <small class="text-muted">Certificates</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="enrollments-tab" data-bs-toggle="tab" data-bs-target="#enrollments" type="button" role="tab">
+      <i class="ti ti-book me-1"></i>Enrollments
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">
+      <i class="ti ti-currency-rupee me-1"></i>Payments
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab">
+      <i class="ti ti-chart-line me-1"></i>Progress
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button" role="tab">
+      <i class="ti ti-bell me-1"></i>Alerts
+      {% if active_alerts %}
+      <span class="badge bg-danger ms-1">{{ active_alerts|length }}</span>
+      {% endif %}
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="certificates-tab" data-bs-toggle="tab" data-bs-target="#certificates" type="button" role="tab">
+      <i class="ti ti-certificate me-1"></i>Certificates
+    </button>
+  </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="profileTabsContent">
+  <!-- Enrollments Tab -->
+  <div class="tab-pane fade show active" id="enrollments" role="tabpanel">
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0"><i class="ti ti-book me-2"></i>Course Enrollments</h6>
+      </div>
+      <div class="card-body">
+        {% if enrollment_data %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Course</th>
+                <th>Enrolled On</th>
+                <th>Payment Status</th>
+                <th class="text-end">Total Amount</th>
+                <th class="text-end">Paid</th>
+                <th class="text-end">Outstanding</th>
+                <th class="text-center">Progress</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in enrollment_data %}
+              <tr>
+                <td>
+                  <a href="{% url 'custom_admin:course_detail' item.enrollment.course.id %}" class="text-decoration-none fw-medium">
+                    {{ item.enrollment.course.title|truncatechars:35 }}
+                  </a>
+                  {% if item.enrollment.team %}
+                  <br><small class="text-muted">Team: {{ item.enrollment.team.name }}</small>
+                  {% endif %}
+                </td>
+                <td>{{ item.enrollment.enrolled_on|date:"M d, Y" }}</td>
+                <td>
+                  {% if item.enrollment.payment_status == 'completed' %}
+                  <span class="badge bg-success">Completed</span>
+                  {% elif item.enrollment.payment_status == 'partial' %}
+                  <span class="badge bg-warning">Partial</span>
+                  {% elif item.enrollment.payment_status == 'pending' %}
+                  <span class="badge bg-danger">Pending</span>
+                  {% else %}
+                  <span class="badge bg-info">{{ item.enrollment.payment_status|title }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">{{ item.enrollment.total_amount|floatformat:0 }}</td>
+                <td class="text-end text-success">{{ item.paid|floatformat:0 }}</td>
+                <td class="text-end {% if item.outstanding > 0 %}text-danger{% endif %}">
+                  {{ item.outstanding|floatformat:0 }}
+                </td>
+                <td class="text-center">
+                  <div class="progress" style="height: 8px; width: 80px;">
+                    <div class="progress-bar {% if item.progress >= 80 %}bg-success{% elif item.progress >= 40 %}bg-warning{% else %}bg-danger{% endif %}"
+                         style="width: {{ item.progress }}%"></div>
+                  </div>
+                  <small class="text-muted">{{ item.progress }}%</small>
+                </td>
+                <td>
+                  {% if item.enrollment.active %}
+                  <span class="badge bg-success">Active</span>
+                  {% else %}
+                  <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="ti ti-book-off text-muted" style="font-size: 48px;"></i>
+          <h5 class="mt-3">No Enrollments</h5>
+          <p class="text-muted">This student is not enrolled in any courses yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Tab -->
+  <div class="tab-pane fade" id="payments" role="tabpanel">
+    <!-- Quick Action Bar -->
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{% url 'custom_admin:payment_create' %}?student={{ student.id }}" class="btn btn-primary">
+        <i class="ti ti-plus me-1"></i> Add New Payment
+      </a>
+    </div>
+    <div class="row">
+      <!-- Pending Payments -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3 bg-danger-subtle d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 text-danger"><i class="ti ti-clock me-2"></i>Pending Payments ({{ pending_payments|length }})</h6>
+            {% if pending_payments %}
+            <span class="badge bg-danger">₹{{ total_outstanding|floatformat:0 }} Outstanding</span>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if pending_payments %}
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for payment in pending_payments %}
+                  <tr>
+                    <td>{{ payment.enrollment.course.title|truncatechars:20 }}</td>
+                    <td class="fw-bold">₹{{ payment.amount|floatformat:0 }}</td>
+                    <td>
+                      {% if payment.due_date %}
+                      {{ payment.due_date|date:"M d, Y" }}
+                      {% else %}
+                      -
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if payment.status == 'overdue' %}
+                      <span class="badge bg-danger">Overdue</span>
+                      {% else %}
+                      <span class="badge bg-warning">Pending</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'custom_admin:payment_edit' payment.id %}?next={% url 'custom_admin:student_profile' student.id %}"
+                         class="btn btn-sm btn-success" title="Record Payment">
+                        <i class="ti ti-cash"></i> Record
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-check-circle text-success" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No pending payments</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment History -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3">
+            <h6 class="mb-0"><i class="ti ti-history me-2"></i>Payment History</h6>
+          </div>
+          <div class="card-body">
+            {% if all_payments %}
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for payment in all_payments %}
+                  <tr>
+                    <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                    <td>{{ payment.enrollment.course.title|truncatechars:20 }}</td>
+                    <td class="fw-bold">{{ payment.amount|floatformat:0 }}</td>
+                    <td>
+                      {% if payment.status == 'completed' %}
+                      <span class="badge bg-success">Completed</span>
+                      {% elif payment.status == 'pending' %}
+                      <span class="badge bg-warning">Pending</span>
+                      {% elif payment.status == 'overdue' %}
+                      <span class="badge bg-danger">Overdue</span>
+                      {% else %}
+                      <span class="badge bg-secondary">{{ payment.status|title }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-receipt-off text-muted" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No payment history</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax Invoices -->
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0"><i class="ti ti-file-invoice me-2"></i>Tax Invoices</h6>
+      </div>
+      <div class="card-body">
+        {% if tax_invoices %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Invoice #</th>
+                <th>Course</th>
+                <th>Amount</th>
+                <th>Generated On</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for invoice in tax_invoices %}
+              <tr>
+                <td><code>{{ invoice.invoice_number }}</code></td>
+                <td>{{ invoice.enrollment.course.title|truncatechars:30 }}</td>
+                <td class="fw-bold">{{ invoice.total_amount|floatformat:0 }}</td>
+                <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+                <td class="text-end">
+                  {% if invoice.invoice_pdf_path %}
+                  <a href="{{ invoice.invoice_pdf_path }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    <i class="ti ti-download"></i> Download
+                  </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-file-off text-muted" style="font-size: 32px;"></i>
+          <p class="text-muted mt-2 mb-0">No tax invoices generated</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Tab -->
+  <div class="tab-pane fade" id="progress" role="tabpanel">
+    <div class="row">
+      <!-- Analytics Overview -->
+      <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3">
+            <h6 class="mb-0"><i class="ti ti-chart-pie me-2"></i>Performance Overview</h6>
+          </div>
+          <div class="card-body">
+            {% if analytics %}
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Overall Completion</span>
+                <span class="fw-bold">{{ analytics.overall_completion_rate|floatformat:0 }}%</span>
+              </div>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-primary" style="width: {{ analytics.overall_completion_rate }}%"></div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Video Watch Rate</span>
+                <span class="fw-bold">{{ analytics.video_watch_rate|floatformat:0 }}%</span>
+              </div>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-info" style="width: {{ analytics.video_watch_rate }}%"></div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Quiz Average</span>
+                <span class="fw-bold">{{ analytics.quiz_average|floatformat:1 }}%</span>
+              </div>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar {% if analytics.quiz_average >= 70 %}bg-success{% elif analytics.quiz_average >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                     style="width: {{ analytics.quiz_average }}%"></div>
+              </div>
+            </div>
+            <hr>
+            <div class="row text-center">
+              <div class="col-6">
+                <h5 class="mb-0">{{ quiz_count }}</h5>
+                <small class="text-muted">Quiz Attempts</small>
+              </div>
+              <div class="col-6">
+                <h5 class="mb-0">{{ assignment_count }}</h5>
+                <small class="text-muted">Assignments</small>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-chart-off text-muted" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No analytics data available</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Progress -->
+      <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3">
+            <h6 class="mb-0"><i class="ti ti-layout-grid me-2"></i>Module Progress</h6>
+          </div>
+          <div class="card-body">
+            {% if module_progress %}
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Module</th>
+                    <th>Course</th>
+                    <th>Progress</th>
+                    <th>Last Activity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for mp in module_progress %}
+                  <tr>
+                    <td>{{ mp.module.title|truncatechars:25 }}</td>
+                    <td>{{ mp.module.course.title|truncatechars:20 }}</td>
+                    <td>
+                      <div class="progress" style="height: 6px; width: 100px;">
+                        <div class="progress-bar" style="width: {{ mp.completion_percentage }}%"></div>
+                      </div>
+                      <small>{{ mp.completion_percentage|floatformat:0 }}%</small>
+                    </td>
+                    <td>
+                      {% if mp.updated_at %}
+                      {{ mp.updated_at|date:"M d, Y" }}
+                      {% else %}
+                      -
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-progress text-muted" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No module progress recorded</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Progress -->
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0"><i class="ti ti-video me-2"></i>Recent Video Progress</h6>
+      </div>
+      <div class="card-body">
+        {% if video_progress %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Video</th>
+                <th>Course</th>
+                <th>Watch Progress</th>
+                <th>Status</th>
+                <th>Last Watched</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for vp in video_progress %}
+              <tr>
+                <td>{{ vp.video_lesson.title|truncatechars:30 }}</td>
+                <td>{{ vp.course.title|truncatechars:25 }}</td>
+                <td>
+                  <div class="progress" style="height: 6px; width: 100px;">
+                    <div class="progress-bar" style="width: {{ vp.completed_percentage }}%"></div>
+                  </div>
+                  <small>{{ vp.completed_percentage|floatformat:0 }}%</small>
+                </td>
+                <td>
+                  {% if vp.completed %}
+                  <span class="badge bg-success">Completed</span>
+                  {% else %}
+                  <span class="badge bg-warning">In Progress</span>
+                  {% endif %}
+                </td>
+                <td>{{ vp.last_watched_at|date:"M d, Y H:i" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="ti ti-video-off text-muted" style="font-size: 32px;"></i>
+          <p class="text-muted mt-2 mb-0">No video progress recorded</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts Tab -->
+  <div class="tab-pane fade" id="alerts" role="tabpanel">
+    <div class="row">
+      <!-- Active Alerts -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3 bg-danger-subtle">
+            <h6 class="mb-0 text-danger"><i class="ti ti-alert-triangle me-2"></i>Active Alerts ({{ active_alerts|length }})</h6>
+          </div>
+          <div class="card-body">
+            {% if active_alerts %}
+            {% for alert in active_alerts %}
+            <div class="alert {% if alert.alert_type == 'high_risk' %}alert-danger{% elif alert.alert_type == 'low_engagement' %}alert-warning{% else %}alert-info{% endif %} mb-2">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <strong>{{ alert.alert_type|title }}</strong>
+                  <p class="mb-0 small">{{ alert.message }}</p>
+                </div>
+                <small class="text-muted">{{ alert.created_at|date:"M d" }}</small>
+              </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-check-circle text-success" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No active alerts</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentor Sessions -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header py-3">
+            <h6 class="mb-0"><i class="ti ti-users me-2"></i>Mentor Sessions ({{ mentor_sessions|length }})</h6>
+          </div>
+          <div class="card-body">
+            {% if mentor_sessions %}
+            {% for session in mentor_sessions %}
+            <div class="border rounded p-3 mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>{{ session.session_date|date:"M d, Y" }}</strong>
+                <span class="badge {% if session.status == 'completed' %}bg-success{% elif session.status == 'scheduled' %}bg-primary{% else %}bg-secondary{% endif %}">
+                  {{ session.status|title }}
+                </span>
+              </div>
+              {% if session.mentor %}
+              <small class="text-muted"><i class="ti ti-user me-1"></i>Mentor: {{ session.mentor.name }}</small>
+              {% endif %}
+              {% if session.notes %}
+              <p class="small text-muted mb-0 mt-1">{{ session.notes|truncatechars:100 }}</p>
+              {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-4">
+              <i class="ti ti-users-group text-muted" style="font-size: 32px;"></i>
+              <p class="text-muted mt-2 mb-0">No mentor sessions recorded</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resolved Alerts -->
+    {% if resolved_alerts %}
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0"><i class="ti ti-check me-2"></i>Resolved Alerts</h6>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Message</th>
+                <th>Created</th>
+                <th>Resolved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for alert in resolved_alerts %}
+              <tr>
+                <td><span class="badge bg-secondary">{{ alert.alert_type|title }}</span></td>
+                <td>{{ alert.message|truncatechars:50 }}</td>
+                <td>{{ alert.created_at|date:"M d, Y" }}</td>
+                <td>{{ alert.resolved_at|date:"M d, Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Certificates Tab -->
+  <div class="tab-pane fade" id="certificates" role="tabpanel">
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0"><i class="ti ti-certificate me-2"></i>Certificates ({{ certificates|length }})</h6>
+      </div>
+      <div class="card-body">
+        {% if certificates %}
+        <div class="row">
+          {% for cert in certificates %}
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card border h-100">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="ti ti-certificate text-success" style="font-size: 48px;"></i>
+                </div>
+                <h6 class="fw-bold mb-1">{{ cert.course.title|truncatechars:30 }}</h6>
+                <p class="text-muted small mb-2">{{ cert.certificate_number }}</p>
+                <p class="small mb-0">Issued: {{ cert.issue_date|date:"M d, Y" }}</p>
+                {% if cert.is_revoked %}
+                <span class="badge bg-danger mt-2">Revoked</span>
+                {% else %}
+                <span class="badge bg-success mt-2">Valid</span>
+                {% endif %}
+              </div>
+              <div class="card-footer bg-light">
+                <div class="d-flex gap-2 justify-content-center">
+                  <a href="{% url 'custom_admin:certificate_detail' cert.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="ti ti-eye"></i> View
+                  </a>
+                  <a href="{% url 'custom_admin:certificate_download' cert.id %}" class="btn btn-sm btn-primary">
+                    <i class="ti ti-download"></i> Download
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <i class="ti ti-certificate-off text-muted" style="font-size: 48px;"></i>
+          <h5 class="mt-3">No Certificates</h5>
+          <p class="text-muted">This student hasn't earned any certificates yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

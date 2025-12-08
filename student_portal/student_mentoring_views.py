@@ -188,24 +188,24 @@ def student_progress_insights(request):
         modules = course.modules.all()
         
         # Calculate detailed progress
-        total_videos = sum(module.video_lessons.count() for module in modules)
+        total_videos = sum(module.video_links.count() for module in modules)
         completed_videos = StudentProgress.objects.filter(
             user=student,
-            video_lesson__module__course=course,
+            course=course,
             completed=True
         ).count()
-        
+
         quiz_attempts = QuizAttempt.objects.filter(
             student=student,
-            quiz__module__course=course,
+            quiz__courses=course,
             completed=True
         )
-        
+
         assignment_submissions = AssignmentSubmission.objects.filter(
             student=student,
-            assignment__module__course=course
+            assignment__courses=course
         ).exclude(status='draft')
-        
+
         completion_percentage = (completed_videos / total_videos * 100) if total_videos > 0 else 0
         course_insights.append({
             'course': course,
@@ -218,7 +218,7 @@ def student_progress_insights(request):
             'assignments_submitted': assignment_submissions.count(),
             'last_activity': StudentProgress.objects.filter(
                 user=student,
-                video_lesson__module__course=course
+                course=course
             ).order_by('-last_watched_at').first(),
         })
     

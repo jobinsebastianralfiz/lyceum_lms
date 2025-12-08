@@ -18,7 +18,7 @@ from apps.users.models import User
 from apps.courses.models import (
     Course, Module, VideoLesson, StudentProgress, ModuleProgress,
     Assignment, Quiz, QuizQuestion, QuizChoice, AssignmentSubmission,
-    QuizAttempt, QuizAnswer, StudentAnalytics
+    QuizAttempt, QuizAnswer, StudentAnalytics, Certificate
 )
 from apps.payments.models import Enrollment, Payment, TaxInvoice, InstallmentPlan
 from apps.ratings.models import CourseRating
@@ -307,29 +307,18 @@ def dashboard(request):
             completed=True
         ).select_related('video_lesson', 'course').order_by('-last_watched_at').first()
 
-    # Calculate learning streak (consecutive days with activity)
-    learning_streak = 0
-    current_date = timezone.now().date()
-    for i in range(365):  # Check up to 1 year
-        check_date = current_date - timedelta(days=i)
-        has_activity = StudentProgress.objects.filter(
-            user=user,
-            last_watched_at__date=check_date
-        ).exists() or AssignmentSubmission.objects.filter(
-            student=user,
-            created_at__date=check_date
-        ).exists()
-
-        if has_activity:
-            learning_streak = i + 1
-        elif i > 0:  # If no activity and not today, break streak
-            break
+    # Get learning streak from DailyStreak model
+    from apps.courses.models import DailyStreak
+    streak_record = DailyStreak.get_or_create_for_user(user)
+    learning_streak = streak_record.current_streak
+    longest_streak = streak_record.longest_streak
+    total_active_days = streak_record.total_active_days
 
     # Calculate total learning time (estimate based on video progress)
     total_learning_minutes = 0
     for progress in StudentProgress.objects.filter(user=user, completed=True):
-        if progress.video_lesson and progress.video_lesson.duration_seconds:
-            total_learning_minutes += progress.video_lesson.duration_seconds / 60
+        if progress.video_lesson and progress.video_lesson.duration:
+            total_learning_minutes += progress.video_lesson.duration / 60
 
     # Upcoming assignments (within next 7 days)
     upcoming_deadline = timezone.now() + timedelta(days=7)
@@ -352,6 +341,12 @@ def dashboard(request):
                         'assignment': assignment
                     })
     
+    # Get certificates count
+    certificates_count = Certificate.objects.filter(
+        student=user,
+        is_revoked=False
+    ).count()
+
     context = {
         'user': user,
         'current_time': timezone.now(),
@@ -359,6 +354,8 @@ def dashboard(request):
         # Continue Learning
         'continue_learning': continue_learning,
         'learning_streak': learning_streak,
+        'longest_streak': longest_streak,
+        'total_active_days': total_active_days,
         'total_learning_hours': round(total_learning_minutes / 60, 1),
 
         # Course data
@@ -374,6 +371,7 @@ def dashboard(request):
         'quiz_attempts_count': quiz_attempts_count,
         'average_quiz_score': average_quiz_score,
         'modules_completed': modules_completed,
+        'certificates_count': certificates_count,
 
         # Weekly activity
         'videos_this_week': videos_this_week,
@@ -1687,6 +1685,68 @@ def help_support(request):
     """Help and support page with FAQs"""
     if not request.user.is_authenticated:
         return redirect('landing:login')
-    
+
     return render(request, 'student_portal/help_support.html')
+
+
+@login_required(login_url='landing:login')
+def my_certificates(request):
+    """Display all certificates earned by the student"""
+    certificates = Certificate.objects.filter(
+        student=request.user,
+        is_revoked=False
+    ).select_related('course').order_by('-issue_date')
+
+    context = {
+        'certificates': certificates,
+        'total_certificates': certificates.count(),
+    }
+
+    return render(request, 'student_portal/certificates.html', context)
+
+
+@login_required(login_url='landing:login')
+def certificate_view(request, certificate_id):
+    """View a single certificate"""
+    certificate = get_object_or_404(
+        Certificate.objects.select_related('course', 'student'),
+        id=certificate_id,
+        student=request.user
+    )
+
+    context = {
+        'certificate': certificate,
+    }
+
+    return render(request, 'student_portal/certificate_view.html', context)
+
+
+@login_required(login_url='landing:login')
+def certificate_download(request, certificate_id):
+    """Download certificate as PDF"""
+    from django.http import HttpResponse
+    from apps.courses.certificate_generator import generate_certificate_pdf
+
+    certificate = get_object_or_404(
+        Certificate.objects.select_related('course', 'student'),
+        id=certificate_id,
+        student=request.user,
+        is_revoked=False
+    )
+
+    # Generate PDF
+    pdf_buffer = generate_certificate_pdf(certificate)
+
+    # Create response
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+
+    # Generate filename
+    student_name = certificate.student.name or certificate.student.email
+    safe_name = "".join(c for c in student_name if c.isalnum() or c in (' ', '-', '_')).strip()
+    safe_course = "".join(c for c in certificate.course.title if c.isalnum() or c in (' ', '-', '_')).strip()
+    filename = f"Certificate_{safe_name}_{safe_course}.pdf"
+
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
 

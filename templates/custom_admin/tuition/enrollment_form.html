@@ -1,0 +1,183 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">{{ page_title }}</h4>
+    <small class="text-muted">{% if enrollment %}Edit enrollment{% else %}Create a new enrollment{% endif %}</small>
+  </div>
+  <a href="{% url 'custom_admin:tuition_enrollments_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="ti ti-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<form method="POST">
+  {% csrf_token %}
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Enrollment Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Student <span class="text-danger">*</span></label>
+              <select name="student" class="form-select" required id="studentSelect">
+                <option value="">Select Student</option>
+                {% for s in students %}
+                <option value="{{ s.id }}" {% if enrollment.student_id == s.id %}selected{% endif %}>{{ s.name }} ({{ s.phone }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mode <span class="text-danger">*</span></label>
+              <select name="mode" class="form-select" required id="modeSelect">
+                {% for mode_val, mode_label in mode_choices %}
+                <option value="{{ mode_val }}" {% if enrollment.mode == mode_val %}selected{% endif %}>{{ mode_label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Batch Mode Fields -->
+            <div class="col-12 batch-fields" id="batchFields">
+              <label class="form-label">Batch <span class="text-danger">*</span></label>
+              <select name="batch" class="form-select" id="batchSelect">
+                <option value="">Select Batch</option>
+                {% for b in batches %}
+                <option value="{{ b.id }}" {% if enrollment.batch_id == b.id %}selected{% endif %}>
+                  {{ b.name }} ({{ b.standard.name }} - {{ b.subject.name }}) - {{ b.monthly_fee|floatformat:0 }}/month
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Individual/Home Mode Fields -->
+            <div class="col-md-6 individual-fields" id="individualFields" style="display: none;">
+              <label class="form-label">Subject <span class="text-danger">*</span></label>
+              <select name="subject" class="form-select" id="subjectSelect">
+                <option value="">Select Subject</option>
+                {% for subj in subjects %}
+                <option value="{{ subj.id }}" {% if enrollment.subject_id == subj.id %}selected{% endif %}>{{ subj.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 individual-fields" style="display: none;">
+              <label class="form-label">Teacher</label>
+              <select name="teacher" class="form-select">
+                <option value="">Select Teacher</option>
+                {% for t in teachers %}
+                <option value="{{ t.id }}" {% if enrollment.teacher_id == t.id %}selected{% endif %}>{{ t.get_full_name|default:t.email }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 individual-fields" style="display: none;">
+              <label class="form-label">Monthly Fee</label>
+              <input type="number" name="monthly_fee" class="form-control" value="{{ enrollment.monthly_fee|default:'' }}" step="0.01" min="0">
+            </div>
+
+            <!-- Home Mode Address -->
+            <div class="col-12 home-fields" id="homeFields" style="display: none;">
+              <label class="form-label">Tuition Address</label>
+              <textarea name="tuition_address" class="form-control" rows="2" placeholder="Address where tuition will be conducted">{{ enrollment.tuition_address|default:'' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Start Date <span class="text-danger">*</span></label>
+              <input type="date" name="start_date" class="form-control" value="{{ enrollment.start_date|date:'Y-m-d'|default:'' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">End Date</label>
+              <input type="date" name="end_date" class="form-control" value="{{ enrollment.end_date|date:'Y-m-d'|default:'' }}">
+            </div>
+
+            {% if enrollment %}
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if enrollment.is_active %}checked{% endif %}>
+                <label class="form-check-label" for="isActive">Active</label>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule (for individual/home) -->
+    <div class="col-lg-4 individual-fields" style="display: none;">
+      <div class="card">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Weekly Schedule</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-2">
+            <label class="form-label small mb-1">Monday</label>
+            <input type="text" name="schedule_mon" class="form-control form-control-sm" value="{{ enrollment.schedule.mon|default:'' }}" placeholder="e.g., 16:00-17:00">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Tuesday</label>
+            <input type="text" name="schedule_tue" class="form-control form-control-sm" value="{{ enrollment.schedule.tue|default:'' }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Wednesday</label>
+            <input type="text" name="schedule_wed" class="form-control form-control-sm" value="{{ enrollment.schedule.wed|default:'' }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Thursday</label>
+            <input type="text" name="schedule_thu" class="form-control form-control-sm" value="{{ enrollment.schedule.thu|default:'' }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Friday</label>
+            <input type="text" name="schedule_fri" class="form-control form-control-sm" value="{{ enrollment.schedule.fri|default:'' }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Saturday</label>
+            <input type="text" name="schedule_sat" class="form-control form-control-sm" value="{{ enrollment.schedule.sat|default:'' }}">
+          </div>
+          <div class="mb-0">
+            <label class="form-label small mb-1">Sunday</label>
+            <input type="text" name="schedule_sun" class="form-control form-control-sm" value="{{ enrollment.schedule.sun|default:'' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <button type="submit" class="btn btn-primary">
+      <i class="ti ti-check me-1"></i>{% if enrollment %}Update{% else %}Create{% endif %} Enrollment
+    </button>
+    <a href="{% url 'custom_admin:tuition_enrollments_list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modeSelect = document.getElementById('modeSelect');
+  const batchFields = document.querySelectorAll('.batch-fields');
+  const individualFields = document.querySelectorAll('.individual-fields');
+  const homeFields = document.querySelectorAll('.home-fields');
+
+  function toggleFields() {
+    const mode = modeSelect.value;
+
+    batchFields.forEach(el => el.style.display = mode === 'batch' ? '' : 'none');
+    individualFields.forEach(el => el.style.display = mode !== 'batch' ? '' : 'none');
+    homeFields.forEach(el => el.style.display = mode === 'home' ? '' : 'none');
+
+    // Toggle required
+    document.getElementById('batchSelect').required = mode === 'batch';
+    document.getElementById('subjectSelect').required = mode !== 'batch';
+  }
+
+  modeSelect.addEventListener('change', toggleFields);
+  toggleFields(); // Initial state
+});
+</script>
+{% endblock %}

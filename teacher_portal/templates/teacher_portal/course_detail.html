@@ -1,0 +1,337 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Teacher Portal{% endblock %}
+{% block page_title %}Course Details{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav style="margin-bottom: 20px;">
+  <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
+    <li class="breadcrumb-item"><a href="{% url 'teacher_portal:my_courses' %}" style="color: var(--primary);">My Courses</a></li>
+    <li class="breadcrumb-item active" style="color: var(--text-secondary);">{{ course.title|truncatechars:30 }}</li>
+  </ol>
+</nav>
+
+<!-- Course Header -->
+<div class="tp-card" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; margin-bottom: 24px;">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="tp-badge" style="background: rgba(255,255,255,0.2); color: white;">{{ course.category.name|default:"Uncategorized" }}</span>
+        {% if course.is_published %}
+          <span class="tp-badge" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-check-circle me-1"></i>Published</span>
+        {% else %}
+          <span class="tp-badge" style="background: rgba(255,200,50,0.3); color: #ffc832;"><i class="fas fa-clock me-1"></i>Draft</span>
+        {% endif %}
+      </div>
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">{{ course.title }}</h2>
+      <p style="opacity: 0.9; margin-bottom: 0;">{{ course.description|truncatechars:150 }}</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+      {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" alt="" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="tp-stat-value">{{ enrollment_count }}</div>
+      <div class="tp-stat-label">Enrolled Students</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-layer-group"></i>
+      </div>
+      <div class="tp-stat-value">{{ modules|length }}</div>
+      <div class="tp-stat-label">Modules</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon orange">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="tp-stat-value">{{ assignment_count }}</div>
+      <div class="tp-stat-label">Assignments</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon purple">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <div class="tp-stat-value">{{ quiz_count }}</div>
+      <div class="tp-stat-label">Quizzes</div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Main Content -->
+  <div class="col-lg-8">
+    <!-- Course Modules -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-layer-group me-2"></i>Course Modules</h3>
+      </div>
+      {% if modules %}
+        <div class="accordion" id="modulesAccordion">
+          {% for module in modules %}
+          <div class="tp-accordion-item">
+            <div class="tp-accordion-header" data-bs-toggle="collapse" data-bs-target="#module{{ module.id }}">
+              <div class="d-flex align-items-center gap-3 flex-grow-1">
+                <div style="width: 36px; height: 36px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-weight: 600; color: var(--primary);">{{ forloop.counter }}</span>
+                </div>
+                <div>
+                  <div style="font-weight: 500;">{{ module.title }}</div>
+                  <small style="color: var(--text-secondary);">{{ module.lessons.count }} Lessons</small>
+                </div>
+              </div>
+              <i class="fas fa-chevron-down tp-accordion-icon"></i>
+            </div>
+            <div id="module{{ module.id }}" class="collapse" data-bs-parent="#modulesAccordion">
+              <div class="tp-accordion-body">
+                {% for lesson in module.lessons.all %}
+                <div class="d-flex align-items-center gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                  <div style="width: 28px; height: 28px; background: var(--bg-secondary); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                    {% if lesson.lesson_type == 'video' %}
+                      <i class="fas fa-play" style="font-size: 10px; color: var(--primary);"></i>
+                    {% elif lesson.lesson_type == 'quiz' %}
+                      <i class="fas fa-question" style="font-size: 10px; color: var(--warning);"></i>
+                    {% elif lesson.lesson_type == 'assignment' %}
+                      <i class="fas fa-tasks" style="font-size: 10px; color: var(--info);"></i>
+                    {% else %}
+                      <i class="fas fa-file-alt" style="font-size: 10px; color: var(--text-secondary);"></i>
+                    {% endif %}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div style="font-size: 14px;">{{ lesson.title }}</div>
+                    <small style="color: var(--text-secondary);">
+                      {{ lesson.get_lesson_type_display|default:"Lesson" }}
+                      {% if lesson.duration %} - {{ lesson.duration }} min{% endif %}
+                    </small>
+                  </div>
+                </div>
+                {% empty %}
+                <p class="text-muted mb-0">No lessons in this module.</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-4" style="color: var(--text-secondary);">
+          <i class="fas fa-layer-group" style="font-size: 48px; opacity: 0.3;"></i>
+          <p class="mt-3 mb-0">No modules added yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent Submissions -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-clipboard-check me-2"></i>Recent Submissions</h3>
+        <a href="{% url 'teacher_portal:course_assignments' course.id %}" class="tp-btn tp-btn-secondary tp-btn-sm">View All</a>
+      </div>
+      {% if recent_submissions %}
+        <div class="table-responsive">
+          <table class="tp-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Assignment</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for submission in recent_submissions %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">
+                      {{ submission.student.name|slice:":1"|upper }}
+                    </div>
+                    <span>{{ submission.student.name }}</span>
+                  </div>
+                </td>
+                <td>{{ submission.assignment.title|truncatechars:30 }}</td>
+                <td><small>{{ submission.submitted_at|date:"M d, h:i A" }}</small></td>
+                <td>
+                  {% if submission.status == 'graded' %}
+                    <span class="tp-badge tp-badge-success">Graded</span>
+                  {% elif submission.status == 'submitted' %}
+                    <span class="tp-badge tp-badge-warning">Pending</span>
+                  {% else %}
+                    <span class="tp-badge tp-badge-secondary">{{ submission.status }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'teacher_portal:grade_submission' submission.id %}" class="tp-btn tp-btn-primary tp-btn-sm">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4" style="color: var(--text-secondary);">
+          <i class="fas fa-clipboard" style="font-size: 32px; opacity: 0.3;"></i>
+          <p class="mt-2 mb-0">No submissions yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- Quick Actions -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-bolt me-2"></i>Quick Actions</h3>
+      </div>
+      <div class="d-grid gap-2">
+        <a href="{% url 'teacher_portal:course_students' course.id %}" class="tp-btn tp-btn-secondary">
+          <i class="fas fa-users me-2"></i>View Students
+          <span class="tp-badge tp-badge-info ms-auto">{{ enrollment_count }}</span>
+        </a>
+        <a href="{% url 'teacher_portal:course_assignments' course.id %}" class="tp-btn tp-btn-secondary">
+          <i class="fas fa-tasks me-2"></i>Assignments
+          {% if pending_count > 0 %}
+            <span class="tp-badge tp-badge-warning ms-auto">{{ pending_count }} pending</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'teacher_portal:course_quizzes' course.id %}" class="tp-btn tp-btn-secondary">
+          <i class="fas fa-question-circle me-2"></i>Quizzes
+        </a>
+        <a href="{% url 'teacher_portal:create_announcement' %}?course={{ course.id }}" class="tp-btn tp-btn-secondary">
+          <i class="fas fa-bullhorn me-2"></i>Create Announcement
+        </a>
+      </div>
+    </div>
+
+    <!-- Course Info -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-info-circle me-2"></i>Course Info</h3>
+      </div>
+      <div class="tp-info-list">
+        <div class="tp-info-item">
+          <span class="tp-info-label">Category</span>
+          <span class="tp-info-value">{{ course.category.name|default:"Uncategorized" }}</span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">Level</span>
+          <span class="tp-info-value">{{ course.get_level_display|default:"Not set" }}</span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">Price</span>
+          <span class="tp-info-value">{% if course.price %}₹{{ course.price|floatformat:0 }}{% else %}Free{% endif %}</span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">Duration</span>
+          <span class="tp-info-value">{{ course.duration|default:"Not set" }}</span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">Created</span>
+          <span class="tp-info-value">{{ course.created_at|date:"M d, Y" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Enrollments -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-user-plus me-2"></i>Recent Enrollments</h3>
+      </div>
+      {% if recent_enrollments %}
+        {% for enrollment in recent_enrollments %}
+        <div class="d-flex align-items-center gap-2 {% if not forloop.last %}mb-3 pb-3{% endif %}" style="{% if not forloop.last %}border-bottom: 1px solid var(--border-color);{% endif %}">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">
+            {{ enrollment.user.name|slice:":1"|upper }}
+          </div>
+          <div class="flex-grow-1">
+            <div style="font-weight: 500; font-size: 14px;">{{ enrollment.user.name }}</div>
+            <small style="color: var(--text-secondary);">{{ enrollment.enrolled_on|date:"M d, Y" }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted mb-0">No recent enrollments.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.tp-accordion-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.tp-accordion-header {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s;
+}
+.tp-accordion-header:hover {
+  background: var(--border-color);
+}
+.tp-accordion-icon {
+  transition: transform 0.2s;
+  color: var(--text-secondary);
+}
+.tp-accordion-header[aria-expanded="true"] .tp-accordion-icon,
+.tp-accordion-header:not(.collapsed) .tp-accordion-icon {
+  transform: rotate(180deg);
+}
+.tp-accordion-body {
+  padding: 16px;
+  background: var(--bg-primary);
+}
+.tp-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tp-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.tp-info-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.tp-info-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.tp-info-value {
+  font-weight: 500;
+  font-size: 14px;
+}
+</style>
+{% endblock %}

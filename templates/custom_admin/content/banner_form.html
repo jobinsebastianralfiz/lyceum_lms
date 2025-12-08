@@ -1,0 +1,286 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if banner %}Edit Banner{% else %}Create Banner{% endif %} - LM Academy Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title fw-semibold mb-0">
+            <i class="ti ti-photo me-2"></i>
+            {% if banner %}Edit Banner{% else %}Create New Banner{% endif %}
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'custom_admin:banners_list' %}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-arrow-left"></i> Back to Banners
+            </a>
+          </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-lg-8">
+              <!-- Banner Content -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Banner Content</h6>
+
+                  <div class="mb-3">
+                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="title"
+                           value="{% if banner %}{{ banner.title }}{% endif %}"
+                           placeholder="Enter banner title..." required>
+                    <div class="form-text">Main heading text. You can use &lt;span&gt; tags for highlighting.</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Subtitle</label>
+                    <input type="text" class="form-control" name="subtitle"
+                           value="{% if banner %}{{ banner.subtitle }}{% endif %}"
+                           placeholder="Secondary heading text...">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="description" rows="3"
+                              placeholder="Supporting text/description...">{% if banner %}{{ banner.description }}{% endif %}</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Call to Action -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Call to Action Buttons</h6>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Primary Button Text</label>
+                        <input type="text" class="form-control" name="cta_text"
+                               value="{% if banner %}{{ banner.cta_text }}{% endif %}"
+                               placeholder="e.g., Explore Courses">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Primary Button Link</label>
+                        <input type="text" class="form-control" name="cta_link"
+                               value="{% if banner %}{{ banner.cta_link }}{% endif %}"
+                               placeholder="e.g., /courses/">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Secondary Button Text</label>
+                        <input type="text" class="form-control" name="secondary_cta_text"
+                               value="{% if banner %}{{ banner.secondary_cta_text }}{% endif %}"
+                               placeholder="e.g., Get Started Free">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Secondary Button Link</label>
+                        <input type="text" class="form-control" name="secondary_cta_link"
+                               value="{% if banner %}{{ banner.secondary_cta_link }}{% endif %}"
+                               placeholder="e.g., /register/">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Statistics -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Hero Statistics (Optional)</h6>
+
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Stat 1 Value</label>
+                        <input type="text" class="form-control" name="stat_1_value"
+                               value="{% if banner %}{{ banner.stat_1_value }}{% endif %}"
+                               placeholder="e.g., 500+">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Stat 1 Label</label>
+                        <input type="text" class="form-control" name="stat_1_label"
+                               value="{% if banner %}{{ banner.stat_1_label }}{% endif %}"
+                               placeholder="e.g., Students">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Stat 2 Value</label>
+                        <input type="text" class="form-control" name="stat_2_value"
+                               value="{% if banner %}{{ banner.stat_2_value }}{% endif %}"
+                               placeholder="e.g., 50+">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Stat 2 Label</label>
+                        <input type="text" class="form-control" name="stat_2_label"
+                               value="{% if banner %}{{ banner.stat_2_label }}{% endif %}"
+                               placeholder="e.g., Courses">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label">Stat 3 Value</label>
+                        <input type="text" class="form-control" name="stat_3_value"
+                               value="{% if banner %}{{ banner.stat_3_value }}{% endif %}"
+                               placeholder="e.g., 95%">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Stat 3 Label</label>
+                        <input type="text" class="form-control" name="stat_3_label"
+                               value="{% if banner %}{{ banner.stat_3_label }}{% endif %}"
+                               placeholder="e.g., Success Rate">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <!-- Settings -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Settings</h6>
+
+                  <div class="mb-3">
+                    <label class="form-label">Banner Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="banner_type" required>
+                      {% for type_code, type_name in banner_types %}
+                        <option value="{{ type_code }}"
+                                {% if banner and banner.banner_type == type_code %}selected{% endif %}>
+                          {{ type_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Priority</label>
+                    <input type="number" class="form-control" name="priority"
+                           value="{% if banner %}{{ banner.priority }}{% else %}0{% endif %}">
+                    <div class="form-text">Higher priority banners show first</div>
+                  </div>
+
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive"
+                           {% if banner.is_active or not banner %}checked{% endif %}>
+                    <label class="form-check-label" for="isActive">
+                      Active
+                    </label>
+                    <div class="form-text">Show this banner on the site</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Images -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Images</h6>
+
+                  {% if banner.background_image %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Background</label>
+                    <div class="d-flex align-items-start gap-3">
+                      <img src="{{ banner.background_image.url }}" alt="Background"
+                           class="rounded" style="max-height: 80px;">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remove_background_image" id="removeBackground">
+                        <label class="form-check-label text-danger small" for="removeBackground">
+                          Remove image
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="mb-3">
+                    <label class="form-label">Background Image</label>
+                    <input type="file" class="form-control form-control-sm" name="background_image" accept="image/*">
+                    <div class="form-text">Full-width hero background</div>
+                  </div>
+
+                  {% if banner.featured_image %}
+                  <div class="mb-3">
+                    <label class="form-label">Current Featured Image</label>
+                    <div class="d-flex align-items-start gap-3">
+                      <img src="{{ banner.featured_image.url }}" alt="Featured"
+                           class="rounded" style="max-height: 80px;">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remove_featured_image" id="removeFeatured">
+                        <label class="form-check-label text-danger small" for="removeFeatured">
+                          Remove image
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <div class="mb-3">
+                    <label class="form-label">Featured Image</label>
+                    <input type="file" class="form-control form-control-sm" name="featured_image" accept="image/*">
+                    <div class="form-text">Optional decorative image</div>
+                  </div>
+                </div>
+              </div>
+
+              {% if banner %}
+              <!-- Banner Info -->
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title fw-semibold mb-3">Banner Info</h6>
+                  <div class="small">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                      <span class="text-muted">Created:</span>
+                      <span class="fw-medium">{{ banner.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                      <span class="text-muted">Updated:</span>
+                      <span class="fw-medium">{{ banner.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'custom_admin:banners_list' %}" class="btn btn-outline-secondary">
+                      Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="ti ti-device-floppy me-1"></i>
+                      {% if banner %}Update Banner{% else %}Create Banner{% endif %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

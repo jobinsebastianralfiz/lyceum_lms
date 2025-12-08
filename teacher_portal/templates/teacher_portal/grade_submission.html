@@ -1,0 +1,260 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}Grade Submission - Teacher Portal{% endblock %}
+{% block page_title %}Grade Submission{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav style="margin-bottom: 20px;">
+  <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
+    <li class="breadcrumb-item"><a href="{% url 'teacher_portal:assignments' %}" style="color: var(--primary);">Assignments</a></li>
+    <li class="breadcrumb-item active" style="color: var(--text-secondary);">Grade Submission</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <!-- Main Content -->
+  <div class="col-lg-8">
+    <!-- Assignment Info -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-clipboard me-2"></i>{{ submission.assignment.title }}</h3>
+        {% if submission.status == 'graded' %}
+          <span class="tp-badge tp-badge-success">Graded</span>
+        {% else %}
+          <span class="tp-badge tp-badge-warning">Pending Review</span>
+        {% endif %}
+      </div>
+      <div style="margin-bottom: 16px;">
+        <p style="color: var(--text-secondary); margin-bottom: 12px;">{{ submission.assignment.description }}</p>
+        <div class="d-flex flex-wrap gap-3" style="font-size: 13px; color: var(--text-secondary);">
+          <span><i class="fas fa-book me-1"></i>{{ submission.assignment.course.title }}</span>
+          {% if submission.assignment.due_date %}
+            <span><i class="fas fa-calendar me-1"></i>Due: {{ submission.assignment.due_date|date:"M d, Y h:i A" }}</span>
+          {% endif %}
+          <span><i class="fas fa-star me-1"></i>Max Grade: {{ submission.assignment.max_grade|default:100 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission Content -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-file-alt me-2"></i>Student Submission</h3>
+        <small style="color: var(--text-secondary);">Submitted {{ submission.submitted_at|date:"M d, Y" }} at {{ submission.submitted_at|time:"h:i A" }}</small>
+      </div>
+
+      {% if submission.content %}
+        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+          <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Response:</h5>
+          <div style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;">{{ submission.content }}</div>
+        </div>
+      {% endif %}
+
+      {% if submission.file %}
+        <div class="d-flex align-items-center gap-3 p-3" style="background: var(--bg-secondary); border-radius: 8px;">
+          <div style="width: 48px; height: 48px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-file" style="font-size: 20px; color: var(--primary);"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div style="font-weight: 500;">Attached File</div>
+            <small style="color: var(--text-secondary);">{{ submission.file.name|slice:"-30:" }}</small>
+          </div>
+          <a href="{{ submission.file.url }}" target="_blank" class="tp-btn tp-btn-primary tp-btn-sm">
+            <i class="fas fa-download me-1"></i>Download
+          </a>
+        </div>
+      {% endif %}
+
+      {% if submission.link %}
+        <div class="mt-3">
+          <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">External Link:</h5>
+          <a href="{{ submission.link }}" target="_blank" style="color: var(--primary);">
+            <i class="fas fa-external-link-alt me-1"></i>{{ submission.link|truncatechars:50 }}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if not submission.content and not submission.file and not submission.link %}
+        <div class="text-center py-4" style="color: var(--text-secondary);">
+          <i class="fas fa-file-alt" style="font-size: 32px; opacity: 0.3;"></i>
+          <p class="mt-2 mb-0">No content submitted.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Grading Form -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-edit me-2"></i>Grade & Feedback</h3>
+      </div>
+      <form method="post" action="{% url 'teacher_portal:grade_submission' submission.id %}">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label" style="font-weight: 500;">Grade</label>
+            <div class="input-group">
+              <input type="number" name="grade" class="form-control tp-input"
+                     value="{{ submission.score|default:'' }}"
+                     min="0" max="{{ submission.assignment.max_grade|default:100 }}"
+                     placeholder="0" required>
+              <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                / {{ submission.assignment.max_grade|default:100 }}
+              </span>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label" style="font-weight: 500;">Feedback (Optional)</label>
+            <textarea name="feedback" class="form-control tp-input" rows="4"
+                      placeholder="Provide feedback for the student...">{{ submission.grade_comments|default:'' }}</textarea>
+          </div>
+          <div class="col-12">
+            <div class="d-flex gap-2">
+              <button type="submit" class="tp-btn tp-btn-primary">
+                <i class="fas fa-check me-2"></i>{% if submission.status == 'graded' %}Update Grade{% else %}Submit Grade{% endif %}
+              </button>
+              <a href="{% url 'teacher_portal:assignments' %}" class="tp-btn tp-btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <!-- Student Info -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-user me-2"></i>Student</h3>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600;">
+          {{ submission.student.name|slice:":1"|upper }}
+        </div>
+        <div>
+          <div style="font-weight: 600;">{{ submission.student.name }}</div>
+          <small style="color: var(--text-secondary);">{{ submission.student.email }}</small>
+        </div>
+      </div>
+      <hr style="border-color: var(--border-color);">
+      <a href="{% url 'teacher_portal:student_detail' submission.student.id %}" class="tp-btn tp-btn-secondary w-100">
+        <i class="fas fa-user me-2"></i>View Student Profile
+      </a>
+    </div>
+
+    <!-- Submission Status -->
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-info-circle me-2"></i>Status</h3>
+      </div>
+      <div class="tp-info-list">
+        <div class="tp-info-item">
+          <span class="tp-info-label">Status</span>
+          <span class="tp-info-value">
+            {% if submission.status == 'graded' %}
+              <span class="tp-badge tp-badge-success">Graded</span>
+            {% elif submission.status == 'submitted' %}
+              <span class="tp-badge tp-badge-warning">Pending</span>
+            {% else %}
+              <span class="tp-badge tp-badge-secondary">{{ submission.status }}</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">Submitted</span>
+          <span class="tp-info-value">{{ submission.submitted_at|date:"M d, Y" }}</span>
+        </div>
+        {% if submission.assignment.due_date %}
+        <div class="tp-info-item">
+          <span class="tp-info-label">Due Date</span>
+          <span class="tp-info-value">{{ submission.assignment.due_date|date:"M d, Y" }}</span>
+        </div>
+        <div class="tp-info-item">
+          <span class="tp-info-label">On Time</span>
+          <span class="tp-info-value">
+            {% if submission.submitted_at <= submission.assignment.due_date %}
+              <span class="tp-badge tp-badge-success">Yes</span>
+            {% else %}
+              <span class="tp-badge tp-badge-danger">Late</span>
+            {% endif %}
+          </span>
+        </div>
+        {% endif %}
+        {% if submission.graded_at %}
+        <div class="tp-info-item">
+          <span class="tp-info-label">Graded</span>
+          <span class="tp-info-value">{{ submission.graded_at|date:"M d, Y" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Previous Submissions -->
+    {% if previous_submissions %}
+    <div class="tp-card">
+      <div class="tp-card-header">
+        <h3 class="tp-card-title"><i class="fas fa-history me-2"></i>Previous Submissions</h3>
+      </div>
+      {% for prev in previous_submissions %}
+      <div class="d-flex justify-content-between align-items-center {% if not forloop.last %}mb-2 pb-2{% endif %}" style="{% if not forloop.last %}border-bottom: 1px solid var(--border-color);{% endif %}">
+        <div>
+          <small style="color: var(--text-secondary);">{{ prev.submitted_at|date:"M d, Y" }}</small>
+        </div>
+        <div>
+          {% if prev.score %}
+            <span style="font-weight: 500;">{{ prev.score }}/{{ submission.assignment.max_grade|default:100 }}</span>
+          {% else %}
+            <span class="tp-badge tp-badge-secondary">Not graded</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.tp-input {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.tp-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(42, 182, 115, 0.1);
+}
+.tp-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tp-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.tp-info-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.tp-info-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.tp-info-value {
+  font-weight: 500;
+  font-size: 14px;
+}
+</style>
+{% endblock %}

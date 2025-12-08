@@ -1,0 +1,217 @@
+{% extends 'teacher_portal/base.html' %}
+{% load static %}
+
+{% block title %}{{ session.title }} - Teacher Portal{% endblock %}
+{% block page_title %}Session Details{% endblock %}
+
+{% block content %}
+<!-- Back Button -->
+<div class="mb-4">
+  <a href="{% url 'teacher_portal:live_sessions' %}" class="tp-btn tp-btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to Sessions
+  </a>
+</div>
+
+<!-- Session Header -->
+<div class="tp-card mb-4">
+  <div class="p-4">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="tp-badge {% if session.status == 'live' %}tp-badge-danger{% elif session.status == 'scheduled' %}tp-badge-primary{% elif session.status == 'ended' %}tp-badge-success{% else %}tp-badge-secondary{% endif %}">
+            {% if session.status == 'live' %}
+              <i class="fas fa-broadcast-tower me-1"></i> Live Now
+            {% else %}
+              {{ session.get_status_display }}
+            {% endif %}
+          </span>
+        </div>
+        <h2 style="font-weight: 700; margin-bottom: 8px;">{{ session.title }}</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 0;">
+          {% if session.course %}
+            <i class="fas fa-book me-1"></i> {{ session.course.title }}
+          {% else %}
+            <i class="fas fa-video me-1"></i> Standalone Session
+          {% endif %}
+        </p>
+      </div>
+      <div class="text-end">
+        {% if session.meeting_link and session.status in 'scheduled,live' %}
+        <a href="{{ session.meeting_link }}" target="_blank" class="tp-btn tp-btn-primary">
+          <i class="fas fa-video me-2"></i>
+          {% if session.status == 'live' %}Join Now{% else %}Open Meeting Link{% endif %}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Session Info Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon blue">
+        <i class="fas fa-calendar"></i>
+      </div>
+      <div class="tp-stat-value" style="font-size: 16px;">{{ session.scheduled_date|date:"M d, Y" }}</div>
+      <div class="tp-stat-label">Date</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon orange">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="tp-stat-value" style="font-size: 16px;">{{ session.scheduled_date|time:"h:i A" }}</div>
+      <div class="tp-stat-label">Time</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon green">
+        <i class="fas fa-hourglass-half"></i>
+      </div>
+      <div class="tp-stat-value">{{ session.duration_minutes }}</div>
+      <div class="tp-stat-label">Duration (mins)</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="tp-stat-card">
+      <div class="tp-stat-icon purple">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="tp-stat-value">{{ total_assigned }}</div>
+      <div class="tp-stat-label">Participants</div>
+    </div>
+  </div>
+</div>
+
+<!-- Description -->
+{% if session.description %}
+<div class="tp-card mb-4">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title"><i class="fas fa-info-circle me-2"></i>Description</h3>
+  </div>
+  <div class="p-3">
+    <p style="margin: 0; color: var(--text-primary);">{{ session.description }}</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- Attendance Summary -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="tp-card h-100">
+      <div class="p-3 text-center">
+        <div style="font-size: 36px; font-weight: 700; color: var(--success);">{{ attended }}</div>
+        <div style="color: var(--text-secondary);">Attended</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tp-card h-100">
+      <div class="p-3 text-center">
+        <div style="font-size: 36px; font-weight: 700; color: var(--danger);">{{ missed }}</div>
+        <div style="color: var(--text-secondary);">Missed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tp-card h-100">
+      <div class="p-3 text-center">
+        <div style="font-size: 36px; font-weight: 700; color: var(--primary);">{{ attendance_rate|floatformat:0 }}%</div>
+        <div style="color: var(--text-secondary);">Attendance Rate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Participants List -->
+<div class="tp-card">
+  <div class="tp-card-header">
+    <h3 class="tp-card-title"><i class="fas fa-user-friends me-2"></i>Participants ({{ total_assigned }})</h3>
+  </div>
+  {% if participants %}
+    <div class="table-responsive">
+      <table class="table tp-table mb-0">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Status</th>
+            <th>Joined At</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for participant in participants %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="avatar-circle" style="width: 36px; height: 36px; background: var(--primary-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--primary);">
+                  {{ participant.student.name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div style="font-weight: 500;">{{ participant.student.name }}</div>
+                  <small style="color: var(--text-secondary);">{{ participant.student.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="tp-badge {% if participant.status == 'attended' %}tp-badge-success{% elif participant.status == 'missed' %}tp-badge-danger{% elif participant.status == 'assigned' %}tp-badge-secondary{% else %}tp-badge-warning{% endif %}">
+                {{ participant.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if participant.joined_at %}
+                {{ participant.joined_at|time:"h:i A" }}
+              {% else %}
+                <span style="color: var(--text-secondary);">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if participant.duration_minutes %}
+                {{ participant.duration_minutes }} mins
+              {% else %}
+                <span style="color: var(--text-secondary);">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-5" style="color: var(--text-secondary);">
+      <i class="fas fa-users" style="font-size: 48px; opacity: 0.3;"></i>
+      <p class="mt-3 mb-0">No participants assigned to this session.</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.tp-badge-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.tp-badge-purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+.tp-table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  border: none;
+}
+.tp-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+</style>
+{% endblock %}

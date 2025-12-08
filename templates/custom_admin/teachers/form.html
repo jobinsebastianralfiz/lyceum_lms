@@ -1,0 +1,495 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - CodeLearn LMS Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="card-title mb-0">
+          {% if is_edit %}
+            <i class="ti ti-user-edit me-2"></i>{{ title }}
+          {% else %}
+            <i class="ti ti-user-plus me-2"></i>{{ title }}
+          {% endif %}
+        </h4>
+        <p class="card-subtitle">
+          {% if is_edit %}
+            Update teacher information and course assignments
+          {% else %}
+            Create a new teacher account with profile information
+          {% endif %}
+        </p>
+      </div>
+      <div class="ms-auto">
+        <a href="{% url 'custom_admin:teachers_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Back to Teachers
+        </a>
+      </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Errors -->
+    {% if form.errors %}
+    <div class="alert alert-danger mb-4">
+      <h6 class="alert-heading">
+        <i class="ti ti-alert-triangle me-2"></i>Please correct the errors below:
+      </h6>
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <div class="mb-1">
+            {% if field != '__all__' %}
+              <strong>{{ field|title }}:</strong>
+            {% endif %}
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="row">
+        <!-- Account Information -->
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="ti ti-user me-2"></i>Account Information
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Name -->
+              <div class="mb-3">
+                <label for="id_name" class="form-label">
+                  Full Name <span class="text-danger">*</span>
+                </label>
+                {{ form.name }}
+                {% if form.name.help_text %}
+                  <div class="form-text">{{ form.name.help_text }}</div>
+                {% endif %}
+                {% if form.name.errors %}
+                  {% for error in form.name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="id_email" class="form-label">
+                  Email <span class="text-danger">*</span>
+                </label>
+                {{ form.email }}
+                {% if form.email.help_text %}
+                  <div class="form-text">{{ form.email.help_text }}</div>
+                {% endif %}
+                {% if form.email.errors %}
+                  {% for error in form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- Phone Number -->
+              <div class="mb-3">
+                <label for="id_phone_number" class="form-label">Phone Number</label>
+                {{ form.phone_number }}
+                {% if form.phone_number.help_text %}
+                  <div class="form-text">{{ form.phone_number.help_text }}</div>
+                {% endif %}
+              </div>
+
+              {% if not is_edit %}
+              <!-- Password (only for new teachers) -->
+              <div class="mb-3">
+                <label for="id_password" class="form-label">
+                  Password <span class="text-danger">*</span>
+                </label>
+                {{ form.password }}
+                {% if form.password.help_text %}
+                  <div class="form-text">{{ form.password.help_text }}</div>
+                {% endif %}
+                {% if form.password.errors %}
+                  {% for error in form.password.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+              {% else %}
+              <!-- Active Status (only for edit) -->
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  {{ form.is_active }}
+                  <label class="form-check-label" for="id_is_active">Active Account</label>
+                </div>
+                {% if form.is_active.help_text %}
+                  <div class="form-text">{{ form.is_active.help_text }}</div>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Information -->
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="ti ti-briefcase me-2"></i>Professional Information
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Employee ID -->
+              <div class="mb-3">
+                <label for="id_employee_id" class="form-label">Employee ID</label>
+                {{ form.employee_id }}
+                {% if form.employee_id.help_text %}
+                  <div class="form-text">{{ form.employee_id.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Designation -->
+              <div class="mb-3">
+                <label for="id_designation" class="form-label">Designation</label>
+                {{ form.designation }}
+                {% if form.designation.help_text %}
+                  <div class="form-text">{{ form.designation.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Department -->
+              <div class="mb-3">
+                <label for="id_department" class="form-label">Department</label>
+                {{ form.department }}
+                {% if form.department.help_text %}
+                  <div class="form-text">{{ form.department.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Experience Years -->
+              <div class="mb-3">
+                <label for="id_experience_years" class="form-label">Experience (Years)</label>
+                {{ form.experience_years }}
+                {% if form.experience_years.help_text %}
+                  <div class="form-text">{{ form.experience_years.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Date of Joining -->
+              <div class="mb-3">
+                <label for="id_date_of_joining" class="form-label">Date of Joining</label>
+                {{ form.date_of_joining }}
+                {% if form.date_of_joining.help_text %}
+                  <div class="form-text">{{ form.date_of_joining.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Qualifications & Bio -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-certificate me-2"></i>Qualifications & Bio
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Qualification -->
+              <div class="mb-3">
+                <label for="id_qualification" class="form-label">Qualifications</label>
+                {{ form.qualification }}
+                {% if form.qualification.help_text %}
+                  <div class="form-text">{{ form.qualification.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <!-- Specialization -->
+              <div class="mb-3">
+                <label for="id_specialization" class="form-label">Specialization</label>
+                {{ form.specialization }}
+                {% if form.specialization.help_text %}
+                  <div class="form-text">{{ form.specialization.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <!-- Bio -->
+          <div class="mb-3">
+            <label for="id_bio" class="form-label">Biography</label>
+            {{ form.bio }}
+            {% if form.bio.help_text %}
+              <div class="form-text">{{ form.bio.help_text }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Teaching Mode -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-school me-2"></i>Teaching Mode
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  {{ form.can_teach_online }}
+                  <label class="form-check-label" for="id_can_teach_online">
+                    <strong>Can Teach Online Courses</strong>
+                  </label>
+                </div>
+                {% if form.can_teach_online.help_text %}
+                  <div class="form-text">{{ form.can_teach_online.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  {{ form.can_teach_offline }}
+                  <label class="form-check-label" for="id_can_teach_offline">
+                    <strong>Can Teach Offline Tuition</strong>
+                  </label>
+                </div>
+                {% if form.can_teach_offline.help_text %}
+                  <div class="form-text">{{ form.can_teach_offline.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Assignment (Online) -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-device-laptop me-2"></i>Online Course Assignment
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="id_assigned_courses" class="form-label">Assigned Online Courses</label>
+            {{ form.assigned_courses }}
+            {% if form.assigned_courses.help_text %}
+              <div class="form-text">{{ form.assigned_courses.help_text }}</div>
+            {% endif %}
+            <div class="form-text">Hold Ctrl/Cmd to select multiple courses</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tuition Subjects (Offline) -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-book me-2"></i>Tuition Subjects (Offline)
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="id_tuition_subjects" class="form-label">Tuition Subjects</label>
+            {{ form.tuition_subjects }}
+            {% if form.tuition_subjects.help_text %}
+              <div class="form-text">{{ form.tuition_subjects.help_text }}</div>
+            {% endif %}
+            <div class="form-text">Select subjects for offline tuition batches. Hold Ctrl/Cmd to select multiple.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Contact Information -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-address-book me-2"></i>Additional Contact
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_alternate_phone" class="form-label">Alternate Phone</label>
+                {{ form.alternate_phone }}
+                {% if form.alternate_phone.help_text %}
+                  <div class="form-text">{{ form.alternate_phone.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_address" class="form-label">Address</label>
+                {{ form.address }}
+                {% if form.address.help_text %}
+                  <div class="form-text">{{ form.address.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Details -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-building-bank me-2"></i>Bank Details (for Salary Payment)
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_bank_name" class="form-label">Bank Name</label>
+                {{ form.bank_name }}
+                {% if form.bank_name.help_text %}
+                  <div class="form-text">{{ form.bank_name.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_account_number" class="form-label">Account Number</label>
+                {{ form.account_number }}
+                {% if form.account_number.help_text %}
+                  <div class="form-text">{{ form.account_number.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_ifsc_code" class="form-label">IFSC Code</label>
+                {{ form.ifsc_code }}
+                {% if form.ifsc_code.help_text %}
+                  <div class="form-text">{{ form.ifsc_code.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_upi_id" class="form-label">UPI ID</label>
+                {{ form.upi_id }}
+                {% if form.upi_id.help_text %}
+                  <div class="form-text">{{ form.upi_id.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Internal Notes -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ti ti-notes me-2"></i>Internal Notes
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="id_notes" class="form-label">Notes</label>
+            {{ form.notes }}
+            {% if form.notes.help_text %}
+              <div class="form-text">{{ form.notes.help_text }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'custom_admin:teachers_list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-x me-1"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-device-floppy me-1"></i>
+          {% if is_edit %}Save Changes{% else %}Create Teacher{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e6ed;
+  padding: 15px 20px;
+}
+
+.form-control, .form-select {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-text {
+  color: #6c757d;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #5d87ff;
+  border-color: #5d87ff;
+}
+
+.btn-primary:hover {
+  background-color: #4570ea;
+  border-color: #4570ea;
+}
+</style>
+{% endblock %}
