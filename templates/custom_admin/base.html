@@ -82,6 +82,7 @@
     .close-btn {
       width: 32px;
       height: 32px;
+      min-width: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -89,6 +90,8 @@
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
+      margin-left: 10px;
+      flex-shrink: 0;
     }
 
     .close-btn:hover {
@@ -112,18 +115,21 @@
       min-height: 70px !important;
       display: flex !important;
       align-items: center !important;
+      justify-content: space-between !important;
     }
 
     .brand-logo a {
       display: flex !important;
       align-items: center !important;
       text-decoration: none !important;
+      flex: 1;
+      min-width: 0;
     }
 
     .brand-logo img {
       height: auto !important;
-      width: 250px !important;
-      max-width: 260px !important;
+      width: 100% !important;
+      max-width: 200px !important;
     }
 
     .brand-logo .logo-text {
