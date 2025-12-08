@@ -1,2 +1,2 @@
-web: gunicorn codelearn_lms.wsgi --log-file -
-release: python manage.py migrate --noinput
+web: gunicorn codelearn_lms.wsgi --bind 0.0.0.0:$PORT --log-file -
+release: python manage.py migrate --noinput && python manage.py collectstatic --noinput

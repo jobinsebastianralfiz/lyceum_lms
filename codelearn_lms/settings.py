@@ -157,7 +157,8 @@ if (BASE_DIR / 'static').exists():
     STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # WhiteNoise for static file serving in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Using CompressedStaticFilesStorage (not Manifest) to avoid issues with missing .map files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files (User uploads) - Railway volume will be mounted here
 MEDIA_URL = '/media/'
