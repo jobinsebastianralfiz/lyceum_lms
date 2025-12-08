@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.conf import settings
 from django.db import transaction, models
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
@@ -1045,3 +1045,18 @@ def course_enquiry(request, course_id):
         f'Thank you for your enquiry about "{course.title}"! Our team will contact you within 24 hours.'
     )
     return redirect('landing:course_detail', course_id=course_id)
+
+
+def robots_txt(request):
+    """Serve robots.txt for SEO."""
+    content = """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /student/
+Disallow: /teacher/
+Disallow: /django-admin/
+
+Sitemap: https://www.lmacademy.info/sitemap.xml
+"""
+    return HttpResponse(content, content_type='text/plain')

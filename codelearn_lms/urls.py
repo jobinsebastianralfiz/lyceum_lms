@@ -5,10 +5,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from .admin import admin_site
+from landing.sitemaps import StaticViewSitemap, CourseSitemap, NewsSitemap, EventSitemap
+
+# Sitemaps configuration
+sitemaps = {
+    'static': StaticViewSitemap,
+    'courses': CourseSitemap,
+    'news': NewsSitemap,
+    'events': EventSitemap,
+}
 
 urlpatterns = [
+    # Sitemap
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
     # Landing Pages
     path('', include('landing.urls')),
     

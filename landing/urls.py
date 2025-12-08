@@ -44,4 +44,7 @@ urlpatterns = [
     # Achievements URLs
     path('achievements/', views.achievements_list, name='achievements_list'),
     path('achievements/<slug:slug>/', views.achievement_detail, name='achievement_detail'),
+
+    # SEO
+    path('robots.txt', views.robots_txt, name='robots_txt'),
 ]
