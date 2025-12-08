@@ -78,6 +78,33 @@
       box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
     }
 
+    /* Sidebar close button for mobile */
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--light-bg-tertiary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: var(--lyceum-green);
+      color: white;
+    }
+
+    .close-btn i {
+      font-size: 18px;
+      color: var(--text-gray);
+    }
+
+    .close-btn:hover i {
+      color: white;
+    }
+
     .brand-logo {
       background: var(--light-bg-secondary) !important;
       border-bottom: 1px solid var(--light-border) !important;

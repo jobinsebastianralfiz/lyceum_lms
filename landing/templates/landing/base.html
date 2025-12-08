@@ -402,6 +402,19 @@
       .lm-nav-actions .btn-lm-primary:not([href*="dashboard"]):not([href*="admin"]) {
         display: none;
       }
+
+      /* Mobile styling for Admin Panel / Dashboard button */
+      .lm-nav-actions .btn-lm-primary[href*="dashboard"],
+      .lm-nav-actions .btn-lm-primary[href*="admin"] {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+      }
+
+      .lm-nav-actions .btn-lm-primary[href*="dashboard"] i,
+      .lm-nav-actions .btn-lm-primary[href*="admin"] i {
+        display: none;
+      }
     }
 
     @media (min-width: 992px) {
