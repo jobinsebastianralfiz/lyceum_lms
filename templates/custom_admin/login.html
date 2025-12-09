@@ -4,11 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - Lyceum Academy Admin</title>
+  <title>Login - LM Academy Admin</title>
   <link rel="shortcut icon" type="image/png" href="{% load static %}{% static 'images/logos/LOGO.svg' %}" />
   <link rel="stylesheet" href="{% load static %}{% static 'admin/flexy-bootstrap-lite-1.0.0/assets/css/styles.min.css' %}" />
   <style>
-    /* Lyceum Dark Theme for Login */
+    /* LM Academy Dark Theme for Login */
     :root {
       --lyceum-green: #2AB673;
       --lyceum-green-dark: #229959;
@@ -152,10 +152,10 @@
             <div class="card mb-0">
               <div class="card-body">
                 <a href="{% url 'custom_admin:dashboard' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                  <img src="{% load static %}{% static 'images/logos/LOGO.svg' %}" alt="Lyceum Academy">
+                  <img src="{% load static %}{% static 'images/logos/LOGO.svg' %}" alt="LM Academy">
                 </a>
                 <h3 class="login-title text-center">Admin Panel</h3>
-                <p class="login-subtitle text-center mb-4">Lyceum Academy Learning Management System</p>
+                <p class="login-subtitle text-center mb-4">LM Academy Learning Management System</p>
 
                 {% if form.errors %}
                   <div class="alert alert-danger" role="alert">
@@ -188,7 +188,7 @@
                   </div>
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
                   <div class="d-flex align-items-center justify-content-center">
-                    <p class="fs-4 mb-0">Powered by <strong class="fw-bold">Lyceum Academy</strong></p>
+                    <p class="fs-4 mb-0">Powered by <strong class="fw-bold">LM Academy</strong></p>
                   </div>
                 </form>
               </div>

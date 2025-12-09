@@ -1,5 +1,5 @@
 """
-Certificate PDF Generator for Lyceum Academy LMS
+Certificate PDF Generator for LM Academy LMS
 Generates professional PDF certificates with QR code verification using ReportLab.
 """
 
@@ -20,7 +20,7 @@ class CertificatePDFGenerator:
     Generates professional PDF certificates for course completion.
     """
 
-    # Lyceum Academy brand colors
+    # LM Academy brand colors
     PRIMARY_COLOR = colors.HexColor('#2AB673')  # Green
     SECONDARY_COLOR = colors.HexColor('#1a365d')  # Dark blue/Navy
     GOLD_COLOR = colors.HexColor('#D4AF37')  # Rich Gold
@@ -137,7 +137,7 @@ class CertificatePDFGenerator:
         # Institution name
         c.setFillColor(self.SECONDARY_COLOR)
         c.setFont("Helvetica-Bold", 26)
-        c.drawCentredString(center_x, header_y - 50, "LYCEUM ACADEMY")
+        c.drawCentredString(center_x, header_y - 50, "LM ACADEMY")
 
     def _draw_placeholder_logo(self, c, center_x, y):
         """Draw placeholder logo."""
@@ -332,7 +332,7 @@ class CertificatePDFGenerator:
         c.setFont("Helvetica", 8)
         c.setFillColor(self.PRIMARY_COLOR)
         c.drawCentredString(center_x, footer_y - 22,
-                           "www.lyceumacademy.com")
+                           "www.lmacademy.info")
 
         # Right section - Signature (if exists)
         if self.certificate.signed_by:
