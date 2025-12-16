@@ -162,7 +162,7 @@ if (BASE_DIR / 'static').exists():
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files (User uploads) - Railway volume will be mounted here
-MEDIA_URL = '/media/'
+MEDIA_URL = '/codelearnmedia/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
