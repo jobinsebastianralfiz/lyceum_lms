@@ -425,6 +425,7 @@ def course_detail(request, course_id):
         'is_enrolled': is_enrolled,
         'user_rating': user_rating,
         'razorpay_key': getattr(settings, 'RAZORPAY_KEY_ID', ''),
+        'CLOUDFLARE_TURNSTILE_SITE_KEY': getattr(settings, 'CLOUDFLARE_TURNSTILE_SITE_KEY', ''),
     }
     return render(request, 'landing/course_detail.html', context)
 
