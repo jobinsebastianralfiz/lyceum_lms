@@ -194,9 +194,10 @@
 .cd-hero h1 {
   font-size: 2.75rem;
   font-weight: 800;
-  color: white;
+  color: #ffffff !important;
   margin-bottom: 1rem;
   line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .cd-hero-subtitle {
@@ -685,10 +686,91 @@
   font-size: 0.95rem;
 }
 
-/* Sidebar */
+/* Sidebar - 3D Card Effect */
 .cd-sidebar {
   position: sticky;
   top: 160px;
+}
+
+.cd-sidebar-wrapper {
+  position: relative;
+  perspective: 1500px;
+}
+
+.cd-sidebar-depth-layer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: -10px;
+  bottom: -10px;
+  border: 1px solid rgba(42, 182, 115, 0.15);
+  border-radius: var(--radius-lg);
+  transform: translateZ(-30px);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.cd-sidebar-wrapper:hover .cd-sidebar-depth-layer {
+  top: 18px;
+  left: 18px;
+  right: -18px;
+  bottom: -18px;
+  transform: translateZ(-50px);
+}
+
+.cd-sidebar-card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease-out, box-shadow 0.4s ease;
+}
+
+.cd-sidebar-wrapper:hover .cd-sidebar-card-inner {
+  box-shadow:
+    0 50px 80px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(42, 182, 115, 0.3),
+    0 0 60px rgba(42, 182, 115, 0.1);
+}
+
+.cd-sidebar-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: var(--radius-lg);
+}
+
+.cd-sidebar-wrapper:hover .cd-sidebar-shine {
+  opacity: 1;
+}
+
+.cd-sidebar-3d-accent {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--primary) 0%, transparent 60%);
+  opacity: 0;
+  transform: translateZ(-20px) rotate(45deg);
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+
+.cd-sidebar-wrapper:hover .cd-sidebar-3d-accent {
+  opacity: 0.2;
+  transform: translateZ(10px) rotate(45deg) scale(1.2);
 }
 
 .cd-sidebar-card {
@@ -698,6 +780,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--border-light);
   overflow: hidden;
+  transform: translateZ(0);
 }
 
 .cd-sidebar-image {
@@ -710,6 +793,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.cd-sidebar-wrapper:hover .cd-sidebar-image img {
+  transform: scale(1.08);
 }
 
 .cd-sidebar-image-overlay {
@@ -1441,21 +1529,25 @@
 
       <!-- Sidebar -->
       <div class="cd-sidebar" id="enroll">
-        <div class="cd-sidebar-card">
-          <!-- Course Image -->
-          <div class="cd-sidebar-image">
-            {% if course.thumbnail %}
-            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
-            {% else %}
-            <img src="{% static 'landing/assets/img/course-placeholder.jpg' %}" alt="{{ course.title }}" onerror="this.style.background='linear-gradient(135deg, #e8f8f0 0%, #f3f4f6 100%)'">
-            {% endif %}
-            <div class="cd-sidebar-image-overlay"></div>
-            {% if course.preview_video %}
-            <a href="#preview" class="cd-play-btn">
-              <i class="fas fa-play"></i>
-            </a>
-            {% endif %}
-          </div>
+        <div class="cd-sidebar-wrapper" data-tilt>
+          <div class="cd-sidebar-depth-layer"></div>
+          <div class="cd-sidebar-card-inner">
+            <div class="cd-sidebar-shine"></div>
+            <div class="cd-sidebar-card">
+              <!-- Course Image -->
+              <div class="cd-sidebar-image">
+                {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+                {% else %}
+                <img src="{% static 'landing/assets/img/course-placeholder.jpg' %}" alt="{{ course.title }}" onerror="this.style.background='linear-gradient(135deg, #e8f8f0 0%, #f3f4f6 100%)'">
+                {% endif %}
+                <div class="cd-sidebar-image-overlay"></div>
+                {% if course.preview_video %}
+                <a href="#preview" class="cd-play-btn">
+                  <i class="fas fa-play"></i>
+                </a>
+                {% endif %}
+              </div>
 
           <div class="cd-sidebar-body">
             <!-- Price -->
@@ -1561,8 +1653,11 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </div><!-- cd-sidebar-card -->
+        </div><!-- cd-sidebar-card-inner -->
+        <div class="cd-sidebar-3d-accent"></div>
+        </div><!-- cd-sidebar-wrapper -->
+      </div><!-- cd-sidebar -->
 
     </div>
   </div>
@@ -1659,6 +1754,37 @@ $(document).ready(function() {
       }, 600);
     }
   });
+
+  // 3D Tilt Effect for Sidebar Card
+  const sidebarWrapper = document.querySelector('.cd-sidebar-wrapper[data-tilt]');
+  if (sidebarWrapper) {
+    const inner = sidebarWrapper.querySelector('.cd-sidebar-card-inner');
+    const shine = sidebarWrapper.querySelector('.cd-sidebar-shine');
+
+    sidebarWrapper.addEventListener('mousemove', (e) => {
+      const rect = sidebarWrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = (y - centerY) / 30;
+      const rotateY = (centerX - x) / 30;
+
+      inner.style.transform = `rotateX(${-rotateX}deg) rotateY(${-rotateY}deg)`;
+
+      // Dynamic shine effect
+      const shineX = (x / rect.width) * 100;
+      const shineY = (y / rect.height) * 100;
+      shine.style.background = `radial-gradient(circle at ${shineX}% ${shineY}%, rgba(255,255,255,0.2) 0%, transparent 50%)`;
+    });
+
+    sidebarWrapper.addEventListener('mouseleave', () => {
+      inner.style.transform = 'rotateX(0) rotateY(0)';
+      shine.style.background = '';
+    });
+  }
 });
 </script>
 {% endblock %}

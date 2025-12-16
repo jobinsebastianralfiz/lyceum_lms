@@ -1201,34 +1201,123 @@ a:hover {
 }
 
 /* ============================================
-   COURSE CARDS - LM Style
+   COURSE CARDS - 3D Premium Style
    ============================================ */
 .lm-courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: var(--spacing-6);
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2rem;
 }
 
+/* 3D Card Container */
 .lm-course-card {
+  position: relative;
+  height: 480px;
+  perspective: 1500px;
+  cursor: pointer;
+}
+
+.lm-course-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease-out, box-shadow 0.4s ease;
+}
+
+.lm-course-card:hover .lm-course-card-inner {
+  box-shadow:
+    0 50px 80px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(42, 182, 115, 0.3),
+    0 0 60px rgba(42, 182, 115, 0.1);
+}
+
+/* Shine Effect Layer */
+.lm-course-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: var(--radius-lg);
+}
+
+.lm-course-card:hover .lm-course-shine {
+  opacity: 1;
+}
+
+/* Card Background */
+.lm-course-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition: all var(--transition-slow);
+  transform: translateZ(0);
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border-light);
 }
 
-.lm-course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--primary-subtle);
+/* 3D Depth Layer */
+.lm-course-depth-layer {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+  border: 1px solid rgba(42, 182, 115, 0.1);
+  border-radius: var(--radius-lg);
+  transform: translateZ(-30px);
+  pointer-events: none;
+  transition: all 0.4s ease;
 }
 
+.lm-course-card:hover .lm-course-depth-layer {
+  top: 15px;
+  left: 15px;
+  right: -15px;
+  bottom: -15px;
+  transform: translateZ(-50px);
+}
+
+/* 3D Accent Element */
+.lm-course-3d-accent {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary) 0%, transparent 60%);
+  opacity: 0;
+  transform: translateZ(-20px) rotate(45deg);
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+
+.lm-course-card:hover .lm-course-3d-accent {
+  opacity: 0.2;
+  transform: translateZ(10px) rotate(45deg) scale(1.2);
+}
+
+/* Course Image - Recommended: 800x450px (16:9) */
 .lm-course-image {
   position: relative;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
   background: var(--bg-light);
 }
@@ -1237,29 +1326,52 @@ a:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: transform 0.6s ease, filter 0.6s ease;
 }
 
 .lm-course-card:hover .lm-course-image img {
-  transform: scale(1.05);
+  transform: scale(1.1);
+}
+
+/* Image Overlay Gradient */
+.lm-course-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
 }
 
 .lm-course-badges {
   position: absolute;
-  top: var(--spacing-4);
-  left: var(--spacing-4);
+  top: 1rem;
+  left: 1rem;
   display: flex;
-  gap: var(--spacing-2);
+  gap: 0.5rem;
   flex-wrap: wrap;
+  transform: translateZ(30px);
+  transition: transform 0.4s ease;
+  z-index: 5;
+}
+
+.lm-course-card:hover .lm-course-badges {
+  transform: translateZ(50px);
 }
 
 .lm-badge {
-  padding: var(--spacing-1) var(--spacing-3);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1em;
 }
 
 .lm-badge-bestseller {
@@ -1297,28 +1409,48 @@ a:hover {
   width: auto;
 }
 
+/* Course Body Content */
 .lm-course-body {
-  padding: var(--spacing-6);
+  padding: 1.25rem;
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  transform: translateZ(20px);
+  transition: transform 0.4s ease;
+}
+
+.lm-course-card:hover .lm-course-body {
+  transform: translateZ(40px);
 }
 
 .lm-course-category {
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--primary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-2);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lm-course-category::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
 }
 
 .lm-course-title {
-  font-size: var(--font-size-lg);
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary) !important;
-  margin-bottom: var(--spacing-3);
-  line-height: 1.4;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1328,6 +1460,7 @@ a:hover {
 .lm-course-title a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .lm-course-title a:hover {
@@ -1337,47 +1470,66 @@ a:hover {
 .lm-course-meta {
   display: flex;
   align-items: center;
-  gap: var(--spacing-4);
-  margin-bottom: var(--spacing-4);
-  font-size: var(--font-size-sm);
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
 .lm-course-meta-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-1);
+  gap: 0.4rem;
 }
 
 .lm-course-meta-item i {
   color: var(--primary);
-  font-size: var(--font-size-sm);
+  font-size: 0.8rem;
+}
+
+.lm-course-meta-item span {
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .lm-course-description {
-  font-size: var(--font-size-sm);
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  margin-bottom: var(--spacing-4);
+  margin-bottom: 1rem;
   flex: 1;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.6;
 }
 
 .lm-course-footer {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  padding-top: var(--spacing-4);
+  padding-top: 1rem;
   border-top: 1px solid var(--border-light);
   margin-top: auto;
 }
 
+.lm-course-price-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.lm-course-price-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.2rem;
+}
+
 .lm-course-price {
-  font-size: var(--font-size-xl);
+  font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--primary);
 }
 
 .lm-course-price-original {
@@ -1387,18 +1539,55 @@ a:hover {
   margin-left: var(--spacing-2);
 }
 
+/* View Button */
 .lm-course-cta {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(42, 182, 115, 0.3);
   color: var(--primary);
   font-weight: 600;
-  font-size: var(--font-size-sm);
-  transition: gap var(--transition);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 .lm-course-cta:hover {
-  gap: var(--spacing-3);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+  text-decoration: none;
+}
+
+.lm-course-cta i {
+  transition: transform 0.3s ease;
+}
+
+.lm-course-cta:hover i {
+  transform: translateX(3px);
+}
+
+/* Responsive Adjustments for 3D Cards */
+@media (max-width: 900px) {
+  .lm-courses-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lm-course-card {
+    height: 450px;
+  }
+
+  .lm-course-image {
+    height: 200px;
+  }
 }
 
 /* ============================================

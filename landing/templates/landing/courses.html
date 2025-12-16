@@ -156,59 +156,70 @@
 
     <div class="lm-courses-grid" id="coursesGrid">
       {% for course in courses %}
-      <div class="lm-course-card course-item {% if course.category %}{{ course.category.name|slugify }}{% endif %}">
-        <div class="lm-course-image">
-          {% if course.thumbnail %}
-            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
-          {% else %}
-            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--bg-light) 100%); display: flex; align-items: center; justify-content: center;">
-              <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--primary);"></i>
-            </div>
-          {% endif %}
-          <div class="lm-course-badges">
-            {% if not course.allow_public_enrollment %}
-              <span class="lm-badge lm-badge-enquiry" style="background: #ff9800;">Enquire Only</span>
-            {% elif course.is_free_course %}
-              <span class="lm-badge lm-badge-free">Free</span>
-            {% elif forloop.first %}
-              <span class="lm-badge lm-badge-bestseller">Bestseller</span>
-            {% elif forloop.counter == 2 %}
-              <span class="lm-badge lm-badge-popular">Popular</span>
-            {% elif forloop.counter == 3 %}
-              <span class="lm-badge lm-badge-new">New</span>
-            {% endif %}
-          </div>
-        </div>
-        <div class="lm-course-body">
-          {% if course.category %}
-            <div class="lm-course-category">{{ course.category.name }}</div>
-          {% endif %}
-          <h3 class="lm-course-title">
-            <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
-          </h3>
-          <div class="lm-course-meta">
-            <span class="lm-course-meta-item">
-              <i class="far fa-clock"></i> {% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}
-            </span>
-            <span class="lm-course-meta-item">
-              <i class="far fa-calendar"></i> {{ course.created_at|date:"M Y" }}
-            </span>
-          </div>
-          <p class="lm-course-description">{{ course.description|truncatechars:100 }}</p>
-          <div class="lm-course-footer">
-            <div class="lm-course-price">
-              {% if course.is_free_course %}
-                Free
+      <article class="lm-course-card course-item {% if course.category %}{{ course.category.name|slugify }}{% endif %}" data-tilt>
+        <div class="lm-course-depth-layer"></div>
+        <div class="lm-course-card-inner">
+          <div class="lm-course-shine"></div>
+          <div class="lm-course-bg">
+            <div class="lm-course-image">
+              {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
               {% else %}
-                ₹{{ course.total_price|floatformat:0 }}
+                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--bg-light) 100%); display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--primary);"></i>
+                </div>
               {% endif %}
+              <div class="lm-course-image-overlay"></div>
+              <div class="lm-course-badges">
+                {% if not course.allow_public_enrollment %}
+                  <span class="lm-badge lm-badge-enquiry" style="background: #ff9800;">Enquire Only</span>
+                {% elif course.is_free_course %}
+                  <span class="lm-badge lm-badge-free">Free</span>
+                {% elif forloop.first %}
+                  <span class="lm-badge lm-badge-bestseller">Bestseller</span>
+                {% elif forloop.counter == 2 %}
+                  <span class="lm-badge lm-badge-popular">Popular</span>
+                {% elif forloop.counter == 3 %}
+                  <span class="lm-badge lm-badge-new">New</span>
+                {% endif %}
+              </div>
             </div>
-            <a href="{% url 'landing:course_detail' course.id %}" class="lm-course-cta">
-              {% if not course.allow_public_enrollment %}Enquire Now{% else %}View Program{% endif %} <i class="fas fa-arrow-right"></i>
-            </a>
+            <div class="lm-course-body">
+              {% if course.category %}
+                <div class="lm-course-category">{{ course.category.name }}</div>
+              {% endif %}
+              <h3 class="lm-course-title">
+                <a href="{% url 'landing:course_detail' course.id %}">{{ course.title }}</a>
+              </h3>
+              <div class="lm-course-meta">
+                <span class="lm-course-meta-item">
+                  <i class="far fa-clock"></i> <span>{% if course.duration %}{{ course.duration }}h{% else %}Self-paced{% endif %}</span>
+                </span>
+                <span class="lm-course-meta-item">
+                  <i class="far fa-calendar"></i> <span>{{ course.created_at|date:"M Y" }}</span>
+                </span>
+              </div>
+              <p class="lm-course-description">{{ course.description|truncatechars:100 }}</p>
+              <div class="lm-course-footer">
+                <div class="lm-course-price-wrapper">
+                  <span class="lm-course-price-label">Starting from</span>
+                  <div class="lm-course-price">
+                    {% if course.is_free_course %}
+                      Free
+                    {% else %}
+                      ₹{{ course.total_price|floatformat:0 }}
+                    {% endif %}
+                  </div>
+                </div>
+                <a href="{% url 'landing:course_detail' course.id %}" class="lm-course-cta">
+                  {% if not course.allow_public_enrollment %}Enquire{% else %}View{% endif %} <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
           </div>
+          <div class="lm-course-3d-accent"></div>
         </div>
-      </div>
+      </article>
       {% empty %}
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;">
         <i class="fas fa-graduation-cap" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1.5rem;"></i>
@@ -242,6 +253,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Filter functionality
   const filterTabs = document.querySelectorAll('.lm-filter-tab');
   const courseItems = document.querySelectorAll('.course-item');
   const visibleCount = document.getElementById('visibleCount');
@@ -259,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       courseItems.forEach(item => {
         if (filter === '*' || item.classList.contains(filter.replace('.', ''))) {
-          item.style.display = 'flex';
+          item.style.display = 'block';
           count++;
         } else {
           item.style.display = 'none';
@@ -269,6 +281,38 @@ document.addEventListener('DOMContentLoaded', function() {
       if (visibleCount) {
         visibleCount.textContent = count;
       }
+    });
+  });
+
+  // 3D Tilt Effect for Course Cards
+  const cards = document.querySelectorAll('.lm-course-card[data-tilt]');
+
+  cards.forEach(card => {
+    const inner = card.querySelector('.lm-course-card-inner');
+    const shine = card.querySelector('.lm-course-shine');
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = (y - centerY) / 25;
+      const rotateY = (centerX - x) / 25;
+
+      inner.style.transform = `rotateX(${-rotateX}deg) rotateY(${-rotateY}deg)`;
+
+      // Dynamic shine effect
+      const shineX = (x / rect.width) * 100;
+      const shineY = (y / rect.height) * 100;
+      shine.style.background = `radial-gradient(circle at ${shineX}% ${shineY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      inner.style.transform = 'rotateX(0) rotateY(0)';
+      shine.style.background = '';
     });
   });
 });
