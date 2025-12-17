@@ -600,8 +600,8 @@ class CourseEnquiry(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(
-        max_length=15,
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter a valid phone number.')]
+        max_length=20,
+        validators=[RegexValidator(r'^\+?\d{9,15}$', 'Enter a valid phone number (9-15 digits, optional + prefix).')]
     )
 
     # Enquiry Details

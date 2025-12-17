@@ -984,8 +984,9 @@ def course_enquiry(request, course_id):
 
     if turnstile_secret:  # Only verify if secret key is configured
         try:
+            verify_url = getattr(settings, 'CLOUDFLARE_TURNSTILE_VERIFY_URL', 'https://challenges.cloudflare.com/turnstile/v0/siteverify')
             verify_response = requests.post(
-                settings.CLOUDFLARE_TURNSTILE_VERIFY_URL,
+                verify_url,
                 data={
                     'secret': turnstile_secret,
                     'response': turnstile_token,
@@ -1015,6 +1016,10 @@ def course_enquiry(request, course_id):
         messages.error(request, 'Please fill in all required fields.')
         return redirect('landing:course_detail', course_id=course_id)
 
+    # Clean phone number - remove spaces, dashes, and parentheses
+    import re
+    phone = re.sub(r'[\s\-\(\)]', '', phone)
+
     # Get client IP
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -1022,29 +1027,34 @@ def course_enquiry(request, course_id):
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    # Create the enquiry
-    enquiry = CourseEnquiry.objects.create(
-        course=course,
-        name=name,
-        email=email,
-        phone=phone,
-        message=message_text,
-        current_qualification=current_qualification,
-        work_experience=work_experience,
-        preferred_batch=preferred_batch,
-        source='website',
-        user=request.user if request.user.is_authenticated else None,
-        ip_address=ip,
-        user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
-        utm_source=request.GET.get('utm_source', ''),
-        utm_medium=request.GET.get('utm_medium', ''),
-        utm_campaign=request.GET.get('utm_campaign', ''),
-    )
+    # Create the enquiry with error handling
+    try:
+        enquiry = CourseEnquiry.objects.create(
+            course=course,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message_text,
+            current_qualification=current_qualification,
+            work_experience=work_experience,
+            preferred_batch=preferred_batch,
+            source='website',
+            user=request.user if request.user.is_authenticated else None,
+            ip_address=ip,
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+            utm_source=request.GET.get('utm_source', ''),
+            utm_medium=request.GET.get('utm_medium', ''),
+            utm_campaign=request.GET.get('utm_campaign', ''),
+        )
 
-    messages.success(
-        request,
-        f'Thank you for your enquiry about "{course.title}"! Our team will contact you within 24 hours.'
-    )
+        messages.success(
+            request,
+            f'Thank you for your enquiry about "{course.title}"! Our team will contact you within 24 hours.'
+        )
+    except Exception as e:
+        print(f"Course enquiry error: {e}")
+        messages.error(request, 'There was an error submitting your enquiry. Please check your details and try again.')
+
     return redirect('landing:course_detail', course_id=course_id)
 
 
